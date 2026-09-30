@@ -1,0 +1,35 @@
+components:
+  - {id: screen_printer, name: Screen printer, category: electronics, behavior: server, version: "1.0.0",
+     description: "Solder paste screen printer (SMD line start).", tags: [electronics, smd],
+     keywords: [serigrafia, screen printer, impresora pasta, pasta], defaults: {capacity: 1}, kpis: [utilization, oee]}
+  - {id: spi, name: SPI, category: electronics, behavior: server, version: "1.0.0",
+     description: "Solder paste inspection.", tags: [electronics, smd, inspection],
+     keywords: [spi, inspeccion pasta], defaults: {capacity: 1}, kpis: [utilization, yield]}
+  - {id: pick_and_place, name: Pick and place, category: electronics, behavior: server, version: "1.0.0",
+     description: "SMD placement machine.", tags: [electronics, smd],
+     keywords: [pick and place, pick&place, insertadora smd, colocacion, montaje smd, pnp], defaults: {capacity: 1}, kpis: [utilization, oee]}
+  - {id: reflow, name: Reflow oven, category: electronics, behavior: server, version: "1.0.0",
+     description: "Reflow oven. Model as capacity = boards inside the oven, process_time = transit time.", tags: [electronics, smd, oven],
+     keywords: [reflow, horno, horno reflow, refusion], defaults: {capacity: 1}, kpis: [utilization, avg_content]}
+  - {id: aoi, name: AOI, category: electronics, behavior: server, version: "1.0.0",
+     description: "Automatic optical inspection.", tags: [electronics, inspection],
+     keywords: [aoi, inspeccion optica, optical inspection], defaults: {capacity: 1}, kpis: [utilization, yield]}
+  - {id: manual_insertion, name: Manual insertion (PTH), category: electronics, behavior: server, version: "1.0.0",
+     description: "Manual through-hole component insertion.", tags: [electronics, pth, manual],
+     keywords: [insercion manual, pth, insercion, through hole], defaults: {capacity: 1}, kpis: [utilization]}
+  - {id: selective_soldering, name: Selective soldering, category: electronics, behavior: server, version: "1.0.0",
+     description: "Selective soldering machine. Automatic; boards usually travel on racks/fixtures (model racks as a CARRIER resource seized upstream).",
+     tags: [electronics, pth, soldering], keywords: [selectiva, soldadura selectiva, selective, selective soldering, soldadura],
+     defaults: {capacity: 1}, kpis: [utilization, blocked, starved, oee]}
+  - {id: wave_soldering, name: Wave soldering, category: electronics, behavior: server, version: "1.0.0",
+     description: "Wave soldering machine.", tags: [electronics, pth, soldering],
+     keywords: [ola, soldadura por ola, wave, wave soldering], defaults: {capacity: 1}, kpis: [utilization, oee]}
+  - {id: coating, name: Conformal coating, category: electronics, behavior: server, version: "1.0.0",
+     description: "Conformal coating / varnishing.", tags: [electronics, coating],
+     keywords: [barnizado, barniz, coating, conformal], defaults: {capacity: 1}, kpis: [utilization]}
+  - {id: ict, name: ICT, category: electronics, behavior: server, version: "1.0.0",
+     description: "In-circuit test.", tags: [electronics, test], keywords: [ict, in circuit, test electrico], defaults: {capacity: 1}, kpis: [utilization, yield]}
+  - {id: functional_test, name: Functional test, category: electronics, behavior: server, version: "1.0.0",
+     description: "Functional test (FCT).", tags: [electronics, test], keywords: [test funcional, fct, functional test, funcional], defaults: {capacity: 1}, kpis: [utilization, yield]}
+  - {id: router, name: Depaneling router, category: electronics, behavior: server, version: "1.0.0",
+     description: "PCB depaneling router.", tags: [electronics, depaneling], keywords: [router, fresadora, despanelado, depaneling], defaults: {capacity: 1}, kpis: [utilization]}

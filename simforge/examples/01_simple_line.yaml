@@ -1,0 +1,15 @@
+# Two machines in series with a buffer. Deterministic -> hand-calculable.
+# M1 60 s, M2 45 s: M1 is the constraint -> 60 u/h; first unit out at t = 105 s.
+meta: {name: Simple line, description: "Source -> M1 -> buffer -> M2 -> Sink"}
+simulation: {horizon: {value: 1, unit: h}}
+nodes:
+  - {id: src, component: source}
+  - {id: m1, name: Machine 1, component: machine, params: {process_time: {dist: constant, value: 60}}}
+  - {id: buf, name: Buffer, component: buffer, params: {capacity: 3}}
+  - {id: m2, name: Machine 2, component: machine, params: {process_time: {dist: constant, value: 45}}}
+  - {id: out, component: sink}
+edges:
+  - {source: src, target: m1}
+  - {source: m1, target: buf}
+  - {source: buf, target: m2}
+  - {source: m2, target: out}

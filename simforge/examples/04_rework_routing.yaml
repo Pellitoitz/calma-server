@@ -1,0 +1,25 @@
+# Probabilistic routing (two branches) and a rework loop.
+meta: {name: Rework and routing}
+simulation: {horizon: {value: 8, unit: h}, replications: 10}
+resources:
+  - {id: tech, name: Rework technician, quantity: 1}
+nodes:
+  - {id: src, component: source, params: {arrival: interarrival, interarrival: {dist: exponential, mean: 60}}}
+  - {id: q0, component: buffer}
+  - {id: aoi, component: aoi, params: {process_time: {dist: constant, value: 30}, yield_rate: 0.9, on_reject: rework}}
+  - {id: rework, component: rework, params: {process_time: {dist: triangular, low: 60, mode: 90, high: 180}, resources: [{resource: tech}]}}
+  - {id: qa, component: buffer, params: {capacity: 5}}
+  - {id: qb, component: buffer, params: {capacity: 5}}
+  - {id: line_a, component: functional_test, params: {process_time: {dist: uniform, low: 60, high: 90}}}
+  - {id: line_b, component: functional_test, params: {process_time: {dist: uniform, low: 80, high: 110}}}
+  - {id: out, component: sink}
+edges:
+  - {source: src, target: q0}
+  - {source: q0, target: aoi}
+  - {source: aoi, target: qa, probability: 0.6}
+  - {source: aoi, target: qb, probability: 0.4}
+  - {source: qa, target: line_a}
+  - {source: qb, target: line_b}
+  - {source: rework, target: q0}
+  - {source: line_a, target: out}
+  - {source: line_b, target: out}

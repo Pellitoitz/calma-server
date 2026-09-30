@@ -1,0 +1,83 @@
+components:
+  - id: source
+    name: Source
+    category: core
+    behavior: source
+    version: "1.0.0"
+    description: |
+      Creates entities. 'infinite' = unlimited supply (a new unit enters as soon as the first node has space).
+      'interarrival' = arrivals separated by a (possibly random) time.
+    tags: [core, arrivals, demand]
+    keywords: [fuente, source, entrada, suministro, supply, llegadas, arrivals]
+    defaults: {arrival: infinite}
+    kpis: [entities_created]
+    validation_status: tested
+    tests: [tests/test_engine_golden.py]
+    changelog: [{version: "1.0.0", change: "Initial version"}]
+
+  - id: sink
+    name: Sink
+    category: core
+    behavior: sink
+    version: "1.0.0"
+    description: End of the process. Records completed units and lead times.
+    tags: [core, exit]
+    keywords: [salida, sink, fin, final, expedicion, output]
+    kpis: [units_completed, throughput, lead_time]
+    validation_status: tested
+    tests: [tests/test_engine_golden.py]
+
+  - id: buffer
+    name: Buffer
+    category: core
+    behavior: buffer
+    version: "1.0.0"
+    description: |
+      Finite or unlimited queue between stations. A full buffer blocks the upstream station
+      (blocking-after-service).
+    tags: [core, queue, wip, storage]
+    keywords: [buffer, cola, queue, pulmon, almacen intermedio, espera, stock intermedio]
+    defaults: {capacity: null, discipline: fifo}
+    param_docs:
+      capacity: "Max units stored. null = unlimited."
+      discipline: "fifo | lifo"
+    kpis: [avg_content, max_content, avg_wait_time]
+    validation_status: tested
+    tests: [tests/test_engine_golden.py]
+
+  - id: machine
+    name: Machine
+    category: core
+    behavior: server
+    version: "1.0.0"
+    description: |
+      Generic automatic station. Processes 'capacity' units in parallel. Optional operator/tool
+      resources are held for the whole processing time. Supports yield (scrap/rework) and
+      time-based failures (MTBF/MTTR).
+    tags: [core, station, automatic]
+    keywords: [maquina, machine, estacion, station, proceso, equipo, horno, prensa, celula]
+    defaults: {capacity: 1}
+    param_docs:
+      capacity: "Parallel identical slots."
+      process_time: "Processing time per unit (distribution)."
+      resources: "Resources held during processing, e.g. [{resource: operator_1}]"
+      yield_rate: "Fraction of good units (0-1]. Rejects go to 'on_reject'."
+      on_reject: "'scrap' or id of rework node."
+      failures: "{mtbf: <dist>, mttr: <dist>} calendar-time based."
+    kpis: [utilization, blocked, starved, down, waiting_resource, throughput, oee]
+    validation_status: tested
+    tests: [tests/test_engine_golden.py]
+
+  - id: manual_process
+    name: Manual process
+    category: core
+    behavior: server
+    version: "1.0.0"
+    description: |
+      Generic manual workstation. Requires an operator resource (declared in 'resources').
+    tags: [core, manual, station, operator]
+    keywords: [manual, puesto manual, operario, operator, tarea manual, manual station]
+    defaults: {capacity: 1}
+    kpis: [utilization, waiting_resource, blocked, starved]
+    validation_status: tested
+    tests: [tests/test_engine_golden.py]

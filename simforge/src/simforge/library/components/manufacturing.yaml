@@ -1,0 +1,29 @@
+components:
+  - {id: manual_assembly, name: Manual assembly, category: manufacturing, behavior: server, version: "1.0.0",
+     description: "Manual assembly workstation (operator required).",
+     tags: [manufacturing, manual, assembly], keywords: [montaje, ensamblaje, assembly, ensamblado, montar, monta],
+     defaults: {capacity: 1}, kpis: [utilization, waiting_resource, blocked, starved]}
+  - {id: inspection, name: Inspection, category: manufacturing, behavior: server, version: "1.0.0",
+     description: "Visual/manual inspection or review. Use yield_rate + on_reject to model rejects.",
+     tags: [manufacturing, quality, inspection], keywords: [inspeccion, inspecciona, revision, revisa, control, calidad, inspection, review, verificacion],
+     defaults: {capacity: 1}, kpis: [utilization, yield, rejects]}
+  - {id: test_station, name: Test station, category: manufacturing, behavior: server, version: "1.0.0",
+     description: "Generic test station (functional or electrical).",
+     tags: [manufacturing, test, quality], keywords: [test, prueba, testeo, ensayo, banco],
+     defaults: {capacity: 1}, kpis: [utilization, yield]}
+  - {id: packaging, name: Packaging, category: manufacturing, behavior: server, version: "1.0.0",
+     description: "Packaging / boxing station.",
+     tags: [manufacturing, packaging], keywords: [embalaje, empaquetado, packaging, envasado, embalar],
+     defaults: {capacity: 1}, kpis: [utilization]}
+  - {id: rework, name: Rework, category: manufacturing, behavior: server, version: "1.0.0",
+     description: "Rework station. Reference it from another node's on_reject.",
+     tags: [manufacturing, quality, rework], keywords: [retrabajo, reparacion, rework, repair],
+     defaults: {capacity: 1}, kpis: [utilization]}
+  - {id: cleaning, name: Cleaning, category: manufacturing, behavior: server, version: "1.0.0",
+     description: "Cleaning operation (parts, fixtures, racks).",
+     tags: [manufacturing, cleaning], keywords: [limpieza, limpiar, cleaning, lavado],
+     defaults: {capacity: 1}, kpis: [utilization]}
+  - {id: transport_delay, name: Transport (delay), category: logistics, behavior: server, version: "1.0.0",
+     description: "Fixed-capacity transport modelled as a delay (e.g. conveyor with N positions: capacity=N, process_time=transit time).",
+     tags: [logistics, transport, conveyor], keywords: [transporte, conveyor, cinta, transportador, traslado, transport],
+     defaults: {capacity: 1}, kpis: [utilization, avg_content]}

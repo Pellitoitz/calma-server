@@ -1,0 +1,20 @@
+# Stochastic line with failures. Needs replications.
+meta: {name: Line with breakdowns}
+simulation: {horizon: {value: 40, unit: h}, warmup: {value: 2, unit: h}, kind: steady_state, replications: 20, base_seed: 7}
+nodes:
+  - {id: src, component: source, params: {arrival: interarrival, interarrival: {dist: exponential, mean: 70}}}
+  - id: press
+    component: machine
+    params:
+      process_time: {dist: triangular, low: 50, mode: 55, high: 70}
+      failures: {mtbf: {dist: exponential, mean: 2, unit: h}, mttr: {dist: lognormal, mean: 10, std: 5, unit: min}}
+  - {id: q1, component: buffer, params: {capacity: 10}}
+  - id: test
+    component: test_station
+    params: {process_time: {dist: normal, mean: 50, std: 5}, yield_rate: 0.97}
+  - {id: out, component: sink}
+edges:
+  - {source: src, target: press}
+  - {source: press, target: q1}
+  - {source: q1, target: test}
+  - {source: test, target: out}

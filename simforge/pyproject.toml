@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "simforge"
+version = "0.1.0"
+description = "Local AI-assisted industrial discrete-event simulation workbench"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Proprietary (personal use)" }
+dependencies = [
+    "simpy>=4.1,<5",          # MIT  - DES kernel (hidden behind simforge.engine)
+    "pydantic>=2.6,<3",       # MIT  - ISMS schemas & validation
+    "networkx>=3.2",          # BSD  - process-graph checks
+    "pyyaml>=6.0",            # MIT  - YAML model files
+    "typer>=0.12",            # MIT  - CLI
+]
+
+[project.optional-dependencies]
+ui = ["streamlit>=1.35", "pandas>=2.1"]   # Apache-2.0 / BSD
+llm = ["anthropic>=0.40"]                  # MIT
+excel = ["openpyxl>=3.1"]                  # MIT
+dev = ["pytest>=8"]
+all = ["simforge[ui,llm,excel,dev]"]
+
+[project.scripts]
+simforge = "simforge.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+simforge = ["library/components/*.yaml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

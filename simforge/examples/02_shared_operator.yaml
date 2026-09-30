@@ -1,0 +1,32 @@
+# MVP case: one operator shared between assembly (60 s) and inspection (20 s).
+# Operator work content = 80 s/unit -> theoretical max 45 u/h (360 in 8 h).
+meta: {name: Shared operator line, domain: electronics}
+simulation: {horizon: {value: 8, unit: h}, trace: false}
+resources:
+  - {id: operator_1, name: Operator 1, kind: operator, quantity: 1, dispatch: priority}
+nodes:
+  - {id: src, component: source}
+  - id: assembly
+    name: Assembly
+    component: manual_assembly
+    priority: 2
+    params: {process_time: {dist: constant, value: 60, unit: s}, resources: [{resource: operator_1}]}
+  - {id: buffer_1, name: Buffer, component: buffer, params: {capacity: 5}}
+  - {id: machine, name: Machine, component: machine, params: {process_time: {dist: constant, value: 45}}}
+  - id: inspection
+    name: Inspection
+    component: inspection
+    priority: 1
+    params: {process_time: {dist: constant, value: 20}, resources: [{resource: operator_1}]}
+  - {id: out, component: sink}
+edges:
+  - {source: src, target: assembly}
+  - {source: assembly, target: buffer_1}
+  - {source: buffer_1, target: machine}
+  - {source: machine, target: inspection}
+  - {source: inspection, target: out}
+assumptions:
+  - {id: a1, text: "Inspection has priority over assembly when both need the operator (keeps finished units flowing).", path: resources.operator_1.dispatch, origin: engineer, accepted: true}
+experiments:
+  - name: buffer sweep
+    factors: [{path: nodes.buffer_1.params.capacity, values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}]

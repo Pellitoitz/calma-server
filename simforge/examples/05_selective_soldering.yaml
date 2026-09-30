@@ -1,0 +1,40 @@
+# Benchmark case (simplified): racks (bastidores) circulate in a closed loop.
+# Operator loads boards on a rack (assembly, 120 s), rack waits in buffer (3),
+# selective soldering 200 s (automatic), operator reviews/unloads (80 s) and the
+# rack returns to assembly. Operator priority: keep the selective fed (assembly first).
+# Distances: operator walks between assembly and review.
+meta: {name: Selective soldering racks, domain: electronics, tags: [benchmark, racks, selective]}
+simulation: {horizon: {value: 8, unit: h}}
+resources:
+  - {id: operator_1, name: Operator, kind: operator, quantity: 1, dispatch: priority, home: assembly,
+     travel: {speed: {value: 1.0, unit: m/s}}}
+  - {id: racks, name: Racks (bastidores), kind: carrier, quantity: 6}
+nodes:
+  - {id: src, component: source}
+  - id: assembly
+    name: Manual assembly
+    component: manual_assembly
+    priority: 1
+    seize: [{resource: racks}]
+    position: {x: 0, y: 0}
+    params: {process_time: {dist: constant, value: 120}, resources: [{resource: operator_1}]}
+  - {id: selective_in, name: Selective input buffer, component: buffer, params: {capacity: 3}}
+  - {id: selective, name: Selective soldering, component: selective_soldering, position: {x: 4, y: 0},
+     params: {process_time: {dist: constant, value: 200}}}
+  - id: review
+    name: Review
+    component: inspection
+    priority: 2
+    release: [racks]
+    position: {x: 8, y: 0}
+    params: {process_time: {dist: constant, value: 80}, resources: [{resource: operator_1}]}
+  - {id: out, component: sink}
+edges:
+  - {source: src, target: assembly}
+  - {source: assembly, target: selective_in}
+  - {source: selective_in, target: selective}
+  - {source: selective, target: review}
+  - {source: review, target: out}
+experiments:
+  - name: racks 1-10
+    factors: [{path: resources.racks.quantity, values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}]
