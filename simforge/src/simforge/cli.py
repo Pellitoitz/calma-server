@@ -28,6 +28,8 @@ from .validation.verifier import ModelError, verify
 app = typer.Typer(add_completion=False, help="SimForge - AI-assisted industrial simulation (local).", no_args_is_help=True)
 lib_app = typer.Typer(help="Component library", no_args_is_help=True)
 app.add_typer(lib_app, name="library")
+bench_app = typer.Typer(help="Benchmark against a reference model (e.g. AnyLogic)", no_args_is_help=True)
+app.add_typer(bench_app, name="benchmark")
 
 
 def _registry() -> ComponentRegistry:
@@ -185,6 +187,73 @@ def lib_docs(output: Path = typer.Option(Path("component_library.md"), "-o")):
     reg = _registry()
     output.write_text("# Component library\n\n" + "\n\n".join(c.to_markdown() for c in reg.all()), encoding="utf-8")
     typer.echo(f"Written {output}")
+
+
+@bench_app.command("status")
+def bench_status(spec_file: Path):
+    """Is the benchmark model complete? Lists every missing datum."""
+    from .benchmark.bench import BenchmarkSpec, load_reference, prepare_model
+    from .domain.paths import set_value
+    spec = BenchmarkSpec.load(spec_file)
+    model = prepare_model(spec, spec_file.parent)
+    rep, _ = verify(set_value(model, spec.factor.path, spec.factor.values[0]), _registry())
+    for i in rep.issues:
+        typer.secho(str(i), fg={"error": "red", "warning": "yellow"}.get(i.level.value, None))
+    typer.secho(f"Model: {rep.summary()}", bold=True)
+    ref = load_reference(spec_file.parent / spec.reference_csv, spec)
+    filled = sum(v is not None for row in ref.values() for v in row.values())
+    total = len(spec.factor.values) * len(spec.metrics)
+    typer.secho(f"Reference values filled: {filled}/{total} ({spec.reference_csv})", bold=True)
+    raise typer.Exit(0 if rep.ok else 1)
+
+
+@bench_app.command("run")
+def bench_run(spec_file: Path, trace_scenario: Optional[float] = typer.Option(None, help="Export event/decision logs for this scenario value")):
+    """Run all scenarios, save engine results and the comparison with the reference CSV."""
+    from .benchmark.bench import BenchmarkNotReady, BenchmarkSpec, prepare_model, run_engine, write_outputs
+    from .domain.paths import set_value
+    from .persistence.project import _write_csv
+    spec = BenchmarkSpec.load(spec_file)
+    reg = _registry()
+    try:
+        exp = run_engine(spec, spec_file.parent, reg)
+    except BenchmarkNotReady as e:
+        for i in e.report.errors:
+            typer.secho(str(i), fg="red")
+        typer.secho(f"Benchmark not runnable: {e.report.summary()}", fg="red", bold=True)
+        raise typer.Exit(1) from None
+    paths = write_outputs(spec, spec_file.parent, exp, reg)
+    for s in exp.scenarios:
+        if s.error:
+            typer.secho(f"  scenario {s.factors}: ERROR {s.error}", fg="red")
+    typer.echo(paths["comparison_md"].read_text(encoding="utf-8").split("## ")[0])
+    for k, pth in paths.items():
+        typer.echo(f"{k}: {pth}")
+    if trace_scenario is not None:
+        val = int(trace_scenario) if float(trace_scenario).is_integer() else trace_scenario
+        m = set_value(prepare_model(spec, spec_file.parent), spec.factor.path, val)
+        res = run_simulation(m, reg, replications=1, trace=True)
+        d = spec_file.parent / "results" / f"trace_{spec.scenario_column}_{val}"
+        d.mkdir(parents=True, exist_ok=True)
+        rec = res.records[0]
+        _write_csv(d / "events.csv", rec.events or [])
+        _write_csv(d / "decisions.csv", [{**x, "candidates": json.dumps(x["candidates"]), "state": json.dumps(x["state"]),
+                                          "units": ",".join(x["units"])} for x in rec.decisions or []])
+        typer.echo(f"trace: {d}")
+
+
+@bench_app.command("template")
+def bench_template(spec_file: Path, force: bool = False):
+    """(Re)create the EMPTY reference CSV to be filled with AnyLogic results."""
+    from .benchmark.bench import BenchmarkSpec, load_reference, reference_template
+    spec = BenchmarkSpec.load(spec_file)
+    target = spec_file.parent / spec.reference_csv
+    ref = load_reference(target, spec)
+    if any(v is not None for row in ref.values() for v in row.values()) and not force:
+        typer.secho(f"{target} already contains values; use --force to overwrite.", fg="red")
+        raise typer.Exit(1)
+    target.write_text(reference_template(spec), encoding="utf-8")
+    typer.echo(f"Written {target}")
 
 
 @app.command()

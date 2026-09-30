@@ -78,18 +78,18 @@ def resolve(model: ISMSModel) -> tuple[ISMSModel | None, list[tuple[str, str, bo
         if isinstance(obj, dict):
             return {k: walk(v, f"{path}.{k}") for k, v in obj.items()}
         if isinstance(obj, list):
-            return [walk(v, f"{path}.{i}") for i, v in enumerate(obj)]
+            return [walk(v, f"{path}.{v['id'] if isinstance(v, dict) and 'id' in v else i}") for i, v in enumerate(obj)]
         if is_expression(obj):
             try:
                 return _num(evaluate(obj, values))
             except MissingParameter as e:
-                problems.append((path, f"{e} Se usa en {path}.", True))
+                problems.append((path, e.name, True))
             except ExpressionError as e:
                 problems.append((path, str(e), False))
             return None
         return obj
 
-    for section in ("resources", "nodes", "edges"):
+    for section in ("resources", "nodes", "edges"):  # (simulation settings are never parameterised)
         data[section] = walk(data[section], section)
     if problems:
         return None, problems

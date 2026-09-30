@@ -1,0 +1,22 @@
+name: Selective soldering racks 1-10 vs AnyLogic
+model: model.yaml
+factor: {path: resources.racks.quantity, values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], label: racks}
+scenario_column: racks
+replications: null          # model is deterministic as specified (constant times); set >1 if distributions are added
+reference_csv: anylogic_results.csv
+reference_definitions: anylogic_definitions.yaml
+notes: >
+  Tolerances are initial proposals and must be agreed before the benchmark is used as acceptance criterion.
+  Parameters must NOT be tuned to match AnyLogic: every DIFF must be explained by a cause.
+metrics:
+  - {id: production, label: Production, engine_key: units_completed, unit: racks, tolerance_rel_pct: 1, tolerance_abs: 1, likely_causes: [warmup, simultaneous_events, operator_rules, capacity]}
+  - {id: throughput_per_h, label: Throughput, engine_key: throughput_per_hour, unit: racks/h, tolerance_rel_pct: 1, likely_causes: [warmup, kpi_definition, operator_rules]}
+  - {id: avg_wip, label: Average WIP, engine_key: avg_wip, unit: racks, tolerance_rel_pct: 3, likely_causes: [kpi_definition, warmup, capacity]}
+  - {id: selective_utilization, label: Selective (branch 1) utilization, engine_key: node.selective_1.utilization, tolerance_rel_pct: 2, likely_causes: [kpi_definition, operator_rules]}
+  - {id: selective2_utilization, label: Selective (branch 2) utilization, engine_key: node.selective_2.utilization, tolerance_rel_pct: 2, tolerance_abs: 0.005, likely_causes: [logic, kpi_definition]}
+  - {id: selective_starvation, label: Selective starvation, engine_key: node.selective_1.starved, tolerance_rel_pct: 5, tolerance_abs: 0.01, likely_causes: [operator_rules, transport, simultaneous_events]}
+  - {id: selective_blocking, label: Selective blocking, engine_key: node.selective_1.blocked, tolerance_rel_pct: 5, tolerance_abs: 0.01, likely_causes: [capacity, operator_rules, kpi_definition]}
+  - {id: assembly_blocking, label: Assembly blocking, engine_key: node.assembly.blocked, tolerance_rel_pct: 5, tolerance_abs: 0.01, likely_causes: [capacity, logic]}
+  - {id: operator_utilization, label: Operator utilization, engine_key: resource.operator.utilization, tolerance_rel_pct: 2, likely_causes: [kpi_definition, transport, operator_rules]}
+  - {id: walking_time_h, label: Operator walking time, engine_key: resource.operator.walking_h, unit: h, tolerance_rel_pct: 5, tolerance_abs: 0.02, likely_causes: [transport, kpi_definition]}
+  - {id: transports, label: Rack transports, engine_key: node.rack_return.trips, unit: trips, tolerance_rel_pct: 1, tolerance_abs: 1, likely_causes: [transport, warmup, kpi_definition]}

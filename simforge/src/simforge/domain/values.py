@@ -46,9 +46,16 @@ class Quantity(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    value: float
+    value: float | str  # str only for parameter expressions ('$operator_speed'), resolved before simulation
     unit: str
     provenance: Provenance | None = None
+
+    @field_validator("value")
+    @classmethod
+    def _expr(cls, v):
+        if isinstance(v, str) and "$" not in v:
+            raise ValueError(f"valor no numérico '{v}' (sólo se admiten expresiones con $parametro)")
+        return v
 
     @field_validator("unit")
     @classmethod

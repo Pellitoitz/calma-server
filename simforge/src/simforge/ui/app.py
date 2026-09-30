@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import tempfile
 from pathlib import Path
 
@@ -14,7 +15,8 @@ st.set_page_config(page_title="SimForge", page_icon="🏭", layout="wide")
 
 
 @st.cache_resource
-def get_app() -> SimForgeApp:
+def get_app(workspace: str, library: str) -> SimForgeApp:
+    """Cached per (workspace, library): changing SIMFORGE_WORKSPACE never reuses another workspace."""
     try:
         from dotenv import load_dotenv  # optional
         load_dotenv()
@@ -35,7 +37,8 @@ def _load_env_file() -> None:
                     os.environ.setdefault(k.strip(), v.strip())
 
 
-app = get_app()
+_load_env_file()
+app = get_app(os.environ.get("SIMFORGE_WORKSPACE", "./workspace"), os.environ.get("SIMFORGE_LIBRARY", ""))
 
 # ------------------------------------------------------------------ sidebar: projects
 with st.sidebar:

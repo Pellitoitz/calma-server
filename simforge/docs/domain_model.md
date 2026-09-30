@@ -17,6 +17,12 @@
 | Cost | `resources[].cost_per_hour` | reservado para la capa económica (no afecta a la simulación) |
 | KPI | `analytics/kpis.py` | ver `METRIC_INFO` |
 
+## Novedades v0.2 (benchmark selectiva)
+
+- `parameters` (+ expresiones `$param`), `work_units` en estaciones, `resources[].dispatch: wip_target` + `wip_target{...}`,
+  comportamiento `transport` (componentes `transport`, `rack_transport`), `nodes[].release_via` (retorno físico de carriers),
+  probabilidades de ruta como expresión (segunda rama trazable), posiciones y velocidades parametrizables.
+
 ## Estructura ISMS
 
 ```yaml

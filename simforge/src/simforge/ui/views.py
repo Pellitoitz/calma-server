@@ -41,16 +41,27 @@ def process_graph(model: ISMSModel, report: VerificationReport | None = None) ->
             label.append("time: MISSING")
         if n.component == "buffer":
             label.append(f"cap {p.get('capacity', '∞')}")
-        elif p.get("capacity", 1) > 1:
+        elif isinstance(p.get("capacity", 1), str) or p.get("capacity", 1) > 1:
             label.append(f"x{p['capacity']}")
+        if "work_units" in p:
+            label.append(f"× {p['work_units']} units")
         shape = {"source": "ellipse", "sink": "ellipse", "buffer": "cylinder"}.get(n.component, "box")
+        if n.component in ("transport", "rack_transport"):
+            shape = "cds"
+            tp = n.params
+            label.append(f"{(tp.get('distance') or {}).get('value', '?')} m @ {(tp.get('speed') or {}).get('value', '?')} m/s")
         extra = ', color="#cf222e", penwidth=2' if n.id in bad else ""
         lab = "\\n".join(str(x).replace('"', "'") for x in label)
         lines.append(f'"{n.id}" [label="{lab}", shape={shape}{extra}];')
     for e in model.edges:
-        lab = f' [label="{e.probability:.0%}"]' if e.probability not in (None, 1.0) else ""
+        lab = (f' [label="{e.probability}"]' if isinstance(e.probability, str) else f' [label="{e.probability:.0%}"]') if e.probability not in (None, 1.0) else ""
         lines.append(f'"{e.source}" -> "{e.target}"{lab};')
     for n in model.nodes:
+        for rid, tid in n.release_via.items():
+            lines.append(f'"{n.id}" -> "{tid}" [style=dashed, label="empty {rid}", color="#8c959f"];')
+            dest = model.node(tid).params.get("destination") if tid in [x.id for x in model.nodes] else None
+            if dest:
+                lines.append(f'"{tid}" -> "{dest}" [style=dashed, color="#8c959f"];')
         if n.params.get("on_reject", "scrap") != "scrap":
             lines.append(f'"{n.id}" -> "{n.params["on_reject"]}" [style=dashed, label="reject", color="#cf222e"];')
     for r in model.resources:
@@ -84,6 +95,15 @@ def issues_table(report: VerificationReport) -> None:
     icon = {Level.ERROR: "⛔", Level.WARNING: "⚠️", Level.INFO: "ℹ️"}
     st.dataframe(pd.DataFrame([{"": icon[i.level], "code": i.code, "message": i.message, "where": i.path or "", "hint": i.hint or ""}
                                for i in report.issues]), hide_index=True, width="stretch")
+
+
+def _num(col, label: str, value, key: str, integer: bool = False, **kw):
+    """Number input, or a text input when the value is a parameter expression ('$n_operators')."""
+    if isinstance(value, str):
+        return col.text_input(label + " (expr)", value=value, key=key, help="Parameter expression; edit the parameter in the table above")
+    if integer:
+        return int(col.number_input(label, value=int(value), key=key, step=1, **kw))
+    return col.number_input(label, value=float(value), key=key, **kw)
 
 
 def _save(app: SimForgeApp, project: Project, model: ISMSModel, msg: str) -> None:
@@ -219,6 +239,18 @@ def _param_editor(app: SimForgeApp, project: Project, model: ISMSModel) -> None:
         changes["simulation.replications"] = c[3].number_input("Replications", value=s.replications, min_value=1, max_value=1000)
         changes["simulation.base_seed"] = c[4].number_input("Base seed", value=s.base_seed, step=1)
         changes["simulation.trace"] = st.checkbox("Debug mode (event log + operator decision log)", value=s.trace)
+        if model.parameters:
+            st.markdown("**Model parameters** (value empty = REQUIRED, not provided)")
+            pdf = pd.DataFrame([{"id": p.id, "value": p.value, "unit": p.unit, "role": p.role, "description": p.description,
+                                 "status": (p.provenance.status.value if p.provenance else ("REQUIRED" if p.value is None else ""))}
+                                for p in model.parameters])
+            edited = st.data_editor(pdf, hide_index=True, width="stretch", disabled=["id", "unit", "role", "description", "status"], key="params_editor")
+            for i, p in enumerate(model.parameters):
+                v = edited.loc[i, "value"]
+                v = None if v is None or (isinstance(v, float) and pd.isna(v)) else float(v)
+                if v != p.value:
+                    changes[f"parameters.{p.id}.value"] = v
+                    changes[f"parameters.{p.id}.provenance"] = {"status": "provided_by_client", "source": "ui"}
         for n in model.nodes:
             if n.component in ("source", "sink"):
                 continue
@@ -227,37 +259,43 @@ def _param_editor(app: SimForgeApp, project: Project, model: ISMSModel) -> None:
             c = st.columns(5)
             if n.component == "buffer" or (comp and comp.behavior.value == "buffer"):
                 cap = n.params.get("capacity")
-                changes[f"nodes.{n.id}.params.capacity"] = c[0].number_input("Capacity (0 = unlimited)", value=int(cap or 0), min_value=0, key=f"cap_{n.id}") or None
+                v = _num(c[0], "Capacity (0 = unlimited)", cap if isinstance(cap, str) else (cap or 0), f"cap_{n.id}", integer=True)
+                changes[f"nodes.{n.id}.params.capacity"] = v or None
+                continue
+            if comp and comp.behavior.value == "transport":
+                st.caption("Transport: edit distance/speed/load/unload in the parameters table or the YAML editor.")
                 continue
             pt = n.params.get("process_time")
             if pt is None or pt.get("dist") == "constant":
-                val = c[0].number_input(f"Time ({(pt or {}).get('unit', 's')})", value=float((pt or {}).get("value", 0.0)), min_value=0.0, key=f"pt_{n.id}")
-                if pt is not None or val > 0:
+                val = _num(c[0], f"Time ({(pt or {}).get('unit', 's')})", (pt or {}).get("value", 0.0), f"pt_{n.id}")
+                if pt is not None or (not isinstance(val, str) and val > 0):
                     changes[f"nodes.{n.id}.params.process_time"] = {"dist": "constant", "value": val, "unit": (pt or {}).get("unit", "s"),
                                                                    **({"provenance": pt["provenance"]} if pt and pt.get("provenance") and pt.get("value") == val else {})}
             else:
                 c[0].text_input("Time (distribution)", value=json.dumps({k: v for k, v in pt.items() if k != "provenance"}), disabled=True,
                                 key=f"ptd_{n.id}", help="Edit non-constant distributions in the YAML editor")
-            changes[f"nodes.{n.id}.params.capacity"] = c[1].number_input("Parallel slots", value=int(n.params.get("capacity", 1)), min_value=1, key=f"c_{n.id}")
+            changes[f"nodes.{n.id}.params.capacity"] = _num(c[1], "Parallel slots", n.params.get("capacity", 1), f"c_{n.id}", integer=True)
             res_ids = [r.id for r in model.resources if r.kind.value != "carrier"]
             cur = [u["resource"] for u in n.params.get("resources", [])]
             sel = c[2].multiselect("Resources", res_ids, default=[x for x in cur if x in res_ids], key=f"r_{n.id}")
             changes[f"nodes.{n.id}.params.resources"] = [{"resource": x} for x in sel]
             changes[f"nodes.{n.id}.priority"] = c[3].number_input("Priority (lower = first)", value=n.priority, key=f"p_{n.id}")
-            changes[f"nodes.{n.id}.params.yield_rate"] = c[4].number_input("Yield", value=float(n.params.get("yield_rate", 1.0)), min_value=0.01, max_value=1.0, key=f"y_{n.id}")
+            changes[f"nodes.{n.id}.params.yield_rate"] = _num(c[4], "Yield", n.params.get("yield_rate", 1.0), f"y_{n.id}")
         if model.resources:
             st.markdown("**Resources**")
         for r in model.resources:
             c = st.columns(3)
             c[0].markdown(f"{r.name or r.id} · *{r.kind.value}*")
-            changes[f"resources.{r.id}.quantity"] = c[1].number_input("Quantity", value=r.quantity, min_value=0, key=f"q_{r.id}")
-            changes[f"resources.{r.id}.dispatch"] = c[2].selectbox("Dispatch rule", ["fifo", "priority"], index=["fifo", "priority"].index(r.dispatch.value), key=f"d_{r.id}")
+            changes[f"resources.{r.id}.quantity"] = _num(c[1], "Quantity", r.quantity, f"q_{r.id}", integer=True)
+            rules = ["fifo", "priority", "wip_target"]
+            changes[f"resources.{r.id}.dispatch"] = c[2].selectbox("Dispatch rule", rules, index=rules.index(r.dispatch.value), key=f"d_{r.id}",
+                                                                    help="wip_target = WIP_TARGET_PRIORITY (configure its parameters in YAML)")
         submitted = st.form_submit_button("SAVE MODEL", type="primary")
     if submitted:
         new = model
         try:
             for path, val in changes.items():
-                if path.endswith(("replications", "base_seed", "capacity", "quantity", "priority")) and val is not None:
+                if path.endswith(("replications", "base_seed", "capacity", "quantity", "priority")) and val is not None and not isinstance(val, str):
                     val = int(val)  # type: ignore[arg-type]
                 new = set_value(new, path, val)
         except Exception as e:  # noqa: BLE001
@@ -360,7 +398,7 @@ def _numeric_paths(model: ISMSModel) -> list[str]:
     for p, v in flatten(model).items():
         if isinstance(v, bool) or not isinstance(v, (int, float)):
             continue
-        if p.startswith(("nodes.", "resources.", "simulation.horizon.value", "simulation.warmup.value")) and "provenance" not in p and not p.endswith((".x", ".y")):
+        if p.startswith(("nodes.", "resources.", "parameters.", "simulation.horizon.value", "simulation.warmup.value")) and "provenance" not in p and not p.endswith((".x", ".y")):
             out.append(p)
     for n in model.nodes:  # capacity of buffers defined as unlimited is still a valid factor
         if n.component == "buffer" and f"nodes.{n.id}.params.capacity" not in out:

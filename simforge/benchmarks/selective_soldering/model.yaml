@@ -1,0 +1,120 @@
+# Selective soldering benchmark - SimForge reconstruction of the engineer's AnyLogic model.
+# Every value not provided by the engineer is a REQUIRED parameter (value: null) -> the model stays
+# INCOMPLETE until it is filled in. Nothing here is estimated. Structural hypotheses are listed in
+# `assumptions` and must be confirmed (see DATA_REQUIRED.md).
+isms_version: "0.1"
+meta:
+  name: Selective soldering - rack benchmark
+  domain: electronics
+  tags: [benchmark, anylogic, selective, racks, shared-operator]
+simulation:
+  horizon: {value: 8, unit: h, provenance: {status: provided_by_client, source: engineer, note: "8 h netas"}}
+  warmup: {value: 0, unit: s}
+  kind: terminating
+  replications: 1
+  base_seed: 12345
+
+parameters:
+  # --- provided by the engineer ---
+  - {id: t_assembly_per_circuit, value: 6, unit: s, description: "Montaje base", provenance: {status: provided_by_client, source: engineer}}
+  - {id: t_review_per_circuit, value: 2, unit: s, description: "Revision + limpieza base", provenance: {status: provided_by_client, source: engineer}}
+  - {id: t_selective_per_circuit, value: 5, unit: s, description: "Selectiva base (rama 1)", provenance: {status: provided_by_client, source: engineer}}
+  # --- REQUIRED, not provided yet (never invented) ---
+  - {id: circuits_per_rack, value: null, unit: circuits, description: "Circuitos por bastidor", min: 1}
+  - {id: n_operators, value: null, unit: operators, role: decision_variable, min: 0, max: 4, description: "Operarios montaje/revision (0-4)"}
+  - {id: assembly_stations, value: null, unit: stations, min: 1, description: "Puestos de montaje en paralelo"}
+  - {id: t_selective2_per_circuit, value: null, unit: s, description: "Tiempo por circuito de la segunda rama de selectiva"}
+  - {id: branch2_share, value: null, min: 0, max: 1, role: decision_variable, description: "Fraccion de bastidores enviada a la segunda rama (0-1)"}
+  - {id: wip_target, value: null, unit: racks, min: 0, description: "WIP objetivo delante de la selectiva (estrategia del operario)"}
+  - {id: operator_speed, value: null, unit: m/s, description: "Velocidad del operario (andando y llevando bastidor)"}
+  - {id: d_assembly_review, value: null, unit: m, description: "Distancia montaje <-> mesa de revision"}
+  - {id: t_rack_load, value: null, unit: s, description: "Tiempo de carga de un bastidor para el retorno"}
+  - {id: t_rack_unload, value: null, unit: s, description: "Tiempo de descarga de un bastidor en montaje"}
+
+resources:
+  - id: operator
+    name: Operario montaje/revision
+    kind: operator
+    quantity: "$n_operators"
+    home: assembly
+    travel: {speed: {value: "$operator_speed", unit: m/s}}
+    dispatch: wip_target
+    wip_target:
+      protected_node: selective_1
+      feed_nodes: [assembly_conveyor, selective_entry]
+      feeder_nodes: [assembly]
+      target: "$wip_target"
+      count_feeder_in_process: true
+      preempt_below: null
+  - {id: racks, name: Bastidores, kind: carrier, quantity: 6}
+
+nodes:
+  - {id: src, name: Suministro (siempre disponible), component: source, params: {arrival: infinite}}
+  - id: assembly
+    name: Montaje
+    component: manual_assembly
+    seize: [{resource: racks}]
+    position: {x: 0}
+    params:
+      capacity: "$assembly_stations"
+      process_time: {dist: constant, value: "$t_assembly_per_circuit", unit: s}
+      work_units: "$circuits_per_rack"
+      resources: [{resource: operator}]
+  - {id: assembly_conveyor, name: Conveyor de montaje, component: buffer, params: {capacity: 2}}
+  - {id: selective_entry, name: Entrada de selectiva, component: buffer, params: {capacity: 3}}
+  - id: selective_1
+    name: Selectiva rama 1
+    component: selective_soldering
+    params: {process_time: {dist: constant, value: "$t_selective_per_circuit", unit: s}, work_units: "$circuits_per_rack"}
+  - id: selective_2
+    name: Selectiva rama 2
+    component: selective_soldering
+    params: {process_time: {dist: constant, value: "$t_selective2_per_circuit", unit: s}, work_units: "$circuits_per_rack"}
+  - {id: selective_buffer, name: Buffer de selectiva, component: buffer, params: {capacity: 2}}
+  - id: review
+    name: Mesa de revision + limpieza
+    component: inspection
+    position: {x: "$d_assembly_review"}
+    release: [racks]
+    release_via: {racks: rack_return}
+    params:
+      capacity: "$n_operators"
+      process_time: {dist: constant, value: "$t_review_per_circuit", unit: s}
+      work_units: "$circuits_per_rack"
+      resources: [{resource: operator}]
+  - {id: out, name: Salida, component: sink}
+  - id: rack_return
+    name: Retorno de bastidor vacio (1 por viaje)
+    component: rack_transport
+    params:
+      origin: review
+      destination: assembly
+      distance: {value: "$d_assembly_review", unit: m}
+      speed: {value: "$operator_speed", unit: m/s}
+      capacity: 1
+      load_time: {dist: constant, value: "$t_rack_load", unit: s}
+      unload_time: {dist: constant, value: "$t_rack_unload", unit: s}
+      resources: [{resource: operator}]
+      return_empty: false
+
+edges:
+  - {source: src, target: assembly}
+  - {source: assembly, target: assembly_conveyor}
+  - {source: assembly_conveyor, target: selective_entry}
+  - {source: selective_entry, target: selective_1, probability: "1 - $branch2_share"}
+  - {source: selective_entry, target: selective_2, probability: "$branch2_share"}
+  - {source: selective_1, target: selective_buffer}
+  - {source: selective_2, target: selective_buffer}
+  - {source: selective_buffer, target: review}
+  - {source: review, target: out}
+
+assumptions:
+  - {id: s1, origin: system, text: "Flujo: montaje -> conveyor montaje (2) -> entrada selectiva (3) -> rama 1 | rama 2 -> buffer de selectiva (2) -> mesa de revision -> salida. CONFIRMAR orden y posicion del 'buffer de selectiva'."}
+  - {id: s2, origin: system, text: "La entidad es un bastidor cargado: tiempos por bastidor = tiempo por circuito x circuitos por bastidor."}
+  - {id: s3, origin: system, text: "El bastidor se toma al empezar el montaje y se libera al terminar la revision; vuelve vacio a montaje con un transporte de 1 bastidor por viaje hecho por el operario."}
+  - {id: s4, origin: system, text: "Conveyor de montaje y entrada de selectiva modelados como colas FIFO sin tiempo de transito (CONFIRMAR si el conveyor tiene tiempo de recorrido)."}
+  - {id: s5, origin: system, text: "WIP que alimenta la selectiva = conveyor de montaje + entrada de selectiva + bastidores en montaje. Sin interrupcion de la revision (preempt_below = null). CONFIRMAR con la logica AnyLogic."}
+  - {id: s6, origin: system, text: "El reparto a la segunda rama es probabilistico por bastidor (branch2_share). CONFIRMAR si AnyLogic usa reparto probabilistico, alternado o 'primera libre'."}
+  - {id: s7, origin: system, text: "Mesa de revision: capacidad = n_operators (1 por operario). Operarios en un unico pool que hace montaje, revision y retorno de bastidores."}
+  - {id: s8, origin: system, text: "Layout lineal: montaje en x=0, revision en x=d_assembly_review; el operario no va a la selectiva."}
+  - {id: s9, origin: system, text: "Racks = 6 es solo el valor del baseline; el benchmark los recorre de 1 a 10."}

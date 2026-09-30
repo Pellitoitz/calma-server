@@ -146,8 +146,17 @@ def verify(model: ISMSModel, registry: ComponentRegistry) -> tuple[VerificationR
             add(Level.WARNING, "UNUSED_PARAMETER", f"El parámetro '{prm.id}' no se usa en el modelo.", f"parameters.{prm.id}")
     original = model
     resolved, problems = resolve(model)
+    missing_uses: dict[str, list[str]] = {}
     for path, msg, is_missing in problems:
-        add(Level.ERROR, "MISSING" if is_missing else "BAD_EXPRESSION", msg, path)
+        if is_missing:
+            missing_uses.setdefault(msg, []).append(path)
+        else:
+            add(Level.ERROR, "BAD_EXPRESSION", msg, path)
+    for name, uses in missing_uses.items():
+        prm = next(p for p in model.parameters if p.id == name)
+        desc = f" ({prm.description})" if prm.description else ""
+        add(Level.ERROR, "MISSING", f"Falta el valor del parámetro '{name}'{desc} [{prm.unit or '-'}]. Se usa en: {', '.join(uses)}.",
+            f"parameters.{name}.value")
     if resolved is None:
         for m in model.missing:
             add(Level.ERROR if m.required else Level.WARNING, "MISSING", m.question, m.path)

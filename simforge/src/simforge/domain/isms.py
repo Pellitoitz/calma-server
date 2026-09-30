@@ -68,6 +68,8 @@ class SimulationSettings(_Strict):
     @field_validator("horizon", "warmup")
     @classmethod
     def _time(cls, q: Quantity) -> Quantity:
+        if isinstance(q.value, str):
+            raise ValueError("el horizonte/warm-up no admite parámetros; usa un valor numérico")
         q.to_base(Dimension.TIME)
         if q.value < 0:
             raise ValueError("el tiempo no puede ser negativo")
@@ -121,7 +123,9 @@ class Travel(_Strict):
     @field_validator("speed")
     @classmethod
     def _speed(cls, q: Quantity) -> Quantity:
-        q.to_base(Dimension.SPEED)
+        q.to_base(Dimension.SPEED) if not isinstance(q.value, str) else None
+        if isinstance(q.value, str):
+            return q  # parameter expression, checked after resolution
         if q.value <= 0:
             raise ValueError("la velocidad debe ser > 0")
         return q
@@ -140,8 +144,8 @@ class Resource(_HasId):
 
 
 class Position(_Strict):
-    x: float  # metres
-    y: float = 0.0
+    x: float | str  # metres, or parameter expression ('$d_assembly_review')
+    y: float | str = 0.0
 
 
 class Node(_HasId):
@@ -160,13 +164,13 @@ class Node(_HasId):
 class Edge(_Strict):
     source: str
     target: str
-    probability: float | str | None = Field(default=None, description="0<p<=1 or expression, e.g. '$branch2_share'")
+    probability: float | str | None = Field(default=None, description="0<=p<=1 or expression, e.g. '$branch2_share'")
 
     @field_validator("probability")
     @classmethod
     def _p(cls, v):
-        if isinstance(v, (int, float)) and not isinstance(v, bool) and not 0 < v <= 1:
-            raise ValueError("la probabilidad debe estar en (0, 1]")
+        if isinstance(v, (int, float)) and not isinstance(v, bool) and not 0 <= v <= 1:
+            raise ValueError("la probabilidad debe estar en [0, 1]")
         return v
 
 

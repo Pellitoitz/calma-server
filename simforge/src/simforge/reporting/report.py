@@ -43,7 +43,8 @@ def flow_text(model: ISMSModel) -> str:
         succ = model.successors(cur)
         cur = succ[0].target if len(succ) == 1 else None
         if len(succ) > 1:
-            order.append("{" + " | ".join(f"{e.target} ({e.probability:.0%})" for e in succ) + "}")
+            order.append("{" + " | ".join(f"{e.target} ({e.probability if isinstance(e.probability, str) else format(e.probability, '.0%')})"
+                                          for e in succ) + "}")
     return " → ".join(order)
 
 
@@ -144,6 +145,12 @@ def build_markdown(model: ISMSModel, report: VerificationReport, run: Simulation
     if model.resources:
         L += [_table(["Resource", "Kind", "Qty", "Dispatch"],
                      [[r.name or r.id, r.kind.value, str(r.quantity), r.dispatch.value] for r in model.resources]), ""]
+
+    if model.parameters:
+        L += ["**Model parameters**", "", _table(["Parameter", "Value", "Unit", "Role", "Source / status", "Description"],
+              [[f"`{p.id}`", "⛔ REQUIRED" if p.value is None else f"{p.value:g}", p.unit or "", p.role,
+                (f"{p.provenance.status.value}" + (f" ({p.provenance.source})" if p.provenance.source else "")) if p.provenance else "—",
+                p.description] for p in model.parameters]), ""]
 
     # 3. assumptions & missing data
     L += ["## 3. Assumptions and missing data", ""]

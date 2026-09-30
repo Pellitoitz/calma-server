@@ -18,6 +18,33 @@ decisiones ni estadísticas) es precisamente lo que queremos controlar nosotros.
 | `IndustrialSink` | registra salida y lead time; libera carriers pendientes |
 | `ResourcePool` (runtime.py) | unidades individuales con estado y posición; asignación FIFO o por prioridad; **log de decisiones** |
 
+## Estrategias de despacho (engine/des/dispatch.py)
+
+Desacopladas del proceso: una estrategia sólo *decide* (`choose`, `preempt_candidate`) y ve los nodos a través de dos
+sondas genéricas (`occupancy()`, `state_counts()`).
+
+| Regla | Comportamiento |
+|---|---|
+| `fifo` | petición más antigua |
+| `priority` | menor `node.priority`, FIFO en empate |
+| `wip_target` (**WIP_TARGET_PRIORITY**) | 1) si el nodo protegido está BLOQUEADO → tarea aguas abajo (desbloquear); 2) si WIP de alimentación < objetivo → tarea feeder; 3) si no → tarea no-feeder; FIFO dentro de cada clase. Re-evaluación continua: cada cambio en los nodos observados reprograma la decisión; con `preempt_below` una tarea no-feeder en curso se **suspende** (trabajo restante conservado) si el WIP cae por debajo del umbral y hay una tarea feeder esperando. |
+
+Log de decisiones (modo trace): `kind` (assign/preempt), candidatos, regla, **motivo** y **estado del sistema**
+(WIP de alimentación y detalle por nodo, objetivo, estado del nodo protegido). Se registran todas las decisiones, no sólo las disputadas.
+
+## Transporte (IndustrialTransport)
+
+Viaje = recurso (camina al origen) → carga → recorrido `distance/speed` → descarga → entrega al destino (bloqueado si lleno)
+→ retorno vacío opcional. `capacity` unidades por viaje (`batch: immediate|full`), `fleet` viajes en paralelo.
+Uso en el flujo o para **devolver carriers vacíos** (`release_via`): el bastidor no está disponible hasta que termina el viaje.
+Distancia, velocidad, carga y descarga son obligatorias. El recurso cuenta como *walking* durante los recorridos y *working* en carga/descarga.
+
+## Parámetros de modelo
+
+`parameters:` con valor, unidad, rol (fixed/decision_variable/uncertain), rango y procedencia. Se referencian como
+`$id` en expresiones seguras (`1 - $branch2_share`, `$circuits_per_rack`) en tiempos (`work_units`), capacidades,
+cantidades, probabilidades de ruta, distancias y velocidades. Valor `null` → modelo INCOMPLETE, con la lista de usos.
+
 ## Semántica (fijada por tests)
 
 - **Bloqueo tras servicio**: una estación terminada retiene su ranura hasta que el siguiente nodo acepta la unidad.

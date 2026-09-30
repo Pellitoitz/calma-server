@@ -11,3 +11,4 @@ client_data/
 *.simproject
 build/
 dist/
+benchmarks/*/results/

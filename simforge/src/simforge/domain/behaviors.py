@@ -103,6 +103,8 @@ class TransportParams(BaseModel):
     @model_validator(mode="after")
     def _check(self) -> "TransportParams":
         if self.distance is not None:
+            if isinstance(self.distance.value, str):
+                raise ValueError("distance sin resolver")
             self.distance.to_base(Dimension.LENGTH)
             if self.distance.value < 0:
                 raise ValueError("distance no puede ser negativa")

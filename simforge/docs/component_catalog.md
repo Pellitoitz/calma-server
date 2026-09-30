@@ -10,6 +10,7 @@ Automatic optical inspection.
 |---|---|---|---|
 | `capacity` | integer | `1` | Parallel slots (identical stations) |
 | `process_time` | distribution | `None` |  |
+| `work_units` | number | `1` | process_time is per work unit (e.g. per circuit); time per entity = sampled time x work_units. Use '$circuits_per_rack'. |
 | `resources` | array | `` | Held during processing |
 | `yield_rate` | number | `1.0` |  |
 | `on_reject` | string | `scrap` | 'scrap' or id of a rework node |
@@ -46,6 +47,7 @@ Cleaning operation (parts, fixtures, racks).
 |---|---|---|---|
 | `capacity` | integer | `1` | Parallel slots (identical stations) |
 | `process_time` | distribution | `None` |  |
+| `work_units` | number | `1` | process_time is per work unit (e.g. per circuit); time per entity = sampled time x work_units. Use '$circuits_per_rack'. |
 | `resources` | array | `` | Held during processing |
 | `yield_rate` | number | `1.0` |  |
 | `on_reject` | string | `scrap` | 'scrap' or id of a rework node |
@@ -66,6 +68,7 @@ Conformal coating / varnishing.
 |---|---|---|---|
 | `capacity` | integer | `1` | Parallel slots (identical stations) |
 | `process_time` | distribution | `None` |  |
+| `work_units` | number | `1` | process_time is per work unit (e.g. per circuit); time per entity = sampled time x work_units. Use '$circuits_per_rack'. |
 | `resources` | array | `` | Held during processing |
 | `yield_rate` | number | `1.0` |  |
 | `on_reject` | string | `scrap` | 'scrap' or id of a rework node |
@@ -86,6 +89,7 @@ Functional test (FCT).
 |---|---|---|---|
 | `capacity` | integer | `1` | Parallel slots (identical stations) |
 | `process_time` | distribution | `None` |  |
+| `work_units` | number | `1` | process_time is per work unit (e.g. per circuit); time per entity = sampled time x work_units. Use '$circuits_per_rack'. |
 | `resources` | array | `` | Held during processing |
 | `yield_rate` | number | `1.0` |  |
 | `on_reject` | string | `scrap` | 'scrap' or id of a rework node |
@@ -106,6 +110,7 @@ In-circuit test.
 |---|---|---|---|
 | `capacity` | integer | `1` | Parallel slots (identical stations) |
 | `process_time` | distribution | `None` |  |
+| `work_units` | number | `1` | process_time is per work unit (e.g. per circuit); time per entity = sampled time x work_units. Use '$circuits_per_rack'. |
 | `resources` | array | `` | Held during processing |
 | `yield_rate` | number | `1.0` |  |
 | `on_reject` | string | `scrap` | 'scrap' or id of a rework node |
@@ -126,6 +131,7 @@ Visual/manual inspection or review. Use yield_rate + on_reject to model rejects.
 |---|---|---|---|
 | `capacity` | integer | `1` | Parallel slots (identical stations) |
 | `process_time` | distribution | `None` |  |
+| `work_units` | number | `1` | process_time is per work unit (e.g. per circuit); time per entity = sampled time x work_units. Use '$circuits_per_rack'. |
 | `resources` | array | `` | Held during processing |
 | `yield_rate` | number | `1.0` |  |
 | `on_reject` | string | `scrap` | 'scrap' or id of a rework node |
@@ -148,6 +154,7 @@ time-based failures (MTBF/MTTR).
 |---|---|---|---|
 | `capacity` | integer | `1` | Parallel identical slots. |
 | `process_time` | distribution | `None` | Processing time per unit (distribution). |
+| `work_units` | number | `1` | process_time is per work unit (e.g. per circuit); time per entity = sampled time x work_units. Use '$circuits_per_rack'. |
 | `resources` | array | `` | Resources held during processing, e.g. [{resource: operator_1}] |
 | `yield_rate` | number | `1.0` | Fraction of good units (0-1]. Rejects go to 'on_reject'. |
 | `on_reject` | string | `scrap` | 'scrap' or id of rework node. |
@@ -168,6 +175,7 @@ Manual assembly workstation (operator required).
 |---|---|---|---|
 | `capacity` | integer | `1` | Parallel slots (identical stations) |
 | `process_time` | distribution | `None` |  |
+| `work_units` | number | `1` | process_time is per work unit (e.g. per circuit); time per entity = sampled time x work_units. Use '$circuits_per_rack'. |
 | `resources` | array | `` | Held during processing |
 | `yield_rate` | number | `1.0` |  |
 | `on_reject` | string | `scrap` | 'scrap' or id of a rework node |
@@ -188,6 +196,7 @@ Manual through-hole component insertion.
 |---|---|---|---|
 | `capacity` | integer | `1` | Parallel slots (identical stations) |
 | `process_time` | distribution | `None` |  |
+| `work_units` | number | `1` | process_time is per work unit (e.g. per circuit); time per entity = sampled time x work_units. Use '$circuits_per_rack'. |
 | `resources` | array | `` | Held during processing |
 | `yield_rate` | number | `1.0` |  |
 | `on_reject` | string | `scrap` | 'scrap' or id of a rework node |
@@ -208,6 +217,7 @@ Generic manual workstation. Requires an operator resource (declared in 'resource
 |---|---|---|---|
 | `capacity` | integer | `1` | Parallel slots (identical stations) |
 | `process_time` | distribution | `None` |  |
+| `work_units` | number | `1` | process_time is per work unit (e.g. per circuit); time per entity = sampled time x work_units. Use '$circuits_per_rack'. |
 | `resources` | array | `` | Held during processing |
 | `yield_rate` | number | `1.0` |  |
 | `on_reject` | string | `scrap` | 'scrap' or id of a rework node |
@@ -228,6 +238,7 @@ Packaging / boxing station.
 |---|---|---|---|
 | `capacity` | integer | `1` | Parallel slots (identical stations) |
 | `process_time` | distribution | `None` |  |
+| `work_units` | number | `1` | process_time is per work unit (e.g. per circuit); time per entity = sampled time x work_units. Use '$circuits_per_rack'. |
 | `resources` | array | `` | Held during processing |
 | `yield_rate` | number | `1.0` |  |
 | `on_reject` | string | `scrap` | 'scrap' or id of a rework node |
@@ -248,6 +259,7 @@ SMD placement machine.
 |---|---|---|---|
 | `capacity` | integer | `1` | Parallel slots (identical stations) |
 | `process_time` | distribution | `None` |  |
+| `work_units` | number | `1` | process_time is per work unit (e.g. per circuit); time per entity = sampled time x work_units. Use '$circuits_per_rack'. |
 | `resources` | array | `` | Held during processing |
 | `yield_rate` | number | `1.0` |  |
 | `on_reject` | string | `scrap` | 'scrap' or id of a rework node |
@@ -257,6 +269,30 @@ SMD placement machine.
 *KPIs:* utilization, oee
 
 *Tags:* electronics, smd
+
+### Rack transport (one rack per trip) (`rack_transport` v1.0.0)
+
+*Category:* logistics · *Behaviour:* `transport` · *Status:* **tested**
+
+Carrying racks/fixtures (bastidores) one per trip. Same semantics as 'transport' with capacity 1.
+
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| `origin` | distribution | `None` | node id; required for carrier-return transports |
+| `destination` | distribution | `None` | node id; required for carrier-return transports |
+| `distance` | distribution | `None` |  |
+| `speed` | distribution | `None` |  |
+| `capacity` | integer | `1` | units carried per trip |
+| `fleet` | integer | `1` | trips that can run in parallel (vehicles) |
+| `load_time` | distribution | `None` |  |
+| `unload_time` | distribution | `None` |  |
+| `resources` | array | `` | held for the whole trip (incl. empty return) |
+| `return_empty` | boolean | `True` | the transporter travels back empty (resource held) |
+| `batch` | string | `immediate` | leave with what is waiting / wait for a full load |
+
+*KPIs:* trips, units_transported, utilization
+
+*Tags:* logistics, transport, racks, electronics
 
 ### Reflow oven (`reflow` v1.0.0)
 
@@ -268,6 +304,7 @@ Reflow oven. Model as capacity = boards inside the oven, process_time = transit 
 |---|---|---|---|
 | `capacity` | integer | `1` | Parallel slots (identical stations) |
 | `process_time` | distribution | `None` |  |
+| `work_units` | number | `1` | process_time is per work unit (e.g. per circuit); time per entity = sampled time x work_units. Use '$circuits_per_rack'. |
 | `resources` | array | `` | Held during processing |
 | `yield_rate` | number | `1.0` |  |
 | `on_reject` | string | `scrap` | 'scrap' or id of a rework node |
@@ -288,6 +325,7 @@ Rework station. Reference it from another node's on_reject.
 |---|---|---|---|
 | `capacity` | integer | `1` | Parallel slots (identical stations) |
 | `process_time` | distribution | `None` |  |
+| `work_units` | number | `1` | process_time is per work unit (e.g. per circuit); time per entity = sampled time x work_units. Use '$circuits_per_rack'. |
 | `resources` | array | `` | Held during processing |
 | `yield_rate` | number | `1.0` |  |
 | `on_reject` | string | `scrap` | 'scrap' or id of a rework node |
@@ -308,6 +346,7 @@ PCB depaneling router.
 |---|---|---|---|
 | `capacity` | integer | `1` | Parallel slots (identical stations) |
 | `process_time` | distribution | `None` |  |
+| `work_units` | number | `1` | process_time is per work unit (e.g. per circuit); time per entity = sampled time x work_units. Use '$circuits_per_rack'. |
 | `resources` | array | `` | Held during processing |
 | `yield_rate` | number | `1.0` |  |
 | `on_reject` | string | `scrap` | 'scrap' or id of a rework node |
@@ -328,6 +367,7 @@ Solder paste screen printer (SMD line start).
 |---|---|---|---|
 | `capacity` | integer | `1` | Parallel slots (identical stations) |
 | `process_time` | distribution | `None` |  |
+| `work_units` | number | `1` | process_time is per work unit (e.g. per circuit); time per entity = sampled time x work_units. Use '$circuits_per_rack'. |
 | `resources` | array | `` | Held during processing |
 | `yield_rate` | number | `1.0` |  |
 | `on_reject` | string | `scrap` | 'scrap' or id of a rework node |
@@ -348,6 +388,7 @@ Selective soldering machine. Automatic; boards usually travel on racks/fixtures 
 |---|---|---|---|
 | `capacity` | integer | `1` | Parallel slots (identical stations) |
 | `process_time` | distribution | `None` |  |
+| `work_units` | number | `1` | process_time is per work unit (e.g. per circuit); time per entity = sampled time x work_units. Use '$circuits_per_rack'. |
 | `resources` | array | `` | Held during processing |
 | `yield_rate` | number | `1.0` |  |
 | `on_reject` | string | `scrap` | 'scrap' or id of a rework node |
@@ -399,6 +440,7 @@ Solder paste inspection.
 |---|---|---|---|
 | `capacity` | integer | `1` | Parallel slots (identical stations) |
 | `process_time` | distribution | `None` |  |
+| `work_units` | number | `1` | process_time is per work unit (e.g. per circuit); time per entity = sampled time x work_units. Use '$circuits_per_rack'. |
 | `resources` | array | `` | Held during processing |
 | `yield_rate` | number | `1.0` |  |
 | `on_reject` | string | `scrap` | 'scrap' or id of a rework node |
@@ -419,6 +461,7 @@ Generic test station (functional or electrical).
 |---|---|---|---|
 | `capacity` | integer | `1` | Parallel slots (identical stations) |
 | `process_time` | distribution | `None` |  |
+| `work_units` | number | `1` | process_time is per work unit (e.g. per circuit); time per entity = sampled time x work_units. Use '$circuits_per_rack'. |
 | `resources` | array | `` | Held during processing |
 | `yield_rate` | number | `1.0` |  |
 | `on_reject` | string | `scrap` | 'scrap' or id of a rework node |
@@ -428,6 +471,33 @@ Generic test station (functional or electrical).
 *KPIs:* utilization, yield
 
 *Tags:* manufacturing, test, quality
+
+### Transport (`transport` v1.0.0)
+
+*Category:* logistics · *Behaviour:* `transport` · *Status:* **tested**
+
+Physical transport between an origin and a destination: resource (operator, AGV, forklift...) walks to the
+origin, loads, travels distance/speed, unloads, hands over (blocked if the destination is full) and optionally
+returns empty. capacity = units per trip, fleet = parallel trips. Distance, speed, load and unload times are
+REQUIRED (never defaulted). Can also return EMPTY carriers (racks, pallets) via a node's release_via.
+
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| `origin` | distribution | `None` | node id; required for carrier-return transports |
+| `destination` | distribution | `None` | node id; required for carrier-return transports |
+| `distance` | distribution | `None` | REQUIRED. {value, unit: m} |
+| `speed` | distribution | `None` | REQUIRED. {value, unit: m/s} |
+| `capacity` | integer | `1` | Units per trip. |
+| `fleet` | integer | `1` | Parallel trips (vehicles). |
+| `load_time` | distribution | `None` | REQUIRED. Per trip. |
+| `unload_time` | distribution | `None` | REQUIRED. Per trip. |
+| `resources` | array | `` | Held for the whole trip, e.g. [{resource: operator_1}] |
+| `return_empty` | boolean | `True` | Travel back empty holding the resource (set false when the operator's walking is modelled by positions). |
+| `batch` | string | `immediate` | leave with what is waiting / wait for a full load |
+
+*KPIs:* trips, units_transported, avg_load, utilization, blocked
+
+*Tags:* logistics, transport, walking, carriers
 
 ### Transport (delay) (`transport_delay` v1.0.0)
 
@@ -439,6 +509,7 @@ Fixed-capacity transport modelled as a delay (e.g. conveyor with N positions: ca
 |---|---|---|---|
 | `capacity` | integer | `1` | Parallel slots (identical stations) |
 | `process_time` | distribution | `None` |  |
+| `work_units` | number | `1` | process_time is per work unit (e.g. per circuit); time per entity = sampled time x work_units. Use '$circuits_per_rack'. |
 | `resources` | array | `` | Held during processing |
 | `yield_rate` | number | `1.0` |  |
 | `on_reject` | string | `scrap` | 'scrap' or id of a rework node |
@@ -459,6 +530,7 @@ Wave soldering machine.
 |---|---|---|---|
 | `capacity` | integer | `1` | Parallel slots (identical stations) |
 | `process_time` | distribution | `None` |  |
+| `work_units` | number | `1` | process_time is per work unit (e.g. per circuit); time per entity = sampled time x work_units. Use '$circuits_per_rack'. |
 | `resources` | array | `` | Held during processing |
 | `yield_rate` | number | `1.0` |  |
 | `on_reject` | string | `scrap` | 'scrap' or id of a rework node |
