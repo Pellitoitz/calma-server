@@ -71,7 +71,7 @@ MIGRATIONS: list[str] = [
 
 
 def connect(path: Path) -> sqlite3.Connection:
-    conn = sqlite3.connect(path)
+    conn = sqlite3.connect(path, check_same_thread=False)  # Streamlit reruns on worker threads
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
     migrate(conn)

@@ -132,11 +132,11 @@ class SimForgeApp:
 
     # --------------------------------------------------------------- simulation
     def run_simulation(self, project: Project, model: ISMSModel | None = None, replications: int | None = None,
-                       trace: bool | None = None) -> SimulationResult:
+                       trace: bool | None = None, keep_records: bool = False) -> SimulationResult:
         model = model or project.current_model()
         if model is None:
             raise ValueError("El proyecto no tiene modelo.")
-        res = run_simulation(model, self.registry, replications=replications, trace=trace, cache=project)
+        res = run_simulation(model, self.registry, replications=replications, trace=trace, cache=project, keep_records=keep_records)
         project.save_run(res, project.meta.current_version)
         project.log("system", "run_simulation", result=f"run {res.run_id}: TH={res.kpis.mean('throughput_per_hour'):.2f}/h")
         return res
@@ -233,3 +233,26 @@ class SimForgeApp:
     # ------------------------------------------------------------- scenarios
     def compare_versions(self, project: Project, a: int, b: int) -> list[tuple[str, Any, Any]]:
         return diff(project.load_version(a), project.load_version(b))
+
+    # ------------------------------------------------------------------ reports
+    def generate_report(self, project: Project, run_id: str | None = None, experiment_id: str | None = None) -> dict[str, Path]:
+        from ..reporting.report import build_markdown, markdown_to_html, results_csv
+
+        model = project.current_model()
+        if model is None:
+            raise ValueError("El proyecto no tiene modelo.")
+        runs = project.runs(1)
+        run = project.load_run(run_id) if run_id else (project.load_run(runs[0]["run_id"]) if runs else None)
+        exp = project.load_experiment(experiment_id) if experiment_id else None
+        md = build_markdown(model, self.validate_model(model), run, exp, project.name)
+        stamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+        out = project.root / "reports"
+        out.mkdir(exist_ok=True)
+        paths = {"markdown": out / f"report_{stamp}.md", "html": out / f"report_{stamp}.html"}
+        paths["markdown"].write_text(md, encoding="utf-8")
+        paths["html"].write_text(markdown_to_html(md, f"{project.name} — report"), encoding="utf-8")
+        if run:
+            paths["csv"] = out / f"kpis_{run.run_id}.csv"
+            paths["csv"].write_text(results_csv(run), encoding="utf-8")
+        project.log("system", "generate_report", result=str(paths["html"].name))
+        return paths
