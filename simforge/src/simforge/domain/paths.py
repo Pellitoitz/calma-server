@@ -103,11 +103,13 @@ def flatten(model: ISMSModel) -> dict[str, Any]:
     return out
 
 
-def diff(a: ISMSModel, b: ISMSModel) -> list[tuple[str, Any, Any]]:
+def diff(a: ISMSModel, b: ISMSModel, ignore_provenance: bool = False) -> list[tuple[str, Any, Any]]:
     """[(path, old, new)] for every changed leaf."""
     fa, fb = flatten(a), flatten(b)
     changes = []
     for p in sorted(set(fa) | set(fb)):
+        if ignore_provenance and ".provenance" in p:
+            continue
         if fa.get(p, "<absent>") != fb.get(p, "<absent>"):
             changes.append((p, fa.get(p, "<absent>"), fb.get(p, "<absent>")))
     return changes

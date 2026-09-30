@@ -13,7 +13,7 @@ components:
      defaults: {capacity: 1}, kpis: [utilization, yield]}
   - {id: packaging, name: Packaging, category: manufacturing, behavior: server, version: "1.0.0",
      description: "Packaging / boxing station.",
-     tags: [manufacturing, packaging], keywords: [embalaje, empaquetado, packaging, envasado, embalar],
+     tags: [manufacturing, packaging], keywords: [embalaje, empaquetado, packaging, envasado, embalar, empaqueta, pack, packs, packing],
      defaults: {capacity: 1}, kpis: [utilization]}
   - {id: rework, name: Rework, category: manufacturing, behavior: server, version: "1.0.0",
      description: "Rework station. Reference it from another node's on_reject.",
