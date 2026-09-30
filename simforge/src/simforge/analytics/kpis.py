@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from ..domain.behaviors import ServerParams
+from ..domain.behaviors import ServerParams, TransportParams
 from ..engine.base import NodeState, ResourceState, RunRecord
 from ..validation.verifier import CompiledModel
 from .stats import Stat, percentile, summarize
@@ -36,6 +36,11 @@ METRIC_INFO: dict[str, tuple[str, str, str]] = {
     "resource.*.utilization": ("Utilization", "", "(working + walking) / (units x measured time)"),
     "resource.*.working": ("Working", "", "Working fraction"),
     "resource.*.walking": ("Walking", "", "Walking fraction"),
+    "node.*.trips": ("Trips", "trips", "Transport trips delivered (counted at unload)"),
+    "node.*.units_transported": ("Units transported", "units", "Units (or empty carriers) delivered by the transport"),
+    "node.*.preemptions": ("Pre-emptions", "count", "Tasks at this node suspended by the dispatch strategy"),
+    "resource.*.walking_h": ("Walking/travel time", "h", "Hours walking or travelling (incl. carrying loads and empty returns)"),
+    "resource.*.preemptions": ("Pre-emptions", "count", "Tasks this resource abandoned for a more urgent one"),
     "resource.*.avg_in_use": ("Avg in use", "units", "Time-weighted units in use (carriers: racks in circulation)"),
 }
 
@@ -88,9 +93,15 @@ def compute_run_kpis(rec: RunRecord, cm: CompiledModel) -> dict[str, float]:
             k[f"node.{nid}.rejects"] = rec.node_rejects.get(nid, 0)
             k[f"node.{nid}.failures"] = rec.node_failures.get(nid, 0)
             k[f"node.{nid}.avg_wait_s"] = sum(waits) / len(waits) if waits else 0.0
+            if isinstance(cn.params, TransportParams):
+                k[f"node.{nid}.trips"] = rec.node_trips.get(nid, 0)
+                k[f"node.{nid}.units_transported"] = rec.node_units_moved.get(nid, 0)
+                k[f"node.{nid}.avg_load"] = (rec.node_units_moved.get(nid, 0) / rec.node_trips[nid]) if rec.node_trips.get(nid) else float("nan")
+                continue
+            k[f"node.{nid}.preemptions"] = rec.node_preemptions.get(nid, 0)
             p: ServerParams = cn.params  # type: ignore[assignment]
             if p.process_time is not None and denom:
-                ideal = (p.ideal_cycle_time or p.process_time).mean_seconds()
+                ideal = (p.ideal_cycle_time or p.process_time).mean_seconds() * (1 if p.ideal_cycle_time else p.work_units)
                 down = st.get(NodeState.DOWN, 0.0)
                 run_time = denom - down
                 a = run_time / denom
@@ -112,6 +123,8 @@ def compute_run_kpis(rec: RunRecord, cm: CompiledModel) -> dict[str, float]:
         walk = st.get(ResourceState.WALKING, 0.0)
         k[f"resource.{rid}.working"] = work / denom if denom else 0.0
         k[f"resource.{rid}.walking"] = walk / denom if denom else 0.0
+        k[f"resource.{rid}.walking_h"] = walk / 3600
+        k[f"resource.{rid}.preemptions"] = rec.resource_preemptions.get(rid, 0)
         k[f"resource.{rid}.avg_in_use"] = rec.level_avg.get(f"in_use:{rid}", 0.0)
         k[f"resource.{rid}.utilization"] = k[f"resource.{rid}.avg_in_use"] / n_units if n_units else 0.0
     return k

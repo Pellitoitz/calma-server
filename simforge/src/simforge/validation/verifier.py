@@ -16,8 +16,9 @@ from enum import Enum
 import networkx as nx
 from pydantic import BaseModel, ValidationError
 
-from ..domain.behaviors import Behavior, ServerParams, SourceParams
-from ..domain.isms import ISMSModel, Node, ResourceKind
+from ..domain.behaviors import Behavior, ServerParams, SourceParams, TransportParams
+from ..domain.expressions import references, resolve
+from ..domain.isms import DispatchRule, ISMSModel, Node, ResourceKind
 from ..domain.units import Dimension
 from ..domain.values import Constant, Normal
 from ..library.registry import ComponentDef, ComponentRegistry
@@ -123,11 +124,37 @@ def _iter_durations(params: BaseModel):
             yield "failures.mttr", params.failures.mttr
     if isinstance(params, SourceParams):
         yield "interarrival", params.interarrival
+    if isinstance(params, TransportParams):
+        yield "load_time", params.load_time
+        yield "unload_time", params.unload_time
 
 
 def verify(model: ISMSModel, registry: ComponentRegistry) -> tuple[VerificationReport, CompiledModel | None]:
     rep = VerificationReport()
     add = lambda lvl, code, msg, path=None, hint=None: rep.issues.append(Issue(lvl, code, msg, path, hint))  # noqa: E731
+
+    # ---- model parameters ('$name' references) ----------------------------
+    pids = [p.id for p in model.parameters]
+    for dup in {i for i in pids if pids.count(i) > 1}:
+        add(Level.ERROR, "DUP_PARAMETER", f"Parámetro duplicado '{dup}'.", f"parameters.{dup}")
+    for prm in model.parameters:
+        if prm.value is not None and ((prm.min is not None and prm.value < prm.min) or (prm.max is not None and prm.value > prm.max)):
+            add(Level.ERROR, "PARAM_RANGE", f"'{prm.id}' = {prm.value} fuera de rango [{prm.min}, {prm.max}].", f"parameters.{prm.id}")
+    used_refs = set(references(model.model_dump_json()))
+    for prm in model.parameters:
+        if prm.id not in used_refs:
+            add(Level.WARNING, "UNUSED_PARAMETER", f"El parámetro '{prm.id}' no se usa en el modelo.", f"parameters.{prm.id}")
+    original = model
+    resolved, problems = resolve(model)
+    for path, msg, is_missing in problems:
+        add(Level.ERROR, "MISSING" if is_missing else "BAD_EXPRESSION", msg, path)
+    if resolved is None:
+        for m in model.missing:
+            add(Level.ERROR if m.required else Level.WARNING, "MISSING", m.question, m.path)
+        rep.readiness = Readiness.INCOMPLETE if any(i.code == "MISSING" and i.level is Level.ERROR for i in rep.issues) else Readiness.CONFIGURED
+        add(Level.INFO, "CHECKS_PENDING", "El resto de comprobaciones se ejecutarán cuando todos los parámetros tengan valor.")
+        return rep, None
+    model = resolved
 
     # ---- simulation settings --------------------------------------------
     horizon = model.simulation.horizon.to_base(Dimension.TIME)
@@ -151,6 +178,10 @@ def verify(model: ISMSModel, registry: ComponentRegistry) -> tuple[VerificationR
     for c in clash:
         add(Level.ERROR, "ID_CLASH", f"'{c}' se usa como nodo y como recurso.")
     resources = {r.id: r for r in model.resources}
+    for r in model.resources:
+        if not isinstance(r.quantity, int) or r.quantity < 0:
+            add(Level.ERROR, "BAD_QUANTITY", f"La cantidad de '{r.id}' debe ser un entero >= 0 (es {r.quantity}).", f"resources.{r.id}.quantity")
+    carrier_transports = {tid for n in model.nodes for tid in n.release_via.values()}
 
     # ---- missing information declared by the parser -----------------------
     for m in model.missing:
@@ -223,6 +254,39 @@ def verify(model: ISMSModel, registry: ComponentRegistry) -> tuple[VerificationR
         elif n.seize or n.release:
             add(Level.ERROR, "SEIZE_UNSUPPORTED", f"'seize'/'release' sólo se soporta en nodos de proceso (server); '{n.id}' es {comp.behavior.value}.", path)
 
+        if isinstance(params, TransportParams):
+            for f in ("distance", "speed", "load_time", "unload_time"):
+                if getattr(params, f) is None:
+                    add(Level.ERROR, "MISSING", f"Falta '{f}' del transporte '{n.name or n.id}' (REQUIRED, no se asume).", f"{path}.params.{f}")
+            for use in params.resources:
+                r = resources.get(use.resource)
+                if r is None:
+                    add(Level.ERROR, "UNKNOWN_RESOURCE", f"El transporte '{n.id}' requiere '{use.resource}', que no existe.", f"{path}.params.resources")
+                elif r.quantity < use.quantity:
+                    add(Level.ERROR, "RESOURCE_SHORT", f"El transporte '{n.id}' requiere {use.quantity} × '{r.id}' pero sólo hay {r.quantity}.", f"resources.{r.id}.quantity")
+            for f in ("origin", "destination"):
+                v = getattr(params, f)
+                if v is not None and v not in node_ids:
+                    add(Level.ERROR, "BAD_TRANSPORT", f"{f} '{v}' del transporte '{n.id}' no existe.", f"{path}.params.{f}")
+            if n.id in carrier_transports:
+                if params.origin is None or params.destination is None:
+                    add(Level.ERROR, "MISSING", f"El transporte de retorno '{n.id}' necesita origin y destination.", f"{path}.params")
+                if model.successors(n.id) or model.predecessors(n.id):
+                    add(Level.ERROR, "BAD_TRANSPORT", f"'{n.id}' devuelve carriers vacíos: no debe estar conectado al flujo de producto.", path)
+            else:
+                preds, succs = model.predecessors(n.id), model.successors(n.id)
+                if params.origin and preds and params.origin not in [e.source for e in preds]:
+                    add(Level.ERROR, "BAD_TRANSPORT", f"origin '{params.origin}' de '{n.id}' no coincide con su entrada.", f"{path}.params.origin")
+                if params.destination and succs and params.destination not in [e.target for e in succs]:
+                    add(Level.ERROR, "BAD_TRANSPORT", f"destination '{params.destination}' de '{n.id}' no coincide con su salida.", f"{path}.params.destination")
+        elif n.id in carrier_transports:
+            add(Level.ERROR, "BAD_TRANSPORT", f"release_via apunta a '{n.id}', que no es un transporte.", path)
+        for rid, tid in n.release_via.items():
+            if rid not in n.release:
+                add(Level.ERROR, "BAD_RELEASE_VIA", f"'{n.id}' devuelve '{rid}' vía '{tid}' pero no lo libera (añádelo a release).", f"{path}.release_via")
+            if tid not in node_ids:
+                add(Level.ERROR, "BAD_RELEASE_VIA", f"El transporte '{tid}' no existe.", f"{path}.release_via")
+
         if isinstance(params, SourceParams) and params.arrival == "interarrival" and params.interarrival is None:
             add(Level.ERROR, "MISSING", f"La fuente '{n.id}' usa llegadas por intervalo pero falta 'interarrival'.", f"{path}.params.interarrival")
 
@@ -245,6 +309,10 @@ def verify(model: ISMSModel, registry: ComponentRegistry) -> tuple[VerificationR
             add(Level.ERROR, "BAD_HOME", f"El nodo 'home' de '{r.id}' ('{r.home}') no existe.", f"resources.{r.id}.home")
         used = any(r.id in [u.resource for u in getattr(c.params, "resources", [])] for c in compiled.values()) or any(
             r.id in [s.resource for s in n.seize] for n in model.nodes)
+        if r.dispatch is DispatchRule.WIP_TARGET:
+            _check_wip_target(r, compiled, add)
+        elif r.wip_target is not None:
+            add(Level.WARNING, "WIP_TARGET_IGNORED", f"'{r.id}' define wip_target pero su dispatch es '{r.dispatch.value}'.", f"resources.{r.id}.dispatch")
         if not used:
             add(Level.WARNING, "UNUSED_RESOURCE", f"El recurso '{r.id}' no lo usa ningún nodo.", f"resources.{r.id}")
 
@@ -273,6 +341,8 @@ def verify(model: ISMSModel, registry: ComponentRegistry) -> tuple[VerificationR
         add(Level.ERROR, "NO_SINK", "El modelo no tiene ninguna salida (Sink).", hint="Añade un nodo 'sink'.")
 
     for n_id, c in compiled.items():
+        if n_id in carrier_transports:
+            continue  # returns empty carriers: not part of the product flow
         outs = model.successors(n_id)
         ins = model.predecessors(n_id)
         label = c.node.name or n_id
@@ -300,6 +370,8 @@ def verify(model: ISMSModel, registry: ComponentRegistry) -> tuple[VerificationR
     if sources and sinks and not rep.errors:
         reach = set().union(*(nx.descendants(g, s) | {s} for s in sources))
         for n_id in node_ids:
+            if n_id in carrier_transports:
+                continue
             if n_id not in reach:
                 add(Level.ERROR, "UNREACHABLE", f"El nodo '{n_id}' no es alcanzable desde ninguna fuente.", f"nodes.{n_id}")
             elif not any(t in sinks for t in nx.descendants(g, n_id) | {n_id}):
@@ -340,16 +412,47 @@ def verify(model: ISMSModel, registry: ComponentRegistry) -> tuple[VerificationR
         rep.readiness = Readiness.INCOMPLETE
     elif rep.errors:
         rep.readiness = Readiness.CONFIGURED
-    elif model.is_approved:
+    elif original.is_approved:
         rep.readiness = Readiness.ENGINEER_APPROVED
     else:
         rep.readiness = Readiness.EXECUTABLE
-    if model.approval.approved and not model.is_approved:
+    if original.approval.approved and not original.is_approved:
         add(Level.WARNING, "APPROVAL_STALE", "El modelo cambió después de la aprobación del ingeniero: la aprobación ya no es válida.")
 
     if rep.errors:
         return rep, None
     return rep, CompiledModel(model, compiled, horizon, warmup, comp_versions)
+
+
+def _check_wip_target(r, compiled: dict[str, CompiledNode], add) -> None:
+    w = r.wip_target
+    path = f"resources.{r.id}.wip_target"
+    if w is None:
+        add(Level.ERROR, "MISSING", f"'{r.id}' usa dispatch=wip_target pero no define 'wip_target'.", path)
+        return
+    if w.target is None:
+        add(Level.ERROR, "MISSING", f"Falta el WIP objetivo ('target') de la estrategia de '{r.id}' (REQUIRED).", f"{path}.target")
+    elif not isinstance(w.target, int) or w.target < 0:
+        add(Level.ERROR, "BAD_PARAM", f"target de '{r.id}' debe ser entero >= 0 (es {w.target}).", f"{path}.target")
+    if w.preempt_below is not None and (not isinstance(w.preempt_below, int) or w.preempt_below < 0
+                                       or (isinstance(w.target, int) and w.preempt_below > w.target)):
+        add(Level.ERROR, "BAD_PARAM", "preempt_below debe ser entero, >= 0 y <= target.", f"{path}.preempt_below")
+    pn = compiled.get(w.protected_node)
+    if pn is None:
+        add(Level.ERROR, "BAD_WIP_TARGET", f"El nodo protegido '{w.protected_node}' no existe.", f"{path}.protected_node")
+    elif pn.behavior is not Behavior.SERVER:
+        add(Level.ERROR, "BAD_WIP_TARGET", f"El nodo protegido '{w.protected_node}' debe ser una estación (server).", f"{path}.protected_node")
+    for nid in w.feed_nodes:
+        if nid not in compiled:
+            add(Level.ERROR, "BAD_WIP_TARGET", f"feed_nodes: '{nid}' no existe.", f"{path}.feed_nodes")
+    users = {nid for nid, c in compiled.items() if r.id in [u.resource for u in getattr(c.params, "resources", [])]}
+    for nid in w.feeder_nodes:
+        if nid not in compiled:
+            add(Level.ERROR, "BAD_WIP_TARGET", f"feeder_nodes: '{nid}' no existe.", f"{path}.feeder_nodes")
+        elif nid not in users:
+            add(Level.ERROR, "BAD_WIP_TARGET", f"feeder_nodes: '{nid}' no usa el recurso '{r.id}'.", f"{path}.feeder_nodes")
+    if users and not (users - set(w.feeder_nodes)):
+        add(Level.WARNING, "WIP_TARGET_NO_OTHER", f"Todas las tareas de '{r.id}' son feeder: la estrategia equivale a FIFO.", path)
 
 
 def compile_model(model: ISMSModel, registry: ComponentRegistry) -> CompiledModel:

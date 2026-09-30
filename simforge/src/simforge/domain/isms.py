@@ -88,6 +88,30 @@ class ResourceKind(str, Enum):
 class DispatchRule(str, Enum):
     FIFO = "fifo"  # first request first served
     PRIORITY = "priority"  # lowest node.priority first, FIFO tie-break
+    WIP_TARGET = "wip_target"  # WIP_TARGET_PRIORITY: keep a protected node fed (see WipTargetParams)
+
+
+class WipTargetParams(_Strict):
+    """WIP_TARGET_PRIORITY dispatching (reusable, process-agnostic).
+
+    The resource serves FEEDER tasks while the WIP available to feed the PROTECTED node is below
+    `target`; otherwise it serves the other tasks (e.g. review). Rules, in order:
+      1. protected node BLOCKED (its output is full) and a downstream task waits -> downstream task
+         (otherwise the resource itself would starve the protected node through blocking);
+      2. feed WIP < target and a feeder task waits -> feeder task;
+      3. feed WIP >= target -> non-feeder task if one waits, else feeder;
+      FIFO among tasks of the same class.
+    Re-evaluation while busy: if `preempt_below` is set and feed WIP drops below it while a unit is
+    working on a non-feeder task and a feeder task waits, that task is suspended (remaining work kept)
+    and the unit switches to the feeder task.
+    """
+
+    protected_node: str
+    feed_nodes: list[str] = Field(min_length=1, description="nodes whose content is WIP ready to feed the protected node")
+    feeder_nodes: list[str] = Field(min_length=1, description="tasks that create feed WIP (e.g. assembly)")
+    target: int | str | None = Field(default=None, description="REQUIRED. units; may be an expression like '$wip_target'")
+    count_feeder_in_process: bool = True  # units being worked on at feeder tasks count as feed WIP
+    preempt_below: int | str | None = None  # None = no pre-emption (non-preemptive re-evaluation at each decision)
 
 
 class Travel(_Strict):
@@ -106,8 +130,9 @@ class Travel(_Strict):
 class Resource(_HasId):
     name: str = ""
     kind: ResourceKind = ResourceKind.OPERATOR
-    quantity: int = Field(default=1, ge=0)
+    quantity: int | str = Field(default=1, description="int >= 0 or expression, e.g. '$n_operators'")
     dispatch: DispatchRule = DispatchRule.FIFO
+    wip_target: WipTargetParams | None = None  # required when dispatch = wip_target
     travel: Travel | None = None  # only meaningful for operators with node positions
     home: str | None = None  # node id where the operator starts
     cost_per_hour: float | None = Field(default=None, ge=0)  # economics layer only
@@ -127,6 +152,7 @@ class Node(_HasId):
     priority: int = 0  # for PRIORITY dispatching of shared resources (lower = more urgent)
     seize: list[ResourceUse] = Field(default_factory=list)  # carriers acquired before processing, kept downstream
     release: list[str] = Field(default_factory=list)  # carriers released after processing here
+    release_via: dict[str, str] = Field(default_factory=dict)  # carrier -> transport node that returns it (empty trip)
     position: Position | None = None
     notes: str = ""
 
@@ -134,7 +160,27 @@ class Node(_HasId):
 class Edge(_Strict):
     source: str
     target: str
-    probability: float | None = Field(default=None, gt=0, le=1)
+    probability: float | str | None = Field(default=None, description="0<p<=1 or expression, e.g. '$branch2_share'")
+
+    @field_validator("probability")
+    @classmethod
+    def _p(cls, v):
+        if isinstance(v, (int, float)) and not isinstance(v, bool) and not 0 < v <= 1:
+            raise ValueError("la probabilidad debe estar en (0, 1]")
+        return v
+
+
+class ModelParameter(_HasId):
+    """Named, traceable model parameter. Referenced anywhere as '$id' (e.g. process-time multipliers,
+    routing shares, capacities). value = None means REQUIRED and not yet provided (model INCOMPLETE)."""
+
+    value: float | None = None
+    unit: str = ""
+    description: str = ""
+    role: Literal["fixed", "decision_variable", "uncertain"] = "fixed"
+    min: float | None = None
+    max: float | None = None
+    provenance: Provenance | None = None
 
 
 class Assumption(_Strict):
@@ -177,6 +223,7 @@ class ISMSModel(_Strict):
     meta: ModelMeta
     simulation: SimulationSettings = Field(default_factory=SimulationSettings)
     entities: list[EntityType] = Field(default_factory=lambda: [EntityType(id="unit", name="Unit")])
+    parameters: list[ModelParameter] = Field(default_factory=list)
     resources: list[Resource] = Field(default_factory=list)
     nodes: list[Node] = Field(default_factory=list)
     edges: list[Edge] = Field(default_factory=list)

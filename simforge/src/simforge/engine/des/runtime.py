@@ -14,7 +14,7 @@ from typing import Any, Callable
 
 import simpy
 
-from ...domain.isms import DispatchRule, Resource
+from ...domain.isms import Resource
 from ..base import ResourceState, RunRecord, TimeSeries
 
 LOW_PRIORITY = 2  # SimPy: 0 urgent, 1 normal. 2 = "end of current time step"
@@ -34,6 +34,7 @@ class SimContext:
         self._next_entity = 0
         self.nodes: dict[str, Any] = {}
         self.pools: dict[str, "ResourcePool"] = {}
+        self.watchers: dict[str, list["ResourcePool"]] = {}  # node id -> pools whose strategy watches it
         self.wip = LevelTracker(self, "wip")
 
     def rng(self, *key: str) -> random.Random:
@@ -41,6 +42,11 @@ class SimContext:
         -> common random numbers, i.e. fairer scenario comparisons."""
         h = hashlib.sha256(("|".join([str(self.seed), *key])).encode()).digest()
         return random.Random(int.from_bytes(h[:8], "big"))
+
+    def changed(self, node_id: str) -> None:
+        """A node's occupancy/state changed: strategies watching it re-evaluate (end of time step)."""
+        for pool in self.watchers.get(node_id, ()):
+            pool._schedule_dispatch()
 
     def new_entity(self, etype: str) -> "Entity":
         self._next_entity += 1
@@ -157,6 +163,9 @@ class Unit:
     tracker: StateTracker
     location: str | None = None
     busy: bool = False
+    task: str | None = None  # node currently served
+    preemptible: bool = False  # True only while processing a task that may be suspended
+    preempt: object = None  # callable set by the holder: suspends the task and frees this unit
 
     @property
     def name(self) -> str:
@@ -172,6 +181,7 @@ class _Request:
     t: float
     event: simpy.Event
     entity: int | None
+    resume: bool = False  # re-request of a task suspended by pre-emption
 
 
 class ResourcePool:
@@ -194,18 +204,27 @@ class ResourcePool:
         self.metric = spec.travel.metric if spec.travel else "euclidean"
         self.in_use = LevelTracker(ctx, f"in_use:{spec.id}", record_series=spec.kind.value == "carrier")
         self.tasks: dict[str, int] = {}
+        self.preemptions = 0
+        from .dispatch import make_strategy
+
+        self.strategy = make_strategy(spec)
+        for nid in self.strategy.watched_nodes():
+            ctx.watchers.setdefault(nid, []).append(self)
 
     # ---- API used by nodes ----
-    def request(self, node: str, qty: int, priority: int, entity: int | None) -> simpy.Event:
+    def request(self, node: str, qty: int, priority: int, entity: int | None, resume: bool = False) -> simpy.Event:
         self._seq += 1
         evt = self.ctx.env.event()
-        self.waiting.append(_Request(self._seq, node, qty, priority, self.ctx.now, evt, entity))
+        self.waiting.append(_Request(self._seq, node, qty, priority, self.ctx.now, evt, entity, resume))
         self._schedule_dispatch()
         return evt
 
     def release(self, units: list[Unit]) -> None:
         for u in units:
             u.busy = False
+            u.task = None
+            u.preemptible = False
+            u.preempt = None
             u.tracker.set(ResourceState.IDLE)
         self.in_use.change(-len(units))
         self._schedule_dispatch()
@@ -232,34 +251,45 @@ class ResourcePool:
             free = [u for u in self.units if not u.busy]
             feasible = [r for r in self.waiting if r.qty <= len(free)]
             if not feasible:
+                cand = self.strategy.preempt_candidate(self)
+                if cand is not None:
+                    unit, reason, state = cand
+                    unit.preemptible = False
+                    self.preemptions += int(self.ctx.counting)
+                    self._log("preempt", unit.task, None, [unit], self.waiting, reason, state)
+                    unit.preempt()  # type: ignore[operator]  # holder suspends its task and releases the unit
                 return
-            if self.spec.dispatch is DispatchRule.PRIORITY:
-                chosen = min(feasible, key=lambda r: (r.priority, r.seq))
-                reason = f"priority rule: node '{chosen.node}' has priority {chosen.priority} (lower = more urgent)"
-            else:
-                chosen = min(feasible, key=lambda r: r.seq)
-                reason = f"FIFO: oldest request (waiting since t={chosen.t:.1f}s)"
+            chosen, reason, state = self.strategy.choose(self, feasible)
             # nearest free units first (walking time), then lowest index
             free.sort(key=lambda u: (self.travel_time(u, chosen.node), u.index))
             units = free[: chosen.qty]
             for u in units:
                 u.busy = True
+                u.task = chosen.node
             self.in_use.change(len(units))
             self.waiting.remove(chosen)
             self.tasks[chosen.node] = self.tasks.get(chosen.node, 0) + 1
-            if self.ctx.trace and self.ctx.record.decisions is not None and (len(self.waiting) > 0 or len(feasible) > 1):
-                self.ctx.record.decisions.append({
-                    "t": round(self.ctx.now, 6),
-                    "resource": self.id,
-                    "units": [u.name for u in units],
-                    "chosen_node": chosen.node,
-                    "chosen_entity": chosen.entity,
-                    "candidates": [{"node": r.node, "entity": r.entity, "priority": r.priority,
-                                    "waiting_s": round(self.ctx.now - r.t, 3)} for r in [chosen, *self.waiting]],
-                    "rule": self.spec.dispatch.value,
-                    "reason": reason,
-                })
+            self._log("assign", chosen.node, chosen, units, [chosen, *self.waiting], reason, state)
             chosen.event.succeed(units)
+
+    def _log(self, kind: str, node: str | None, chosen: "_Request | None", units: list["Unit"],
+             candidates: list["_Request"], reason: str, state: dict) -> None:
+        if not (self.ctx.trace and self.ctx.record.decisions is not None):
+            return
+        self.ctx.record.decisions.append({
+            "t": round(self.ctx.now, 6),
+            "resource": self.id,
+            "kind": kind,
+            "units": [u.name for u in units],
+            "chosen_node": node,
+            "chosen_entity": chosen.entity if chosen else None,
+            "contested": len({r.node for r in candidates}) > 1,
+            "candidates": [{"node": r.node, "entity": r.entity, "priority": r.priority, "resume": r.resume,
+                            "waiting_s": round(self.ctx.now - r.t, 3)} for r in candidates],
+            "rule": self.strategy.rule,
+            "reason": reason,
+            "state": state,
+        })
 
     def finalize(self) -> None:
         rec = self.ctx.record
@@ -270,4 +300,5 @@ class ResourcePool:
         rec.resource_units[self.id] = len(self.units)
         rec.resource_state_time[self.id] = tot
         rec.resource_tasks[self.id] = dict(self.tasks)
+        rec.resource_preemptions[self.id] = self.preemptions
         self.in_use.finalize()

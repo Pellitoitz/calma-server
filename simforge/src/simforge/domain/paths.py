@@ -16,7 +16,7 @@ from typing import Any
 
 from .isms import ISMSModel
 
-_ID_LISTS = {"nodes", "resources", "entities"}
+_ID_LISTS = {"nodes", "resources", "entities", "parameters"}
 
 
 class PathError(KeyError):

@@ -10,7 +10,7 @@ from dataclasses import asdict, dataclass, field
 
 import networkx as nx
 
-from ..domain.behaviors import Behavior, ServerParams
+from ..domain.behaviors import Behavior, ServerParams, TransportParams
 from ..validation.verifier import CompiledModel
 from .kpis import ReplicatedKPIs
 
@@ -74,7 +74,7 @@ def capacity_bounds(cm: CompiledModel) -> list[CapacityBound]:
         if c.behavior is not Behavior.SERVER or visits[n] == 0:
             continue
         p: ServerParams = c.params  # type: ignore[assignment]
-        mean = p.process_time.mean_seconds() if p.process_time else 0.0
+        mean = p.process_time.mean_seconds() * p.work_units if p.process_time else 0.0
         avail = 1.0
         if p.failures:
             mtbf, mttr = p.failures.mtbf.mean_seconds(), p.failures.mttr.mean_seconds()
@@ -85,6 +85,19 @@ def capacity_bounds(cm: CompiledModel) -> list[CapacityBound]:
                                         f"{p.capacity} slot(s) × 3600 / {mean:.1f}s × availability {avail:.3f} / visits {visits[n]:.3f}"))
         for use in p.resources:
             work_by_resource[use.resource] = work_by_resource.get(use.resource, 0.0) + mean * visits[n] * use.quantity
+    carrier_transports = {t for c in cm.nodes.values() for t in c.node.release_via.values()}
+    for n, c in cm.nodes.items():
+        if c.behavior is not Behavior.TRANSPORT:
+            continue
+        tp: TransportParams = c.params  # type: ignore[assignment]
+        cycle = _trip_cycle(tp)
+        per_unit = cycle / tp.capacity
+        v = visits[n] if n not in carrier_transports else visits.get(_releasing_node(cm, n), 0)
+        if cycle > 0 and v > 0:
+            bounds.append(CapacityBound(n, "transport", tp.fleet * 3600 / per_unit / v * out_frac,
+                                        f"{tp.fleet} vehicle(s) × {tp.capacity} unit(s)/trip / {cycle:.1f}s per trip (load+travel+unload+return)"))
+        for use in tp.resources:
+            work_by_resource[use.resource] = work_by_resource.get(use.resource, 0.0) + per_unit * v * use.quantity
     for rid, work in work_by_resource.items():
         units = cm.model.resource(rid).quantity
         if work > 0 and units > 0:
@@ -100,13 +113,29 @@ def capacity_bounds(cm: CompiledModel) -> list[CapacityBound]:
             for pn in path_nodes:
                 pc = cm.nodes[pn]
                 if pc.behavior is Behavior.SERVER and pc.params.process_time:
-                    hold += pc.params.process_time.mean_seconds()
+                    hold += pc.params.process_time.mean_seconds() * pc.params.work_units
+                elif pc.behavior is Behavior.TRANSPORT:
+                    hold += _trip_cycle(pc.params, with_return=False)
+                via = pc.node.release_via.get(s.resource)
+                if via:  # empty carrier travels back before it can be reused
+                    hold += _trip_cycle(cm.nodes[via].params, with_return=False)
+                    path_nodes = [*path_nodes, via]
             if hold > 0:
                 qty = cm.model.resource(s.resource).quantity
                 bounds.append(CapacityBound(s.resource, "carrier_loop", qty / s.quantity * 3600 / hold,
                                             f"{qty} carrier(s) / {hold:.1f}s minimum holding time ({' → '.join(path_nodes)})"))
     bounds.sort(key=lambda b: b.units_per_hour)
     return bounds
+
+
+def _trip_cycle(tp: TransportParams, with_return: bool = True) -> float:
+    trip = tp.travel_seconds() if tp.distance is not None and tp.speed is not None else 0.0
+    lu = (tp.load_time.mean_seconds() if tp.load_time else 0.0) + (tp.unload_time.mean_seconds() if tp.unload_time else 0.0)
+    return lu + trip * (2 if (tp.return_empty and with_return) else 1)
+
+
+def _releasing_node(cm: CompiledModel, transport: str) -> str:
+    return next((n for n, c in cm.nodes.items() if transport in c.node.release_via.values()), "")
 
 
 def _path_to_release(g: nx.DiGraph, cm: CompiledModel, start: str, resource: str) -> list[str]:

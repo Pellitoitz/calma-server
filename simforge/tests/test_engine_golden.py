@@ -76,8 +76,9 @@ def test_two_operators_relieve_constraint(registry):
 def test_operator_decision_log(registry):
     m = load_model(EXAMPLES / "02_shared_operator.yaml")
     rec, _ = run1(m, registry, trace=True)
-    assert rec.decisions, "contested decisions must be logged"
-    d = rec.decisions[0]
+    assert rec.decisions, "decisions must be logged"
+    assert all(x["kind"] == "assign" for x in rec.decisions)
+    d = next(x for x in rec.decisions if x["contested"])
     assert {"t", "resource", "chosen_node", "candidates", "reason", "rule"} <= set(d)
     # priority rule: inspection (priority 1) beats assembly (priority 2)
     assert d["chosen_node"] == "inspection"

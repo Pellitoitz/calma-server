@@ -1,0 +1,41 @@
+components:
+  - id: transport
+    name: Transport
+    category: logistics
+    behavior: transport
+    version: "1.0.0"
+    description: |
+      Physical transport between an origin and a destination: resource (operator, AGV, forklift...) walks to the
+      origin, loads, travels distance/speed, unloads, hands over (blocked if the destination is full) and optionally
+      returns empty. capacity = units per trip, fleet = parallel trips. Distance, speed, load and unload times are
+      REQUIRED (never defaulted). Can also return EMPTY carriers (racks, pallets) via a node's release_via.
+    tags: [logistics, transport, walking, carriers]
+    keywords: [transporte, transport, traslado, llevar, mover, carretilla, agv, forklift, viaje]
+    defaults: {capacity: 1, fleet: 1}
+    param_docs:
+      distance: "REQUIRED. {value, unit: m}"
+      speed: "REQUIRED. {value, unit: m/s}"
+      capacity: "Units per trip."
+      fleet: "Parallel trips (vehicles)."
+      load_time: "REQUIRED. Per trip."
+      unload_time: "REQUIRED. Per trip."
+      resources: "Held for the whole trip, e.g. [{resource: operator_1}]"
+      return_empty: "Travel back empty holding the resource (set false when the operator's walking is modelled by positions)."
+    kpis: [trips, units_transported, avg_load, utilization, blocked]
+    validation_status: tested
+    tests: [tests/test_benchmark_elements.py]
+    changelog: [{version: "1.0.0", change: "Initial version"}]
+
+  - id: rack_transport
+    name: Rack transport (one rack per trip)
+    category: logistics
+    behavior: transport
+    version: "1.0.0"
+    description: "Carrying racks/fixtures (bastidores) one per trip. Same semantics as 'transport' with capacity 1."
+    tags: [logistics, transport, racks, electronics]
+    keywords: [bastidor, bastidores, rack, racks, retorno de bastidores, transporte de bastidores, utillaje]
+    defaults: {capacity: 1, fleet: 1}
+    kpis: [trips, units_transported, utilization]
+    validation_status: tested
+    tests: [tests/test_benchmark_elements.py]
+    changelog: [{version: "1.0.0", change: "Initial version"}]

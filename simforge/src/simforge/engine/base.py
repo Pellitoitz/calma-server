@@ -65,6 +65,10 @@ class RunRecord:
     resource_units: dict[str, int] = field(default_factory=dict)
     resource_state_time: dict[str, dict[str, float]] = field(default_factory=dict)  # summed over units
     resource_tasks: dict[str, dict[str, int]] = field(default_factory=dict)  # resource -> node -> tasks
+    resource_preemptions: dict[str, int] = field(default_factory=dict)
+    node_trips: dict[str, int] = field(default_factory=dict)  # transports: trips started (post-warmup)
+    node_units_moved: dict[str, int] = field(default_factory=dict)  # transports: units delivered
+    node_preemptions: dict[str, int] = field(default_factory=dict)  # tasks suspended by pre-emption
     # debug
     events: list[dict[str, Any]] | None = None
     decisions: list[dict[str, Any]] | None = None

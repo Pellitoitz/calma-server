@@ -13,7 +13,8 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from .values import Duration
+from .units import Dimension
+from .values import Duration, Quantity
 
 
 class Behavior(str, Enum):
@@ -21,6 +22,7 @@ class Behavior(str, Enum):
     SINK = "sink"
     BUFFER = "buffer"
     SERVER = "server"  # machines, manual stations, inspection, test...
+    TRANSPORT = "transport"  # physical move origin -> destination (racks, pallets, AGV, forklift...)
 
 
 class ResourceUse(BaseModel):
@@ -64,6 +66,8 @@ class ServerParams(BaseModel):
 
     capacity: int = Field(default=1, ge=1, description="Parallel slots (identical stations)")
     process_time: Duration | None = None  # None -> model INCOMPLETE
+    work_units: float = Field(default=1, gt=0, description="process_time is per work unit (e.g. per circuit); "
+                              "time per entity = sampled time x work_units. Use '$circuits_per_rack'.")
     resources: list[ResourceUse] = Field(default_factory=list, description="Held during processing")
     yield_rate: float = Field(default=1.0, gt=0, le=1)
     on_reject: str = Field(default="scrap", description="'scrap' or id of a rework node")
@@ -78,9 +82,44 @@ class ServerParams(BaseModel):
         return self
 
 
+class TransportParams(BaseModel):
+    """Physical transport. Distance, speed, load and unload times are REQUIRED (None -> INCOMPLETE):
+    they are never defaulted because they drive walking/transport time directly."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    origin: str | None = Field(default=None, description="node id; required for carrier-return transports")
+    destination: str | None = Field(default=None, description="node id; required for carrier-return transports")
+    distance: Quantity | None = None
+    speed: Quantity | None = None
+    capacity: int = Field(default=1, ge=1, description="units carried per trip")
+    fleet: int = Field(default=1, ge=1, description="trips that can run in parallel (vehicles)")
+    load_time: Duration | None = None  # per trip
+    unload_time: Duration | None = None  # per trip
+    resources: list[ResourceUse] = Field(default_factory=list, description="held for the whole trip (incl. empty return)")
+    return_empty: bool = Field(default=True, description="the transporter travels back empty (resource held)")
+    batch: Literal["immediate", "full"] = Field(default="immediate", description="leave with what is waiting / wait for a full load")
+
+    @model_validator(mode="after")
+    def _check(self) -> "TransportParams":
+        if self.distance is not None:
+            self.distance.to_base(Dimension.LENGTH)
+            if self.distance.value < 0:
+                raise ValueError("distance no puede ser negativa")
+        if self.speed is not None:
+            self.speed.to_base(Dimension.SPEED)
+            if self.speed.value <= 0:
+                raise ValueError("speed debe ser > 0")
+        return self
+
+    def travel_seconds(self) -> float:
+        return self.distance.to_base() / self.speed.to_base()  # type: ignore[union-attr]
+
+
 BEHAVIOR_PARAMS: dict[Behavior, type[BaseModel]] = {
     Behavior.SOURCE: SourceParams,
     Behavior.SINK: SinkParams,
     Behavior.BUFFER: BufferParams,
     Behavior.SERVER: ServerParams,
+    Behavior.TRANSPORT: TransportParams,
 }
