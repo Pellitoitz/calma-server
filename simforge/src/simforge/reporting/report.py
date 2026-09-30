@@ -174,8 +174,9 @@ def build_markdown(model: ISMSModel, report: VerificationReport, run: Simulation
         node_rows = []
         for n in model.nodes:
             if f"node.{n.id}.utilization" in run.kpis.stats:
-                g = lambda m: fmt(f"node.{n.id}.{m}", run.kpis.mean(f"node.{n.id}.{m}"))  # noqa: E731
-                node_rows.append([n.name or n.id, g("utilization"), g("waiting_resource"), g("blocked"), g("starved"), g("down"), g("oee")])
+                vals = [fmt(f"node.{n.id}.{m}", run.kpis.mean(f"node.{n.id}.{m}"))
+                        for m in ("utilization", "waiting_resource", "blocked", "starved", "down", "oee")]
+                node_rows.append([n.name or n.id, *vals])
         if node_rows:
             L += ["### Stations", "", _table(["Station", "Busy", "Wait resource", "Blocked", "Starved", "Down", "OEE*"], node_rows), "",
                   f"*{OEE_DEFINITION}", ""]

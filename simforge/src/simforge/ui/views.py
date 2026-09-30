@@ -17,7 +17,7 @@ from ..engine.base import NodeState
 from ..experiments.runner import SimulationResult
 from ..library.registry import ComponentDef, save_user_component
 from ..persistence.project import Project
-from ..reporting.report import HEADLINE, experiment_csv, fmt, results_csv
+from ..reporting.report import experiment_csv, fmt, results_csv
 from ..services.app import SimForgeApp
 from ..validation.verifier import Level, VerificationReport
 from .charts import STATE_LABELS, experiment_line, station_states, wip_series

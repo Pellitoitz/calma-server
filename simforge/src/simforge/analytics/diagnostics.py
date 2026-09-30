@@ -143,7 +143,7 @@ def diagnose(cm: CompiledModel, k: ReplicatedKPIs) -> list[Finding]:
 
     # ---- demand vs capacity (open systems) ----
     arrivals = 0.0
-    for n, c in cm.nodes.items():
+    for c in cm.nodes.values():
         if c.behavior is Behavior.SOURCE and c.params.arrival == "interarrival" and c.params.interarrival:
             arrivals += 3600 / c.params.interarrival.mean_seconds()
     if arrivals and bounds and arrivals > bounds[0].units_per_hour * 0.98:

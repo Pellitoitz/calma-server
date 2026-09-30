@@ -1,6 +1,5 @@
 """AI layer + application service. No real API calls: MockLLMProvider / offline rules."""
 
-import json
 
 import pytest
 

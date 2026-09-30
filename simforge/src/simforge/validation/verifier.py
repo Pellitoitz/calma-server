@@ -16,7 +16,7 @@ from enum import Enum
 import networkx as nx
 from pydantic import BaseModel, ValidationError
 
-from ..domain.behaviors import Behavior, BufferParams, ServerParams, SourceParams
+from ..domain.behaviors import Behavior, ServerParams, SourceParams
 from ..domain.isms import ISMSModel, Node, ResourceKind
 from ..domain.units import Dimension
 from ..domain.values import Constant, Normal

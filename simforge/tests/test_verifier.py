@@ -1,7 +1,6 @@
-import pytest
 
 from simforge.domain.io import load_model
-from simforge.domain.isms import Approval, Edge, MissingInfo, Node, Resource
+from simforge.domain.isms import Approval, Edge, MissingInfo, Node
 from simforge.domain.paths import set_value
 from simforge.validation.verifier import Readiness, verify
 
