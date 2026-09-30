@@ -58,7 +58,7 @@ class DesEngine:
         record.wip_end = ctx.wip.level
         record.invariant_checks = ctx.invariant_checks
         record.completion_times = [d for _, _, d in record.completions]
-        for rid, locs in ctx.carrier_locs.items():
-            for loc, tr in locs.items():
+        for locs in ctx.carrier_locs.values():
+            for tr in locs.values():
                 tr.finalize()
         return record
