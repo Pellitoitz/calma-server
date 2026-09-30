@@ -1,0 +1,16 @@
+# How each KPI is computed IN ANYLOGIC. Fill from the model (statistics, datasets, output objects, code).
+# Leave null if unknown; the report shows "NOT PROVIDED". Compare with docs/benchmark_kpi_definitions.md.
+kpis:
+  production: null            # e.g. "sink.count() read at stop time (8 h)"
+  throughput: null            # e.g. "production / 8"
+  avg_wip: null               # e.g. "time average of a variable incremented at assembly start, decremented at Sink" / "dataset sampled every 60 s"
+  max_wip: null
+  lead_time: null             # e.g. "TimeMeasureStart at assembly -> TimeMeasureEnd at Sink, mean"
+  operator_utilization: null  # e.g. "resourcePool.utilization(): includes moving time?"
+  selective_utilization: null # e.g. "delay.statsUtilization.mean(): blocked agents counted as busy?"
+  selective_starvation: null
+  selective_blocking: null
+  trips: null
+  racks_transported: null
+  walking_time: null
+measurement_period: null      # e.g. "0 - 8 h, no reset"

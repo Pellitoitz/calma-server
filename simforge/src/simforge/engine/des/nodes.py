@@ -46,6 +46,11 @@ class IndustrialNode:
                 return self.ctx.nodes[target]
         return self.ctx.nodes[succ[-1][0]]
 
+    def reserve(self) -> Proc:
+        """Reserve a place for a future `enter(..., reservation=token)`; default: nothing to reserve."""
+        return None
+        yield  # pragma: no cover
+
     # generic probes used by dispatch strategies (process-agnostic)
     def occupancy(self) -> int:
         return 0
@@ -95,7 +100,7 @@ class IndustrialSource(IndustrialNode):
 
 
 class IndustrialSink(IndustrialNode):
-    def enter(self, entity: Entity, on_accept=None) -> Proc:
+    def enter(self, entity: Entity, on_accept=None, reservation=None) -> Proc:
         if on_accept:
             on_accept(entity)
         self.ctx.place(entity, self.id)
@@ -119,9 +124,16 @@ class IndustrialBuffer(IndustrialNode):
         self.level = LevelTracker(ctx, f"buffer:{self.id}", upper=self.p.capacity)
         ctx.env.process(self._forward())
 
-    def enter(self, entity: Entity, on_accept=None) -> Proc:
-        req = None
-        if self.space is not None:
+    def reserve(self) -> Proc:
+        if self.space is None:
+            return None
+        req = self.space.request()
+        yield req
+        return req
+
+    def enter(self, entity: Entity, on_accept=None, reservation=None) -> Proc:
+        req = reservation
+        if req is None and self.space is not None:
             req = self.space.request()
             yield req
         if on_accept:
@@ -195,9 +207,16 @@ class IndustrialServer(IndustrialNode):
             t.set(NodeState.DOWN if self.down else self.logical[i])
 
     # ---- flow ----
-    def enter(self, entity: Entity, on_accept=None) -> Proc:
+    def reserve(self) -> Proc:
         req = self.slots.request()
         yield req
+        return req
+
+    def enter(self, entity: Entity, on_accept=None, reservation=None) -> Proc:
+        req = reservation
+        if req is None:
+            req = self.slots.request()
+            yield req
         if on_accept:
             on_accept(entity)
         slot = self.free_slots.pop(0)
@@ -477,6 +496,15 @@ class IndustrialTransport(IndustrialNode):
             yield from self._wait_items(p.capacity if p.batch == "full" else 1)
             load = [self.queue.pop(0) for _ in range(min(p.capacity, len(self.queue)))]
             self.in_trip.extend(load)
+            targets: dict[int, tuple] = {}
+            for q in load:
+                if q[0] == "unit":
+                    target = self.next_node()
+                    token = None
+                    if p.reserve_destination:
+                        self._set(v, NodeState.BLOCKED)  # waiting for room at the destination (resource not held)
+                        token = yield from target.reserve()
+                    targets[id(q)] = (target, token)
             held: list[Unit] = []
             for use in p.resources:
                 self._set(v, NodeState.WAITING_RESOURCE)
@@ -508,7 +536,8 @@ class IndustrialTransport(IndustrialNode):
             for q in list(load):
                 if q[0] == "unit":
                     self._set(v, NodeState.BLOCKED)
-                    yield from self.next_node().enter(q[1])
+                    target, token = targets[id(q)]
+                    yield from target.enter(q[1], reservation=token)
                 else:
                     ctx.carrier_move(q[1], len(q[2]), f"return:{tid}", AVAILABLE)
                     self.aboard.remove(q)

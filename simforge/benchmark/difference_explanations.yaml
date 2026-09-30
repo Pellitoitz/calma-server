@@ -1,0 +1,9 @@
+# One entry per investigated difference (from benchmark_report.md section 7/8).
+# status: open | explained | engine_bug_fixed | anylogic_model_issue
+# cause: one of kpi_definition, initial_conditions, event_ordering, simultaneous_events, seize_release,
+#        buffer_capacity, blocking, starvation, operator_priority, transport_timing, rack_conservation,
+#        second_branch, warmup, end_of_simulation, randomness, time_resolution
+# NEVER resolve a difference by tuning a parameter.
+explanations: []
+#  - {racks: 4, kpi: selective_utilization, cause: kpi_definition, status: explained,
+#     explanation: "AnyLogic counts blocked time as busy; engine busy + blocked = AnyLogic value within 0.1 pp"}

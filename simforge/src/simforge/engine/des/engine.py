@@ -9,7 +9,7 @@ from ...domain.behaviors import Behavior
 from ...validation.verifier import CompiledModel
 from ..base import RunRecord
 from .nodes import IndustrialBuffer, IndustrialNode, IndustrialServer, IndustrialSink, IndustrialSource, IndustrialTransport
-from .runtime import ResourcePool, SimContext
+from .runtime import ResourcePool, SimContext, fmt_hms
 
 # Convention: events occurring exactly at t = horizon are included.
 _HORIZON_EPS = 1e-7
@@ -20,6 +20,23 @@ _NODE_CLASSES: dict[Behavior, type[IndustrialNode]] = {
     Behavior.SERVER: IndustrialServer,
     Behavior.SOURCE: IndustrialSource,
 }
+
+
+class DeadlockError(RuntimeError):
+    """The system can no longer move (circular wait). Results of such a run are never reported."""
+
+
+def _deadlock_report(ctx: SimContext) -> str:
+    lines = [f"DEADLOCK at t={ctx.now:.3f}s ({fmt_hms(ctx.now)}): no event can occur before the horizon."]
+    for pid, pool in ctx.pools.items():
+        busy = {u.name: u.task for u in pool.units if u.busy}
+        waiting = [r.node for r in pool.waiting]
+        if busy or waiting:
+            lines.append(f"  resource '{pid}': busy {busy}; waiting requests from {waiting}")
+    snap = ctx.snapshot()
+    lines.append(f"  stations {snap['stations']}; buffers {snap['buffers']}; transports {snap['transports']}; "
+                 f"carriers available {snap['carriers_available']}")
+    return "\n".join(lines)
 
 
 class DesEngine:
@@ -47,7 +64,17 @@ class DesEngine:
             else:
                 ctx.nodes[cn.node.id] = _NODE_CLASSES[cn.behavior](ctx, cn)
 
-        env.run(until=model.horizon_s + _HORIZON_EPS)
+        end = model.horizon_s + _HORIZON_EPS
+        while True:
+            t_next = env.peek()
+            if t_next == float("inf"):  # (checked before 'past the horizon': inf > end)
+                # nothing can ever happen again before the horizon: every process waits for another
+                if ctx.live or any(p.waiting for p in ctx.pools.values()):
+                    raise DeadlockError(_deadlock_report(ctx))
+                break
+            if t_next > end:
+                break
+            env.step()
 
         for node in ctx.nodes.values():
             node.finalize()

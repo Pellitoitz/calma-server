@@ -17,6 +17,7 @@ from .stats import Stat, percentile, summarize
 METRIC_INFO: dict[str, tuple[str, str, str]] = {
     "units_completed": ("Units completed", "units", "Units reaching a Sink in [warm-up, horizon]"),
     "throughput_per_hour": ("Throughput", "units/h", "units_completed / measured hours"),
+    "units_completed_before_horizon": ("Units completed (t < horizon)", "units", "Completions strictly before the horizon"),
     "units_scrapped": ("Units scrapped", "units", "Units removed as scrap in [warm-up, horizon]"),
     "yield": ("Overall yield", "", "completed / (completed + scrapped)"),
     "avg_wip": ("Average WIP", "units", "Time-weighted number of units in the system"),
@@ -74,6 +75,7 @@ def compute_run_kpis(rec: RunRecord, cm: CompiledModel) -> dict[str, float]:
     done = len(rec.completions)
     k["units_completed"] = done
     k["throughput_per_hour"] = done / (T / 3600) if T > 0 else 0.0
+    k["units_completed_before_horizon"] = sum(1 for _, _, d in rec.completions if d < rec.horizon_s)
     k["units_scrapped"] = len(rec.scrapped)
     k["yield"] = done / (done + len(rec.scrapped)) if done + len(rec.scrapped) else float("nan")
     k["avg_wip"] = rec.level_avg.get("wip", 0.0)

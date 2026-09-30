@@ -89,7 +89,7 @@ class WipTargetPriority:
         feeders = [r for r in feasible if r.node in self.feeders]
         others = [r for r in feasible if r.node not in self.feeders]
         first = lambda rs: min(rs, key=lambda x: x.seq)  # noqa: E731 - FIFO within a class
-        if blocked and others:
+        if blocked and others and self.p.unblock_protected:
             return first(others), (f"PROTECTED_BLOCKED: '{self.p.protected_node}' is BLOCKED (output full) -> downstream task first "
                                    f"to unblock it (feed WIP {feed}, target {self.target})"), state
         if feed < self.target and feeders:
@@ -106,7 +106,7 @@ class WipTargetPriority:
         if not any(r.node in self.feeders for r in pool.waiting):
             return None
         feed, blocked, state = self._state(pool)
-        if feed >= self.preempt_below or blocked:
+        if feed >= self.preempt_below or (blocked and self.p.unblock_protected):
             return None
         for u in pool.units:
             if u.busy and u.preemptible and u.task not in self.feeders:

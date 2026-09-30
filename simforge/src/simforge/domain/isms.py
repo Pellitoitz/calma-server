@@ -118,6 +118,7 @@ class WipTargetParams(_Strict):
     feeder_nodes: list[str] = Field(min_length=1, description="tasks that create feed WIP (e.g. assembly)")
     target: int | str | None = Field(default=None, description="REQUIRED. units; may be an expression like '$wip_target'")
     count_feeder_in_process: bool = True  # units being worked on at feeder tasks count as feed WIP
+    unblock_protected: bool = True  # rule 1 (protected node BLOCKED -> downstream task first) can be disabled
     preempt_below: int | str | None = None  # None = no pre-emption (non-preemptive re-evaluation at each decision)
 
 

@@ -189,71 +189,58 @@ def lib_docs(output: Path = typer.Option(Path("component_library.md"), "-o")):
     typer.echo(f"Written {output}")
 
 
-@bench_app.command("status")
-def bench_status(spec_file: Path):
-    """Is the benchmark model complete? Lists every missing datum."""
-    from .benchmark.bench import BenchmarkSpec, load_reference, prepare_model
-    from .domain.paths import set_value
-    spec = BenchmarkSpec.load(spec_file)
-    model = prepare_model(spec, spec_file.parent)
-    rep, _ = verify(set_value(model, spec.factor.path, spec.factor.values[0]), _registry())
-    for i in rep.issues:
-        typer.secho(str(i), fg={"error": "red", "warning": "yellow"}.get(i.level.value, None))
-    typer.secho(f"Model: {rep.summary()}", bold=True)
-    ref = load_reference(spec_file.parent / spec.reference_csv, spec)
-    filled = sum(v is not None for row in ref.values() for v in row.values())
-    total = len(spec.factor.values) * len(spec.metrics)
-    typer.secho(f"Reference values filled: {filled}/{total} ({spec.reference_csv})", bold=True)
-    raise typer.Exit(0 if rep.ok else 1)
-
-
-@bench_app.command("run")
-def bench_run(spec_file: Path, trace_scenario: Optional[float] = typer.Option(None, help="Export event/decision logs for this scenario value")):
-    """Run all scenarios, save engine results and the comparison with the reference CSV."""
-    from .benchmark.bench import BenchmarkNotReady, BenchmarkSpec, prepare_model, run_engine, write_outputs
-    from .domain.paths import set_value
-    from .persistence.project import _write_csv
-    spec = BenchmarkSpec.load(spec_file)
-    reg = _registry()
-    try:
-        exp = run_engine(spec, spec_file.parent, reg)
-    except BenchmarkNotReady as e:
-        for i in e.report.errors:
-            typer.secho(str(i), fg="red")
-        typer.secho(f"Benchmark not runnable: {e.report.summary()}", fg="red", bold=True)
-        raise typer.Exit(1) from None
-    paths = write_outputs(spec, spec_file.parent, exp, reg)
-    for s in exp.scenarios:
-        if s.error:
-            typer.secho(f"  scenario {s.factors}: ERROR {s.error}", fg="red")
-    typer.echo(paths["comparison_md"].read_text(encoding="utf-8").split("## ")[0])
-    for k, pth in paths.items():
+@bench_app.command("selective-soldering")
+def bench_selective(bench_dir: Path = typer.Option(Path("benchmark"), "--dir"),
+                    no_sensitivity: bool = typer.Option(False, help="Skip the simultaneous-event sensitivity run"),
+                    no_charts: bool = False):
+    """Run racks 1..10, compare with AnyLogic results (if imported), write report + charts."""
+    from .benchmark.run_selective_soldering import run_benchmark
+    run = run_benchmark(bench_dir, _registry(), sensitivity=not no_sensitivity, charts=not no_charts)
+    color = "red" if run.status.startswith(("BLOCKED", "NOT")) else "yellow" if run.status.startswith("PRELIMINARY") else "green"
+    typer.secho(f"Status: {run.status}", fg=color, bold=True)
+    if run.check.missing:
+        typer.secho(f"{len(run.check.missing)} inputs missing (REQUIRED_FROM_ANYLOGIC):", fg="red")
+        for k in run.check.missing:
+            typer.echo(f"  - {k}")
+    for x in run.check.invalid:
+        typer.secho(f"  invalid: {x}", fg="red")
+    for k, pth in run.files.items():
         typer.echo(f"{k}: {pth}")
-    if trace_scenario is not None:
-        val = int(trace_scenario) if float(trace_scenario).is_integer() else trace_scenario
-        m = set_value(prepare_model(spec, spec_file.parent), spec.factor.path, val)
-        res = run_simulation(m, reg, replications=1, trace=True)
-        d = spec_file.parent / "results" / f"trace_{spec.scenario_column}_{val}"
-        d.mkdir(parents=True, exist_ok=True)
-        rec = res.records[0]
-        _write_csv(d / "events.csv", rec.events or [])
-        _write_csv(d / "decisions.csv", [{**x, "candidates": json.dumps(x["candidates"]), "state": json.dumps(x["state"]),
-                                          "units": ",".join(x["units"])} for x in rec.decisions or []])
-        typer.echo(f"trace: {d}")
+    raise typer.Exit(0 if run.check.runnable else 2)
 
 
-@bench_app.command("template")
-def bench_template(spec_file: Path, force: bool = False):
-    """(Re)create the EMPTY reference CSV to be filled with AnyLogic results."""
-    from .benchmark.bench import BenchmarkSpec, load_reference, reference_template
-    spec = BenchmarkSpec.load(spec_file)
-    target = spec_file.parent / spec.reference_csv
-    ref = load_reference(target, spec)
-    if any(v is not None for row in ref.values() for v in row.values()) and not force:
-        typer.secho(f"{target} already contains values; use --force to overwrite.", fg="red")
-        raise typer.Exit(1)
-    target.write_text(reference_template(spec), encoding="utf-8")
-    typer.echo(f"Written {target}")
+@bench_app.command("inputs")
+def bench_inputs(bench_dir: Path = typer.Option(Path("benchmark"), "--dir")):
+    """Regenerate required_inputs.md from the configuration."""
+    from .benchmark.selective_soldering import Config, check_inputs, required_inputs_markdown
+    cfg = Config.load(bench_dir / "selective_soldering_config.yaml")
+    (bench_dir / "required_inputs.md").write_text(required_inputs_markdown(cfg), encoding="utf-8")
+    chk = check_inputs(cfg)
+    typer.echo(f"missing {len(chk.missing)} · to confirm {len(chk.unconfirmed)} · invalid {len(chk.invalid)} -> {bench_dir / 'required_inputs.md'}")
+
+
+@bench_app.command("trace")
+def bench_trace(racks: int = typer.Option(..., help="number of racks"), minutes: float = typer.Option(15.0),
+                bench_dir: Path = typer.Option(Path("benchmark"), "--dir"), show: int = typer.Option(60, help="lines to print")):
+    """Short detailed trace (first N minutes) for event-by-event comparison with AnyLogic."""
+    from .benchmark.run_selective_soldering import run_trace
+    from .benchmark.selective_soldering import BenchmarkBlocked
+    from .engine.des.runtime import fmt_hms
+    try:
+        events, decisions, stem = run_trace(bench_dir, _registry(), racks, minutes)
+    except BenchmarkBlocked as e:
+        typer.secho(f"Blocked: {len(e.missing)} inputs missing, {len(e.invalid)} invalid. Run 'simforge benchmark inputs'.", fg="red")
+        raise typer.Exit(2) from None
+    merged = sorted([("E", ev["t"], ev) for ev in events] + [("D", d["t"], d) for d in decisions], key=lambda x: (x[1], x[0] != "D"))
+    for kind, t, x in merged[:show]:
+        if kind == "E":
+            extra = {k: v for k, v in x.items() if k not in ("t", "entity", "event", "node")}
+            typer.echo(f"{fmt_hms(t)}  rack/unit {x.get('entity') or '-':>4}  {x['event']:<22} {x.get('node') or '':<24} {extra if extra else ''}")
+        else:
+            typer.secho(f"{fmt_hms(t)}  DECISION {x['resource']}: {x['chosen_node']} [{x['reason_code']}] candidates="
+                        f"{[c['node'] for c in x['candidates']]} feed_wip={x['state'].get('feed_wip')} "
+                        f"racks_available={x['system']['carriers_available']}", fg="cyan")
+    typer.echo(f"{len(events)} events, {len(decisions)} decisions -> {stem}_events.csv / _decisions.csv")
 
 
 @app.command()

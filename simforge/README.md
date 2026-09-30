@@ -108,6 +108,11 @@ simforge/
 
 Datos de cliente (`workspace/`, configurable con `SIMFORGE_WORKSPACE`) y biblioteca propia (`~/.simforge/library`, `SIMFORGE_LIBRARY`) están **separados físicamente**. `workspace/` está en `.gitignore`.
 
+## Benchmark contra AnyLogic (fase actual)
+
+`benchmark/` contiene la validación del motor contra el modelo AnyLogic de soldadura selectiva. Ver `benchmark/README.md`,
+`docs/benchmark_operator_logic.md` y `docs/benchmark_kpi_definitions.md`. Estado actual: **BLOCKED** hasta recibir los datos de AnyLogic.
+
 ## Estado honesto (v0.1)
 
 Funciona de verdad: todo lo descrito arriba. **NO implementado todavía** (y el esquema lo rechaza en vez de ignorarlo): turnos/calendarios, mix de productos y setups, routing condicional/"first available", transporte con distancia para entidades (sólo desplazamiento de operarios), economía (coste/unidad, CAPEX, ROI), energía, optimización (sólo grid), PDF/PPT nativos, importación de Excel/CSV de estudios de tiempos, integración AnyLogic (ver `docs/anylogic.md`, todo marcado TO VERIFY).

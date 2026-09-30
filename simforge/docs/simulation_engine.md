@@ -45,6 +45,17 @@ Distancia, velocidad, carga y descarga son obligatorias. El recurso cuenta como 
 `$id` en expresiones seguras (`1 - $branch2_share`, `$circuits_per_rack`) en tiempos (`work_units`), capacidades,
 cantidades, probabilidades de ruta, distancias y velocidades. Valor `null` → modelo INCOMPLETE, con la lista de usos.
 
+## Cambios de semántica en el motor 0.2.0 (fase benchmark)
+
+- **Recogida física en transportes**: la unidad conserva su plaza aguas arriba hasta que se carga (`loading_area` para zonas de espera explícitas).
+- **`reserve_destination`**: el viaje sólo empieza (y sólo entonces se pide el operario) si hay plaza reservada en destino.
+- **Estados del operario**: `idle`, `walking` (sin carga hacia la tarea), `working:<tarea>`, `transporting:<tarea>` (viaje cargado + retorno vacío).
+- **Distancias**: tabla explícita (`travel.distances` + `travel.locations`) o posiciones; si falta un dato → `TravelDataError` (nunca 0 silencioso).
+- **Invariantes** (activos por defecto): conservación de bastidores por ubicación con verificación cruzada, conservación de entidades,
+  niveles acotados (WIP ≥ 0, buffers ≤ capacidad, recursos ≤ cantidad), fracciones ≤ 100 %. Violación → `InvariantViolation`.
+- **Interbloqueo**: si ningún evento puede ocurrir antes del horizonte con entidades en el sistema → `DeadlockError` con diagnóstico.
+- **`dispatch_timing`**: `end_of_timestep` (por defecto) o `immediate`, para medir la sensibilidad al orden de eventos simultáneos.
+
 ## Semántica (fijada por tests)
 
 - **Bloqueo tras servicio**: una estación terminada retiene su ranura hasta que el siguiente nodo acepta la unidad.

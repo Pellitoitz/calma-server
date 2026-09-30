@@ -1,0 +1,160 @@
+# ============================================================================================
+# Selective soldering benchmark - ALL parameters of the SimForge reconstruction.
+#
+# Every datum is an entry:  {value, unit, status, source, anylogic, note}
+#   status:
+#     REQUIRED_FROM_ANYLOGIC    value missing -> the benchmark cannot run
+#     USER_STATED_TO_CONFIRM    stated by the engineer in conversation; NOT yet confirmed against the
+#                               AnyLogic model -> runs are PRELIMINARY (never "official")
+#     CONFIRMED                 read from the AnyLogic model / confirmed by the engineer
+#     ENGINE_CHOICE             SimForge-side setting, not an AnyLogic datum
+#   anylogic: where to find the value in the AnyLogic model (guidance; verify in your PLE 8.9 model)
+# No value in this file has been invented. Do NOT tune values to match AnyLogic results.
+# ============================================================================================
+benchmark:
+  name: selective_soldering_racks
+  anylogic_model_file: {value: null, status: REQUIRED_FROM_ANYLOGIC, note: ".alp file name and version/date used for the reference run"}
+  anylogic_version: {value: "PLE 8.9", status: USER_STATED_TO_CONFIRM, source: conversation}
+
+experiment:
+  racks: {value: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], unit: racks, status: USER_STATED_TO_CONFIRM, source: conversation,
+          anylogic: "Parameter of Main used for the rack population size (parameters variation / manual runs)"}
+
+simulation:
+  horizon: {value: 8, unit: h, status: USER_STATED_TO_CONFIRM, source: conversation, note: "8 h netas, continuas",
+            anylogic: "Simulation experiment > Model time > Stop: 'Stop at specified time' (check model time units)"}
+  warmup: {value: null, unit: h, status: REQUIRED_FROM_ANYLOGIC, options: ["0 (statistics from t=0)", "<hours>"],
+           anylogic: "Code that resets statistics (e.g. resetStats() in an event) - PLE has no built-in warm-up"}
+  production_definition: {value: null, status: REQUIRED_FROM_ANYLOGIC,
+                          options: [sink_count_at_stop_time, completions_strictly_before_stop],
+                          anylogic: "How production is read: Sink block count() at stop time? any dataset/statistic?"}
+  simultaneous_events: {value: null, status: REQUIRED_FROM_ANYLOGIC, options: [FIFO, LIFO, Random],
+                        anylogic: "Simulation experiment properties > Randomness: 'Selection mode for simultaneous events' (verify location in PLE 8.9)"}
+  randomness: {value: null, status: REQUIRED_FROM_ANYLOGIC, options: [deterministic, stochastic],
+               anylogic: "Are all delay times constants? Search for triangular()/uniform()/normal() in Delay/Service times"}
+  dispatch_timing: {value: end_of_timestep, status: ENGINE_CHOICE,
+                    note: "SimForge decides resource allocation after all events of the same timestamp; 'immediate' is run as sensitivity check"}
+  replications: {value: 1, status: ENGINE_CHOICE, note: "deterministic model -> 1 replication; revisit if randomness = stochastic"}
+  base_seed: {value: 12345, status: ENGINE_CHOICE}
+
+initial_state:
+  racks_location: {value: null, status: REQUIRED_FROM_ANYLOGIC, options: [all_available_at_assembly],
+                   anylogic: "Rack agent population: initial location / how racks are injected at startup (Source or population)"}
+  system_empty: {value: null, status: REQUIRED_FROM_ANYLOGIC, options: [true, false],
+                 anylogic: "Any product/racks already in conveyors, selective or buffers at t=0? (Main > On startup code)"}
+  operator_location: {value: null, status: REQUIRED_FROM_ANYLOGIC, options: [assembly, review],
+                      anylogic: "ResourcePool > Home location (nodes)"}
+
+racks:
+  circuits_per_rack: {value: null, unit: circuits, status: REQUIRED_FROM_ANYLOGIC,
+                      anylogic: "Parameter of Main / Rack agent (used as multiplier in the delay-time expressions)"}
+
+supply:
+  mode: {value: infinite, status: USER_STATED_TO_CONFIRM, source: conversation, note: "suministro siempre disponible",
+         anylogic: "Source block: 'Arrivals defined by' (e.g. 'Calls of inject()' when a rack is free)"}
+
+operator:
+  count: {value: 1, unit: operators, status: USER_STATED_TO_CONFIRM, source: conversation, note: "operario compartido; parametrizable 0-4",
+          anylogic: "ResourcePool > Capacity"}
+  walking_speed: {value: null, unit: m/s, status: REQUIRED_FROM_ANYLOGIC, anylogic: "ResourcePool > Speed (moving resources); check units"}
+  loaded_speed: {value: null, unit: m/s, status: REQUIRED_FROM_ANYLOGIC, note: "speed while carrying a rack (same as walking?)",
+                 anylogic: "MoveTo / transporter speed, or ResourcePool speed if the operator carries the rack"}
+  strategy: {value: WIP_TARGET_PRIORITY, status: USER_STATED_TO_CONFIRM, source: conversation}
+  wip_target: {value: null, unit: racks, status: REQUIRED_FROM_ANYLOGIC,
+               anylogic: "Parameter/variable used in the operator decision code (Seize 'Task priority', Hold/condition code, custom function)"}
+  wip_comparison: {value: null, status: REQUIRED_FROM_ANYLOGIC, options: ["assembly_if_wip < target", "assembly_if_wip <= target"],
+                   note: "SimForge rule is 'feeder if WIP < target'; '<=' maps exactly to target+1 (integers), no code change"}
+  wip_counted_locations: {value: null, status: REQUIRED_FROM_ANYLOGIC,
+                          options: [assembly_conveyor, transport_to_selective, selective_entry],
+                          anylogic: "The expression that computes 'WIP available for the selective' (queue sizes summed in the code)"}
+  count_rack_in_assembly: {value: null, status: REQUIRED_FROM_ANYLOGIC, options: [true, false],
+                           note: "does a rack currently being assembled count as feed WIP?"}
+  feeding_tasks: {value: null, status: REQUIRED_FROM_ANYLOGIC, options: [assembly, transport_to_selective, rack_return],
+                  note: "tasks prioritised while WIP < target (always includes assembly)"}
+  unblock_selective_first: {value: null, status: REQUIRED_FROM_ANYLOGIC, options: [true, false],
+                            note: "if the selective cannot unload (output full), does the operator go to review first?"}
+  preempt_review_below: {value: null, status: REQUIRED_FROM_ANYLOGIC, options: [never, "<integer WIP threshold>"],
+                         anylogic: "Seize block for review: 'Task may preempt' / 'Task preemption policy'; custom interrupt code"}
+  same_class_order: {value: null, status: REQUIRED_FROM_ANYLOGIC, options: [FIFO],
+                     anylogic: "ResourcePool / Seize queue ordering when several tasks of the same type wait"}
+
+assembly:
+  seconds_per_circuit: {value: 6, unit: s, status: USER_STATED_TO_CONFIRM, source: conversation, anylogic: "Delay/Service 'Delay time' of assembly"}
+  stations: {value: null, unit: stations, status: REQUIRED_FROM_ANYLOGIC, anylogic: "Delay/Service 'Capacity' of assembly"}
+  output_conveyor_capacity: {value: 2, unit: racks, status: USER_STATED_TO_CONFIRM, source: conversation,
+                             anylogic: "Conveyor 'Capacity' (or length / cell size)"}
+  output_conveyor_transit: {value: null, unit: s, status: REQUIRED_FROM_ANYLOGIC, options: ["0 (accumulating queue)", "<seconds>"],
+                            anylogic: "Conveyor length / speed"}
+
+transport_to_selective:
+  start_only_if_destination_has_room: {value: null, status: REQUIRED_FROM_ANYLOGIC, options: [true, false],
+                                       note: "does the operator start carrying only when the selective entry has room? (false can deadlock: operator waits holding a rack)",
+                                       anylogic: "Condition/Hold before the MoveTo, or the downstream Queue capacity check in the logic"}
+  exists: {value: null, status: REQUIRED_FROM_ANYLOGIC, options: [true, false], note: "operator carries the rack assembly -> selective entry?",
+           anylogic: "MoveTo / Seize with 'Send seized resources' + 'Attach' between assembly and selective"}
+  racks_per_trip: {value: 1, unit: racks, status: USER_STATED_TO_CONFIRM, source: conversation}
+  load_time: {value: null, unit: s, status: REQUIRED_FROM_ANYLOGIC}
+  unload_time: {value: null, unit: s, status: REQUIRED_FROM_ANYLOGIC}
+
+selective:
+  seconds_per_circuit: {value: 5, unit: s, status: USER_STATED_TO_CONFIRM, source: conversation, anylogic: "Delay time of the selective"}
+  input_capacity: {value: 3, unit: racks, status: USER_STATED_TO_CONFIRM, source: conversation, anylogic: "Queue before the selective > Capacity"}
+  racks_inside: {value: null, unit: racks, status: REQUIRED_FROM_ANYLOGIC, anylogic: "Delay/Service 'Capacity' of the selective"}
+  output_buffer_capacity: {value: 2, unit: racks, status: USER_STATED_TO_CONFIRM, source: conversation, note: "'buffer de selectiva'",
+                           anylogic: "Queue after the selective > Capacity (confirm it is the OUTPUT buffer)"}
+
+second_branch:
+  enabled: {value: null, status: REQUIRED_FROM_ANYLOGIC, options: [true, false]}
+  share: {value: null, unit: fraction, status: REQUIRED_FROM_ANYLOGIC, note: "'% de utilización' of branch 2 as a routing fraction (0-1)",
+          anylogic: "SelectOutput 'Probability' (or the condition used)"}
+  routing_rule: {value: null, status: REQUIRED_FROM_ANYLOGIC, options: [probabilistic_share],
+                 note: "other rules (alternating, first-free, condition) are NOT IMPLEMENTED yet: tell us which one AnyLogic uses",
+                 anylogic: "SelectOutput / SelectOutput5 'Use' property"}
+  seconds_per_circuit: {value: null, unit: s, status: REQUIRED_FROM_ANYLOGIC}
+  racks_inside: {value: null, unit: racks, status: REQUIRED_FROM_ANYLOGIC}
+
+transport_to_review:
+  start_only_if_destination_has_room: {value: null, status: REQUIRED_FROM_ANYLOGIC, options: [true, false],
+                                       note: "does the operator start carrying only when the review table has room? (false can deadlock: operator waits holding a rack)",
+                                       anylogic: "Condition/Hold before the MoveTo, or the downstream Queue capacity check in the logic"}
+  exists: {value: null, status: REQUIRED_FROM_ANYLOGIC, options: [true, false], note: "operator carries the rack selective output -> review?"}
+  racks_per_trip: {value: 1, unit: racks, status: USER_STATED_TO_CONFIRM, source: conversation}
+  load_time: {value: null, unit: s, status: REQUIRED_FROM_ANYLOGIC}
+  unload_time: {value: null, unit: s, status: REQUIRED_FROM_ANYLOGIC}
+
+review:
+  seconds_per_circuit: {value: 2, unit: s, status: USER_STATED_TO_CONFIRM, source: conversation, note: "revision + limpieza",
+                        anylogic: "Delay time of review/cleaning (one block or two?)"}
+  tables_per_operator: {value: 1, unit: tables, status: USER_STATED_TO_CONFIRM, source: conversation, anylogic: "Delay/Service 'Capacity'"}
+
+rack_return:
+  mode: {value: null, status: REQUIRED_FROM_ANYLOGIC, options: [immediate_at_review_end, transport_to_assembly],
+         note: "'bastidor disponible nuevamente': where and when does the empty rack become available?"}
+  load_time: {value: null, unit: s, status: REQUIRED_FROM_ANYLOGIC, note: "only if mode = transport_to_assembly"}
+  unload_time: {value: null, unit: s, status: REQUIRED_FROM_ANYLOGIC, note: "only if mode = transport_to_assembly"}
+
+layout:
+  # physical points the operator moves between; distances are path lengths (AnyLogic network), symmetric
+  distances:
+    assembly__selective_in: {value: null, unit: m, status: REQUIRED_FROM_ANYLOGIC, anylogic: "Path length between the nodes (select the path > Length)"}
+    assembly__selective_out: {value: null, unit: m, status: REQUIRED_FROM_ANYLOGIC}
+    assembly__review: {value: null, unit: m, status: REQUIRED_FROM_ANYLOGIC}
+    selective_in__selective_out: {value: null, unit: m, status: REQUIRED_FROM_ANYLOGIC}
+    selective_in__review: {value: null, unit: m, status: REQUIRED_FROM_ANYLOGIC}
+    selective_out__review: {value: null, unit: m, status: REQUIRED_FROM_ANYLOGIC}
+
+tolerances:
+  # PROPOSED - must be agreed before use as acceptance criterion. Deterministic model: small by design.
+  production: {type: abs, value: 1, unit: racks, status: PROPOSED,
+               justification: "1 rack = granularity of counting at the horizon (a rack finishing exactly at 8 h may be counted by one tool and not the other)"}
+  throughput: {type: rel, value: 0.5, unit: "%", status: PROPOSED, justification: "follows from production +-1 over ~100-400 racks"}
+  avg_wip: {type: rel, value: 1.0, unit: "%", status: PROPOSED, justification: "time-weighted averages; allows end-of-run boundary effects"}
+  max_wip: {type: abs, value: 0, unit: racks, status: PROPOSED, justification: "integer quantity bounded by racks: must match exactly"}
+  lead_time: {type: rel, value: 1.0, unit: "%", status: PROPOSED, justification: "same boundary effects as WIP"}
+  operator_utilization: {type: pp, value: 0.5, unit: pp, status: PROPOSED, justification: "0.5 percentage points ~ 2.4 min in 8 h"}
+  selective_utilization: {type: pp, value: 0.5, unit: pp, status: PROPOSED, justification: "idem"}
+  selective_starvation: {type: pp, value: 0.5, unit: pp, status: PROPOSED, justification: "idem"}
+  selective_blocking: {type: pp, value: 0.5, unit: pp, status: PROPOSED, justification: "idem"}
+  trips: {type: abs, value: 1, unit: trips, status: PROPOSED, justification: "a trip in progress at 8 h"}
+  racks_transported: {type: abs, value: 1, unit: racks, status: PROPOSED, justification: "idem"}
+  walking_time: {type: rel, value: 1.0, unit: "%", status: PROPOSED, justification: "path-length rounding in the AnyLogic network"}

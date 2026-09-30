@@ -99,6 +99,8 @@ class TransportParams(BaseModel):
     resources: list[ResourceUse] = Field(default_factory=list, description="held for the whole trip (incl. empty return)")
     return_empty: bool = Field(default=True, description="the transporter travels back empty (resource held)")
     batch: Literal["immediate", "full"] = Field(default="immediate", description="leave with what is waiting / wait for a full load")
+    reserve_destination: bool = Field(default=False, description="True: a trip starts (resource requested) only once a place "
+                                      "at the destination is reserved; False: the transporter may wait at a full destination holding the load")
     loading_area: int = Field(default=0, ge=0, description="places at the pickup point. 0 = the unit stays in the upstream "
                               "node (keeping its place) until it is physically loaded")
 
