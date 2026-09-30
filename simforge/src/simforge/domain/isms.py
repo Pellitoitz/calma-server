@@ -64,6 +64,11 @@ class SimulationSettings(_Strict):
     replications: int = Field(default=1, ge=1, le=1000)
     base_seed: int = 12345
     trace: bool = False  # event log + operator decision log (debug mode)
+    dispatch_timing: Literal["end_of_timestep", "immediate"] = Field(
+        default="end_of_timestep",
+        description="When shared-resource decisions are taken: after all events of the same timestamp (default) "
+                    "or immediately in event order. Used to measure sensitivity to simultaneous-event ordering.")
+    check_invariants: bool = True  # conservation checks (racks, entities, levels); a violation aborts the run
 
     @field_validator("horizon", "warmup")
     @classmethod
@@ -116,9 +121,20 @@ class WipTargetParams(_Strict):
     preempt_below: int | str | None = None  # None = no pre-emption (non-preemptive re-evaluation at each decision)
 
 
+class NodeDistance(_Strict):
+    """Walking/path distance between two node locations (symmetric), e.g. AnyLogic network path length."""
+
+    a: str
+    b: str
+    distance: Quantity  # m (may be '$param')
+
+
 class Travel(_Strict):
     speed: Quantity  # m/s, m/min, km/h
     metric: Literal["euclidean", "manhattan"] = "euclidean"
+    distances: list[NodeDistance] = Field(default_factory=list, description="explicit table; takes precedence over positions")
+    locations: dict[str, str] = Field(default_factory=dict, description="node id -> physical point name used in `distances` "
+                                      "(several nodes can share a point, e.g. a station and its output conveyor)")
 
     @field_validator("speed")
     @classmethod

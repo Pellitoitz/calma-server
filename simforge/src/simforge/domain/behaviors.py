@@ -99,6 +99,14 @@ class TransportParams(BaseModel):
     resources: list[ResourceUse] = Field(default_factory=list, description="held for the whole trip (incl. empty return)")
     return_empty: bool = Field(default=True, description="the transporter travels back empty (resource held)")
     batch: Literal["immediate", "full"] = Field(default="immediate", description="leave with what is waiting / wait for a full load")
+    loading_area: int = Field(default=0, ge=0, description="places at the pickup point. 0 = the unit stays in the upstream "
+                              "node (keeping its place) until it is physically loaded")
+
+    @model_validator(mode="after")
+    def _batch(self) -> "TransportParams":
+        if self.batch == "full" and self.capacity > 1 and self.loading_area < self.capacity:
+            raise ValueError("batch 'full' con capacity > 1 requiere loading_area >= capacity (si no, nunca se completa la carga)")
+        return self
 
     @model_validator(mode="after")
     def _check(self) -> "TransportParams":

@@ -9,7 +9,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from ..domain.behaviors import ServerParams, TransportParams
-from ..engine.base import NodeState, ResourceState, RunRecord
+from ..engine.base import NodeState, RunRecord
 from ..validation.verifier import CompiledModel
 from .stats import Stat, percentile, summarize
 
@@ -39,7 +39,10 @@ METRIC_INFO: dict[str, tuple[str, str, str]] = {
     "node.*.trips": ("Trips", "trips", "Transport trips delivered (counted at unload)"),
     "node.*.units_transported": ("Units transported", "units", "Units (or empty carriers) delivered by the transport"),
     "node.*.preemptions": ("Pre-emptions", "count", "Tasks at this node suspended by the dispatch strategy"),
-    "resource.*.walking_h": ("Walking/travel time", "h", "Hours walking or travelling (incl. carrying loads and empty returns)"),
+    "resource.*.walking_h": ("Walking time", "h", "Hours walking unloaded to reach the next task location"),
+    "resource.*.transporting_h": ("Transporting time", "h", "Hours travelling in transport tasks (loaded trip + empty return)"),
+    "resource.*.working_h": ("Working time", "h", "Hours working at tasks (processing, loading, unloading)"),
+    "resource.*.idle_h": ("Idle time", "h", "Hours with no task assigned"),
     "resource.*.preemptions": ("Pre-emptions", "count", "Tasks this resource abandoned for a more urgent one"),
     "resource.*.avg_in_use": ("Avg in use", "units", "Time-weighted units in use (carriers: racks in circulation)"),
 }
@@ -119,15 +122,34 @@ def compute_run_kpis(rec: RunRecord, cm: CompiledModel) -> dict[str, float]:
     for rid, n_units in rec.resource_units.items():
         st = rec.resource_state_time.get(rid, {})
         denom = n_units * T
-        work = st.get(ResourceState.WORKING, 0.0)
-        walk = st.get(ResourceState.WALKING, 0.0)
-        k[f"resource.{rid}.working"] = work / denom if denom else 0.0
-        k[f"resource.{rid}.walking"] = walk / denom if denom else 0.0
-        k[f"resource.{rid}.walking_h"] = walk / 3600
+        cats = {"working": 0.0, "walking": 0.0, "transporting": 0.0, "idle": 0.0}
+        per_task: dict[str, float] = {}
+        for state, secs in st.items():
+            cat, _, task = state.partition(":")
+            cats[cat] = cats.get(cat, 0.0) + secs
+            if task:
+                per_task[task] = per_task.get(task, 0.0) + secs
+                k[f"resource.{rid}.{cat}_h.{task}"] = secs / 3600
+        for cat, secs in cats.items():
+            k[f"resource.{rid}.{cat}"] = secs / denom if denom else 0.0
+            k[f"resource.{rid}.{cat}_h"] = secs / 3600
+        for task, secs in per_task.items():
+            k[f"resource.{rid}.task_h.{task}"] = secs / 3600
         k[f"resource.{rid}.preemptions"] = rec.resource_preemptions.get(rid, 0)
         k[f"resource.{rid}.avg_in_use"] = rec.level_avg.get(f"in_use:{rid}", 0.0)
         k[f"resource.{rid}.utilization"] = k[f"resource.{rid}.avg_in_use"] / n_units if n_units else 0.0
+        prefix = f"carrier_at:{rid}:"
+        for name, avg in rec.level_avg.items():
+            if name.startswith(prefix):
+                k[f"resource.{rid}.avg_at.{name[len(prefix):]}"] = avg
+    # invariant: fractions of time can never exceed 100 %
+    for key, v in k.items():
+        if key.split(".")[-1] in _FRACTIONS and v == v and not -1e-9 <= v <= 1 + 1e-9:
+            raise ValueError(f"KPI invariant violated: {key} = {v} outside [0, 1]")
     return k
+
+
+_FRACTIONS = {"utilization", "blocked", "starved", "waiting_resource", "down", "working", "walking", "transporting", "idle", "yield"}
 
 
 @dataclass

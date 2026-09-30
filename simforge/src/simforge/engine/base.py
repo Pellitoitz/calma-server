@@ -69,6 +69,8 @@ class RunRecord:
     node_trips: dict[str, int] = field(default_factory=dict)  # transports: trips started (post-warmup)
     node_units_moved: dict[str, int] = field(default_factory=dict)  # transports: units delivered
     node_preemptions: dict[str, int] = field(default_factory=dict)  # tasks suspended by pre-emption
+    invariant_checks: int = 0
+    completion_times: list[float] = field(default_factory=list)
     # debug
     events: list[dict[str, Any]] | None = None
     decisions: list[dict[str, Any]] | None = None

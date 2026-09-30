@@ -66,7 +66,7 @@ def test_transport_one_unit_per_trip_exact(registry):
 
 def test_transport_capacity_two_full_batches(registry):
     # two units per 25 s trip; first delivery at 35 s -> deliveries at 35 + 25k -> 143 trips x 2
-    res = run_simulation(line_with_transport(transport_params(capacity=2, batch="full")), registry)
+    res = run_simulation(line_with_transport(transport_params(capacity=2, batch="full", loading_area=2)), registry)
     assert res.kpis.mean("units_completed") == 286
     assert res.kpis.mean("node.tr.trips") == 143
     assert res.kpis.mean("node.tr.avg_load") == 2
@@ -79,8 +79,10 @@ def test_transport_resource_walks_back_by_positions(registry):
                             positions={"m1": {"x": 0}, "tr": {"x": 0}, "out": {"x": 10}})
     res = run_simulation(m, registry)
     assert res.kpis.mean("units_completed") == 144
-    # 10 s loaded + 10 s walking back per trip; last walk-back cut by the horizon
-    assert res.kpis.mean("resource.op.walking_h") == pytest.approx(144 * 20 / 3600, abs=10 / 3600)
+    # per trip: 10 s transporting (loaded) + 10 s walking back unloaded; last walk-back cut by the horizon
+    assert res.kpis.mean("resource.op.transporting_h") == pytest.approx(144 * 10 / 3600, abs=1e-9)
+    assert res.kpis.mean("resource.op.walking_h") == pytest.approx(143 * 10 / 3600)  # 144th walk-back after the horizon
+    assert res.kpis.mean("resource.op.working_h") == pytest.approx(144 * 5 / 3600)  # load 2 + unload 3
 
 
 @pytest.mark.parametrize("missing", ["distance", "speed", "load_time", "unload_time"])

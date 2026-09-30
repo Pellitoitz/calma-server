@@ -48,7 +48,7 @@ class PriorityStrategy(FifoStrategy):
 
     def choose(self, pool, feasible):
         r = min(feasible, key=lambda x: (x.priority, x.seq))
-        return r, f"static priority: '{r.node}' has priority {r.priority} (lower = more urgent)", {}
+        return r, f"PRIORITY: static priority: '{r.node}' has priority {r.priority} (lower = more urgent)", {}
 
 
 class WipTargetPriority:
@@ -90,14 +90,15 @@ class WipTargetPriority:
         others = [r for r in feasible if r.node not in self.feeders]
         first = lambda rs: min(rs, key=lambda x: x.seq)  # noqa: E731 - FIFO within a class
         if blocked and others:
-            return first(others), (f"'{self.p.protected_node}' is BLOCKED (output full) -> downstream task first "
+            return first(others), (f"PROTECTED_BLOCKED: '{self.p.protected_node}' is BLOCKED (output full) -> downstream task first "
                                    f"to unblock it (feed WIP {feed}, target {self.target})"), state
         if feed < self.target and feeders:
-            return first(feeders), f"feed WIP {feed} < target {self.target} -> feeder task (keep '{self.p.protected_node}' fed)", state
+            return first(feeders), f"WIP_BELOW_TARGET: feed WIP {feed} < target {self.target} -> feeder task (keep '{self.p.protected_node}' fed)", state
         if others:
-            why = f"feed WIP {feed} >= target {self.target}" if feed >= self.target else f"feed WIP {feed} < target but no feeder task waiting"
+            why = (f"WIP_AT_OR_ABOVE_TARGET: feed WIP {feed} >= target {self.target}" if feed >= self.target
+                   else f"NO_FEEDER_WAITING: feed WIP {feed} < target but no feeder task waiting")
             return first(others), f"{why} -> non-feeder task", state
-        return first(feeders), f"only feeder tasks waiting (feed WIP {feed}, target {self.target})", state
+        return first(feeders), f"ONLY_FEEDER_WAITING: only feeder tasks waiting (feed WIP {feed}, target {self.target})", state
 
     def preempt_candidate(self, pool):
         if self.preempt_below is None:
@@ -110,7 +111,7 @@ class WipTargetPriority:
         for u in pool.units:
             if u.busy and u.preemptible and u.task not in self.feeders:
                 state["preempted_task"] = u.task
-                return u, (f"feed WIP {feed} < preempt_below {self.preempt_below} while working on non-feeder "
+                return u, (f"PREEMPT_WIP_BELOW_THRESHOLD: feed WIP {feed} < preempt_below {self.preempt_below} while working on non-feeder "
                            f"'{u.task}' -> suspend it and serve the feeder task"), state
         return None
 

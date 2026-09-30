@@ -31,7 +31,9 @@ class DesEngine:
         record = RunRecord(seed=seed, horizon_s=model.horizon_s, warmup_s=model.warmup_s,
                            engine=self.name, engine_version=self.version,
                            events=[] if trace else None, decisions=[] if trace else None)
-        ctx = SimContext(env, seed, model.warmup_s, model.horizon_s, record, trace)
+        sim = model.model.simulation
+        ctx = SimContext(env, seed, model.warmup_s, model.horizon_s, record, trace,
+                         dispatch_timing=sim.dispatch_timing, check_invariants=sim.check_invariants)
         ctx.model = model.model
         positions = {n.id: (n.position.x, n.position.y) for n in model.model.nodes if n.position}
         for r in model.model.resources:
@@ -52,5 +54,11 @@ class DesEngine:
         for pool in ctx.pools.values():
             pool.finalize()
         ctx.wip.finalize()
+        ctx.check_end()
         record.wip_end = ctx.wip.level
+        record.invariant_checks = ctx.invariant_checks
+        record.completion_times = [d for _, _, d in record.completions]
+        for rid, locs in ctx.carrier_locs.items():
+            for loc, tr in locs.items():
+                tr.finalize()
         return record

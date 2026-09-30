@@ -17,7 +17,7 @@ from collections import Counter
 from ...domain.behaviors import BufferParams, ServerParams, SourceParams, TransportParams
 from ...validation.verifier import CompiledNode
 from ..base import NodeState
-from .runtime import Entity, LevelTracker, ResourcePool, SimContext, StateTracker, Unit
+from .runtime import AVAILABLE, Entity, LevelTracker, ResourcePool, SimContext, StateTracker, Unit
 
 Proc = Generator[simpy.Event, object, object]
 
@@ -27,6 +27,7 @@ class IndustrialNode:
         self.ctx = ctx
         self.cn = cn
         self.id = cn.node.id
+        self.kind = cn.behavior.value
         self.route_rng = ctx.rng(self.id, "routing")
         ctx.record.node_behavior[self.id] = cn.behavior.value
         ctx.record.node_wait[self.id] = []
@@ -70,6 +71,7 @@ class IndustrialSource(IndustrialNode):
 
     def _admit(self, e: Entity) -> None:
         e.created = self.ctx.now
+        self.ctx.admit(e, self.id)
         self.ctx.record.created += 1
         self.ctx.wip.change(+1)
         self.ctx.log("created", e, self.id)
@@ -96,7 +98,9 @@ class IndustrialSink(IndustrialNode):
     def enter(self, entity: Entity, on_accept=None) -> Proc:
         if on_accept:
             on_accept(entity)
+        self.ctx.place(entity, self.id)
         release_all_carriers(self.ctx, entity)
+        self.ctx.retire(entity, "completed")
         self.ctx.wip.change(-1)
         if self.ctx.counting:
             self.ctx.record.completions.append((entity.id, entity.created, self.ctx.now))
@@ -112,7 +116,7 @@ class IndustrialBuffer(IndustrialNode):
         self.space = simpy.Resource(ctx.env, self.p.capacity) if self.p.capacity else None
         self.items: list[tuple[Entity, simpy.resources.resource.Request | None]] = []
         self._wake: simpy.Event | None = None
-        self.level = LevelTracker(ctx, f"buffer:{self.id}")
+        self.level = LevelTracker(ctx, f"buffer:{self.id}", upper=self.p.capacity)
         ctx.env.process(self._forward())
 
     def enter(self, entity: Entity, on_accept=None) -> Proc:
@@ -123,6 +127,7 @@ class IndustrialBuffer(IndustrialNode):
         if on_accept:
             on_accept(entity)
         entity.node_entered = self.ctx.now
+        self.ctx.place(entity, self.id)
         self.items.append((entity, req))
         self.level.change(+1)
         self.ctx.changed(self.id)
@@ -197,6 +202,7 @@ class IndustrialServer(IndustrialNode):
             on_accept(entity)
         slot = self.free_slots.pop(0)
         entity.node_entered = self.ctx.now
+        self.ctx.place(entity, self.id)
         self.ctx.log("enter", entity, self.id, slot=slot)
         self.ctx.env.process(self._work(entity, req, slot))
 
@@ -215,9 +221,13 @@ class IndustrialServer(IndustrialNode):
         # 1) carriers (racks, pallets...) first, so an operator is never held while waiting for a rack
         for use in node.seize:
             self._set(slot, NodeState.WAITING_RESOURCE)
-            units: list[Unit] = yield ctx.pools[use.resource].request(self.id, use.quantity, node.priority, e.id)
+            pool = ctx.pools[use.resource]
+            units: list[Unit] = yield pool.request(self.id, use.quantity, node.priority, e.id)
             e.carriers.append((use.resource, units))
-            ctx.log("carrier_seized", e, self.id, resource=use.resource)
+            pool.pending -= len(units)
+            ctx.carrier_move(use.resource, len(units), f"granted:{self.id}", e.location or self.id)
+            ctx.check_carriers(use.resource)
+            ctx.log("carrier_seized", e, self.id, resource=use.resource, available=sum(1 for u in pool.units if not u.busy))
         # 2) operators / tools
         held = yield from self._acquire(e, slot)
         self.record_wait(e)
@@ -267,6 +277,7 @@ class IndustrialServer(IndustrialNode):
                 ctx.record.node_rejects[self.id] += 1
             if self.p.on_reject == "scrap":
                 release_all_carriers(ctx, e)
+                ctx.retire(e, "scrapped")
                 ctx.wip.change(-1)
                 if ctx.counting:
                     ctx.record.scrapped.append((e.id, self.id, ctx.now))
@@ -318,17 +329,18 @@ class IndustrialServer(IndustrialNode):
 def acquire_units(ctx: SimContext, pool: ResourcePool, node_id: str, qty: int, priority: int, e: Entity | None,
                   resume: bool = False, walk_to: str | None = None) -> Proc:
     """Request units, walk them to `walk_to` (default: the requesting node), mark them working."""
-    units: list[Unit] = yield pool.request(node_id, qty, priority, e.id if e else None, resume)
     dest = walk_to or node_id
+    units: list[Unit] = yield pool.request(node_id, qty, priority, e.id if e else None, resume, location=dest)
     walk = max(pool.travel_time(u, dest) for u in units)
     for u in units:
-        u.tracker.set("walking" if walk > 0 else "working")
+        u.tracker.set("walking" if walk > 0 else f"working:{node_id}")
     if walk > 0:
-        ctx.log("operator_walking", e, node_id, resource=pool.id, seconds=round(walk, 3), to=dest)
+        ctx.log("operator_walking", e, node_id, resource=pool.id, seconds=round(walk, 3),
+                frm=",".join(str(u.location) for u in units), to=dest)
         yield ctx.env.timeout(walk)
     for u in units:
         u.location = dest
-        u.tracker.set("working")
+        u.tracker.set(f"working:{node_id}")
     return units
 
 
@@ -345,28 +357,39 @@ def release_carrier(ctx: SimContext, e: Entity, resource: str, via: str | None =
         if rid == resource:
             del e.carriers[i]
             if via:
-                ctx.nodes[via].carry_back(rid, units)  # empty carrier returns physically before being reusable
+                # the empty carrier travels back physically before it can be reused
+                ctx.carrier_move(rid, len(units), e.location or AVAILABLE, f"return:{via}")
+                ctx.nodes[via].carry_back(rid, units)
                 ctx.log("carrier_to_transport", e, via, resource=rid)
             else:
+                ctx.carrier_move(rid, len(units), e.location or AVAILABLE, AVAILABLE)
                 ctx.pools[rid].release(units)
                 ctx.log("carrier_released", e, None, resource=rid)
+            ctx.check_carriers(rid)
             return
 
 
 def release_all_carriers(ctx: SimContext, e: Entity) -> None:
-    for rid, units in e.carriers:
+    carriers, e.carriers = e.carriers, []
+    for rid, units in carriers:
+        ctx.carrier_move(rid, len(units), e.location or AVAILABLE, AVAILABLE)
         ctx.pools[rid].release(units)
-    e.carriers.clear()
+    if carriers:
+        ctx.check_carriers()
 
 
 class IndustrialTransport(IndustrialNode):
     """Physical transport: origin -> destination, `capacity` units per trip, `fleet` parallel trips.
 
-    Trip = acquire resources (they walk to the origin) -> load -> travel (distance/speed)
-           -> unload -> hand over to destination (blocked while it is full) -> optional empty return.
-    Two uses: in the product flow (edges in/out) or returning EMPTY carriers (referenced by a node's
-    `release_via`; carriers become reusable only when the trip ends).
-    The resource's time while travelling (loaded or empty) is recorded as 'walking'; load/unload as 'working'.
+    Trip = resources walk to the origin -> load -> travel (distance/speed) -> unload -> hand over to the
+    destination (blocked while it is full) -> optional empty return.
+    Pickup semantics: with loading_area = 0 (default) a unit STAYS in the upstream node, keeping its place,
+    until it is physically loaded (no phantom buffer place). With loading_area = N, N units may wait at the
+    pickup point (belonging to this node).
+    Two uses: in the product flow (edges) or returning EMPTY carriers (a node's `release_via`): the carrier
+    becomes available only when it is unloaded at the destination.
+    Resource states: load/unload = working:<this node>; loaded travel and empty return = transporting:<this node>;
+    reaching the origin = walking.
     """
 
     def __init__(self, ctx: SimContext, cn: CompiledNode, carrier_mode: bool):
@@ -376,10 +399,12 @@ class IndustrialTransport(IndustrialNode):
         preds = [e.source for e in ctx.model.edges if e.target == self.id]
         self.origin = self.p.origin or (preds[0] if preds else None)
         self.destination = self.p.destination or (cn.successors[0][0] if cn.successors else None)
-        self.space = None if carrier_mode else simpy.Resource(ctx.env, self.p.capacity * self.p.fleet)
-        self.queue: list[tuple] = []  # ("unit", entity, space_req) | ("carrier", resource_id, units)
+        self.area = simpy.Resource(ctx.env, self.p.loading_area) if (self.p.loading_area and not carrier_mode) else None
+        # queue items: ("unit", entity, picked_event, area_req) | ("carrier", resource_id, units)
+        self.queue: list[tuple] = []
         self._wake: list[simpy.Event] = []
-        self.aboard = 0
+        self.aboard: list[tuple] = []  # physically on board (after loading)
+        self.in_trip: list[tuple] = []  # assigned to a trip (from pickup request until delivery)
         self.trackers = [StateTracker(ctx, NodeState.STARVED) for _ in range(self.p.fleet)]
         self.logical = [NodeState.STARVED] * self.p.fleet
         self.level = LevelTracker(ctx, f"transport:{self.id}")
@@ -393,7 +418,12 @@ class IndustrialTransport(IndustrialNode):
 
     # ---- probes ----
     def occupancy(self) -> int:
-        return sum(1 for q in self.queue if q[0] == "unit") + self.aboard
+        """Units physically in this node: aboard + waiting in the loading area (not those still upstream)."""
+        waiting = sum(1 for q in self.queue if q[0] == "unit" and q[3] is not None)
+        return waiting + sum(1 for q in self.aboard if q[0] == "unit")
+
+    def carriers_in_transit(self, rid: str) -> int:
+        return sum(len(q[2]) for q in [*self.queue, *self.in_trip] if q[0] == "carrier" and q[1] == rid)
 
     def state_counts(self) -> dict[str, int]:
         return dict(Counter(self.logical))
@@ -405,13 +435,20 @@ class IndustrialTransport(IndustrialNode):
 
     # ---- inputs ----
     def enter(self, entity: Entity, on_accept=None) -> Proc:
-        req = self.space.request()  # type: ignore[union-attr]
-        yield req
+        area_req = None
+        if self.area is not None:
+            area_req = self.area.request()
+            yield area_req
         if on_accept:
             on_accept(entity)
-        entity.node_entered = self.ctx.now
-        self._push(("unit", entity, req))
-        self.ctx.log("enter_transport", entity, self.id)
+        picked = self.ctx.env.event()
+        if area_req is not None:
+            entity.node_entered = self.ctx.now
+            self.ctx.place(entity, self.id)
+        self._push(("unit", entity, picked, area_req))
+        self.ctx.log("transport_requested", entity, self.id, origin=self.origin)
+        if area_req is None:
+            yield picked  # the unit keeps its upstream place until it is loaded
 
     def carry_back(self, resource: str, units: list[Unit]) -> None:
         self._push(("carrier", resource, units))
@@ -435,53 +472,70 @@ class IndustrialTransport(IndustrialNode):
     def _vehicle(self, v: int) -> Proc:
         ctx, p = self.ctx, self.p
         trip = p.travel_seconds()
+        tid = self.id
         while True:
             yield from self._wait_items(p.capacity if p.batch == "full" else 1)
             load = [self.queue.pop(0) for _ in range(min(p.capacity, len(self.queue)))]
-            self.aboard += sum(1 for q in load if q[0] == "unit")
-            for q in load:
-                if q[0] == "unit":
-                    self.record_wait(q[1])
+            self.in_trip.extend(load)
             held: list[Unit] = []
             for use in p.resources:
                 self._set(v, NodeState.WAITING_RESOURCE)
-                held.extend((yield from acquire_units(ctx, ctx.pools[use.resource], self.id, use.quantity,
+                held.extend((yield from acquire_units(ctx, ctx.pools[use.resource], tid, use.quantity,
                                                       self.cn.node.priority, None, walk_to=self.origin)))
             self._set(v, NodeState.BUSY)
-            ctx.log("trip_start", None, self.id, items=len(load), origin=self.origin, destination=self.destination)
+            ctx.log("trip_start", None, tid, items=len(load), origin=self.origin, destination=self.destination,
+                    resources=[u.name for u in held])
             yield ctx.env.timeout(p.load_time.sample_seconds(self.rng_load))  # type: ignore[union-attr]
+            for q in load:  # physically on board now
+                self.aboard.append(q)
+                if q[0] == "unit":
+                    e = q[1]
+                    self.record_wait(e)
+                    e.node_entered = ctx.now
+                    ctx.place(e, tid)
+                    if q[3] is not None:
+                        self.area.release(q[3])  # type: ignore[union-attr]
+                    if not q[2].triggered:
+                        q[2].succeed()  # upstream node frees its place
+            ctx.log("loaded", None, tid, items=len(load))
             for u in held:
-                u.tracker.set("walking")
+                u.tracker.set(f"transporting:{tid}")
             yield ctx.env.timeout(trip)
             for u in held:
-                u.tracker.set("working")
+                u.tracker.set(f"working:{tid}")
                 u.location = self.destination
             yield ctx.env.timeout(p.unload_time.sample_seconds(self.rng_unload))  # type: ignore[union-attr]
-            for q in load:
+            for q in list(load):
                 if q[0] == "unit":
                     self._set(v, NodeState.BLOCKED)
                     yield from self.next_node().enter(q[1])
-                    self.aboard -= 1
-                    self.space.release(q[2])  # type: ignore[union-attr]
                 else:
+                    ctx.carrier_move(q[1], len(q[2]), f"return:{tid}", AVAILABLE)
+                    self.aboard.remove(q)
+                    self.in_trip.remove(q)
                     ctx.pools[q[1]].release(q[2])
-                    ctx.log("carrier_released", None, self.id, resource=q[1])
+                    ctx.check_carriers(q[1])
+                    ctx.log("carrier_released", None, tid, resource=q[1])
+                if q in self.aboard:
+                    self.aboard.remove(q)
+                if q in self.in_trip:
+                    self.in_trip.remove(q)
                 self.level.change(-1)
                 if ctx.counting:
-                    ctx.record.node_units_moved[self.id] += 1
-                    ctx.record.node_processed[self.id] += 1
+                    ctx.record.node_units_moved[tid] += 1
+                    ctx.record.node_processed[tid] += 1
             if ctx.counting:
-                ctx.record.node_trips[self.id] += 1  # delivered trips (avg load = units / trips is exact)
-            ctx.changed(self.id)
+                ctx.record.node_trips[tid] += 1  # delivered trips (avg load = units / trips is exact)
+            ctx.changed(tid)
             if p.return_empty and trip > 0:
                 self._set(v, NodeState.BUSY)
                 for u in held:
-                    u.tracker.set("walking")
+                    u.tracker.set(f"transporting:{tid}")
                 yield ctx.env.timeout(trip)
                 for u in held:
                     u.location = self.origin
             release_units(ctx, held)
-            ctx.log("trip_end", None, self.id)
+            ctx.log("trip_end", None, tid)
             self._set(v, NodeState.STARVED)
 
     def finalize(self) -> None:
