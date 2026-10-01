@@ -16,7 +16,12 @@ El LLM **nunca** produce resultados, nunca ejecuta código, nunca aprueba modelo
 | `schemas.py` | `ProcessDraft` (pasos, recursos, políticas, lazos de carriers, experimentos, faltantes, supuestos) y `EditPlan` (intents: set, experiment, run, revert, compare_baseline, explain_bottleneck, explain_waiting). |
 | `compiler.py` | Draft → ISMS: búsqueda en biblioteca, configuración, supuestos, faltantes, **grounding numérico**. |
 | `context.py` | Frontera de privacidad: sólo texto de la petición + catálogo + esquema del modelo; anonimización. |
-| `interpreter.py` | `LLMInterpreter` / `RuleBasedInterpreter` con el mismo contrato. |
+| `interpreter.py` | `LLMInterpreter` (validación semántica, reparación ×2, auditoría, fallback) / `RuleBasedInterpreter` con el mismo contrato. |
+| `prompts/` | Prompts versionados (`process_parser_v1.txt`, `edit_planner_v1.txt`). |
+| `edits.py` | Cambios por chat sobre parámetros (`$ref` → `parameters.<id>.value`), política de correcciones. |
+| `tools.py` | Herramientas controladas para un orquestador IA (sin aprobar, sin código). |
+
+Flujo completo, matching report, aprobación, comparación A/B y productividad: [`ai_orchestration.md`](ai_orchestration.md).
 
 ## Responsabilidades (punto 7 de la especificación)
 
@@ -36,7 +41,7 @@ El LLM **nunca** produce resultados, nunca ejecuta código, nunca aprueba modelo
 1. Schemas estrictos (structured outputs): el LLM no puede devolver texto libre.
 2. **Grounding**: cada número del draft debe aparecer en la descripción; si no, `provenance.status=assumed` + supuesto visible.
 3. Valores no indicados → `MISSING` (no se inventan). Excepción explícita: horizonte 8 h, FIFO, suministro infinito → siempre como supuestos.
-4. Las operaciones de edición se aplican con `set_value` + validación Pydantic; una ruta inexistente aborta todo el plan.
+4. Las operaciones de edición se aplican con `set_value` + validación Pydantic; con LLM, una ruta inexistente provoca reparación y, si persiste, el plan se descarta (fallback offline).
 5. Cambios importantes (≥3 parámetros, recursos a 0, modelo aprobado, revertir) piden confirmación.
 6. El modelo aprobado queda ligado a su hash; la IA no puede "heredar" la aprobación.
 

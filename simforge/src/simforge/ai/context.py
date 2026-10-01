@@ -56,6 +56,7 @@ def model_outline(model: ISMSModel) -> str:
     outline = {
         "horizon": model.simulation.horizon.model_dump(exclude_none=True, exclude={"provenance"}),
         "replications": model.simulation.replications,
+        "parameters": [{"id": p.id, "value": p.value, "unit": p.unit, "description": p.description} for p in model.parameters],
         "resources": [{"id": r.id, "kind": r.kind.value, "quantity": r.quantity, "dispatch": r.dispatch.value} for r in model.resources],
         "nodes": nodes,
         "edges": [[e.source, e.target] for e in model.edges],

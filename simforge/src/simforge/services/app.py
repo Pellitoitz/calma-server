@@ -19,8 +19,8 @@ import time
 from ..ai.compiler import ParseOutcome, compile_draft
 from ..ai.edits import chat_provenance, correction_reason, friendly, is_correction, resolve_edit, resolve_factor_path
 from ..ai.context import Anonymizer
-from ..ai.interpreter import Interpreter, LLMInterpreter, RuleBasedInterpreter
-from ..ai.provider import LLMProvider, LLMUsage, provider_from_env
+from ..ai.interpreter import CallAudit, Interpreter, LLMInterpreter, RuleBasedInterpreter
+from ..ai.provider import LLMError, LLMProvider, LLMUsage, provider_from_env
 from ..ai.schemas import EditPlan, ProcessDraft
 from ..analytics.diagnostics import Finding
 from ..domain.isms import Approval, ExperimentSpec, Factor, ISMSModel
@@ -83,7 +83,12 @@ class SimForgeApp:
             if project:
                 project.log_llm_usage(u.provider, u.model, purpose, u.input_tokens, u.output_tokens, u.est_cost_usd, u.sent_chars)
 
-        return LLMInterpreter(self.provider, self.registry, anon, log_usage)
+        def log_audit(a: CallAudit) -> None:
+            if project:
+                project.audit(a.purpose, a.provider, a.model, a.prompt_version, a.input_text, a.output_json, a.validation_errors,
+                              a.repairs, a.accepted, a.input_tokens, a.output_tokens, a.est_cost_usd, a.latency_ms)
+
+        return LLMInterpreter(self.provider, self.registry, anon, log_usage, log_audit)
 
     # ----------------------------------------------------------------- projects
     def create_project(self, name: str, description: str = "") -> Project:
@@ -101,7 +106,13 @@ class SimForgeApp:
         The result is a new model VERSION (the chat is never the model)."""
         interp = self.interpreter(project)
         t0 = time.perf_counter()
-        draft = interp.parse(text)
+        try:
+            draft = interp.parse(text)
+        except LLMError as e:  # fallback without AI: the deterministic offline interpreter (stated, never silent)
+            project.log("system", "llm_fallback", request=text, result=str(e))
+            interp = RuleBasedInterpreter(self.registry)
+            interp.name = f"offline-rules (fallback: {str(e)[:80]})"
+            draft = interp.parse(text)
         if isinstance(interp, RuleBasedInterpreter):
             project.audit("parse_process", "offline-rules", "-", interp.prompt_version, text, draft.model_dump_json(), [], 0, True)
         return self._build(project, text, draft, interp.name, getattr(interp, "prompt_version", None), {}, prototype, t0)
@@ -289,7 +300,20 @@ class SimForgeApp:
             return CommandResponse(EditPlan(explanation="nuevo modelo"), f"Modelo creado (v{pr.version}): {pr.report.summary()}",
                                    new_version=pr.version)
         interp = self.interpreter(project)
-        plan = interp.plan_edit(text, model)
+        try:
+            plan = interp.plan_edit(text, model)
+        except LLMError as e:
+            if not isinstance(interp, LLMInterpreter):
+                raise
+            # the offline planner still handles the common requests; invalid LLM output is never applied
+            project.log("system", "llm_fallback", request=text, result=str(e))
+            interp = RuleBasedInterpreter(self.registry)
+            plan = interp.plan_edit(text, model)
+            if not plan.operations:
+                return CommandResponse(plan, f"La IA no produjo un cambio válido ({e}). {plan.question or ''}", error=str(e))
+            resp = self.apply_plan(project, plan, text, "offline-rules (fallback)", confirm)
+            resp.message = f"[Salida de la IA rechazada por el validador; interpretado sin IA] {resp.message}"
+            return resp
         return self.apply_plan(project, plan, text, interp.name, confirm)
 
     def apply_plan(self, project: Project, plan: EditPlan, request: str, interpreter: str = "", confirm: bool = False) -> CommandResponse:

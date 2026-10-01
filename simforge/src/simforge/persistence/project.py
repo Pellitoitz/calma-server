@@ -248,6 +248,13 @@ class Project:
         self.db.commit()
         return cur.lastrowid
 
+    def interpretations(self) -> list[dict]:
+        return [dict(r) for r in self.db.execute("SELECT * FROM interpretations ORDER BY id")]
+
+    def first_event(self, action: str) -> dict | None:
+        r = self.db.execute("SELECT * FROM history WHERE action = ? ORDER BY id LIMIT 1", (action,)).fetchone()
+        return dict(r) if r else None
+
     def last_interpretation(self) -> dict | None:
         r = self.db.execute("SELECT * FROM interpretations ORDER BY id DESC LIMIT 1").fetchone()
         return dict(r) if r else None

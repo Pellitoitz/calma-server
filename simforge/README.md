@@ -51,7 +51,18 @@ simforge report examples/05_selective_soldering.yaml -o report.html --experiment
 simforge parse --offline "Fuente infinita. Un operario realiza montaje durante 60 segundos. ..." -o model.yaml
 simforge library list soldadura
 simforge library show selective_soldering
+simforge ai new "Línea MVP" "Fuente infinita. Un operario monta una pieza durante 60 segundos. ..."   # orquestación IA
+simforge ai approve <slug> --by "Nombre" && simforge ai run <slug>
+simforge ai compare examples/02_shared_operator.yaml <slug>@2                                   # modelo A vs B
 ```
+
+## Orquestación IA (lenguaje natural → modelo con la biblioteca)
+
+Describir el proceso → interpretación → **matching con componentes y reglas existentes** (REUSE RATIO) → parámetros
+con procedencia (USER_PROVIDED / ASSUMED / DEFAULT / CALCULATED / MISSING) → preguntas agrupadas → MODEL BUILD PLAN →
+verificación → **aprobación del ingeniero** → simulación. Cambios por chat = cambios estructurados del ISMS; correcciones
+registradas; `compare_model_specs` (textual vs estructural vs resultados); métricas de tiempo ahorrado; auditoría IA.
+Detalle: [`docs/ai_orchestration.md`](docs/ai_orchestration.md).
 
 ## Ejemplo (MVP)
 
@@ -60,7 +71,7 @@ Fuente infinita. Un operario realiza montaje durante 60 segundos. Existe un buff
 Una máquina tarda 45 segundos. El mismo operario inspecciona durante 20 segundos. Simular 8 horas.
 ```
 
-Resultado: `Source → Manual assembly → Buffer(5) → Machine → Inspection → Sink`, 100 % componentes de biblioteca, supuesto registrado *"operario compartido: FIFO"* + pregunta *"¿qué prioridad…?"*. Simulación: **359 unidades** (restricción = operario, 80 s de trabajo/unidad → máx. teórico 45 u/h, verificado a mano en `tests/test_engine_golden.py`).
+Resultado: `Source → Manual assembly → Buffer(5) → Machine → Inspection → Sink`, 100 % componentes de biblioteca, supuesto registrado *"operario compartido: FIFO"* + pregunta *"¿qué prioridad…?"*. El modelo generado requiere aprobación del ingeniero antes de ejecutarse. Simulación: **359 unidades** (restricción = operario, 80 s de trabajo/unidad → máx. teórico 45 u/h, verificado a mano en `tests/test_engine_golden.py`).
 
 ## Arquitectura en una imagen
 
@@ -115,4 +126,4 @@ Datos de cliente (`workspace/`, configurable con `SIMFORGE_WORKSPACE`) y bibliot
 
 ## Estado honesto (v0.1)
 
-Funciona de verdad: todo lo descrito arriba. **NO implementado todavía** (y el esquema lo rechaza en vez de ignorarlo): turnos/calendarios, mix de productos y setups, routing condicional/"first available", transporte con distancia para entidades (sólo desplazamiento de operarios), economía (coste/unidad, CAPEX, ROI), energía, optimización (sólo grid), PDF/PPT nativos, importación de Excel/CSV de estudios de tiempos, integración AnyLogic (ver `docs/anylogic.md`, todo marcado TO VERIFY).
+Funciona de verdad: todo lo descrito arriba. **NO implementado todavía** (y el esquema lo rechaza en vez de ignorarlo): turnos/calendarios, mix de productos y setups, routing condicional/"first available", economía (coste/unidad, CAPEX, ROI), energía, optimización (sólo grid), PDF/PPT nativos, importación de Excel/CSV de estudios de tiempos, integración AnyLogic (ver `docs/anylogic.md`, todo marcado TO VERIFY).

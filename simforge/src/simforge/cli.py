@@ -6,6 +6,7 @@
     simforge report examples/02_shared_operator.yaml -o report.html
     simforge parse "Fuente infinita. Un operario monta 60 s..." -o model.yaml
     simforge library list | show <id> | docs
+    simforge ai new "Linea MVP" "Fuente infinita. Un operario monta..."   (AI orchestration, see `simforge ai --help`)
     simforge ui
 """
 
@@ -30,6 +31,8 @@ lib_app = typer.Typer(help="Component library", no_args_is_help=True)
 app.add_typer(lib_app, name="library")
 bench_app = typer.Typer(help="Benchmark against a reference model (e.g. AnyLogic)", no_args_is_help=True)
 app.add_typer(bench_app, name="benchmark")
+ai_app = typer.Typer(help="AI orchestration on workspace projects: describe -> match -> ask -> approve -> run", no_args_is_help=True)
+app.add_typer(ai_app, name="ai")
 
 
 def _registry() -> ComponentRegistry:
@@ -241,6 +244,163 @@ def bench_trace(racks: int = typer.Option(..., help="number of racks"), minutes:
                         f"{[c['node'] for c in x['candidates']]} feed_wip={x['state'].get('feed_wip')} "
                         f"racks_available={x['system']['carriers_available']}", fg="cyan")
     typer.echo(f"{len(events)} events, {len(decisions)} decisions -> {stem}_events.csv / _decisions.csv")
+
+
+# --------------------------------------------------------------------------- ai orchestration
+def _app(offline: bool = False):
+    from .services.app import SimForgeApp
+    return SimForgeApp(provider=None if offline else "auto")
+
+
+def _project(sf, slug: str):
+    try:
+        return sf.open_project(slug)
+    except Exception as e:  # noqa: BLE001
+        typer.secho(f"Proyecto '{slug}' no encontrado: {e}", fg="red")
+        raise typer.Exit(2) from None
+
+
+def _show_parse(pr) -> None:
+    o = pr.outcome
+    typer.secho(f"Model v{pr.version} | {pr.interpreter} | {pr.report.summary()}", bold=True)
+    typer.echo(o.matching_report())
+    if o.plan:
+        typer.echo("\n" + o.plan.to_text())
+    for a in o.model.assumptions:
+        typer.secho(f"ASSUMED: {a.text}", fg="yellow")
+    for c in o.model.custom_rule_candidates:
+        typer.secho(f"CUSTOM RULE CANDIDATE [{c.id}] ({c.status}): {c.description}", fg="magenta")
+    typer.echo("\n" + o.questions_text())
+
+
+@ai_app.command("new")
+def ai_new(name: str, description: str, offline: bool = typer.Option(False, help="offline rule-based interpreter"),
+           prototype: bool = typer.Option(False, help="fill missing values with library defaults (explicit assumptions)")):
+    """Create a project and build its model from a description (library components only)."""
+    sf = _app(offline)
+    p = sf.create_project(name)
+    _show_parse(sf.parse_process(p, description, prototype=prototype))
+    typer.echo(f"\nProject: {p.meta.slug}")
+
+
+@ai_app.command("answer")
+def ai_answer(slug: str, answers: list[str] = typer.Argument(..., help="param:<id>=<value> or return_mode:<carrier>=immediate|transport")):
+    """Answer the grouped questions; the stored interpretation is recompiled deterministically."""
+    sf = _app(True)
+    parsed = {}
+    for a in answers:
+        k, _, v = a.partition("=")
+        try:
+            parsed[k] = json.loads(v)
+        except json.JSONDecodeError:
+            parsed[k] = v
+    _show_parse(sf.answer_questions(_project(sf, slug), parsed))
+
+
+@ai_app.command("approve")
+def ai_approve(slug: str, by: str = typer.Option(..., help="engineer name")):
+    """Engineer approval (required before the first run of an AI-generated model)."""
+    sf = _app(True)
+    v = sf.approve_model(_project(sf, slug), by)
+    typer.secho(f"v{v} approved by {by}", fg="green")
+
+
+@ai_app.command("say")
+def ai_say(slug: str, request: str, yes: bool = typer.Option(False, "--yes", help="confirm important changes")):
+    """Chat request -> structured ISMS change / experiment / analysis."""
+    sf = _app()
+    r = sf.command(_project(sf, slug), request, confirm=yes)
+    typer.echo(r.message)
+    if r.experiment:
+        for row in r.experiment.table(["units_completed", "throughput_per_hour", "avg_wip"]):
+            typer.echo("  " + json.dumps(row, default=str))
+    if r.needs_confirmation:
+        typer.secho("Repite con --yes para confirmar.", fg="yellow")
+
+
+@ai_app.command("run")
+def ai_run(slug: str):
+    """Run the current model of a project (refused if approval is pending)."""
+    from .services.app import ApprovalRequired
+    sf = _app(True)
+    try:
+        res = sf.run_simulation(_project(sf, slug))
+    except ApprovalRequired as e:
+        typer.secho(str(e), fg="red")
+        raise typer.Exit(1) from None
+    for k in ["units_completed", "throughput_per_hour", "avg_wip", "avg_lead_time_s"]:
+        typer.echo(f"{k:<22}{res.kpis.mean(k):>12.4g}")
+
+
+@ai_app.command("custom-rule")
+def ai_custom_rule(slug: str, candidate_id: str, decision: str = typer.Argument(..., help="deferred | rejected"),
+                   by: str = typer.Option(...)):
+    """Engineer decision on a CustomRuleCandidate (deferred = run WITHOUT it, reported)."""
+    sf = _app(True)
+    v = sf.decide_custom_rule(_project(sf, slug), candidate_id, decision, by)
+    typer.echo(f"v{v}: {candidate_id} -> {decision}")
+
+
+@ai_app.command("compare")
+def ai_compare(a: str = typer.Argument(..., help="model file or <project-slug>@<version>"), b: str = typer.Argument(...),
+               run: bool = typer.Option(True, help="run both when structurally equivalent")):
+    """compare_model_specs(A, B): textual vs structural equivalence, then result equivalence."""
+    sf = _app(True)
+
+    def load(ref: str):
+        if "@" in ref and not Path(ref).exists():
+            slug, ver = ref.rsplit("@", 1)
+            return _project(sf, slug).load_version(int(ver))
+        return Path(ref).read_text(encoding="utf-8")
+    spec, res = sf.compare_models(load(a), load(b), run=run)
+    typer.echo(spec.to_text())
+    if res:
+        typer.echo("\n" + res.to_text())
+    raise typer.Exit(0 if spec.structurally_equivalent and (res is None or res.equivalent) else 1)
+
+
+@ai_app.command("corrections")
+def ai_corrections(slug: str):
+    """Engineer corrections of AI values (AI value -> engineer value, reason)."""
+    sf = _app(True)
+    for c in _project(sf, slug).corrections():
+        typer.echo(f"v{c['model_version']} {c['parameter']} ({c['component'] or '-'}): AI {c['ai_value']} -> engineer "
+                   f"{c['engineer_value']}  reason: {c['reason'] or '—'}")
+
+
+@ai_app.command("candidates")
+def ai_candidates(min_occurrences: int = typer.Option(2)):
+    """CANDIDATE_FOR_LIBRARY_IMPROVEMENT across all projects (the library is never changed automatically)."""
+    sf = _app(True)
+    cands = sf.library_improvement_candidates(min_occurrences)
+    if not cands:
+        typer.echo("No repeated patterns yet.")
+    for c in cands:
+        typer.echo(f"{c['status']} [{c['kind']}] x{c['occurrences']} in {', '.join(c['projects'])}: {c['suggestion']}")
+
+
+@ai_app.command("productivity")
+def ai_productivity(slug: str, manual_min: Optional[float] = typer.Option(None, help="manual model build time (min)"),
+                    review_min: Optional[float] = typer.Option(None), correction_min: Optional[float] = typer.Option(None)):
+    """Time saved vs manual model building (each figure with its source)."""
+    from .services.productivity import productivity, record_engineer_time
+    sf = _app(True)
+    p = _project(sf, slug)
+    for key, val in (("manual_model_build_min", manual_min), ("engineer_review_min", review_min), ("correction_min", correction_min)):
+        if val is not None:
+            record_engineer_time(p, key, val)
+    typer.echo(productivity(p).to_text())
+
+
+@ai_app.command("audit")
+def ai_audit(slug: str):
+    """AI audit log: provider, model, prompt version, repairs, validation errors, tokens, cost, latency."""
+    sf = _app(True)
+    for a in _project(sf, slug).audit_log():
+        cost = f"${a['est_cost_usd']:.4f}" if a["est_cost_usd"] is not None else "-"
+        typer.echo(f"{a['ts']} {a['purpose']:<14} {a['provider']}/{a['model']} {a['prompt_version']} accepted={bool(a['accepted'])} "
+                   f"repairs={a['repairs']} tokens={a['input_tokens']}+{a['output_tokens']} cost={cost} "
+                   f"latency={a['latency_ms'] or 0:.0f}ms")
 
 
 @app.command()

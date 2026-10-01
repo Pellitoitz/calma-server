@@ -185,5 +185,9 @@ def test_llm_edit_plan_validated_deterministically(tmp_path):
     p = app.create_project("edit")
     app.parse_process(p, MVP_TEXT)
     r = app.command(p, "cambia buffer a 8")
-    assert r.error and "ghost" in r.error  # invalid path rejected, nothing applied
-    assert val(p.current_model(), "nodes.buf.params.capacity") == 5
+    # the LLM plan references a path that does not exist: rejected after 2 repair attempts, never applied
+    audit = [a for a in p.audit_log() if a["purpose"] == "plan_edit"][-1]
+    assert not audit["accepted"] and audit["repairs"] == 2 and "ghost" in audit["validation_errors"]
+    # fallback without AI: the deterministic planner handles the request, and says so
+    assert "rechazada" in r.message
+    assert val(p.current_model(), "nodes.buf.params.capacity") == 8

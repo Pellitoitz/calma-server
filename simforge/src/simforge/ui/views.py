@@ -150,13 +150,16 @@ def _handle(app: SimForgeApp, project: Project, text: str, hist: list, confirm: 
             m = pr.outcome.model
             lines = [f"**Model v{pr.version} created** ({pr.interpreter}) — {pr.report.summary()} — "
                      f"library reuse {pr.outcome.reuse_ratio:.0%}"]
-            lines += [f"- `{c['component']}@{c['version']}` ← {c['step']} ({c['how']})" for c in pr.outcome.component_matches]
+            lines += ["```", pr.outcome.matching_report(), "```"]
+            if pr.outcome.plan:
+                lines += ["```", pr.outcome.plan.to_text(), "```"]
             if m.assumptions:
                 lines.append("\n**ASSUMPTIONS**")
                 lines += [f"- {a.text}" for a in m.assumptions]
-            if m.missing:
-                lines.append("\n**MISSING DATA / QUESTIONS**")
-                lines += [f"- {'⛔' if q.required else '❓'} {q.question}" for q in m.missing]
+            if m.custom_rule_candidates:
+                lines.append("\n**CUSTOM LOGIC (not in the library — needs your decision)**")
+                lines += [f"- `{c.id}`: {c.description}" for c in m.custom_rule_candidates]
+            lines.append("\n" + pr.outcome.questions_text())
             lines.append("\nReview it in the **Model** tab and approve it (engineer) before the first run.")
             hist.append({"role": "assistant", "text": "\n".join(lines)})
             return
@@ -204,6 +207,17 @@ def model_tab(app: SimForgeApp, project: Project) -> None:
         st.rerun()
     if st.session_state.get("show_validation", True):
         issues_table(report)
+    _answers_form(app, project, model)
+    for c in [c for c in model.custom_rule_candidates if c.status == "proposed"]:
+        st.warning(f"CUSTOM RULE CANDIDATE `{c.id}`: {c.description} — {c.reason_not_found}. It is NOT executed.")
+        d1, d2 = st.columns(2)
+        who = st.session_state.get("engineer") or "engineer"
+        if d1.button("Run without it (defer)", key=f"defer_{c.id}"):
+            app.decide_custom_rule(project, c.id, "deferred", by=who)
+            st.rerun()
+        if d2.button("Reject", key=f"reject_{c.id}"):
+            app.decide_custom_rule(project, c.id, "rejected", by=who)
+            st.rerun()
     if model.assumptions or model.missing:
         with st.expander(f"Assumptions ({len(model.assumptions)}) and missing data ({len(model.missing)})", expanded=bool(model.missing)):
             for a in model.assumptions:
@@ -226,6 +240,35 @@ def model_tab(app: SimForgeApp, project: Project) -> None:
                 _save(app, project, new, "YAML edit")
             except (ModelFormatError, yaml.YAMLError) as e:
                 st.error(str(e))
+
+
+def _answers_form(app: SimForgeApp, project: Project, model: ISMSModel) -> None:
+    """Grouped answers to the AI's questions: missing parameters and carrier return mode."""
+    missing = [p for p in model.parameters if p.value is None]
+    returns = [m for m in model.missing if m.path and m.path.endswith(".release_via")]
+    if not (missing or returns) or project.last_interpretation() is None:
+        return
+    with st.form("answers"):
+        st.markdown(f"**Para poder ejecutar el modelo necesito {len(missing) + len(returns)} datos**")
+        vals = {}
+        for p in missing:
+            vals[f"param:{p.id}"] = st.text_input(f"{p.description or p.id} [{p.unit or '-'}]", key=f"ans_{p.id}")
+        carriers = [r.id for r in model.resources if r.kind.value == "carrier"]
+        for q in returns:
+            vals[f"return_mode:{carriers[0] if carriers else ''}"] = st.selectbox(q.question, ["", "immediate", "transport"], key=f"ans_{q.path}")
+        if st.form_submit_button("Apply answers"):
+            answers = {}
+            for k, v in vals.items():
+                if v in ("", None):
+                    continue
+                try:
+                    answers[k] = float(v) if k.startswith("param:") else v
+                except ValueError:
+                    st.error(f"'{v}' no es un número ({k[6:]})")
+                    return
+            if answers:
+                app.answer_questions(project, answers)
+                st.rerun()
 
 
 def _param_editor(app: SimForgeApp, project: Project, model: ISMSModel) -> None:
@@ -582,11 +625,22 @@ def project_tab(app: SimForgeApp, project: Project) -> None:
         project.meta.manual_model_estimated_hours = est or None
         project.save_meta()
         st.toast("Saved")
-    st.markdown("#### Productivity metrics")
-    m = project.metrics()
-    if project.meta.manual_model_estimated_hours and m.get("time_to_first_run_s") is not None:
-        saved = 1 - (m["time_to_first_run_s"] / 3600) / project.meta.manual_model_estimated_hours
-        m["time_saved_vs_manual_to_first_run"] = round(saved, 3)
-    st.json({**m, "llm_usage": project.llm_usage_summary()})
+    st.markdown("#### Productivity (time saved vs manual model building)")
+    from ..services.productivity import productivity, record_engineer_time
+    p1, p2, p3 = st.columns(3)
+    rev = p1.number_input("Engineer review (min, optional)", value=0.0, min_value=0.0)
+    cor = p2.number_input("Corrections (min, optional)", value=0.0, min_value=0.0)
+    if p3.button("Save times"):
+        if rev:
+            record_engineer_time(project, "engineer_review_min", rev)
+        if cor:
+            record_engineer_time(project, "correction_min", cor)
+        st.rerun()
+    st.code(productivity(project).to_text(), language=None)
+    with st.expander("Engineer corrections of AI values"):
+        st.dataframe(pd.DataFrame(project.corrections()), hide_index=True, width="stretch")
+    with st.expander("AI audit log"):
+        st.dataframe(pd.DataFrame(project.audit_log()), hide_index=True, width="stretch")
+    st.json({**project.metrics(), "llm_usage": project.llm_usage_summary()})
     st.markdown("#### History")
     st.dataframe(pd.DataFrame(project.history()), hide_index=True, width="stretch", height=260)
