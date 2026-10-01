@@ -55,7 +55,7 @@ components:
       resources are held for the whole processing time. Supports yield (scrap/rework) and
       time-based failures (MTBF/MTTR).
     tags: [core, station, automatic]
-    keywords: [maquina, machine, estacion, station, proceso, equipo, horno, prensa, celula]
+    keywords: [maquina, machine, estacion, station, proceso, equipo, horno, prensa, celula, processes]
     defaults: {capacity: 1}
     param_docs:
       capacity: "Parallel identical slots."
@@ -76,7 +76,7 @@ components:
     description: |
       Generic manual workstation. Requires an operator resource (declared in 'resources').
     tags: [core, manual, station, operator]
-    keywords: [manual, puesto manual, operario, operator, tarea manual, manual station]
+    keywords: [manual, puesto manual, tarea manual, manual station]
     defaults: {capacity: 1}
     kpis: [utilization, waiting_resource, blocked, starved]
     validation_status: tested

@@ -22,6 +22,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from ..domain.behaviors import BEHAVIOR_PARAMS, Behavior
 
 CORE_DIR = Path(__file__).parent / "components"
+RULES_DIR = Path(__file__).parent / "rules"
 
 
 class ValidationStatus(str, Enum):
@@ -100,6 +101,27 @@ class ComponentDef(BaseModel):
         return "\n".join(lines)
 
 
+class RuleDef(BaseModel):
+    """Non-flow library entry: resource type or dispatch strategy (bound to an engine primitive)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: str
+    kind: str  # resource_type | dispatch_strategy
+    name: str
+    version: str = "1.0.0"
+    binding: str  # e.g. "dispatch:wip_target", "resource:operator"
+    description: str = ""
+    keywords: list[str] = Field(default_factory=list)
+    params: list[str] = Field(default_factory=list)
+    validation_status: ValidationStatus = ValidationStatus.DRAFT
+    tests: list[str] = Field(default_factory=list)
+
+    @property
+    def key(self) -> str:
+        return f"{self.id}@{self.version}"
+
+
 def _norm(text: str) -> str:
     text = text.lower()
     for a, b in zip("áéíóúüñ", "aeiouun"):
@@ -110,12 +132,19 @@ def _norm(text: str) -> str:
 class ComponentRegistry:
     def __init__(self) -> None:
         self._by_id: dict[str, dict[str, ComponentDef]] = {}
+        self.rules: dict[str, RuleDef] = {}
+        self.defaults: dict[str, dict] = {}
 
     # ---------------- loading ----------------
     @classmethod
     def load_default(cls, user_dir: Path | None = None) -> "ComponentRegistry":
         reg = cls()
         reg.load_dir(CORE_DIR, origin="core")
+        rules = yaml.safe_load((RULES_DIR / "rules.yaml").read_text(encoding="utf-8")) or {}
+        for item in rules.get("rules", []):
+            r = RuleDef.model_validate(item)
+            reg.rules[r.id] = r
+        reg.defaults = (yaml.safe_load((RULES_DIR / "defaults.yaml").read_text(encoding="utf-8")) or {}).get("defaults", {})
         if user_dir and user_dir.exists():
             reg.load_dir(user_dir, origin="user")
         return reg
@@ -182,6 +211,20 @@ class ComponentRegistry:
                 scored.append((score + (0.1 if comp.category != "core" else 0), comp))
         scored.sort(key=lambda t: (-t[0], t[1].id))
         return [c for _, c in scored]
+
+    def rule_by_binding(self, binding: str) -> RuleDef | None:
+        return next((r for r in self.rules.values() if r.binding == binding), None)
+
+    def search_rules(self, query: str, kind: str | None = None) -> list[RuleDef]:
+        q = _norm(query)
+        hits = []
+        for r in self.rules.values():
+            if kind and r.kind != kind:
+                continue
+            score = sum(len(k) for k in r.keywords if _norm(k) in q)
+            if score:
+                hits.append((score, r))
+        return [r for _, r in sorted(hits, key=lambda t: (-t[0], t[1].id))]
 
     def catalog(self) -> list[dict[str, Any]]:
         """Compact catalog for LLM context (ids + one-line descriptions, no client data)."""

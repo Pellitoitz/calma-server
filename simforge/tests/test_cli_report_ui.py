@@ -76,6 +76,11 @@ def test_ui_flow_headless(tmp_path, monkeypatch):
     at.chat_input[0].set_value("Fuente infinita. Un operario realiza montaje durante 60 segundos. Existe un buffer de 5 unidades. "
                                "Una máquina tarda 45 segundos. El mismo operario inspecciona durante 20 segundos. Simular 8 horas.").run()
     assert "Model v1 created" in at.chat_message[-1].markdown[0].value
+    run_btn = next(b for b in at.button if b.label == "RUN SIMULATION")
+    assert run_btn.disabled  # AI-generated model: approval before the first run
+    next(t for t in at.text_input if t.key == "run_approver").input("Engineer").run()
+    next(b for b in at.button if b.key == "run_approve").click().run()
+    assert not at.exception
     next(b for b in at.button if b.label == "RUN SIMULATION").click().run()
     assert not at.exception
     assert ("Units completed", "359") in [(m.label, m.value) for m in at.metric]

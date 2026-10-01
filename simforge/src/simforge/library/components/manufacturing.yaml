@@ -1,11 +1,11 @@
 components:
   - {id: manual_assembly, name: Manual assembly, category: manufacturing, behavior: server, version: "1.0.0",
      description: "Manual assembly workstation (operator required).",
-     tags: [manufacturing, manual, assembly], keywords: [montaje, ensamblaje, assembly, ensamblado, montar, monta],
+     tags: [manufacturing, manual, assembly], keywords: [montaje, ensamblaje, assembly, ensamblado, montar, monta, montan, montada, assemble, assembles, assembled, assembling],
      defaults: {capacity: 1}, kpis: [utilization, waiting_resource, blocked, starved]}
   - {id: inspection, name: Inspection, category: manufacturing, behavior: server, version: "1.0.0",
      description: "Visual/manual inspection or review. Use yield_rate + on_reject to model rejects.",
-     tags: [manufacturing, quality, inspection], keywords: [inspeccion, inspecciona, revision, revisa, control, calidad, inspection, review, verificacion],
+     tags: [manufacturing, quality, inspection], keywords: [inspeccion, inspecciona, revision, revisa, control, calidad, inspection, review, verificacion, inspect, inspects, inspected, reviews, reviewed],
      defaults: {capacity: 1}, kpis: [utilization, yield, rejects]}
   - {id: test_station, name: Test station, category: manufacturing, behavior: server, version: "1.0.0",
      description: "Generic test station (functional or electrical).",

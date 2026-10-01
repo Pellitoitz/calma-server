@@ -1,0 +1,49 @@
+# Library entries that are not flow components: resource types and dispatch strategies.
+# They are matched exactly like components (keywords ES/EN) and reported in the matching report.
+rules:
+  - id: shared_operator
+    kind: resource_type
+    name: Shared operator
+    version: "1.0.0"
+    binding: "resource:operator"
+    description: "Person (or team) that performs several tasks; walks between locations; one dispatch rule decides the next task."
+    keywords: [operario, operaria, operarios, trabajador, trabajadora, persona, personas, operator, worker, mismo operario, same operator]
+    validation_status: tested
+    tests: [tests/test_engine_golden.py, tests/test_benchmark_elements.py]
+  - id: carrier
+    kind: resource_type
+    name: Carrier (racks, pallets, fixtures)
+    version: "1.0.0"
+    binding: "resource:carrier"
+    description: "Limited circulating resource taken at one step and freed at a later one (CONWIP loop)."
+    keywords: [bastidor, bastidores, rack, racks, palet, palets, pallet, pallets, utillaje, utillajes, fixture, fixtures, carrier, carriers]
+    validation_status: tested
+    tests: [tests/test_engine_golden.py, tests/test_selective_benchmark.py]
+  - id: fifo
+    kind: dispatch_strategy
+    name: FIFO
+    version: "1.0.0"
+    binding: "dispatch:fifo"
+    description: "The resource serves the oldest request first."
+    keywords: [fifo, orden de llegada, primero en llegar, first come]
+    validation_status: tested
+    tests: [tests/test_engine_golden.py]
+  - id: static_priority
+    kind: dispatch_strategy
+    name: Static priority
+    version: "1.0.0"
+    binding: "dispatch:priority"
+    description: "Fixed priority per task (lower number first), FIFO within the same priority."
+    keywords: [prioridad, priority, prioriza, primero, antes que]
+    validation_status: tested
+    tests: [tests/test_engine_golden.py]
+  - id: wip_target_priority
+    kind: dispatch_strategy
+    name: WIP_TARGET_PRIORITY
+    version: "1.0.0"
+    binding: "dispatch:wip_target"
+    description: "Keep a protected station fed: feeder tasks first while the WIP ready for it is below a target; unblock it first if blocked."
+    keywords: [wip objetivo, wip target, objetivo de wip, mantener alimentada, mantenga alimentada, alimentada, alimentar, alimentacion, keep fed, starvation, hambrienta]
+    params: [target, protected_node, feed_nodes, feeder_nodes, preempt_below]
+    validation_status: tested
+    tests: [tests/test_benchmark_elements.py, tests/test_selective_benchmark.py]

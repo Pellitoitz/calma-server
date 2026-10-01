@@ -13,11 +13,14 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
 
+import time
+
 from ..ai.compiler import ParseOutcome, compile_draft
+from ..ai.edits import chat_provenance, correction_reason, friendly, is_ai_value, resolve_edit, resolve_factor_path
 from ..ai.context import Anonymizer
 from ..ai.interpreter import Interpreter, LLMInterpreter, RuleBasedInterpreter
 from ..ai.provider import LLMProvider, LLMUsage, provider_from_env
-from ..ai.schemas import EditPlan
+from ..ai.schemas import EditPlan, ProcessDraft
 from ..analytics.diagnostics import Finding
 from ..domain.isms import Approval, ExperimentSpec, Factor, ISMSModel
 from ..domain.paths import diff, set_value
@@ -54,6 +57,11 @@ class ParseResponse:
     report: VerificationReport
     version: int
     interpreter: str
+    generation_ms: float = 0.0
+
+
+class ApprovalRequired(RuntimeError):
+    """An AI-generated model must be reviewed and approved by the engineer before its first run."""
 
 
 class SimForgeApp:
@@ -87,19 +95,55 @@ class SimForgeApp:
         return self.workspace.open_project(slug)
 
     # ------------------------------------------------------------------- model
-    def parse_process(self, project: Project, text: str) -> ParseResponse:
-        """Natural language -> draft (AI or rules) -> ISMS (deterministic) -> verification -> new version."""
+    def parse_process(self, project: Project, text: str, prototype: bool = False) -> ParseResponse:
+        """Natural language -> interpretation (AI or rules) -> library matching -> parameters -> ISMS -> verification.
+        The result is a new model VERSION (the chat is never the model)."""
         interp = self.interpreter(project)
+        t0 = time.perf_counter()
         draft = interp.parse(text)
-        outcome = compile_draft(draft, self.registry, text)
-        report, _ = verify(outcome.model, self.registry)
-        v = project.save_version(outcome.model, message=f"parsed from description ({interp.name})", author="ai")
+        if isinstance(interp, RuleBasedInterpreter):
+            project.audit("parse_process", "offline-rules", "-", interp.prompt_version, text, draft.model_dump_json(), [], 0, True)
+        return self._build(project, text, draft, interp.name, getattr(interp, "prompt_version", None), {}, prototype, t0)
+
+    def _build(self, project: Project, text: str, draft: ProcessDraft, interpreter: str, prompt_version: str | None,
+               answers: dict[str, Any], prototype: bool, t0: float) -> ParseResponse:
+        for key, val in answers.items():  # structural answers change the interpretation, never the engine
+            if key.startswith("return_mode:"):
+                for loop in draft.carrier_loops:
+                    if loop.resource == key.split(":", 1)[1]:
+                        loop.return_mode = val
+        outcome = compile_draft(draft, self.registry, text, prototype=prototype,
+                                generated_by={"interpreter": interpreter, "prompt_version": prompt_version})
+        model = outcome.model
+        for key, val in answers.items():
+            if key.startswith("param:") and any(p.id == key[6:] for p in model.parameters):
+                model = set_value(model, f"parameters.{key[6:]}.value", val)
+                model = set_value(model, f"parameters.{key[6:]}.provenance", chat_provenance(f"answer: {val}", "answer"))
+        outcome.model = model
+        gen_ms = (time.perf_counter() - t0) * 1000
+        report, _ = verify(model, self.registry)
+        v = project.save_version(model, message=f"generated from description ({interpreter})", author="ai")
+        project.save_interpretation(text, draft.model_dump_json(), interpreter, prompt_version, gen_ms, v, answers)
         project.log("ai", "parse_process", request=text, interpretation=draft.model_dump_json(),
-                    change={"components": outcome.component_matches, "reuse_ratio": outcome.reuse_ratio},
+                    change={"matches": [m.__dict__ for m in outcome.matches], "reuse_ratio": outcome.reuse_ratio},
                     result=report.summary())
         project.record_metric("reuse_ratio", outcome.reuse_ratio)
-        project.record_metric("ai_questions", len([m for m in outcome.model.missing]))
-        return ParseResponse(outcome, report, v, interp.name)
+        project.record_metric("custom_logic_count", outcome.custom_count)
+        project.record_metric("ai_questions", len(outcome.questions()))
+        project.record_metric("ai_generation_s", gen_ms / 1000)
+        return ParseResponse(outcome, report, v, interpreter, gen_ms)
+
+    def answer_questions(self, project: Project, answers: dict[str, Any], prototype: bool = False) -> ParseResponse:
+        """Engineer answers -> merged with previous answers -> deterministic recompilation of the stored interpretation.
+        keys: 'param:<id>' (value) or 'return_mode:<carrier>' (immediate | transport)."""
+        last = project.last_interpretation()
+        if last is None:
+            raise ValueError("No hay ninguna descripción interpretada en este proyecto.")
+        merged = {**json.loads(last["answers_json"] or "{}"), **answers}
+        draft = ProcessDraft.model_validate_json(last["draft_json"])
+        project.log("user", "answer_questions", request=json.dumps(answers, default=str))
+        return self._build(project, last["text"], draft, last["interpreter"], last["prompt_version"], merged, prototype,
+                           time.perf_counter())
 
     def validate_model(self, model: ISMSModel) -> VerificationReport:
         return verify(model, self.registry)[0]
@@ -128,7 +172,26 @@ class SimForgeApp:
             first = project.versions()[0].created_at
             delta = datetime.now(timezone.utc) - datetime.fromisoformat(first)
             project.record_metric("time_to_engineer_approval_s", delta.total_seconds())
+        last = project.last_interpretation()
+        if last and project.metric("engineer_review_s") is None:
+            gen_at = datetime.fromisoformat(last["created_at"])
+            project.record_metric("engineer_review_s", (datetime.now(timezone.utc) - gen_at).total_seconds(),
+                                  "wall clock from last AI generation to approval (includes corrections)")
         return v
+
+    def approval_pending(self, project: Project, model: ISMSModel) -> bool:
+        """AI-generated models need ONE engineer approval before their first run. Later edited versions may run
+        (they are reported as derived, not approved)."""
+        if model.meta.origin != "ai_generated" or model.is_approved:
+            return False
+        return not any(project.load_version(v.version).is_approved for v in project.versions() if v.author not in ("ai",))
+
+    def _check_approval(self, project: Project, model: ISMSModel) -> None:
+        if not self.approval_pending(project, model):
+            return
+        rep = self.validate_model(model)
+        raise ApprovalRequired("Modelo generado por IA: revisa el flujo, componentes, parámetros y supuestos y apruébalo "
+                               f"antes de la primera ejecución (estado: {rep.readiness.value}).")
 
     # --------------------------------------------------------------- simulation
     def run_simulation(self, project: Project, model: ISMSModel | None = None, replications: int | None = None,
@@ -136,6 +199,7 @@ class SimForgeApp:
         model = model or project.current_model()
         if model is None:
             raise ValueError("El proyecto no tiene modelo.")
+        self._check_approval(project, model)
         res = run_simulation(model, self.registry, replications=replications, trace=trace, cache=project, keep_records=keep_records)
         project.save_run(res, project.meta.current_version)
         project.log("system", "run_simulation", result=f"run {res.run_id}: TH={res.kpis.mean('throughput_per_hour'):.2f}/h")
@@ -146,6 +210,7 @@ class SimForgeApp:
         model = model or project.current_model()
         if model is None:
             raise ValueError("El proyecto no tiene modelo.")
+        self._check_approval(project, model)
         res = run_experiment(model, spec, self.registry, cache=project, progress=progress)
         project.save_experiment(res, project.meta.current_version)
         project.log("system", "run_experiment", request=spec.model_dump_json(), result=f"experiment {res.experiment_id}: {len(res.scenarios)} scenarios")
@@ -174,12 +239,18 @@ class SimForgeApp:
         if sets:
             new = model
             try:
+                touched: list[str] = []
                 for op in sets:
                     value = json.loads(op.value_json or "null")
+                    path, value = resolve_edit(new, op.path or "", value)
+                    if path.startswith("parameters.") and path.endswith(".value"):
+                        touched.append(path.split(".")[1])
+                        new = set_value(new, path, value)
+                        new = set_value(new, path.rsplit(".", 1)[0] + ".provenance", chat_provenance(request))
+                        continue
                     if isinstance(value, dict) and "dist" in value and "provenance" not in value:
-                        value["provenance"] = {"status": "provided_by_client", "source": "chat",
-                                               "note": request[:120], "timestamp": datetime.now(timezone.utc).isoformat()}
-                    new = set_value(new, op.path or "", value)
+                        value["provenance"] = chat_provenance(request)
+                    new = set_value(new, path, value)
             except Exception as e:  # noqa: BLE001
                 return CommandResponse(plan, f"No se pudo aplicar el cambio: {e}", error=str(e))
             changes = diff(model, new, ignore_provenance=True)
@@ -190,14 +261,24 @@ class SimForgeApp:
                                        changes=changes, needs_confirmation=True)
             v = project.save_version(new, message=f"chat: {request[:80]}", author="ai")
             project.log("ai", "edit", request=request, interpretation=plan.model_dump_json(), change=[list(c) for c in changes], result=f"v{v}")
+            if model.meta.origin == "ai_generated":
+                for pid in touched:
+                    if is_ai_value(model, pid):
+                        before = next(p.value for p in model.parameters if p.id == pid)
+                        after = next(p.value for p in new.parameters if p.id == pid)
+                        if before != after:
+                            comp = next((n.component for n in new.nodes if f"${pid}" in n.model_dump_json()), None)
+                            project.record_correction(pid, comp, before, after, correction_reason(request), request, v)
             resp.changes, resp.new_version = changes, v
-            resp.message = "Modelo actualizado (v%d): %s" % (v, "; ".join(f"{p}: {a} → {b}" for p, a, b in changes))
+            resp.message = "Modelo actualizado (v%d): %s" % (v, "; ".join(
+                f"{c['parameter']} ({c['used_in']}): {c['before']} → {c['after']}" for c in friendly(new, changes)))
             model = new
         for op in others:
             if op.intent == "experiment":
                 try:
                     values = json.loads(op.values_json or "[]")
-                    spec = ExperimentSpec(name=f"chat: {request[:40]}", factors=[Factor(path=op.factor_path or "", values=values)])
+                    fpath = resolve_factor_path(model, op.factor_path or "")
+                    spec = ExperimentSpec(name=f"chat: {request[:40]}", factors=[Factor(path=fpath, values=values)])
                     validate_experiment(model, spec)
                 except Exception as e:  # noqa: BLE001
                     return CommandResponse(plan, f"Experimento inválido: {e}", error=str(e))

@@ -55,6 +55,8 @@ class ModelMeta(_Strict):
     description: str = ""
     tags: list[str] = Field(default_factory=list)
     domain: str | None = None  # e.g. "electronics", "automotive"
+    origin: Literal["manual", "ai_generated"] = "manual"
+    generated_by: dict[str, Any] | None = None  # interpreter, prompt version, timestamp (AI-generated models)
 
 
 class SimulationSettings(_Strict):
@@ -226,6 +228,20 @@ class Approval(_Strict):
     note: str = ""
 
 
+class CustomRuleCandidate(_Strict):
+    """Behaviour requested in the description that no library rule can represent.
+    Never executed: the model is blocked until the engineer decides (defer = run WITHOUT it, explicitly)."""
+
+    id: str
+    description: str
+    inputs: list[str] = Field(default_factory=list)
+    outputs: list[str] = Field(default_factory=list)
+    expected_behavior: str = ""
+    reason_not_found: str = "no matching rule in the library"
+    status: Literal["proposed", "deferred", "rejected"] = "proposed"
+    implementation: str | None = None  # AI proposals are NOT executed (status stays UNVALIDATED)
+
+
 class Factor(_Strict):
     path: str  # e.g. "nodes.buffer_1.params.capacity" or "resources.racks.quantity"
     values: list[Any] = Field(min_length=1)
@@ -252,6 +268,7 @@ class ISMSModel(_Strict):
     missing: list[MissingInfo] = Field(default_factory=list)
     approval: Approval = Field(default_factory=Approval)
     experiments: list[ExperimentSpec] = Field(default_factory=list)
+    custom_rule_candidates: list[CustomRuleCandidate] = Field(default_factory=list)
 
     # ---------------- helpers ----------------
     def node(self, node_id: str) -> Node:

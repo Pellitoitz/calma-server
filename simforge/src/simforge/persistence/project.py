@@ -237,6 +237,45 @@ class Project:
         out["manual_edits"] = self.db.execute("SELECT COUNT(*) FROM history WHERE actor = 'user' AND action = 'edit'").fetchone()[0]
         return out
 
+
+    # ------------------------------------------------- AI orchestration records
+    def save_interpretation(self, text: str, draft_json: str, interpreter: str, prompt_version: str | None,
+                            generation_ms: float, model_version: int | None, answers: dict | None = None) -> int:
+        cur = self.db.execute(
+            "INSERT INTO interpretations(created_at, model_version, text, draft_json, answers_json, interpreter, prompt_version, generation_ms)"
+            " VALUES (?,?,?,?,?,?,?,?)",
+            (_now(), model_version, text, draft_json, json.dumps(answers or {}), interpreter, prompt_version, generation_ms))
+        self.db.commit()
+        return cur.lastrowid
+
+    def last_interpretation(self) -> dict | None:
+        r = self.db.execute("SELECT * FROM interpretations ORDER BY id DESC LIMIT 1").fetchone()
+        return dict(r) if r else None
+
+    def record_correction(self, parameter: str, component: str | None, ai_value: Any, engineer_value: Any,
+                          reason: str | None, request: str | None, model_version: int | None) -> None:
+        self.db.execute("INSERT INTO corrections(ts, model_version, parameter, component, ai_value, engineer_value, reason, request)"
+                        " VALUES (?,?,?,?,?,?,?,?)",
+                        (_now(), model_version, parameter, component, json.dumps(ai_value, default=str),
+                         json.dumps(engineer_value, default=str), reason, request))
+        self.db.commit()
+
+    def corrections(self) -> list[dict]:
+        return [dict(r) for r in self.db.execute("SELECT * FROM corrections ORDER BY id")]
+
+    def audit(self, purpose: str, provider: str, model: str, prompt_version: str | None, input_text: str,
+              output_json: str | None, validation_errors: list[str], repairs: int, accepted: bool, input_tokens: int = 0,
+              output_tokens: int = 0, est_cost_usd: float | None = None, latency_ms: float | None = None) -> None:
+        self.db.execute(
+            "INSERT INTO ai_audit(ts, purpose, provider, model, prompt_version, input_text, output_json, validation_errors, repairs, accepted,"
+            " input_tokens, output_tokens, est_cost_usd, latency_ms) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            (_now(), purpose, provider, model, prompt_version, input_text, output_json, json.dumps(validation_errors), repairs, int(accepted),
+             input_tokens, output_tokens, est_cost_usd, latency_ms))
+        self.db.commit()
+
+    def audit_log(self) -> list[dict]:
+        return [dict(r) for r in self.db.execute("SELECT * FROM ai_audit ORDER BY id")]
+
     def close(self) -> None:
         self.db.close()
 
@@ -322,3 +361,4 @@ class Workspace:
 
     def delete_project(self, slug: str) -> None:
         shutil.rmtree(self.projects_dir / slug)
+

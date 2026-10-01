@@ -7,7 +7,23 @@ from simforge.ai.provider import MockLLMProvider
 from simforge.ai.schemas import ProcessDraft
 from simforge.domain.paths import get_value
 from simforge.services.app import SimForgeApp
+from simforge.services.app import ApprovalRequired
 from simforge.validation.verifier import Readiness
+
+
+def val(model, path):
+    """Value of a field with parameter references resolved ($buffer_1_capacity -> 5)."""
+    from simforge.domain.expressions import resolve
+    resolved, _ = resolve(model)
+    return get_value(resolved, path)
+
+
+def pval(model, pid):
+    return next(p for p in model.parameters if p.id == pid).value
+
+
+def value_diffs(changes):
+    return [c for c in changes if ".provenance" not in c[0]]
 
 MVP_TEXT = ("Fuente infinita. Un operario realiza montaje durante 60 segundos. Existe un buffer de 5 unidades. "
             "Una máquina tarda 45 segundos. El mismo operario inspecciona durante 20 segundos. Simular 8 horas.")
@@ -24,7 +40,8 @@ def test_mvp_end_to_end_offline(app):
     pr = app.parse_process(p, MVP_TEXT)
     m = pr.outcome.model
     assert [n.component for n in m.nodes] == ["source", "manual_assembly", "buffer", "machine", "inspection", "sink"]
-    assert get_value(m, "nodes.buffer_1.params.capacity") == 5
+    assert get_value(m, "nodes.buffer_1.params.capacity") == "$buffer_1_capacity"
+    assert val(m, "nodes.buffer_1.params.capacity") == 5
     assert pr.report.readiness is Readiness.EXECUTABLE
     # shared operator conflict detected, strategy applied as explicit assumption + question asked
     assert any("FIFO" in a.text for a in m.assumptions)
@@ -32,12 +49,15 @@ def test_mvp_end_to_end_offline(app):
     assert pr.outcome.ungrounded == []
     assert pr.outcome.reuse_ratio == 1.0
 
+    with pytest.raises(ApprovalRequired):  # AI-generated model: engineer approval before the first run
+        app.run_simulation(p)
+    app.approve_model(p, by="engineer")
     res = app.run_simulation(p)
     assert res.kpis.mean("units_completed") == 359  # FIFO: same as hand calculation
-    # modify parameter by chat
-    r = app.command(p, "Cambia el buffer a 8")
-    assert r.changes == [("nodes.buffer_1.params.capacity", 5, 8)]
-    assert get_value(p.current_model(), "nodes.buffer_1.params.capacity") == 8
+    # modify parameter by chat: the PARAMETER changes (ISMS is the source of truth)
+    r = app.command(p, "Cambia el buffer a 8", confirm=True)
+    assert value_diffs(r.changes) == [("parameters.buffer_1_capacity.value", 5, 8)]
+    assert val(p.current_model(), "nodes.buffer_1.params.capacity") == 8
     # experiment by chat
     r = app.command(p, "Prueba buffers entre 1 y 10")
     assert r.experiment and len(r.experiment.scenarios) == 10
@@ -46,24 +66,25 @@ def test_mvp_end_to_end_offline(app):
     slug = p.meta.slug
     p.close()
     p2 = app.open_project(slug)
-    assert get_value(p2.current_model(), "nodes.buffer_1.params.capacity") == 8
+    assert val(p2.current_model(), "nodes.buffer_1.params.capacity") == 8
     assert len(p2.runs()) >= 1 and len(p2.experiments()) == 1
-    assert len(p2.versions()) == 2
+    assert len(p2.versions()) == 3  # generated, approved, edited
 
 
 def test_chat_commands(app):
     p = app.create_project("cmds")
     app.parse_process(p, MVP_TEXT)
-    r = app.command(p, "Reduce montaje a 50 segundos")
-    assert r.changes[0][0] == "nodes.manual_assembly.params.process_time.value"
-    r = app.command(p, "Pon dos operarios")
-    assert get_value(p.current_model(), "resources.operator_1.quantity") == 2
+    app.approve_model(p, by="engineer")  # runs (bottleneck analysis) need an approved version
+    r = app.command(p, "Reduce montaje a 50 segundos", confirm=True)
+    assert value_diffs(r.changes) == [("parameters.manual_assembly_time.value", 60, 50)]
+    r = app.command(p, "Pon dos operarios", confirm=True)
+    assert val(p.current_model(), "resources.operator_1.quantity") == 2
     r = app.command(p, "¿Dónde está el cuello de botella?")
     assert r.findings and all(f.evidence for f in r.findings)
     r = app.command(p, "Vuelve a la versión anterior")
     assert r.needs_confirmation
     r = app.command(p, "Vuelve a la versión anterior", confirm=True)
-    assert get_value(p.current_model(), "resources.operator_1.quantity") == 1
+    assert val(p.current_model(), "resources.operator_1.quantity") == 1
     r = app.command(p, "haz algo raro con el flux")
     assert r.plan.question and not r.changes
 
@@ -71,6 +92,7 @@ def test_chat_commands(app):
 def test_cache_reuses_results(app):
     p = app.create_project("cache")
     app.parse_process(p, MVP_TEXT)
+    app.approve_model(p, by="engineer")
     a = app.run_simulation(p)
     b = app.run_simulation(p)
     assert a.cache_hits == 0 and b.cache_hits == 1
@@ -88,12 +110,13 @@ def test_approval_and_baseline(app):
     r = app.command(p, "Cambia el buffer a 3", confirm=True)
     assert not p.current_model().is_approved
     assert p.load_version(v).is_approved  # baseline snapshot untouched (immutable)
-    assert app.compare_versions(p, v, r.new_version) == [("nodes.buffer_1.params.capacity", 5, 3)]
+    assert value_diffs(app.compare_versions(p, v, r.new_version)) == [("parameters.buffer_1_capacity.value", 5, 3)]
 
 
 def test_export_import(app, tmp_path):
     p = app.create_project("Export me")
     app.parse_process(p, MVP_TEXT)
+    app.approve_model(p, by="engineer")
     app.run_simulation(p)
     pkg = app.workspace.export_project(p.meta.slug, tmp_path / "pkg")
     p2 = app.workspace.import_project(pkg)
@@ -128,9 +151,10 @@ def test_llm_interpreter_with_mock_and_grounding(tmp_path):
     m = pr.outcome.model
     assert pr.interpreter.startswith("llm:mock")
     assert "tiempo de Inspección = 25" in pr.outcome.ungrounded
-    insp = m.node("insp")
-    assert insp.params["process_time"]["provenance"]["status"] == "assumed"
-    assert m.node("assembly").params["process_time"]["provenance"]["status"] == "provided_by_client"
+    params = {prm.id: prm for prm in m.parameters}
+    assert m.node("insp").params["process_time"]["value"] == "$insp_time"
+    assert params["insp_time"].provenance.status.value == "assumed"
+    assert params["assembly_time"].provenance.status.value == "provided_by_client"
     assert get_value(m, "resources.op.dispatch") == "priority"
     assert m.node("insp").priority < m.node("assembly").priority
     # usage logged
@@ -162,4 +186,4 @@ def test_llm_edit_plan_validated_deterministically(tmp_path):
     app.parse_process(p, MVP_TEXT)
     r = app.command(p, "cambia buffer a 8")
     assert r.error and "ghost" in r.error  # invalid path rejected, nothing applied
-    assert get_value(p.current_model(), "nodes.buf.params.capacity") == 5
+    assert val(p.current_model(), "nodes.buf.params.capacity") == 5

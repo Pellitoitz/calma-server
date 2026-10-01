@@ -157,7 +157,7 @@ def _handle(app: SimForgeApp, project: Project, text: str, hist: list, confirm: 
             if m.missing:
                 lines.append("\n**MISSING DATA / QUESTIONS**")
                 lines += [f"- {'⛔' if q.required else '❓'} {q.question}" for q in m.missing]
-            lines.append("\nReview it in the **Model** tab, then validate and run.")
+            lines.append("\nReview it in the **Model** tab and approve it (engineer) before the first run.")
             hist.append({"role": "assistant", "text": "\n".join(lines)})
             return
         r = app.command(project, text, confirm=confirm)
@@ -318,7 +318,18 @@ def run_tab(app: SimForgeApp, project: Project) -> None:
     c1, c2, c3 = st.columns([1, 1, 2])
     reps = c1.number_input("Replications", value=model.simulation.replications, min_value=1, max_value=1000)
     trace = c2.checkbox("Debug trace", value=model.simulation.trace)
-    if c3.button("RUN SIMULATION", type="primary", disabled=not report.ok, width="stretch"):
+    pending = app.approval_pending(project, model)
+    if pending:
+        st.warning("AI-generated model: an engineer must review flow, components, parameters and assumptions "
+                   "(Model tab) and approve it before the first run.")
+        a1, a2 = st.columns([2, 1])
+        approver = a1.text_input("Engineer name", value=st.session_state.get("engineer", ""), key="run_approver",
+                                 label_visibility="collapsed", placeholder="Engineer name (for approval)")
+        if a2.button("APPROVE MODEL", key="run_approve", disabled=not report.ok or not approver, width="stretch"):
+            st.session_state["engineer"] = approver
+            app.approve_model(project, approver)
+            st.rerun()
+    if c3.button("RUN SIMULATION", type="primary", disabled=not report.ok or pending, width="stretch"):
         with st.spinner("Simulating..."):
             st.session_state["last_run"] = app.run_simulation(project, model, replications=int(reps), trace=trace, keep_records=True)
     if not report.ok:
@@ -567,7 +578,7 @@ def project_tab(app: SimForgeApp, project: Project) -> None:
     terms = st.text_area("One per line: real term = placeholder", "\n".join(f"{k} = {v}" for k, v in project.meta.sensitive_terms.items()))
     est = st.number_input("Estimated hours to build this model manually (for productivity metrics)", value=float(project.meta.manual_model_estimated_hours or 0))
     if st.button("Save project settings"):
-        project.meta.sensitive_terms = {l.split("=")[0].strip(): l.split("=")[1].strip() for l in terms.splitlines() if "=" in l}
+        project.meta.sensitive_terms = {ln.split("=")[0].strip(): ln.split("=")[1].strip() for ln in terms.splitlines() if "=" in ln}
         project.meta.manual_model_estimated_hours = est or None
         project.save_meta()
         st.toast("Saved")

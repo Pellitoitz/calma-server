@@ -1,0 +1,7 @@
+# PROTOTYPE defaults. Used ONLY in prototype mode, always recorded as DEFAULT + explicit assumption.
+# Strict mode (default) never uses them: the value stays MISSING and a question is asked.
+defaults:
+  operator_walking_speed: {value: 1.2, unit: m/s, justification: "typical unhurried walking speed in a plant (engineering rule of thumb)"}
+  carrying_speed: {value: 1.0, unit: m/s, justification: "walking while carrying a light load, rule of thumb"}
+  load_time: {value: 0, unit: s, justification: "loading not modelled (prototype)"}
+  unload_time: {value: 0, unit: s, justification: "unloading not modelled (prototype)"}

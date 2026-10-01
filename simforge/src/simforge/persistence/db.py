@@ -67,6 +67,43 @@ MIGRATIONS: list[str] = [
         note TEXT
     );
     """,
+    # 2 - AI orchestration: interpretations (draft + answers), engineer corrections, AI audit log
+    """
+    CREATE TABLE interpretations (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        created_at TEXT NOT NULL,
+        model_version INTEGER,
+        text TEXT NOT NULL,
+        draft_json TEXT NOT NULL,
+        answers_json TEXT NOT NULL DEFAULT '{}',
+        interpreter TEXT,
+        prompt_version TEXT,
+        generation_ms REAL
+    );
+    CREATE TABLE corrections (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ts TEXT NOT NULL,
+        model_version INTEGER,
+        parameter TEXT NOT NULL,
+        component TEXT,
+        ai_value TEXT,
+        engineer_value TEXT,
+        reason TEXT,
+        request TEXT
+    );
+    CREATE TABLE ai_audit (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ts TEXT NOT NULL,
+        purpose TEXT NOT NULL,
+        provider TEXT, model TEXT, prompt_version TEXT,
+        input_text TEXT,
+        output_json TEXT,
+        validation_errors TEXT,
+        repairs INTEGER DEFAULT 0,
+        accepted INTEGER DEFAULT 0,
+        input_tokens INTEGER, output_tokens INTEGER, est_cost_usd REAL, latency_ms REAL
+    );
+    """,
 ]
 
 
