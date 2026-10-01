@@ -231,6 +231,18 @@ class SimForgeApp:
                                           "(implementar + test + validar + aprobación del ingeniero)."})
         return out
 
+    def compare_models(self, a: ISMSModel | str, b: ISMSModel | str, run: bool = True, rel_tol: float = 1e-9):
+        """compare_model_specs(A, B) and, when they are structurally equivalent, run both (same settings) and compare KPIs.
+        A/B: models or their JSON/YAML text. Verification runs: not stored in any project."""
+        from ..validation.equivalence import _load, compare_model_specs, compare_results
+
+        spec = compare_model_specs(a, b, self.registry)
+        results = None
+        if run and spec.structurally_equivalent:
+            ma, mb = _load(a)[0], _load(b)[0]
+            results = compare_results(run_simulation(ma, self.registry), run_simulation(mb, self.registry), spec, rel_tol=rel_tol)
+        return spec, results
+
     def approval_pending(self, project: Project, model: ISMSModel) -> bool:
         """AI-generated models need ONE engineer approval before their first run. Later edited versions may run
         (they are reported as derived, not approved)."""

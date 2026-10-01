@@ -149,6 +149,7 @@ class RuleBasedInterpreter:
             prev_op = op
             return op
 
+        priority_clauses: list[str] = []
         for clause in _sentences(text):
             c = _norm(clause)
             if re.match(r"(si|cuando|siempre que|en caso de|if|when|whenever|unless|in case)\b", c):
@@ -157,6 +158,9 @@ class RuleBasedInterpreter:
                 continue
             if mn and re.match(r"(tengo|tenemos|es|i have|we have|this is)\s+(un|una|an?)\b", c) and not _TIME_RE.search(c):
                 continue  # model name ("Tengo un proceso de ...")
+            if re.search(r"\b(prioridad|prioriza\w*|priorit\w*)\b", c) and not _TIME_RE.search(c):
+                priority_clauses.append(clause)  # dispatch rule, interpreted after all steps are known
+                continue
             op_here = new_op(c) if _OPERATOR_RE.search(c) else None
             tm = _TIME_RE.search(c)
             if any(k in c for k in ("simul", "turno", "horizonte", "shift")) and not re.search(r"\b(monta|inspecc|revis|proces|sold|transport)", c):
@@ -264,7 +268,10 @@ class RuleBasedInterpreter:
             d.policies.append(DraftPolicy(resource=op, rule="wip_target", protected_step=prot.id if prot else None, feeder_steps=feeders,
                                           target=int(_num(wip.group(2))) if wip.group(2) else None))
         else:
-            self._static_priority(d, low, operator_ids)
+            for pc in priority_clauses:
+                if not self._static_priority(d, _norm(pc), operator_ids):
+                    d.custom_rules.append(DraftCustomRule(description=pc.strip(),
+                                                          reason="prioridad no interpretable con las tareas del operario"))
         if not d.steps:
             d.missing_information.append(DraftQuestion(question="No he identificado ningún paso del proceso. Describe cada paso (p.ej. 'montaje 60 segundos')."))
         if d.items is not None and any(st.time_basis == "per_item" for st in d.steps):
@@ -294,22 +301,41 @@ class RuleBasedInterpreter:
         comp = mentioned[0][1] if mentioned else hits[0]
         return comp, comp.name
 
-    def _static_priority(self, d: ProcessDraft, low: str, operator_ids: list[str]) -> None:
-        mp = re.search(r"prioridad\w*\s+(?:es\s+)?(?:a\s+|de\s+)?(.{0,60})|priorit\w*\s+(.{0,60})", low)
-        if not (mp and operator_ids):
-            return
-        target = _norm(mp.group(1) or mp.group(2) or "")
+    def _static_priority(self, d: ProcessDraft, c: str, operator_ids: list[str]) -> bool:
+        """'X tiene prioridad sobre Y', 'prioriza X sobre/antes que Y', 'X has priority over Y', 'prioridad a X'."""
+        if not operator_ids:
+            return False
         op = operator_ids[0]
         op_steps = [st for st in d.steps if op in st.resources]
-        named = [st for st in d.steps if st.component != "buffer" and any(w in target for w in _keywords(self.registry, st.component))]
-        ranked = [st for st in named if op in st.resources]
-        if not ranked and named and re.search(r"aliment|feed|starv|parad|ocupad", target):
-            pos = d.steps.index(named[0])
-            ranked = [st for st in op_steps if d.steps.index(st) < pos]
-        if ranked and len(op_steps) >= 2:
-            order = [r.id for r in ranked] + [st.id for st in op_steps if st not in ranked]
-            d.policies.append(DraftPolicy(resource=op, rule="priority", priority_order=order))
-            d.assumptions.append(f"Prioridad del operario interpretada como: {' > '.join(order)}.")
+        if len(op_steps) < 2:
+            return False
+
+        def named(txt: str) -> list[DraftStep]:
+            return [st for st in op_steps if any(w in txt for w in _keywords(self.registry, st.component)) or _norm(st.name) in txt]
+        first, second = [], []
+        m = re.search(r"(.{0,60}?)\s+(?:tiene|tienen|has|have)\s+(?:mas\s+|more\s+|higher\s+)?(?:prioridad|priority)\s+"
+                      r"(?:sobre|frente a|respecto a|over)\s+(.{0,60})", c) or \
+            re.search(r"(?:prioriza\w*|priorit\w*)\s+(.{0,60}?)\s+(?:sobre|frente a|antes que|antes de|over|before)\s+(.{0,60})", c)
+        if m:
+            first, second = named(m.group(1)), named(m.group(2))
+        else:
+            m = re.search(r"prioridad\w*\s+(?:es\s+)?(?:a\s+|de\s+|para\s+)?(.{0,60})|priorit\w*\s+(?:to\s+)?(.{0,60})", c)
+            if m:
+                target = m.group(1) or m.group(2) or ""
+                first = named(target)
+                if not first and re.search(r"aliment|feed|starv|parad|ocupad", target):
+                    others = [st for st in d.steps if st.component != "buffer" and st not in op_steps and
+                              any(w in target for w in _keywords(self.registry, st.component))]
+                    if others:
+                        pos = d.steps.index(others[0])
+                        first = [st for st in op_steps if d.steps.index(st) < pos]
+        first = [st for st in first if st not in second]
+        if not first:
+            return False
+        order = [st.id for st in first] + [st.id for st in second] + [st.id for st in op_steps if st not in first and st not in second]
+        d.policies.append(DraftPolicy(resource=op, rule="priority", priority_order=order))
+        d.assumptions.append(f"Prioridad del operario interpretada como: {' > '.join(order)}.")
+        return True
 
     # ------------------------------------------------------------------ edits
     def plan_edit(self, text: str, model: ISMSModel) -> EditPlan:
