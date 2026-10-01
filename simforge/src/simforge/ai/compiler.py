@@ -533,7 +533,10 @@ def compile_draft(draft: ProcessDraft, registry: ComponentRegistry, source_text:
         path = None
         if kind == "carrier":
             car = next((r for r in resources if r["kind"] == "carrier"), None)
-            path = f"resources.{car['id']}.quantity" if car else None
+            if car and isinstance(car["quantity"], str) and car["quantity"].startswith("$"):
+                path = f"parameters.{car['quantity'][1:]}.value"
+            elif car:
+                path = f"resources.{car['id']}.quantity"
         elif kind == "operator":
             op = next((r for r in resources if r["kind"] == "operator"), None)
             path = f"parameters.{op['id']}_count.value" if op else None
@@ -545,11 +548,6 @@ def compile_draft(draft: ProcessDraft, registry: ComponentRegistry, source_text:
             experiments.append({"name": f"{ex.target} {vals[0]}..{vals[-1]}", "factors": [{"path": path, "values": vals}]})
         else:
             b.ask(f"No sé qué parámetro variar para '{ex.target}'.", None, required=False)
-    for car in [r for r in resources if r["kind"] == "carrier"]:
-        # the experiment varies the resource quantity directly: keep the parameter as baseline reference
-        for e in experiments:
-            if e["factors"][0]["path"] == f"resources.{car['id']}.quantity" and isinstance(car["quantity"], str):
-                pass
 
     # ------------------------------------------------------------ horizon, draft-level notes
     if d.horizon_value is None:

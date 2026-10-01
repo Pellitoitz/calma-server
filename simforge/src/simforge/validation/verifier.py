@@ -144,6 +144,14 @@ def verify(model: ISMSModel, registry: ComponentRegistry) -> tuple[VerificationR
     for prm in model.parameters:
         if prm.id not in used_refs:
             add(Level.WARNING, "UNUSED_PARAMETER", f"El parámetro '{prm.id}' no se usa en el modelo.", f"parameters.{prm.id}")
+    # custom logic is reported even when parameters are still missing
+    for c in model.custom_rule_candidates:
+        if c.status == "proposed":
+            add(Level.ERROR, "CUSTOM_RULE_PENDING", f"Regla no disponible en la biblioteca: '{c.description}'. "
+                "Decide: implementarla y validarla, o ejecutar sin ella (status: deferred).", f"custom_rule_candidates.{c.id}")
+        elif c.status == "deferred":
+            add(Level.WARNING, "CUSTOM_RULE_NOT_MODELLED", f"La regla '{c.description}' NO está modelada (aplazada por el ingeniero).",
+                f"custom_rule_candidates.{c.id}")
     original = model
     resolved, problems = resolve(model)
     missing_uses: dict[str, list[str]] = {}
@@ -195,13 +203,6 @@ def verify(model: ISMSModel, registry: ComponentRegistry) -> tuple[VerificationR
     # ---- missing information declared by the parser -----------------------
     for m in model.missing:
         add(Level.ERROR if m.required else Level.WARNING, "MISSING", m.question, m.path)
-    for c in model.custom_rule_candidates:
-        if c.status == "proposed":
-            add(Level.ERROR, "CUSTOM_RULE_PENDING", f"Regla no disponible en la biblioteca: '{c.description}'. "
-                "Decide: implementarla y validarla, o ejecutar sin ella (status: deferred).", f"custom_rule_candidates.{c.id}")
-        elif c.status == "deferred":
-            add(Level.WARNING, "CUSTOM_RULE_NOT_MODELLED", f"La regla '{c.description}' NO está modelada (aplazada por el ingeniero).",
-                f"custom_rule_candidates.{c.id}")
     for a in model.assumptions:
         if not a.accepted:
             add(Level.INFO, "ASSUMPTION", a.text, a.path, "Revisar y aceptar o corregir.")

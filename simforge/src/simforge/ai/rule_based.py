@@ -115,7 +115,8 @@ class RuleBasedInterpreter:
             item = (mip.group(2) if mip else mi.group(1)).rstrip("s")
             d.items = DraftItems(item_name=item + "s", per_entity=int(_num(mip.group(1))) if mip else None)
 
-        mn = take(re.search(r"(?:tengo|tenemos|es|i have|we have|this is)\s+(?:un|una|an?)\s+(?:proceso|linea|celula|process|line|cell)\s+(?:de|of)\s+([a-z ]{3,40})", low))
+        mn = take(re.search(r"(?:tengo|tenemos|es|i have|we have|this is)\s+(?:un|una|an?)\s+(?:proceso|linea|celula|process|line|cell)\s+(?:de|of)\s+([a-z ]{3,40})", low)
+                  or re.search(r"(?:i have|we have|this is)\s+an?\s+([a-z ]{3,40}?)\s+(?:process|line|cell)\b", low))
         if mn:
             d.model_name = mn.group(1).strip().capitalize()
         wip = take(re.search(r"(wip objetivo|objetivo de wip|wip target|target wip)(?:\s+(?:de|of|=)\s+" + _NUM + r")?", low))
@@ -149,6 +150,12 @@ class RuleBasedInterpreter:
 
         for clause in _sentences(text):
             c = _norm(clause)
+            if re.match(r"(si|cuando|siempre que|en caso de|if|when|whenever|unless|in case)\b", c):
+                # conditional behaviour: never turned into a plain station, never dropped
+                d.custom_rules.append(DraftCustomRule(description=clause.strip(), reason="ninguna regla de la biblioteca la cubre"))
+                continue
+            if mn and re.match(r"(tengo|tenemos|es|i have|we have|this is)\s+(un|una|an?)\b", c) and not _TIME_RE.search(c):
+                continue  # model name ("Tengo un proceso de ...")
             op_here = new_op(c) if _OPERATOR_RE.search(c) else None
             tm = _TIME_RE.search(c)
             if any(k in c for k in ("simul", "turno", "horizonte", "shift")) and not re.search(r"\b(monta|inspecc|revis|proces|sold|transport)", c):
@@ -167,7 +174,7 @@ class RuleBasedInterpreter:
             # transports
             mt = re.search(r"\b(se\s+)?(transporta\w*|traslada\w*|lleva\w*|mueve\w*|transport\w*|carr(?:y|ies|ied)|moved?|taken)\b", c)
             if mt and not re.search(r"\b(realiza|hace|does|performs)\b.*\b(transporte|transport)\b.*,|\by\b.*transporte", c) and not (
-                    op_here and re.search(r"\b(montaje|revision|inspeccion|assembly|review)\b", c) and "transporte" in c):
+                    op_here and re.search(r"\b(montaje|revision|inspeccion|assembly|review)\b", c) and re.search(r"\btransporte?\b", c)):
                 n = sum(1 for st in d.steps if st.component in ("transport", "rack_transport")) + 1
                 dist = re.search(_NUM + r"\s*(?:m|metros|meters)\b(?!/)", c)
                 spd = re.search(_NUM + r"\s*m/s", c)
@@ -201,18 +208,20 @@ class RuleBasedInterpreter:
                     if re.search(r"(?:por|per|/)\s*(?:circuito|circuit|placa|board|pieza)", c) and d.items is not None:
                         basis = "per_item"
                 if time is None and d.items is not None:
-                    basis = "per_item"
+                    # "la selectiva procesa los bastidores" -> per carrier; otherwise the time is asked per item
+                    carrier_only = re.search(r"\b(bastidor\w*|racks?|palet\w*|pallets?|carros?)\b", c) and not re.search(
+                        r"\b(circuit\w*|placa\w*|boards?|piezas?|items?)\b", c)
+                    basis = "per_entity" if carrier_only else "per_item"
                 st = DraftStep(id=sid, name=name, component=comp.id, time=time, resources=[op_here] if op_here else [], time_basis=basis)  # type: ignore[arg-type]
                 d.steps.append(st)
                 step_clauses.append((st, c))
                 continue
-            if op_here or any(s[0] <= text.lower().find(clause.lower()[:10]) < s[1] for s in consumed_spans):
-                continue
             if _consumed_fact(c):
                 continue
             if re.search(r"\b(si|cuando|siempre que|salvo|excepto|prioriza\w*|regla|if|when|unless|always|never|nunca)\b", c):
+                # conditional logic is never dropped, even in a clause that also names the operator
                 d.custom_rules.append(DraftCustomRule(description=clause.strip(), reason="ninguna regla de la biblioteca la cubre"))
-            else:
+            elif not (op_here or any(s[0] <= text.lower().find(clause.lower()[:10]) < s[1] for s in consumed_spans)):
                 d.unparsed.append(clause.strip())
 
         # ---------------- post-processing ----------------

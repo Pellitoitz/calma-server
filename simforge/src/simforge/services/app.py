@@ -179,6 +179,22 @@ class SimForgeApp:
                                   "wall clock from last AI generation to approval (includes corrections)")
         return v
 
+    def decide_custom_rule(self, project: Project, candidate_id: str, decision: str, by: str, note: str = "") -> int:
+        """Engineer decision on a CustomRuleCandidate: 'deferred' (run WITHOUT the rule, reported as not modelled)
+        or 'rejected'. Implementing it is a library change (test + validate + approve), never done automatically."""
+        if decision not in ("deferred", "rejected"):
+            raise ValueError("Decisión no válida: usa 'deferred' (ejecutar sin la regla) o 'rejected'.")
+        model = project.current_model()
+        if model is None:
+            raise ValueError("El proyecto no tiene modelo.")
+        if not any(c.id == candidate_id for c in model.custom_rule_candidates):
+            raise KeyError(f"No existe la regla candidata '{candidate_id}'.")
+        cands = [c.model_copy(update={"status": decision}) if c.id == candidate_id else c for c in model.custom_rule_candidates]
+        new = model.model_copy(update={"custom_rule_candidates": cands})
+        v = project.save_version(new, message=f"custom rule {candidate_id}: {decision} by {by}" + (f" ({note})" if note else ""), author=by)
+        project.log("user", "decide_custom_rule", result=f"v{v}: {candidate_id} -> {decision}")
+        return v
+
     def approval_pending(self, project: Project, model: ISMSModel) -> bool:
         """AI-generated models need ONE engineer approval before their first run. Later edited versions may run
         (they are reported as derived, not approved)."""
