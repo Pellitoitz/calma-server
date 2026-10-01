@@ -98,6 +98,20 @@ def is_ai_value(model: ISMSModel, pid: str) -> bool:
         "assumed", "default")
 
 
+CORRECTION_INTENT = re.compile(r"\b(porque|ya que|en realidad|realmente|no es|no son|esta mal|está mal|corrig\w*|correcci\w*|"
+                               r"medid\w*|actually|wrong|measured|because|in fact)\b", re.I)
+
+
+def is_correction(model: ISMSModel, pid: str, request: str) -> bool:
+    """An engineer CORRECTION of the AI (logged), as opposed to a what-if change of a value the user stated:
+    the value was produced by the AI without being stated (assumed/default/calculated), or the engineer says it is wrong."""
+    prm = _param(model, pid)
+    if prm is None or prm.value is None or not is_ai_value(model, pid):
+        return False
+    stated = prm.provenance is not None and prm.provenance.status.value == "provided_by_client"
+    return not stated or bool(CORRECTION_INTENT.search(request))
+
+
 def unit_ok(unit: str) -> bool:
     try:
         dimension_of(unit)

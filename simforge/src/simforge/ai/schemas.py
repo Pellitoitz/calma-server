@@ -119,6 +119,7 @@ class EditOp(BaseModel):
     intent: Intent
     path: str | None = Field(default=None, description="ISMS parameter path for 'set', e.g. nodes.buffer_1.params.capacity")
     value_json: str | None = Field(default=None, description="JSON-encoded new value for 'set'")
+    expected_json: str | None = Field(default=None, description="JSON-encoded value the user says it has now ('de 3 a 5' -> 3)")
     factor_path: str | None = Field(default=None, description="path varied by 'experiment'")
     values_json: str | None = Field(default=None, description="JSON list of levels for 'experiment'")
 

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -16,14 +17,14 @@ from typing import Any, Callable
 import time
 
 from ..ai.compiler import ParseOutcome, compile_draft
-from ..ai.edits import chat_provenance, correction_reason, friendly, is_ai_value, resolve_edit, resolve_factor_path
+from ..ai.edits import chat_provenance, correction_reason, friendly, is_correction, resolve_edit, resolve_factor_path
 from ..ai.context import Anonymizer
 from ..ai.interpreter import Interpreter, LLMInterpreter, RuleBasedInterpreter
 from ..ai.provider import LLMProvider, LLMUsage, provider_from_env
 from ..ai.schemas import EditPlan, ProcessDraft
 from ..analytics.diagnostics import Finding
 from ..domain.isms import Approval, ExperimentSpec, Factor, ISMSModel
-from ..domain.paths import diff, set_value
+from ..domain.paths import diff, get_value, set_value
 from ..experiments.runner import ExperimentResult, SimulationResult, run_experiment, run_simulation, validate_experiment
 from ..library.registry import ComponentRegistry
 from ..persistence.project import Project, Workspace
@@ -195,6 +196,41 @@ class SimForgeApp:
         project.log("user", "decide_custom_rule", result=f"v{v}: {candidate_id} -> {decision}")
         return v
 
+    def library_improvement_candidates(self, min_occurrences: int = 2) -> list[dict[str, Any]]:
+        """Repeated engineer corrections and repeated custom rules across ALL projects of the workspace.
+        Reported as CANDIDATE_FOR_LIBRARY_IMPROVEMENT; the library is NEVER modified automatically."""
+        corr: dict[tuple[str, str], list[dict]] = {}
+        rules: dict[str, list[dict]] = {}
+        for meta in self.workspace.list_projects():
+            proj = self.open_project(meta.slug)
+            try:
+                for c in proj.corrections():
+                    role = re.sub(r"_\d+", "", c["parameter"]) if not c["component"] else c["parameter"].rsplit("_", 1)[-1]
+                    corr.setdefault((c["component"] or "-", role), []).append({**c, "project": meta.name})
+                model = proj.current_model()
+                for cand in (model.custom_rule_candidates if model else []):
+                    key = re.sub(r"\s+", " ", re.sub(r"[^a-z0-9 ]", "", cand.description.lower().translate(
+                        str.maketrans("áéíóúüñ", "aeiouun")))).strip()
+                    rules.setdefault(key, []).append({"project": meta.name, "status": cand.status, "description": cand.description})
+            finally:
+                proj.close()
+        out: list[dict[str, Any]] = []
+        for (comp, role), items in sorted(corr.items()):
+            if len(items) >= min_occurrences:
+                out.append({"status": "CANDIDATE_FOR_LIBRARY_IMPROVEMENT", "kind": "parameter_correction", "component": comp,
+                            "parameter": role, "occurrences": len(items), "projects": sorted({i["project"] for i in items}),
+                            "ai_values": [i["ai_value"] for i in items], "engineer_values": [i["engineer_value"] for i in items],
+                            "reasons": [i["reason"] for i in items if i["reason"]],
+                            "suggestion": f"Revisar el default / la interpretación de '{role}' en '{comp}' (corregido {len(items)} veces)."})
+        for key, items in sorted(rules.items()):
+            if len(items) >= min_occurrences:
+                out.append({"status": "CANDIDATE_FOR_LIBRARY_IMPROVEMENT", "kind": "custom_rule", "component": None,
+                            "parameter": None, "occurrences": len(items), "projects": sorted({i["project"] for i in items}),
+                            "description": items[0]["description"],
+                            "suggestion": "Regla pedida repetidamente: candidata a componente de biblioteca "
+                                          "(implementar + test + validar + aprobación del ingeniero)."})
+        return out
+
     def approval_pending(self, project: Project, model: ISMSModel) -> bool:
         """AI-generated models need ONE engineer approval before their first run. Later edited versions may run
         (they are reported as derived, not approved)."""
@@ -259,6 +295,12 @@ class SimForgeApp:
                 for op in sets:
                     value = json.loads(op.value_json or "null")
                     path, value = resolve_edit(new, op.path or "", value)
+                    if op.expected_json is not None and not confirm:
+                        expected = json.loads(op.expected_json)
+                        current = get_value(new, path)
+                        if current is not None and expected is not None and float(current) != float(expected):
+                            return CommandResponse(plan, f"'{path}' vale {current}, no {expected}. ¿Lo cambio igualmente a {value}? "
+                                                         "(requiere confirmación)", needs_confirmation=True)
                     if path.startswith("parameters.") and path.endswith(".value"):
                         touched.append(path.split(".")[1])
                         new = set_value(new, path, value)
@@ -270,6 +312,8 @@ class SimForgeApp:
             except Exception as e:  # noqa: BLE001
                 return CommandResponse(plan, f"No se pudo aplicar el cambio: {e}", error=str(e))
             changes = diff(model, new, ignore_provenance=True)
+            if not changes:
+                return CommandResponse(plan, "Sin cambios: el modelo ya tiene esos valores.")
             important = len(changes) > 2 or model.is_approved or any(p.startswith("resources.") and n in (0, None) for p, _, n in changes)
             if important and not confirm:
                 return CommandResponse(plan, "Cambio importante: requiere confirmación." +
@@ -279,7 +323,7 @@ class SimForgeApp:
             project.log("ai", "edit", request=request, interpretation=plan.model_dump_json(), change=[list(c) for c in changes], result=f"v{v}")
             if model.meta.origin == "ai_generated":
                 for pid in touched:
-                    if is_ai_value(model, pid):
+                    if is_correction(model, pid, request):
                         before = next(p.value for p in model.parameters if p.id == pid)
                         after = next(p.value for p in new.parameters if p.id == pid)
                         if before != after:

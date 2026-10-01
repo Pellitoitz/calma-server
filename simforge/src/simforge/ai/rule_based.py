@@ -12,6 +12,7 @@ import json
 import re
 
 from ..domain.isms import ISMSModel, ResourceKind
+from ..domain.units import UnitError, from_base, to_base
 from ..library.registry import ComponentRegistry
 from .compiler import _WORD_NUMBERS, _snake
 from .schemas import (DraftCarrierLoop, DraftCustomRule, DraftExperiment, DraftItems, DraftPolicy, DraftQuestion, DraftResource,
@@ -356,8 +357,13 @@ class RuleBasedInterpreter:
         if mc and carriers:
             ops.append(EditOp(intent="set", path=f"resources.{carriers[0].id}.quantity", value_json=str(int(_num(mc.group(1))))))
 
-        # buffer capacity: "cambia el buffer a 8"
-        mb = re.search(r"(buffer|cola)\w*\s*(?:\w+\s){0,2}?(?:a|en|=|to|de)\s+" + _NUM + r"\b(?!\s*(?:s|seg|min))", s)
+        # buffer capacity: "cambia el buffer de entrada de 3 a 5" / "cambia el buffer a 8"
+        mft = re.search(r"(buffer|cola)\w*\D{0,30}?\b(?:de|from)\s+" + _NUM + r"\s+(?:a|to)\s+" + _NUM + r"\b(?!\s*(?:s|seg|min))", s)
+        if mft and buffers:
+            target = next((b for b in buffers if b.id in s or _norm(b.name) in s), buffers[0])
+            ops.append(EditOp(intent="set", path=f"nodes.{target.id}.params.capacity", value_json=str(int(_num(mft.group(3)))),
+                              expected_json=str(int(_num(mft.group(2))))))
+        mb = None if mft else re.search(r"(buffer|cola)\w*\s*(?:\w+\s){0,2}?(?:a|en|=|to|de)\s+" + _NUM + r"\b(?!\s*(?:s|seg|min))", s)
         if mb and buffers:
             target = next((b for b in buffers if b.id in s or _norm(b.name) in s), buffers[0])
             ops.append(EditOp(intent="set", path=f"nodes.{target.id}.params.capacity", value_json=str(int(_num(mb.group(2))))))
@@ -374,6 +380,13 @@ class RuleBasedInterpreter:
                     ops.append(EditOp(intent="set", path=f"nodes.{n.id}.params.process_time", value_json=json.dumps(dist)))
                     break
 
+        if not ops and not mh and not mr:
+            op = self._parameter_edit(s, model)
+            if isinstance(op, str):
+                return EditPlan(question=op)
+            if op:
+                ops.append(op)
+
         if re.search(r"^\s*(ejecuta|simula|run|lanza)\b", s) and not ops:
             return EditPlan(operations=[EditOp(intent="run")], explanation="Ejecutar simulación")
         if not ops:
@@ -381,6 +394,42 @@ class RuleBasedInterpreter:
                                      "'pon dos operarios', 'reduce montaje a 50 segundos', 'prueba buffers entre 1 y 10', "
                                      "'¿dónde está el cuello de botella?'. Para lenguaje libre configura ANTHROPIC_API_KEY.")
         return EditPlan(operations=ops, explanation="; ".join(f"{o.path} → {o.value_json}" for o in ops))
+
+    def _parameter_edit(self, s: str, model: ISMSModel) -> EditOp | str | None:
+        """Generic edit on a named model parameter: 'la velocidad del operario es 1.0 m/s', 'distancia montaje-buffer 8 m'.
+        Returns an EditOp, a clarification question (ambiguous), or None."""
+        nums = list(re.finditer(_NUM + r"\s*(m/s|km/h|metros|meters|cm|mm|km|m|segundos|seconds|seg|ms|s|minutos|minutes|min|horas|hours|h)?(?![a-z/])", s))
+        if not nums or not model.parameters:
+            return None
+        mft = re.search(r"\b(?:de|from)\s+" + _NUM + r"\s*\S*\s+(?:a|to)\s+" + _NUM, s)
+        words = {w for w in re.findall(r"[a-z]+", s) if len(w) > 2 and w not in _STOP}
+        req = words | {_PARAM_SYN[w] for w in words if w in _PARAM_SYN}
+        scored = []
+        for prm in model.parameters:
+            vocab = _param_vocab(self.registry, model, prm.id)
+            role = req & set(prm.id.split("_")) & _ROLES  # the role word must name the parameter itself
+            if not role:
+                continue
+            scored.append((len(req & vocab), prm))
+        if not scored:
+            return None
+        scored.sort(key=lambda t: -t[0])
+        best = [p for sc, p in scored if sc == scored[0][0]]
+        if len(best) > 1:
+            return "¿Qué parámetro quieres cambiar? " + ", ".join(p.id for p in best)
+        prm = best[0]
+        m = nums[-1]
+        value = _num(m.group(1))
+        unit = _UNIT_WORDS.get(m.group(2) or "", m.group(2))
+        if unit and prm.unit and unit != prm.unit:
+            try:
+                value = from_base(to_base(value, unit), prm.unit)
+            except (UnitError, KeyError):
+                return f"No puedo convertir {unit} a {prm.unit} para '{prm.id}'."
+        op = EditOp(intent="set", path=f"parameters.{prm.id}.value", value_json=json.dumps(value))
+        if mft:
+            op.expected_json = json.dumps(_num(mft.group(1)))
+        return op
 
     @staticmethod
     def _target_path(target: str, buffers, operators, carriers) -> str | None:
@@ -399,6 +448,35 @@ def _keywords(registry: ComponentRegistry, comp_id: str) -> list[str]:
     except KeyError:
         return []
     return [_norm(k) for k in [*c.keywords, c.name] if len(k) > 3]
+
+
+_STOP = {"del", "los", "las", "the", "que", "por", "para", "con", "una", "uno", "and", "pon", "cambia", "change", "set",
+         "esta", "son", "are", "ahora", "now", "valor", "value"}
+_PARAM_SYN = {"velocidad": "speed", "andando": "walking", "camina": "walking", "distancia": "dist", "distance": "dist",
+              "metros": "dist", "carga": "load", "cargar": "load", "descarga": "unload", "descargar": "unload",
+              "capacidad": "capacity", "objetivo": "target", "tiempo": "time", "duracion": "time", "tarda": "time",
+              "circuitos": "per", "placas": "per", "circuits": "per", "boards": "per", "items": "per",
+              "operario": "operator", "trabajador": "operator", "worker": "operator", "operarios": "count",
+              "bastidores": "racks", "rack": "racks", "bastidor": "racks", "distances": "dist", "loading": "load",
+              "unloading": "unload", "walk": "walking"}
+_ROLES = {"speed", "dist", "load", "unload", "capacity", "wip", "target", "time", "per", "count", "racks"}
+_UNIT_WORDS = {"metros": "m", "km/h": "km/h", "meters": "m", "segundos": "s", "seconds": "s", "seg": "s", "minutos": "min", "minutes": "min",
+               "horas": "h", "hours": "h"}
+
+
+def _param_vocab(registry: ComponentRegistry, model: ISMSModel, pid: str) -> set[str]:
+    """Words that can name a parameter: its id tokens + names/keywords of the nodes it belongs to or is used in."""
+    vocab = set(pid.split("_"))
+    ref = f"${pid}"
+    for n in model.nodes:
+        if n.id in pid or ref in n.model_dump_json():
+            vocab |= set(re.findall(r"[a-z]+", _norm(n.name))) | set(n.id.split("_"))
+            for k in _keywords(registry, n.component):
+                vocab |= set(k.split())
+    for r in model.resources:
+        if r.id in pid or ref in r.model_dump_json():
+            vocab |= set(re.findall(r"[a-z]+", _norm(r.name))) | {r.kind.value}
+    return vocab
 
 
 _FACT_PATTERNS = [r"\b(simul|turno|horizonte|shift|simulate)", r"\b(fuente|suministro|supply|source)\b",
