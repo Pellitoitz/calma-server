@@ -46,11 +46,29 @@ METRIC_INFO: dict[str, tuple[str, str, str]] = {
     "resource.*.idle_h": ("Idle time", "h", "Hours with no task assigned"),
     "resource.*.preemptions": ("Pre-emptions", "count", "Tasks this resource abandoned for a more urgent one"),
     "resource.*.avg_in_use": ("Avg in use", "units", "Time-weighted units in use (carriers: racks in circulation)"),
+    # calendars (engine >= 0.6.0); h = hours summed over units/slots of the measured window
+    "*.*.calendar_time_h": ("Calendar time", "h", "Measured window (horizon - warm-up) x units/slots"),
+    "*.*.planned_available_h": ("Planned available time", "h", "Time inside the calendar's available windows (shifts minus breaks, "
+                                "with exceptions); for a node: its own calendar ∩ its operators'/tools' calendars"),
+    "*.*.break_h": ("Break time", "h", "Breaks inside working windows"),
+    "*.*.off_shift_h": ("Off-shift time", "h", "Neither working nor break (nights, weekends, holidays)"),
+    "*.*.planned_availability_ratio": ("Planned availability", "", "planned_available_time / calendar_time"),
+    "resource.*.working_planned_h": ("Working time (planned)", "h", "working:* + transporting:* inside planned time"),
+    "resource.*.walking_planned_h": ("Walking time (planned)", "h", "walking inside planned time"),
+    "resource.*.idle_available_h": ("Idle available time", "h", "Available and without task"),
+    "resource.*.outside_planned_h": ("Work outside planned time", "h", "Still busy after availability ended (FINISH_CURRENT)"),
+    "resource.*.planned_utilization": ("Utilization of planned time", "", "working_planned / planned_available (walking excluded)"),
+    "node.*.planned_utilization": ("Utilization of planned time", "", "busy inside planned time / planned_available"),
+    "node.*.paused_by_calendar_h": ("Paused by calendar", "h", "Operation interrupted (PAUSE_RESUME / STOP_RESTART), unit kept"),
+    "node.*.busy_outside_planned_h": ("Busy outside planned time", "h", "FINISH_CURRENT overrun"),
+    "node.*.blocked_planned_h": ("Blocked (planned)", "h", "Blocked inside planned time"),
+    "node.*.starved_planned_h": ("Starved (planned)", "h", "Starved inside planned time"),
 }
 
 OEE_DEFINITION = (
     "OEE per station = Availability x Performance x Quality over the measured window, per slot. "
-    "Planned time = measured window (no shifts/breaks modelled in ISMS v0.1). "
+    "Planned time = measured window. Only for stations WITHOUT calendars: for calendar-gated stations no OEE is "
+    "reported yet (planned production time is available as node.*.planned_production_time_h). "
     "Availability = (planned - down) / planned. "
     "Performance = ideal_cycle_time x processed / (planned - down); starvation, blocking and waiting for "
     "resources therefore count as PERFORMANCE losses. ideal_cycle_time = param 'ideal_cycle_time' if given, "
@@ -66,6 +84,8 @@ def metric_info(key: str) -> tuple[str, str, str]:
         generic = f"{parts[0]}.*.{'.'.join(parts[2:])}"
         if generic in METRIC_INFO:
             return METRIC_INFO[generic]
+        if f"*.*.{'.'.join(parts[2:])}" in METRIC_INFO:
+            return METRIC_INFO[f"*.*.{'.'.join(parts[2:])}"]
     return (key, "", "")
 
 
@@ -105,7 +125,8 @@ def compute_run_kpis(rec: RunRecord, cm: CompiledModel) -> dict[str, float]:
                 continue
             k[f"node.{nid}.preemptions"] = rec.node_preemptions.get(nid, 0)
             p: ServerParams = cn.params  # type: ignore[assignment]
-            if p.process_time is not None and denom:
+            gated = bool(rec.availability and nid in rec.availability["nodes"])
+            if p.process_time is not None and denom and not gated:  # OEE needs a planned-time definition: see below
                 ideal = (p.ideal_cycle_time or p.process_time).mean_seconds() * (1 if p.ideal_cycle_time else p.entity_time_factor())
                 down = st.get(NodeState.DOWN, 0.0)
                 run_time = denom - down
@@ -144,6 +165,8 @@ def compute_run_kpis(rec: RunRecord, cm: CompiledModel) -> dict[str, float]:
         for name, avg in rec.level_avg.items():
             if name.startswith(prefix):
                 k[f"resource.{rid}.avg_at.{name[len(prefix):]}"] = avg
+    if rec.availability:
+        _calendar_kpis(k, rec)
     # invariant: fractions of time can never exceed 100 %
     for key, v in k.items():
         if key.split(".")[-1] in _FRACTIONS and v == v and not -1e-9 <= v <= 1 + 1e-9:
@@ -151,7 +174,45 @@ def compute_run_kpis(rec: RunRecord, cm: CompiledModel) -> dict[str, float]:
     return k
 
 
-_FRACTIONS = {"utilization", "blocked", "starved", "waiting_resource", "down", "working", "walking", "transporting", "idle", "yield"}
+def _calendar_kpis(k: dict[str, float], rec: RunRecord) -> None:
+    """Calendar metrics. Denominators are explicit: planned_* over PLANNED available time, *_ratio over calendar time.
+    No OEE is reported for calendar-gated nodes: planned production time is now available, but the full
+    Availability x Performance x Quality definition with calendars is a later phase (not invented here)."""
+    av = rec.availability or {}
+    for rid, row in av.get("resources", {}).items():
+        st = rec.resource_state_time.get(rid, {})
+        base = f"resource.{rid}"
+        planned = row["planned_available_s"]
+        working = sum(v for s, v in st.items() if s.startswith(("working:", "transporting:")))
+        k[f"{base}.calendar_time_h"] = row["calendar_time_s"] / 3600
+        k[f"{base}.planned_available_h"] = planned / 3600
+        k[f"{base}.break_h"] = row["break_s"] / 3600
+        k[f"{base}.off_shift_h"] = row["off_shift_s"] / 3600
+        k[f"{base}.planned_availability_ratio"] = planned / row["calendar_time_s"] if row["calendar_time_s"] else 0.0
+        k[f"{base}.working_planned_h"] = working / 3600
+        k[f"{base}.walking_planned_h"] = st.get("walking", 0.0) / 3600
+        k[f"{base}.idle_available_h"] = st.get("idle", 0.0) / 3600
+        k[f"{base}.outside_planned_h"] = sum(v for s, v in st.items() if s.startswith("outside_planned:")) / 3600
+        k[f"{base}.planned_utilization"] = working / planned if planned else float("nan")
+    for nid, row in av.get("nodes", {}).items():
+        st = rec.node_state_time.get(nid, {})
+        base = f"node.{nid}"
+        planned = row["planned_available_s"]
+        k[f"{base}.calendar_time_h"] = row["calendar_time_s"] / 3600
+        k[f"{base}.planned_available_h"] = planned / 3600
+        k[f"{base}.break_h"] = row["break_s"] / 3600
+        k[f"{base}.off_shift_h"] = row["off_shift_s"] / 3600
+        k[f"{base}.planned_availability_ratio"] = planned / row["calendar_time_s"] if row["calendar_time_s"] else 0.0
+        k[f"{base}.planned_utilization"] = st.get(NodeState.BUSY, 0.0) / planned if planned else float("nan")
+        k[f"{base}.paused_by_calendar_h"] = st.get(NodeState.PAUSED, 0.0) / 3600
+        k[f"{base}.busy_outside_planned_h"] = st.get(NodeState.BUSY_OUTSIDE, 0.0) / 3600
+        k[f"{base}.blocked_planned_h"] = st.get(NodeState.BLOCKED, 0.0) / 3600
+        k[f"{base}.starved_planned_h"] = st.get(NodeState.STARVED, 0.0) / 3600
+        k[f"{base}.planned_production_time_h"] = planned / 3600
+
+
+_FRACTIONS = {"utilization", "blocked", "starved", "waiting_resource", "down", "working", "walking", "transporting", "idle", "yield",
+              "planned_utilization", "planned_availability_ratio"}
 
 
 @dataclass

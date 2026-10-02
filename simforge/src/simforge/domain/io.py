@@ -9,6 +9,7 @@ import yaml
 from pydantic import ValidationError
 
 from .isms import ISMSModel
+from .isms_ext import SimModel
 
 
 class ModelFormatError(ValueError):
@@ -17,7 +18,7 @@ class ModelFormatError(ValueError):
 
 def model_from_dict(data: dict) -> ISMSModel:
     try:
-        return ISMSModel.model_validate(data)
+        return SimModel.model_validate(data)
     except ValidationError as e:
         lines = [f"  - {'.'.join(str(x) for x in err['loc'])}: {err['msg']}" for err in e.errors()]
         raise ModelFormatError("El fichero no cumple el esquema ISMS:\n" + "\n".join(lines)) from None

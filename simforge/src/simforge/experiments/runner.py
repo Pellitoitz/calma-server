@@ -25,7 +25,8 @@ from ..domain.paths import get_value, set_value
 from ..engine.base import RunRecord, SimulationEngine
 from ..engine.des.engine import DesEngine
 from ..library.registry import ComponentRegistry
-from ..validation.verifier import compile_model
+from ..validation.semantics import verify_model
+from ..validation.verifier import ModelError
 
 
 class ResultCache(Protocol):
@@ -56,6 +57,7 @@ class SimulationResult:
     findings: list[Finding]
     cache_hits: int = 0
     records: list[RunRecord] = field(default_factory=list)  # raw data; kept in memory only (trace/debug)
+    availability_hash: str | None = None  # hash of the calendars block used (engine >= 0.6.0); None = no calendars
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -65,6 +67,7 @@ class SimulationResult:
             "started_at": self.started_at, "wall_time_s": self.wall_time_s, "horizon_s": self.horizon_s,
             "warmup_s": self.warmup_s, "kpis": self.kpis.to_dict(), "per_replication": self.per_replication,
             "findings": [f.to_dict() for f in self.findings], "cache_hits": self.cache_hits,
+            "availability_hash": self.availability_hash,
         }
 
     @classmethod
@@ -84,7 +87,9 @@ def run_simulation(
     keep_records: bool = False,
 ) -> SimulationResult:
     engine = engine or DesEngine()
-    cm = compile_model(model, registry)  # raises ModelError with readable issues
+    rep, cm = verify_model(model, registry)  # core verifier + extensions (calendars); never silently resolved
+    if cm is None:
+        raise ModelError(rep)
     reps = replications or model.simulation.replications
     seed0 = model.simulation.base_seed if base_seed is None else base_seed
     trace = model.simulation.trace if trace is None else trace
@@ -114,6 +119,7 @@ def run_simulation(
         app_version=__version__, seeds=[seed0 + i for i in range(reps)], started_at=started,
         wall_time_s=round(time.perf_counter() - t0, 4), horizon_s=cm.horizon_s, warmup_s=cm.warmup_s,
         kpis=agg, per_replication=per_rep, findings=diagnose(cm, agg), cache_hits=hits, records=records,
+        availability_hash=cm.availability.spec_hash if getattr(cm, "availability", None) else None,
     )
 
 

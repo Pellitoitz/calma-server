@@ -71,6 +71,7 @@ class SimContext:
         self._resolver_scheduled = False
         self._instant = -1.0
         self._instant_decisions = 0
+        self.calendar = None  # CalendarClock when the model has an `availability` block (engine >= 0.6.0)
 
     def rng(self, *key: str) -> random.Random:
         """Independent, reproducible stream per (seed, purpose). Same stream across scenarios
@@ -362,6 +363,19 @@ class Unit:
     preempt: object = None  # callable set by the holder: suspends the task and frees this unit
     cstate: str = AVAILABLE  # carriers only: the ONE physical state of this unit (see SimContext.check_carriers)
     granted_at: float | None = None  # carriers only: time it was granted and not yet collected
+    base: str = ResourceState.IDLE  # what the unit is doing (idle / walking / working:<node> / transporting:<node>)
+    cal: str = "available"  # calendar label of its resource: available / break / off_shift (always 'available' if none)
+
+    def set_state(self, base: str) -> None:
+        self.base = base
+        self.tracker.set(self.effective())
+
+    def effective(self) -> str:
+        """Tracked state. Without a calendar it is exactly `base` (legacy). Outside planned time: the calendar
+        label if idle, 'outside_planned:<base>' if still doing something (FINISH_CURRENT overrun, walking)."""
+        if self.cal == "available":
+            return self.base
+        return self.cal if self.base == ResourceState.IDLE else f"outside_planned:{self.base}"
 
     @property
     def name(self) -> str:
@@ -440,7 +454,7 @@ class ResourcePool:
             u.task = None
             u.preemptible = False
             u.preempt = None
-            u.tracker.set(ResourceState.IDLE)
+            u.set_state(ResourceState.IDLE)
         self.in_use.change(-len(units))
         self._schedule_dispatch()
 
@@ -466,6 +480,15 @@ class ResourcePool:
             return 0.0
         return self.distance(unit.location, node) / self.speed
 
+    def set_calendar_label(self, label: str) -> None:
+        """Calendar transition of this resource (all its units share the calendar). Busy units keep their task: what
+        happens to the operation is decided by the node's policy (FINISH_CURRENT / PAUSE_RESUME / STOP_RESTART)."""
+        for u in self.units:
+            u.cal = label
+            u.tracker.set(u.effective())
+        if label == "available":
+            self._schedule_dispatch()
+
     # ---- dispatching ----
     def _schedule_dispatch(self) -> None:
         if self.ctx.dispatch_timing == "immediate":
@@ -488,9 +511,11 @@ class ResourcePool:
         """Take at most ONE decision (assignment or pre-emption). True if one was taken."""
         if not self.waiting:
             return False
-        free = [u for u in self.units if not u.busy]
+        free = [u for u in self.units if not u.busy and u.cal == "available"]  # off-shift units take no new task
         feasible = [r for r in self.waiting if r.qty <= len(free)]
         if not feasible:
+            if self.units and self.units[0].cal != "available":
+                return False  # off-shift: nothing to grant, and pre-empting would hand work to an unavailable unit
             cand = self.strategy.preempt_candidate(self)
             if cand is None:
                 return False

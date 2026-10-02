@@ -11,7 +11,7 @@ from typing import Any
 
 from ..domain.isms import ISMSModel
 from ..library.registry import ComponentRegistry
-from .verifier import Issue, Level, VerificationReport, verify
+from .verifier import Issue, Level, Readiness, VerificationReport, verify
 
 
 def _is_random(pt: Any) -> bool:
@@ -48,10 +48,32 @@ def semantic_issues(model: ISMSModel, registry: ComponentRegistry) -> list[Issue
 
 
 def verify_model(model: ISMSModel, registry: ComponentRegistry):
-    """verify() + semantic warnings (warnings only: readiness is not changed)."""
-    rep, compiled = verify(model, registry)
+    """verify() on the ISMS core + semantic warnings + extension blocks (calendars).
+
+    Returns (report, compiled). With an `availability` block the compiled model is a CalendarCompiledModel; the
+    approval state is re-evaluated on the FULL model (the core view has another hash)."""
+    from .availability import availability_issues
+    spec = getattr(model, "availability", None)
+    core = model.core() if spec is not None else model  # type: ignore[attr-defined]
+    rep, compiled = verify(core, registry)
     rep.issues.extend(semantic_issues(model, registry))
-    return rep, compiled
+    if spec is None:
+        return rep, compiled
+    rep.issues = [i for i in rep.issues if i.code != "APPROVAL_STALE"]
+    if model.approval.approved and not model.is_approved:
+        rep.issues.append(Issue(Level.WARNING, "APPROVAL_STALE",
+                                "El modelo cambió después de la aprobación del ingeniero: la aprobación ya no es válida."))
+    cal_issues = availability_issues(model, registry)
+    rep.issues.extend(cal_issues)
+    if rep.readiness in (Readiness.EXECUTABLE, Readiness.ENGINEER_APPROVED):
+        if any(i.level is Level.ERROR for i in cal_issues):
+            rep.readiness = Readiness.CONFIGURED
+        else:
+            rep.readiness = Readiness.ENGINEER_APPROVED if model.is_approved else Readiness.EXECUTABLE
+    if compiled is None or rep.errors:
+        return rep, None
+    from ..engine.calendar_compile import compile_availability
+    return rep, compile_availability(compiled, model, registry)
 
 
 __all__ = ["semantic_issues", "verify_model", "VerificationReport"]

@@ -9,6 +9,7 @@ from ...domain.behaviors import Behavior
 from ...validation.verifier import CompiledModel
 from ..base import RunRecord
 from .nodes import IndustrialBuffer, IndustrialNode, IndustrialServer, IndustrialSink, IndustrialSource, IndustrialTransport
+from .calendar_runtime import CalendarClock
 from .runtime import ResourcePool, SimContext, fmt_hms
 
 # Convention: events occurring exactly at t = horizon are included.
@@ -54,8 +55,13 @@ class DesEngine:
         ctx.model = model.model
         positions = {n.id: (n.position.x, n.position.y) for n in model.model.nodes if n.position}
         ctx.node_rank = {n.id: i for i, n in enumerate(model.model.nodes)}
+        rt = getattr(model, "availability", None)
+        if rt is not None:  # calendars (engine >= 0.6.0); models without them never create a clock (legacy events)
+            ctx.calendar = CalendarClock(ctx, rt)
         for i, r in enumerate(model.model.resources):
             ctx.pools[r.id] = ResourcePool(ctx, r, positions, index=i)
+            if rt is not None and r.id in rt.resource_calendar:
+                ctx.pools[r.id].set_calendar_label(ctx.calendar.label(rt.resource_calendar[r.id]))
         # sources last: they start pushing immediately and need every other node to exist
         order = sorted(model.nodes.values(), key=lambda c: c.behavior is Behavior.SOURCE)
         carrier_transports = {t for n in model.model.nodes for t in n.release_via.values()}
@@ -70,7 +76,8 @@ class DesEngine:
             t_next = env.peek()
             if t_next == float("inf"):  # (checked before 'past the horizon': inf > end)
                 # nothing can ever happen again before the horizon: every process waits for another
-                if ctx.live or any(p.waiting for p in ctx.pools.values()):
+                horizon_reached = ctx.calendar is not None and env.now >= model.horizon_s  # clock sentinel at the horizon
+                if (ctx.live or any(p.waiting for p in ctx.pools.values())) and not horizon_reached:
                     raise DeadlockError(_deadlock_report(ctx))
                 break
             if t_next > end:
@@ -81,6 +88,8 @@ class DesEngine:
             node.finalize()
         for pool in ctx.pools.values():
             pool.finalize()
+        if rt is not None:
+            _availability_record(ctx, model, record)
         ctx.wip.finalize()
         ctx.check_end()
         record.wip_end = ctx.wip.level
@@ -90,3 +99,46 @@ class DesEngine:
             for tr in locs.values():
                 tr.finalize()
         return record
+
+
+def _availability_record(ctx: SimContext, model, record: RunRecord) -> None:
+    """Planned time per calendar-gated resource/node in the measured window, and the time-accounting invariants:
+    planned states == planned calendar time; unplanned states == unplanned calendar time (no double counting)."""
+    from ...domain.calendar import AVAILABLE, BREAK, OFF_SHIFT
+    from ..base import NodeState
+    rt = model.availability
+    a, b = model.warmup_s, model.horizon_s
+    out: dict = {"calendar_hash": rt.spec_hash, "resources": {}, "nodes": {}}
+    for rid, cid in rt.resource_calendar.items():
+        tl, n = rt.timelines[cid], record.resource_units.get(rid, 0)
+        row = {"calendar": cid, "units": n, "calendar_time_s": (b - a) * n,
+               "planned_available_s": tl.time_in(AVAILABLE, a, b) * n, "break_s": tl.time_in(BREAK, a, b) * n,
+               "off_shift_s": tl.time_in(OFF_SHIFT, a, b) * n}
+        st = record.resource_state_time.get(rid, {})
+        unplanned_states = sum(v for k, v in st.items() if k in (BREAK, OFF_SHIFT) or k.startswith("outside_planned:"))
+        planned_states = sum(st.values()) - unplanned_states
+        row["planned_states_s"], row["unplanned_states_s"] = planned_states, unplanned_states
+        if ctx.check_invariants and abs(planned_states - row["planned_available_s"]) > 1e-6 * max(1.0, b) or \
+                ctx.check_invariants and abs(unplanned_states - (row["break_s"] + row["off_shift_s"])) > 1e-6 * max(1.0, b):
+            ctx.violation(f"calendar time accounting of '{rid}': planned states {planned_states:.3f}s vs calendar "
+                          f"{row['planned_available_s']:.3f}s; unplanned {unplanned_states:.3f}s vs "
+                          f"{row['break_s'] + row['off_shift_s']:.3f}s")
+        out["resources"][rid] = row
+    for nid in rt.gating:
+        # servers only: transport vehicle states are not split by calendar in this version (their operators are,
+        # in the resource accounting above); sources have no state tracker
+        if nid not in record.node_state_time or record.node_behavior.get(nid) != "server":
+            continue
+        tl, n = rt.node_timeline(nid), record.node_slots.get(nid, 1)
+        row = {"calendars": rt.gating[nid], "slots": n, "calendar_time_s": (b - a) * n,
+               "planned_available_s": tl.time_in(AVAILABLE, a, b) * n, "break_s": tl.time_in(BREAK, a, b) * n,
+               "off_shift_s": tl.time_in(OFF_SHIFT, a, b) * n}
+        st = record.node_state_time[nid]
+        planned_states = sum(st.get(s, 0.0) for s in NodeState.PLANNED)
+        unplanned_states = sum(st.get(s, 0.0) for s in NodeState.UNPLANNED)
+        row["planned_states_s"], row["unplanned_states_s"] = planned_states, unplanned_states
+        if ctx.check_invariants and abs(planned_states - row["planned_available_s"]) > 1e-6 * max(1.0, b):
+            ctx.violation(f"calendar time accounting of node '{nid}': planned states {planned_states:.3f}s vs calendar "
+                          f"{row['planned_available_s']:.3f}s")
+        out["nodes"][nid] = row
+    record.availability = out

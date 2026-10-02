@@ -24,6 +24,7 @@ import yaml
 from networkx.algorithms.isomorphism import DiGraphMatcher
 
 from ..domain.expressions import resolve
+from ..domain.isms_ext import SimModel
 from ..domain.isms import ISMSModel
 from ..domain.units import UnitError, dimension_of, to_base
 from ..library.registry import ComponentRegistry
@@ -183,8 +184,8 @@ def _load(spec: ISMSModel | str | dict) -> tuple[ISMSModel, str, Any]:
         return spec, spec.model_dump_json(), json.loads(spec.model_dump_json())
     if isinstance(spec, str):
         data = yaml.safe_load(spec)  # JSON is YAML
-        return ISMSModel.model_validate(data), spec, data
-    return ISMSModel.model_validate(spec), json.dumps(spec), spec
+        return SimModel.model_validate(data), spec, data
+    return SimModel.model_validate(spec), json.dumps(spec), spec
 
 
 def compare_model_specs(a: ISMSModel | str | dict, b: ISMSModel | str | dict, registry: ComponentRegistry) -> SpecComparison:

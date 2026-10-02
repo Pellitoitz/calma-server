@@ -64,6 +64,12 @@ verificación → **aprobación del ingeniero** → simulación. Cambios por cha
 registradas; `compare_model_specs` (textual vs estructural vs resultados); métricas de tiempo ahorrado; auditoría IA.
 Detalle: [`docs/ai_orchestration.md`](docs/ai_orchestration.md).
 
+## Calendarios y turnos
+
+Turnos (incluidos nocturnos), descansos, fines de semana, festivos y horas extra; calendarios distintos por operario,
+máquina o fuente; qué pasa con una operación al acabar el turno (FINISH_CURRENT / PAUSE_RESUME / STOP_RESTART, decisión
+del ingeniero). `simforge calendar ...` o pestaña **Calendars**. Detalle: [`docs/calendars_and_shifts.md`](docs/calendars_and_shifts.md).
+
 ## Datos medidos (CSV/XLSX → distribución → parámetro)
 
 Importar un estudio de tiempos (CSV o XLSX, sin ejecutar nada del archivo) → validación fila a fila (nada se borra ni
@@ -136,4 +142,4 @@ Datos de cliente (`workspace/`, configurable con `SIMFORGE_WORKSPACE`) y bibliot
 
 ## Estado honesto (v0.1)
 
-Funciona de verdad: todo lo descrito arriba. **NO implementado todavía** (y el esquema lo rechaza en vez de ignorarlo): turnos/calendarios, mix de productos y setups, routing condicional/"first available", economía (coste/unidad, CAPEX, ROI), energía, optimización (sólo grid), PDF/PPT nativos, integración AnyLogic (ver `docs/anylogic.md`, todo marcado TO VERIFY).
+Funciona de verdad: todo lo descrito arriba. **NO implementado todavía** (y el esquema lo rechaza en vez de ignorarlo): mix de productos y setups, routing condicional/"first available", economía (coste/unidad, CAPEX, ROI), energía, optimización (sólo grid), PDF/PPT nativos, integración AnyLogic (ver `docs/anylogic.md`, todo marcado TO VERIFY).

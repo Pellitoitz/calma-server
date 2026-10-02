@@ -20,6 +20,13 @@ class NodeState:
     BLOCKED = "blocked"  # finished, downstream full
     DOWN = "down"
     ALL = (STARVED, WAITING_RESOURCE, BUSY, BLOCKED, DOWN)
+    # calendars (engine >= 0.6.0), only outside PLANNED time of the node (its own calendar ∩ its resources' calendars)
+    PAUSED = "paused_by_calendar"  # operation interrupted (PAUSE_RESUME / STOP_RESTART), entity kept in the slot
+    BUSY_OUTSIDE = "busy_outside_planned"  # FINISH_CURRENT: operation started in planned time, finishing after it
+    BREAK = "break"
+    OFF_SHIFT = "off_shift"
+    PLANNED = ALL
+    UNPLANNED = (PAUSED, BUSY_OUTSIDE, BREAK, OFF_SHIFT)
 
 
 class ResourceState:
@@ -70,6 +77,7 @@ class RunRecord:
     node_units_moved: dict[str, int] = field(default_factory=dict)  # transports: units delivered
     node_preemptions: dict[str, int] = field(default_factory=dict)  # tasks suspended by pre-emption
     invariant_checks: int = 0
+    availability: dict[str, Any] | None = None  # calendars: planned/break/off-shift time per resource/node (engine >= 0.6.0)
     completion_times: list[float] = field(default_factory=list)
     # debug
     events: list[dict[str, Any]] | None = None

@@ -66,6 +66,9 @@ class IndustrialNode:
         """Entities in a slot/vehicle that is BUSY or BLOCKED (the 'in process' notion of WIP_TARGET_PRIORITY)."""
         return set()
 
+    def on_calendar_change(self) -> None:
+        """A gating calendar changed (CalendarClock). Default: nothing (waiters re-check on the change event)."""
+
     def record_wait(self, entity: Entity) -> None:
         if self.ctx.counting:
             self.ctx.record.node_wait[self.id].append(self.ctx.now - entity.node_entered)
@@ -80,6 +83,8 @@ class IndustrialSource(IndustrialNode):
         self.p: SourceParams = cn.params  # type: ignore[assignment]
         self.rng = ctx.rng(self.id, "arrivals")
         self.etype = self.p.entity_type or "unit"
+        # own calendar (engine >= 0.6.0): arrivals only in available time (the interarrival clock pauses outside it)
+        self.gating = ctx.calendar.rt.gating.get(self.id, []) if ctx.calendar else []
         ctx.env.process(self._run())
 
     def _admit(self, e: Entity) -> None:
@@ -100,9 +105,19 @@ class IndustrialSource(IndustrialNode):
             if self.p.arrival == "infinite":
                 # unlimited supply: the unit exists in the system once the first node accepts it
                 target = self.next_node()
-                yield from target.enter(e, on_accept=self._admit)  # type: ignore[call-arg]
+                if self.gating:
+                    # place first, then wait for the source's own availability: never admitted outside it
+                    res = yield from target.reserve()
+                    yield from self.ctx.calendar.wait_until_ok(self.gating)
+                    yield from target.enter(e, on_accept=self._admit, reservation=res)  # type: ignore[call-arg]
+                else:
+                    yield from target.enter(e, on_accept=self._admit)  # type: ignore[call-arg]
             else:
-                yield self.ctx.env.timeout(self.p.interarrival.sample_seconds(self.rng))  # type: ignore[union-attr]
+                d = self.p.interarrival.sample_seconds(self.rng)  # type: ignore[union-attr]
+                if self.gating:
+                    yield from self.ctx.calendar.consume_available(self.gating, d)
+                else:
+                    yield self.ctx.env.timeout(d)
                 self._admit(e)
                 self.ctx.env.process(self._push(e))
 
@@ -201,17 +216,39 @@ class IndustrialServer(IndustrialNode):
         self.down = False
         self.up_event = ctx.env.event()
         self.processing: dict[int, simpy.Process] = {}
+        # calendars (engine >= 0.6.0): calendars that must ALL be available for this node to work (own + resources)
+        rt = ctx.calendar.rt if ctx.calendar else None
+        self.gating: list[str] = rt.gating.get(self.id, []) if rt else []
+        pol = rt.policies.get(self.id) if rt else None
+        self.policy = pol.at_unavailability if pol else None
+        self.start_rule = pol.start_rule if pol else None
         ctx.record.node_processed[self.id] = 0
         ctx.record.node_rejects[self.id] = 0
         ctx.record.node_failures[self.id] = 0
         ctx.record.node_preemptions[self.id] = 0
         if self.p.failures:
             ctx.env.process(self._breakdowns())
+        if self.gating:
+            self._refresh()  # initial calendar state at t=0
 
     # ---- state helpers ----
+    def _cal_ok(self) -> bool:
+        return not self.gating or self.ctx.calendar.ok(self.gating)
+
+    def _eff(self, state: str) -> str:
+        """Tracked state. Without calendars: logical state or DOWN (legacy). Outside planned time: paused /
+        busy (FINISH_CURRENT overrun) / break / off_shift, so planned and unplanned time are never mixed."""
+        if self.gating and not self.ctx.calendar.ok(self.gating):
+            if state == NodeState.BUSY:
+                return NodeState.BUSY_OUTSIDE
+            if state == NodeState.PAUSED:
+                return NodeState.PAUSED
+            return self.ctx.calendar.off_label(self.gating)
+        return NodeState.DOWN if self.down else state
+
     def _set(self, slot: int, state: str) -> None:
         self.logical[slot] = state
-        self.trackers[slot].set(NodeState.DOWN if self.down else state)
+        self.trackers[slot].set(self._eff(state))
         self.ctx.changed(self.id)
 
     def occupancy(self) -> int:
@@ -229,7 +266,47 @@ class IndustrialServer(IndustrialNode):
 
     def _refresh(self) -> None:
         for i, t in enumerate(self.trackers):
-            t.set(NodeState.DOWN if self.down else self.logical[i])
+            t.set(self._eff(self.logical[i]))
+
+    def on_calendar_change(self) -> None:
+        """Calendar transition of one of the gating calendars (called by the CalendarClock, URGENT)."""
+        if not self._cal_ok() and self.policy in ("PAUSE_RESUME", "STOP_RESTART"):
+            for slot, proc in sorted(self.processing.items()):
+                del self.processing[slot]
+                if proc.is_alive:
+                    proc.interrupt("calendar")
+        self._refresh()
+        self.ctx.changed(self.id)
+
+    def _release_for_calendar(self, e: Entity, slot: int, held: list[Unit], state: str) -> Proc:
+        """Free operators/tools (not carriers, not the slot) until every gating calendar is available again."""
+        release_units(self.ctx, held)
+        self._set(slot, state)
+        yield from self.ctx.calendar.wait_until_ok(self.gating)
+        return []
+
+    def _ready_to_start(self, e: Entity, slot: int, held: list[Unit]) -> Proc:
+        """Before STARTING an operation: every gating calendar available, and (REQUIRE_FULL_WINDOW, deterministic times
+        only) the whole operation fits before the common availability ends. Returns the held units."""
+        cal = self.ctx.calendar
+        while True:
+            if not self._cal_ok():
+                held = yield from self._release_for_calendar(e, slot, held, NodeState.WAITING_RESOURCE)
+                held = yield from self._acquire(e, slot)
+                continue
+            if self.start_rule == "REQUIRE_FULL_WINDOW":
+                need = self.p.process_time.mean_seconds() * self.p.entity_time_factor()  # type: ignore[union-attr]
+                end = cal.window_end(self.gating, self.ctx.now)
+                if self.ctx.now + need > end + 1e-9:
+                    self.ctx.log("start_deferred", e, self.id, needs_s=round(need, 3), window_left_s=round(end - self.ctx.now, 3))
+                    release_units(self.ctx, held)
+                    self._set(slot, NodeState.WAITING_RESOURCE)
+                    yield self.ctx.env.timeout(end - self.ctx.now)
+                    held = []
+                    yield from cal.wait_until_ok(self.gating)
+                    held = yield from self._acquire(e, slot)
+                    continue
+            return held
 
     # ---- flow ----
     def reserve(self) -> Proc:
@@ -277,15 +354,31 @@ class IndustrialServer(IndustrialNode):
             ctx.log("carrier_seized", e, self.id, resource=use.resource, available=sum(1 for u in pool.units if not u.busy))
         # 2) operators / tools
         held = yield from self._acquire(e, slot)
+        if self.gating:
+            held = yield from self._ready_to_start(e, slot, held)
         self.record_wait(e)
-        # 3) process: suspended during failures; pre-emptible by the resource's dispatch strategy
+        # 3) process: suspended during failures; pre-emptible by the resource's dispatch strategy;
+        #    calendars: FINISH_CURRENT continues, PAUSE_RESUME keeps the remaining work, STOP_RESTART loses it
         self._set(slot, NodeState.BUSY)
         ctx.log("start_process", e, self.id)
         remaining = self.p.sample_entity_seconds(self.rng_time)  # work_units aggregation (behaviors.py)
+        full = remaining
         proc = ctx.env.active_process
         while remaining > 1e-12:
             if self.down:
                 yield self.up_event
+                continue
+            if self.gating and self.policy in ("PAUSE_RESUME", "STOP_RESTART") and not self._cal_ok():
+                if self.policy == "STOP_RESTART":
+                    ctx.log("restart_lost_work", e, self.id, lost_s=round(full - remaining, 3))
+                    remaining = full
+                ctx.log("paused_by_calendar", e, self.id, remaining_s=round(remaining, 3), policy=self.policy)
+                held = yield from self._release_for_calendar(e, slot, held, NodeState.PAUSED)
+                held = yield from self._acquire(e, slot, resume=True)
+                if self.policy == "STOP_RESTART":
+                    held = yield from self._ready_to_start(e, slot, held)  # a restart is a new start
+                self._set(slot, NodeState.BUSY)
+                ctx.log("resume_process", e, self.id, remaining_s=round(remaining, 3))
                 continue
             start = ctx.now
             self.processing[slot] = proc  # type: ignore[assignment]
@@ -297,6 +390,8 @@ class IndustrialServer(IndustrialNode):
                 remaining = 0.0
             except simpy.Interrupt as intr:
                 remaining -= ctx.now - start
+                if intr.cause == "calendar" and remaining <= 1e-9:
+                    remaining = 0.0  # finished exactly when availability ended: complete, never paused/restarted
                 if intr.cause == "preempt":
                     if ctx.counting:
                         ctx.record.node_preemptions[self.id] += 1
@@ -381,14 +476,14 @@ def acquire_units(ctx: SimContext, pool: ResourcePool, node_id: str, qty: int, p
     units: list[Unit] = yield pool.request(node_id, qty, priority, e.id if e else None, resume, location=dest)
     walk = max(pool.travel_time(u, dest) for u in units)
     for u in units:
-        u.tracker.set("walking" if walk > 0 else f"working:{node_id}")
+        u.set_state("walking" if walk > 0 else f"working:{node_id}")
     if walk > 0:
         ctx.log("operator_walking", e, node_id, resource=pool.id, seconds=round(walk, 3),
                 frm=",".join(str(u.location) for u in units), to=dest)
         yield ctx.env.timeout(walk)
     for u in units:
         u.location = dest
-        u.tracker.set(f"working:{node_id}")
+        u.set_state(f"working:{node_id}")
     return units
 
 
@@ -576,10 +671,10 @@ class IndustrialTransport(IndustrialNode):
                         q[2].succeed()  # upstream node frees its place
             ctx.log("loaded", None, tid, items=len(load))
             for u in held:
-                u.tracker.set(f"transporting:{tid}")
+                u.set_state(f"transporting:{tid}")
             yield ctx.env.timeout(trip)
             for u in held:
-                u.tracker.set(f"working:{tid}")
+                u.set_state(f"working:{tid}")
                 u.location = self.destination
             yield ctx.env.timeout(p.unload_time.sample_seconds(self.rng_unload))  # type: ignore[union-attr]
             for q in list(load):
@@ -608,7 +703,7 @@ class IndustrialTransport(IndustrialNode):
             if p.return_empty and trip > 0:
                 self._set(v, NodeState.BUSY)
                 for u in held:
-                    u.tracker.set(f"transporting:{tid}")
+                    u.set_state(f"transporting:{tid}")
                 yield ctx.env.timeout(trip)
                 for u in held:
                     u.location = self.origin

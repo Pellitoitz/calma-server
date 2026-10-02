@@ -74,7 +74,8 @@ def set_value(model: ISMSModel, path: str, value: Any) -> ISMSModel:
         cur[int(last)] = value
     else:
         raise PathError(f"No se puede asignar '{path}'.")
-    return ISMSModel.model_validate(data)
+    from .isms_ext import SimModel
+    return SimModel.model_validate(data)
 
 
 def flatten(model: ISMSModel) -> dict[str, Any]:

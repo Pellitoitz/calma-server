@@ -155,6 +155,10 @@ def build_markdown(model: ISMSModel, report: VerificationReport, run: Simulation
                 (f"{p.provenance.status.value}" + (f" ({p.provenance.source})" if p.provenance.source else "")) if p.provenance else "—",
                 p.description] for p in model.parameters]), ""]
 
+    av = getattr(model, "availability", None)
+    if av is not None:
+        L += _calendar_section(model, run)
+
     # 3. assumptions & missing data
     L += ["## 3. Assumptions and missing data", ""]
     if model.assumptions:
@@ -275,3 +279,34 @@ def markdown_to_html(md: str, title: str = "SimForge report") -> str:
            "th{background:#f6f8fa}blockquote{border-left:4px solid #d4a72c;background:#fff8c5;margin:0;padding:.5rem 1rem}"
            "code{background:#f6f8fa;padding:0 3px}h1{border-bottom:2px solid #d0d7de}@media print{body{margin:0}}")
     return f"<!doctype html><html><head><meta charset='utf-8'><title>{html.escape(title)}</title><style>{css}</style></head><body>{''.join(out)}</body></html>"
+
+
+def _calendar_section(model, run) -> list[str]:
+    """Calendars (engine >= 0.6.0): what works when, which policy applies, planned vs used time."""
+    from ..domain.calendar import week_view
+    from ..library.registry import ComponentRegistry
+    from ..validation.availability import planned_summary
+    av = model.availability
+    L = ["**Calendars and shifts** (planned availability; elapsed horizon "
+         f"{model.simulation.horizon.value:g} {model.simulation.horizon.unit}, not productive hours)", ""]
+    for c in av.calendars:
+        L += ["```", week_view(av, c), "```", ""]
+    rows = []
+    for r in planned_summary(model, ComponentRegistry.load_default(None)):
+        rows.append([f"{r['kind']} `{r['id']}`", r["calendar"], f"{r['planned_available_s'] / 3600:.2f} h",
+                     f"{r['break_s'] / 3600:.2f} h", f"{r['off_shift_s'] / 3600:.2f} h",
+                     str(r.get("at_unavailability") or "—"), str(r.get("start_rule") or "—")])
+    if rows:
+        L += [_table(["Gated by", "Calendar(s)", "Planned available", "Breaks", "Off-shift", "At end of availability",
+                      "Start rule"], rows), ""]
+    always = ", ".join(av.always_available) or "—"
+    L += [f"Explicitly ALWAYS_AVAILABLE: {always}. Resources/nodes not listed anywhere are available all the time "
+          "(compatibility) and are reported as warnings.", ""]
+    if run:
+        k = run.kpis
+        res = [[f"`{rid}`", f"{k.mean(f'resource.{rid}.planned_available_h'):.2f} h",
+                f"{k.mean(f'resource.{rid}.working_planned_h'):.2f} h", f"{k.mean(f'resource.{rid}.planned_utilization'):.1%}",
+                f"{k.mean(f'resource.{rid}.outside_planned_h'):.2f} h"] for rid in av.resources]
+        if res:
+            L += [_table(["Resource", "Planned", "Working (planned)", "Utilization of planned", "Work outside planned"], res), ""]
+    return L
