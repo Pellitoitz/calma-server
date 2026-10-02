@@ -156,6 +156,13 @@ class SimForgeApp:
             if key.startswith("param:") and any(p.id == key[6:] for p in model.parameters):
                 model = set_value(model, f"parameters.{key[6:]}.value", val)
                 model = set_value(model, f"parameters.{key[6:]}.provenance", chat_provenance(f"answer: {val}", "answer"))
+        prev = project.current_model()
+        if prev is not None and getattr(prev, "availability", None) is not None:
+            # the compiler (frozen) knows nothing about calendars: never drop the engineer's calendars when rebuilding
+            from ..domain.isms_ext import as_sim_model
+            model = as_sim_model(model).model_copy(update={"availability": prev.availability})
+            project.log("system", "availability_carried_over",
+                        result=f"calendars of v{project.meta.current_version} kept in the rebuilt model (references re-verified)")
         outcome.model = model
         gen_ms = (time.perf_counter() - t0) * 1000
         report, _ = verify(model, self.registry)

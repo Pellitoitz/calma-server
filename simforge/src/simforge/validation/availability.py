@@ -284,9 +284,13 @@ def _dst_issues(spec: AvailabilitySpec, add) -> None:
                         continue
                     back = local.astimezone(dt.timezone.utc).astimezone(tz)
                     other = local.replace(fold=1)
-                    if back.replace(tzinfo=None) != local.replace(tzinfo=None) or other.utcoffset() != local.utcoffset():
-                        add(Level.WARNING, "CAL_DST_BOUNDARY", f"'{c.id}': la hora {t} no existe o se repite el {year}-{month:02d}-{day:02d} "
-                            f"en {spec.timezone} (cambio de hora): ese turno dura más o menos de lo nominal.", f"availability.calendars.{c.id}")
+                    gap = back.replace(tzinfo=None) != local.replace(tzinfo=None)
+                    if gap or other.utcoffset() != local.utcoffset():
+                        how = (f"no existe (salto de hora): se interpreta como {back:%H:%M} (zoneinfo, fold=0)" if gap else
+                               "se repite (retraso de hora): se usa la PRIMERA ocurrencia (fold=0)")
+                        add(Level.WARNING, "CAL_DST_BOUNDARY", f"'{c.id}': la hora {t} del {year}-{month:02d}-{day:02d} en {spec.timezone} "
+                            f"{how}; ese turno dura más o menos de lo nominal. Revísalo o declara la hora explícitamente.",
+                            f"availability.calendars.{c.id}")
                         break
                 else:
                     continue

@@ -73,6 +73,14 @@ class SimContext:
         self._instant_decisions = 0
         self.calendar = None  # CalendarClock when the model has an `availability` block (engine >= 0.6.0)
 
+    def node_can_work(self, node_id: str) -> bool:
+        """Calendars: a request from a node whose own/gating calendars are unavailable is not granted (it keeps its
+        place in the queue and is re-evaluated when the node becomes available). Always True without calendars."""
+        if self.calendar is None:
+            return True
+        gating = self.calendar.rt.gating.get(node_id)
+        return not gating or self.calendar.ok(gating)
+
     def rng(self, *key: str) -> random.Random:
         """Independent, reproducible stream per (seed, purpose). Same stream across scenarios
         -> common random numbers, i.e. fairer scenario comparisons."""
@@ -512,7 +520,7 @@ class ResourcePool:
         if not self.waiting:
             return False
         free = [u for u in self.units if not u.busy and u.cal == "available"]  # off-shift units take no new task
-        feasible = [r for r in self.waiting if r.qty <= len(free)]
+        feasible = [r for r in self.waiting if r.qty <= len(free) and self.ctx.node_can_work(r.node)]
         if not feasible:
             if self.units and self.units[0].cal != "available":
                 return False  # off-shift: nothing to grant, and pre-empting would hand work to an unavailable unit

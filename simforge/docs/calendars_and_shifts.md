@@ -107,16 +107,29 @@ Ejemplo: 06:00–14:00 con 10:00–10:15 y 12:30–13:00 → 8 h − 45 min = 7 
 
 | Tipo | Efecto | Decisiones obligatorias |
 |---|---|---|
-| `NON_WORKING_DAY` | festivo | `scope` si el calendario tiene turnos de noche: `SHIFTS_STARTING_ON_DATE` (quita los turnos que empiezan ese día; el de noche que empezó la víspera termina) o `CALENDAR_DAY` (nada disponible de 00:00 a 24:00) |
+| `NON_WORKING_DAY` | festivo | `scope` si el calendario tiene turnos de noche (ver abajo) |
 | `OVERRIDE_WORKING_INTERVALS` | sustituye los turnos de ese día | `breaks_apply` si el calendario tiene descansos |
 | `OVERTIME` / `EXTRA_SHIFT` | añade intervalos (horas extra / turno extraordinario) | `breaks_apply` si el calendario tiene descansos |
 
 * Las excepciones actúan sobre los intervalos que **empiezan** en esa fecha.
+* **Alcance del festivo** (turno de noche 22:00–06:00 lunes y martes; festivo el martes):
+
+  | `scope` | Turno que empezó el lunes 22:00 | Turno que empieza el martes 22:00 | Disponible |
+  |---|---|---|---|
+  | `SHIFTS_STARTING_ON_DATE` | se mantiene entero (lun 22:00 → mar 06:00) | eliminado | 8 h |
+  | `CALENDAR_DAY` | **recortado** a lun 22:00 → mar 00:00 | eliminado entero (también su parte del miércoles 00:00–06:00) | 2 h |
+
+  Es decir: `CALENDAR_DAY` = quitar los turnos que empiezan en esa fecha **y** cualquier disponibilidad dentro del día
+  civil 00:00–24:00 (tests F y G).
 * Un festivo junto a otra excepción el mismo día, o dos OVERRIDE el mismo día, es un ERROR.
 * No hay calendario mundial de festivos: se introducen uno a uno.
-* **DST**: las horas de pared se convierten con la zona horaria. Un turno 22:00–06:00 la noche del cambio de hora de
-  octubre en Europe/Madrid dura **9 h reales** (y 7 h en marzo); es intencionado, porque así ocurre en la planta. Si
-  una frontera de turno cae en una hora que no existe o se repite, se avisa (`CAL_DST_BOUNDARY`).
+* **DST**: las horas de pared se convierten con la zona horaria. Un turno 22:00–06:00 la noche del cambio de hora en
+  Europe/Madrid dura **9 h reales en octubre** y **7 h reales en marzo** (probados ambos; sin horas duplicadas ni
+  intervalos negativos): así ocurre en la planta. Si una frontera de turno cae en una hora local que **no existe**
+  (02:30 del último domingo de marzo) o que **se repite** (02:30 del último domingo de octubre), se avisa
+  (`CAL_DST_BOUNDARY`) diciendo cómo se interpreta: la hora inexistente se toma como la hora de pared tras el salto
+  (02:30 → 03:30, regla `fold=0` de zoneinfo) y la repetida como su primera ocurrencia. No se resuelve en silencio:
+  revísalo o declara la hora explícitamente.
 
 ## 6. Asignación
 
@@ -181,11 +194,52 @@ cualquier ventana, se avisa (`CAL_NEVER_FITS`): nunca empezaría.
 * Una máquina fuera de turno no procesa. Su cola puede seguir creciendo **solo** si lo de antes sigue enviando; el
   bloqueo sale de las capacidades reales (buffer lleno → la estación anterior queda bloqueada).
 * **Fuentes**: sin calendario, generan 24/7 (pedidos que llegan siempre). Con calendario propio:
-  * llegadas por intervalo: el reloj de llegadas solo corre en tiempo disponible y se para fuera (no se pierden ni se
-    acumulan llegadas);
+  * llegadas por intervalo: **el reloj de llegadas se mide en TIEMPO DISPONIBLE de la fuente**. Ejemplo: intervalo
+    30 min, quedan 10 min de turno → consume esos 10 min, se para fuera de turno y la llegada ocurre 20 min después
+    del inicio del turno siguiente (test J). **No** equivale a llegadas externas en tiempo civil que siguen ocurriendo
+    mientras la planta está cerrada: para eso, la fuente no lleva calendario (llega 24/7) y la cola espera.
+    Un intervalo que se completa exactamente en el fin del turno produce la llegada en ese instante;
   * fuente infinita: no introduce unidades fuera de su disponibilidad.
 
   No hay un calendario global impuesto a todos los nodos.
+
+## 8 bis. Contratos de 0.6.0 (cierre técnico)
+
+**Recursos durante una operación calendarizada (PAUSE_RESUME / STOP_RESTART).** Los recursos asociados a una operación
+calendarizada (sus operarios/herramientas y el propio nodo) se consideran **requeridos durante toda la duración** de
+la operación. Si se pierde la disponibilidad de **cualquiera** de ellos, se pausa (o se reinicia) la operación
+**completa**: la entidad conserva su plaza y sus carriers; los operarios y herramientas se **liberan** durante la
+pausa, aunque su propio calendario siga disponible (pueden hacer otro trabajo por el dispatch normal), y se
+**vuelven a solicitar** por el dispatch normal cuando hay de nuevo disponibilidad conjunta, sin prioridad por estar
+pausada. Mientras un nodo no está disponible, sus peticiones de recursos pendientes **no se conceden** (conservan su
+antigüedad en la cola y compiten de nuevo cuando el nodo vuelve).
+
+> **No soportado en 0.6.0**: operaciones multifase en las que el operario solo hace falta en la carga, la máquina
+> sigue sola y el operario vuelve a descargar. En 0.6.0 una operación con operario lo necesita durante toda la
+> operación; si la máquina se para (por su calendario), la operación entera se para y el operario se libera.
+
+**STOP_RESTART: `RESTART_DURATION_POLICY = REUSE_ORIGINAL_SAMPLE`.** La duración se sortea una vez al empezar la
+operación; al reiniciar se repite **la misma** duración (`full`), y se pierde lo hecho. No se consume una nueva muestra
+(test I: la siguiente unidad recibe exactamente el mismo sorteo que sin interrupción). SimForge 0.6.0 **no** modela
+"cada nuevo intento tiene una duración aleatoria nueva".
+
+**Averías: `FAILURE_CLOCK = ELAPSED_TIME`** (auditado en el código, sin cambios). El tiempo hasta el fallo (MTBF) se
+cuenta en **tiempo transcurrido desde el fin de la reparación anterior**, también fuera de turno, en descansos y con la
+máquina parada u ociosa; la reparación (MTTR) también es tiempo transcurrido. Un "MTBF de 100 h" son 100 h
+transcurridas, **no** 100 h de funcionamiento. Es la semántica histórica (se conserva para no cambiar modelos
+existentes); averías por tiempo de operación no existen en 0.6.0. Interacciones probadas:
+* avería exactamente en el fin de turno (C): primero la transición de calendario (una única interrupción: pausa con el
+  trabajo restante), después la avería no encuentra nada que interrumpir; la reparación sigue su reloj;
+* reparación terminada fuera de turno (D): la máquina pasa a `up`, pero **no** empieza ninguna operación, no reanuda
+  una pausa y no recibe operarios hasta que su calendario vuelve;
+* máquina aún averiada al empezar el turno (E): no produce hasta la reparación. Una operación que empieza (o se
+  reanuda) con la máquina averiada **retiene** a sus operarios mientras espera la reparación (semántica histórica de
+  averías, también sin calendarios).
+
+**Tiempo restante.** `remaining` solo disminuye durante procesamiento efectivo: la única espera en la que una
+interrupción puede llegar es la del propio procesamiento, y toda interrupción (avería, calendario, pre-emption) pasa por
+una única vía que retira la operación de la lista de procesos activos antes de interrumpirla. Esperas de operario,
+de calendario, de reparación, paseos y re-solicitudes no descuentan nada (tests de cierre).
 
 ## 9. Eventos simultáneos: precedencia dentro de un instante
 
@@ -213,7 +267,7 @@ repitiendo cada caso (resultados idénticos).
 | Clave | Definición exacta |
 |---|---|
 | `resource.X.calendar_time_h` | (horizonte − calentamiento) × unidades |
-| `*.X.planned_available_h` | tiempo dentro de ventanas disponibles (nodo: intersección de sus calendarios) × unidades/slots |
+| `*.X.planned_available_h` | tiempo dentro de ventanas disponibles × unidades/slots. En un **nodo** es la **intersección** de su calendario y los de TODOS los recursos que requiere durante toda la operación: no es la disponibilidad de la máquina independiente de su mano de obra |
 | `*.X.break_h`, `*.X.off_shift_h` | descansos dentro de turnos; resto no disponible |
 | `*.X.planned_availability_ratio` | planned_available / calendar_time |
 | `resource.X.working_planned_h` | working:* + transporting:* dentro del tiempo planificado |
@@ -287,9 +341,11 @@ Los avisos se clasifican en tres niveles:
 * No hay horizonte en horas productivas, solo transcurrido.
 * Transportes: solo `FINISH_CURRENT`, y los estados de sus vehículos no se separan por calendario (sus operarios sí).
 * `REQUIRE_FULL_WINDOW` solo con tiempos deterministas.
-* Las averías (MTBF/MTTR) siguen siendo de tiempo de calendario: el reloj de averías corre también fuera de turno. Una
-  máquina puede averiarse por la noche y repararse antes del turno; ese tiempo de avería no se cuenta como pérdida
-  planificada.
+* Averías: `FAILURE_CLOCK = ELAPSED_TIME` (no tiempo de funcionamiento); una máquina puede averiarse por la noche y
+  repararse antes del turno; ese tiempo de avería no se cuenta como pérdida planificada.
+* Operaciones multifase (operario solo en carga/descarga) no soportadas: los recursos se requieren durante toda la
+  operación.
+* STOP_RESTART reutiliza la muestra original (`REUSE_ORIGINAL_SAMPLE`).
 * WIP_TARGET: una unidad pausada por calendario no cuenta como "en proceso" para el WIP que alimenta.
 * No hay mix de productos, setups, mantenimiento preventivo, calendarios por cuadrillas/rotaciones ni absentismo.
 * No hay festivos automáticos.

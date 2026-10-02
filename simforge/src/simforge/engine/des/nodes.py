@@ -268,13 +268,25 @@ class IndustrialServer(IndustrialNode):
         for i, t in enumerate(self.trackers):
             t.set(self._eff(self.logical[i]))
 
+    def _interrupt(self, slot: int, cause: str) -> bool:
+        """The ONLY way an operation in progress is interrupted (failure, calendar, pre-emption). The process is removed
+        from `processing` BEFORE the interrupt is sent, so a second cause at the same instant, or while the process is
+        handling the first one (e.g. waiting to re-acquire its operator after a pre-emption), finds nothing to
+        interrupt: one interruption, one remaining-work update, one release."""
+        proc = self.processing.pop(slot, None)
+        if proc is None or not proc.is_alive:
+            return False
+        proc.interrupt(cause)
+        return True
+
     def on_calendar_change(self) -> None:
         """Calendar transition of one of the gating calendars (called by the CalendarClock, URGENT)."""
         if not self._cal_ok() and self.policy in ("PAUSE_RESUME", "STOP_RESTART"):
-            for slot, proc in sorted(self.processing.items()):
-                del self.processing[slot]
-                if proc.is_alive:
-                    proc.interrupt("calendar")
+            for slot in sorted(self.processing):
+                self._interrupt(slot, "calendar")
+        elif self._cal_ok():
+            for use in self.p.resources:  # requests left pending while this node was unavailable compete again
+                self.ctx.pools[use.resource]._schedule_dispatch()
         self._refresh()
         self.ctx.changed(self.id)
 
@@ -384,7 +396,7 @@ class IndustrialServer(IndustrialNode):
             self.processing[slot] = proc  # type: ignore[assignment]
             for u in held:
                 u.preemptible = True
-                u.preempt = lambda p=proc: p.interrupt("preempt") if p.is_alive else None
+                u.preempt = lambda s=slot: self._interrupt(s, "preempt")
             try:
                 yield ctx.env.timeout(remaining)
                 remaining = 0.0
@@ -450,9 +462,8 @@ class IndustrialServer(IndustrialNode):
                 self.ctx.record.node_failures[self.id] += 1
             self._refresh()
             self.ctx.log("down", None, self.id)
-            for proc in list(self.processing.values()):
-                if proc.is_alive:
-                    proc.interrupt("failure")
+            for slot in sorted(self.processing):
+                self._interrupt(slot, "failure")
             yield self.ctx.env.timeout(f.mttr.sample_seconds(rng))  # type: ignore[union-attr]
             self.down = False
             self._refresh()
