@@ -470,20 +470,34 @@ def test_wip_target_with_setup_node_counts_setup_unit_once_and_not_in_process():
                + rec.wip_end_by_product[p] for p in rec.created_by_product)
 
 
-def test_runtime_reordering_with_undefined_transition_stops_the_run():
-    # sequence b, a: b takes the slow path, a the fast one -> a reaches 'm' first (B->A defined), then b needs A->B
+def overtaking_model(matrix):
+    # sequence b, a: b takes the slow branch, a the fast one -> a can reach 'm' first: the order at 'm' is NOT the sequence
     nodes = [{"id": "src", "component": "source"}, {"id": "slow", "component": "machine"}, {"id": "fast", "component": "machine"},
              {"id": "m", "component": "machine"}, {"id": "out", "component": "sink"}]
     edges = [{"source": "src", "target": "slow"}, {"source": "src", "target": "fast"}, {"source": "slow", "target": "m"},
              {"source": "fast", "target": "m"}, {"source": "m", "target": "out"}]
-    m = build({"a": {"setup_key": "A"}, "b": {"setup_key": "B"}}, seq("b", "a"),
-              {"slow": {"b": C(100)}, "fast": {"a": C(1)}, "m": {"a": C(1), "b": C(1)}},
-              {"m": {"mode": "SEQUENCE_DEPENDENT", "initial_state": "B", "matrix": {"B": {"A": C(5)}}}},
-              routes={"b": ["src", "slow", "m", "out"], "a": ["src", "fast", "m", "out"]}, nodes=nodes, edges=edges)
-    rep, cm = verify_model(m, REG)
-    assert cm is not None and any(i.code == "SETUP_TRANSITIONS_FROM_SEQUENCE" for i in rep.issues)
+    return build({"a": {"setup_key": "A"}, "b": {"setup_key": "B"}}, seq("b", "a"),
+                 {"slow": {"b": C(100)}, "fast": {"a": C(1)}, "m": {"a": C(1), "b": C(1)}},
+                 {"m": {"mode": "SEQUENCE_DEPENDENT", "initial_state": "B", "matrix": matrix}},
+                 routes={"b": ["src", "slow", "m", "out"], "a": ["src", "fast", "m", "out"]}, nodes=nodes, edges=edges)
+
+
+def test_overtaking_paths_require_every_reachable_transition_before_running():
+    rep, cm = verify_model(overtaking_model({"B": {"A": C(5)}}), REG)
+    assert cm is None and any(i.code == "SETUP_TRANSITION_MISSING" and "A→B" in i.message for i in rep.errors)
+    assert not any(i.code == "SETUP_TRANSITIONS_FROM_SEQUENCE" for i in rep.issues)
+    rec = run(overtaking_model({"B": {"A": C(5)}, "A": {"B": C(7)}})).records[0]
+    assert [(x["from"], x["to"], x["product"]) for x in rec.setups] == [("B", "A", "a"), ("A", "B", "b")]
+
+
+def test_runtime_guard_stops_on_an_undefined_transition():
+    # defensive guard (never reached through the verifier): the engine never defaults a missing transition
+    from simforge.engine.des.engine import DesEngine
+    rep, cm = verify_model(overtaking_model({"B": {"A": C(5)}, "A": {"B": C(7)}}), REG)
+    st = cm.production.setups["m"]
+    cm.production.setups["m"] = type(st).model_validate({**st.model_dump(mode="json"), "matrix": {"B": {"A": C(5)}}})
     with pytest.raises(SetupTransitionMissing):
-        run_simulation(m, REG)
+        DesEngine().run(cm, 1)
 
 
 # ------------------------------------------------------------------------------------------- CLI / UI (minimal)

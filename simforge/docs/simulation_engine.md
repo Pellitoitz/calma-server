@@ -76,7 +76,8 @@ excepciones con fecha, políticas de fin de disponibilidad y precedencia de even
 
 Mix probabilístico / secuencia explícita, tiempos y rutas por producto, setups como estado propio del slot (el estado
 de setup cambia solo al completar), con las mismas políticas de calendario y la misma vía de interrupción que el
-proceso. Detalle completo: `docs/products_and_setups.md`.
+proceso. Contratos de cierre (DISPATCH FIRST / SETUP SECOND, persistencia del estado, HOLD_ACQUIRED_RESOURCES,
+transiciones requeridas) en §17 de ese documento. Detalle completo: `docs/products_and_setups.md`.
 
 ## Cambios de semántica en el motor 0.2.0 (fase benchmark)
 

@@ -54,26 +54,80 @@ def sources_reaching(model: ISMSModel, spec: ProductionSpec, node: str) -> set[s
     return {s for s in spec.generation if s in g and node in nx.descendants(g, s) | {s}}
 
 
-def required_transitions(model: ISMSModel, spec: ProductionSpec, node: str, visiting: set[str]) -> tuple[set, str]:
-    """Setup transitions that CAN occur at `node` (from != to). With a single EXPLICIT_SEQUENCE source the order is the
-    sequence order (initial -> first, consecutive changes, last -> first if repeat); otherwise every change between the
-    keys that reach the node (+ initial). Returns (pairs, basis)."""
+def _order_preserving_path(model: ISMSModel, spec: ProductionSpec, registry: ComponentRegistry, node: str,
+                           src: str, visiting: set[str]) -> tuple[bool, str]:
+    """True when the entities of `src` reach `node` exactly once, all of them, in creation order: a single chain of
+    nodes (one product-flow successor each, or one common route prefix), no node visited twice, no loss on the way
+    (no scrap / rework before `node`), FIFO buffers, single-slot stations and single-vehicle transports. Only then is
+    the explicit sequence the order in which `node` sees the products."""
+    nodes = {n.id: n for n in model.nodes}
+    if spec.routes:
+        prefixes = set()
+        for p in visiting:
+            r = spec.routes.get(p)
+            if r is None or r.nodes.count(node) != 1 or r.nodes[0] != src:
+                return False, f"route of '{p}' does not visit '{node}' exactly once from '{src}'"
+            prefixes.add(tuple(r.nodes[: r.nodes.index(node)]))
+        if len(prefixes) != 1:
+            return False, "products reach the node by different routes (they can overtake each other)"
+        chain = list(next(iter(prefixes)))
+    else:
+        succ: dict[str, list[str]] = {}
+        for e in model.edges:
+            succ.setdefault(e.source, []).append(e.target)
+        chain, cur, seen = [], src, set()
+        while cur != node:
+            if cur in seen:
+                return False, "loop before the node"
+            seen.add(cur)
+            chain.append(cur)
+            nxt = succ.get(cur, [])
+            if len(nxt) != 1:
+                return False, f"'{cur}' branches (entities can overtake each other or go elsewhere)"
+            cur = nxt[0]
+    for nid in chain[1:]:
+        n = nodes[nid]
+        p = n.params if isinstance(n.params, dict) else {}
+        beh = _behavior(registry, n.component)
+        if beh == "server":
+            if p.get("capacity", 1) != 1:
+                return False, f"'{nid}' has several slots (entities can overtake each other)"
+            if p.get("yield_rate", 1) != 1:
+                return False, f"'{nid}' can scrap/reject entities before the node"
+        elif beh == "buffer" and p.get("discipline", "fifo") != "fifo":
+            return False, f"buffer '{nid}' is not FIFO"
+        elif beh == "transport" and p.get("fleet", 1) != 1:
+            return False, f"transport '{nid}' has several vehicles"
+    return True, ""
+
+
+def required_transitions(model: ISMSModel, spec: ProductionSpec, node: str, visiting: set[str],
+                         registry: ComponentRegistry | None = None) -> tuple[set, str]:
+    """Setup transitions (between SETUP KEYS, from != to, deduplicated) that CAN occur at `node`.
+
+    'sequence' basis: a single EXPLICIT_SEQUENCE source whose entities provably reach the node complete and in order
+    (_order_preserving_path): initial -> first key, every consecutive change of key, and last -> first if repeat.
+    'all' basis otherwise (PROBABILISTIC_MIX, several sources, or any way of reordering/losing entities on the path):
+    every change between the keys that can reach the node, plus initial -> each of them. Only products that can
+    reach the node count (no global explosion of irrelevant pairs). Returns (pairs, basis)."""
     st = spec.setups[node]
     key = {p: spec.products[p].setup_key for p in visiting if p in spec.products}
     keys = {k for k in key.values() if k}
     srcs = sources_reaching(model, spec, node)
     gens = [spec.generation.get(s) for s in srcs]
-    if len(srcs) == 1 and isinstance(gens[0], ExplicitSequence):
-        seq = [key[p] for p in gens[0].sequence if p in key and key[p]]
-        pairs = set()
-        prev = st.initial_state
-        for k in seq:
-            if k != prev:
-                pairs.add((prev, k))
-            prev = k
-        if gens[0].repeat and seq and seq[-1] != seq[0]:
-            pairs.add((seq[-1], seq[0]))
-        return pairs, "sequence"
+    if len(srcs) == 1 and isinstance(gens[0], ExplicitSequence) and registry is not None:
+        ok, _why = _order_preserving_path(model, spec, registry, node, next(iter(srcs)), visiting)
+        if ok:
+            seq = [key[p] for p in gens[0].sequence if p in key and key[p]]
+            pairs = set()
+            prev = st.initial_state
+            for k in seq:
+                if k != prev:
+                    pairs.add((prev, k))
+                prev = k
+            if gens[0].repeat and seq and seq[-1] != seq[0]:
+                pairs.add((seq[-1], seq[0]))
+            return pairs, "sequence"
     frm = keys | {st.initial_state}
     return {(a, b) for a in frm for b in keys if a != b}, "all"
 
@@ -221,7 +275,7 @@ def production_issues(model: ISMSModel, registry: ComponentRegistry, compiled=No
                 if not (d.is_deterministic and d.mean_seconds() == 0):
                     add(Level.ERROR, "SETUP_DIAGONAL", f"{a}→{a} en '{nid}' no es 0: sólo hay setup cuando cambia la setup key.",
                         f"{path}.matrix.{a}.{a}", "Usa setup keys distintas si de verdad hay cambio.")
-        pairs, basis = required_transitions(model, spec, nid, vis) if vis else (set(), "none")
+        pairs, basis = required_transitions(model, spec, nid, vis, registry) if vis else (set(), "none")
         for a, b in sorted(pairs):
             if st.duration(a, b) is None:
                 where = "from_unconfigured" if a == UNCONFIGURED else {"CONSTANT_CHANGEOVER": "constant",
@@ -231,8 +285,8 @@ def production_issues(model: ISMSModel, registry: ComponentRegistry, compiled=No
                     "ni se refleja la matriz.", f"{path}.{where}")
         if basis == "sequence":
             add(Level.INFO, "SETUP_TRANSITIONS_FROM_SEQUENCE",
-                f"'{nid}': transiciones requeridas según el orden de la secuencia explícita {sorted(pairs)}. Si en la "
-                "ejecución aparece otra no definida (p. ej. por adelantamientos), la simulación se detiene con error.", path)
+                f"'{nid}': las entidades llegan completas y en el orden de la secuencia explícita (camino sin "
+                f"bifurcaciones, pérdidas ni adelantamientos): transiciones requeridas {sorted(pairs)}.", path)
         for use in st.resources:
             r = resources.get(use.resource)
             if r is None:

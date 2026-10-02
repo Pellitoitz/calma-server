@@ -97,10 +97,7 @@ calendario y traza.
   * `TARGET_DEPENDENT`: `by_target[destino]`.
   * `SEQUENCE_DEPENDENT`: `matrix[desde][hacia]`, **asimétrica**; nunca se refleja ni se completa. La diagonal solo
     admite 0 (`SETUP_DIAGONAL`).
-* **Transiciones requeridas** (verificador): con una única fuente `EXPLICIT_SEQUENCE` que alimenta el nodo, las del
-  orden de la secuencia (inicial → primera, cambios consecutivos, última → primera si `repeat`); en cualquier otro caso,
-  todos los cambios posibles entre las keys que llegan al nodo (+ estado inicial). Si en ejecución aparece un cambio no
-  definido (p. ej. adelantamientos entre ramas), la simulación **se detiene** con `SetupTransitionMissing`.
+* **Transiciones requeridas** (verificador): ver §17 (algoritmo final, cierre técnico 0.7.0).
 * **Orden en la estación**: la entidad ocupa el slot → carriers (`seize`) → **setup** (con sus recursos) → recursos de
   proceso → proceso. El setup se decide **después** de que el dispatch existente haya entregado la entidad al nodo: no
   se reordena nada para ahorrar setups.
@@ -193,3 +190,56 @@ secuencias, sin APS, sin economía.
 
 Estado: **CODE_COMPLETE + SYNTHETICALLY_VALIDATED**. Sin datos reales: no REAL_DATA_VALIDATED (la validación con
 datos reales del módulo de calendarios 0.6 no se extiende a 0.7).
+
+## 17. Cierre técnico 0.7.0: contratos
+
+**Definición de setup.** SETUP / CHANGEOVER es el cambio necesario entre configuraciones asociadas a `setup_key`
+(estado actual de la máquina → key del producto que va a procesarse). **No** representa: warm-up, arranque de turno,
+limpieza periódica o por tiempo, mantenimiento preventivo o correctivo, reuniones, falta de material, inspección ni
+preparación general. Esos tiempos no se meten en setup; pertenecen a otros conceptos (fases futuras).
+
+**DISPATCH FIRST, SETUP SECOND.** Las reglas existentes eligen la entidad (buffers FIFO/LIFO, recursos FIFO / PRIORITY /
+WIP_TARGET con su semántica histórica); **después** el nodo determina si hace falta setup. SimForge 0.7.0 nunca mira
+la cola para evitar, reducir o agrupar setups (test: máquina en A, cola FIFO B, C con A→B = 600 s y A→C = 0 s → B
+primero, 600 s). Las tareas de setup compiten por un recurso con la regla del recurso y la prioridad estática del
+nodo, nunca por la duración del setup.
+
+**Persistencia del estado.** `setup_state` persiste hasta que un setup **completado** lo cambia. No lo cambian: idle,
+descanso, fuera de turno, cambio de día, fin de semana, avería ni reparación (A el viernes → A el lunes: sin setup).
+No existen en 0.7: setup de arranque, limpieza tras inactividad, reset tras fin de semana, caducidad del setup, warm-up.
+
+**Setup interrumpido.** El estado cambia **exactamente una vez** por setup y solo en `setup_end`. Arranque, pausa,
+reinicio, avería, reparación y reanudación no lo modifican: el motor lo comprueba (si el estado cambiara durante un
+setup es una violación de invariante que aborta el run) y la traza lo audita (`setup_state` en `down`, `up`,
+`setup_paused_by_calendar`, `setup_restart_lost_work`, `setup_resume`, `setup_end`). Un setup que llega a 0 s
+restantes en el mismo instante que una transición de calendario o una avería está **completado** (no se registra como
+interrumpido), como en 0.6. Un setup no completado al acabar el horizonte no cuenta ni cambia el estado.
+
+**SETUP_BREAKDOWN_RESOURCE_POLICY = HOLD_ACQUIRED_RESOURCES.** Si la máquina se avería durante un setup, los recursos
+ya adquiridos para el setup se mantienen durante la reparación (no pueden concederse a otro trabajo) y el setup
+continúa con su restante al repararse; igual que el proceso. Es el **contrato de 0.7.0**, no una afirmación sobre el
+comportamiento industrial universal. No hay otras políticas (p. ej. RELEASE_AND_REACQUIRE) en 0.7.
+
+**Atribución de métricas.** Verdad primaria: nodo, from → to, duración y la entidad (con su producto) que **provocó**
+el cambio (`RunRecord.setups`). Las métricas de setup son por nodo y globales (`setup_count`, `setup_time_h`, …).
+SimForge **no** atribuye el tiempo de setup a un producto (ni al saliente ni al entrante) en ningún KPI ni coste: el
+campo `product` de la fila de auditoría identifica el disparador, no al "dueño" del tiempo. Un cambio entre keys
+distintas definido con 0 s cuenta como setup (count + 1, tiempo 0).
+
+**Algoritmo final de transiciones requeridas** (por nodo con setups, sobre **setup keys**, deduplicadas, orden
+determinista):
+1. Productos que pueden llegar al nodo: rutas declaradas, o alcanzabilidad en el grafo desde las fuentes que los
+   generan (probabilidad > 0). Solo esos cuentan: no se exigen matrices para productos que nunca llegan.
+2. Base **secuencia** solo si una única fuente `EXPLICIT_SEQUENCE` alimenta el nodo **y** sus entidades llegan
+   completas y en orden: un único camino (sin bifurcaciones, o el mismo prefijo de ruta para todos los productos), sin
+   visitar el nodo dos veces, sin scrap/rechazo antes del nodo, buffers FIFO, estaciones de 1 slot y transportes de 1
+   vehículo. Entonces: `inicial → primera key`, cada cambio consecutivo de key, y `última → primera` si `repeat`
+   (si la primera y la última key coinciden no hace falta).
+3. Base **todos los pares** en cualquier otro caso (PROBABILISTIC_MIX, varias fuentes, o cualquier posibilidad de
+   pérdida o adelantamiento): todo cambio entre las keys que llegan al nodo, más `inicial → cada key`. Lo que puede
+   ocurrir debe estar definido, aunque "probablemente no ocurra".
+4. Cada transición requerida sin tiempo → `SETUP_TRANSITION_MISSING` (ERROR) antes de ejecutar. `UNCONFIGURED → key`
+   solo en `from_unconfigured`.
+La comprobación en ejecución (`SetupTransitionMissing`) queda como salvaguarda defensiva: con el verificador no debe
+alcanzarse.
+

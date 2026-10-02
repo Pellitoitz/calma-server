@@ -522,21 +522,22 @@ class IndustrialServer(IndustrialNode):
         ctx = self.ctx
         remaining = full
         proc = ctx.env.active_process
+        st = {"setup_state": self.setup_state} if names is _SETUP_EVENTS else {}  # setups: state is audited in the trace
         while remaining > 1e-12:
             if self.down:
                 yield self.up_event
                 continue
             if gating and policy in ("PAUSE_RESUME", "STOP_RESTART") and not ctx.calendar.ok(gating):
                 if policy == "STOP_RESTART":
-                    ctx.log(names["restart"], e, self.id, lost_s=round(full - remaining, 3))
+                    ctx.log(names["restart"], e, self.id, lost_s=round(full - remaining, 3), **st)
                     remaining = full  # REUSE_ORIGINAL_SAMPLE: no new random number
-                ctx.log(names["pause"], e, self.id, remaining_s=round(remaining, 3), policy=policy)
+                ctx.log(names["pause"], e, self.id, remaining_s=round(remaining, 3), policy=policy, **st)
                 held = yield from self._release_for_calendar(e, slot, held, names["paused_state"], gating)
                 held = yield from self._acquire(e, slot, resume=True, uses=uses, task=task)
                 if policy == "STOP_RESTART":
                     held = yield from self._ready_to_start(e, slot, held, gating, uses, task, full_window=task is None)
                 self._set(slot, busy)
-                ctx.log(names["resume"], e, self.id, remaining_s=round(remaining, 3))
+                ctx.log(names["resume"], e, self.id, remaining_s=round(remaining, 3), **st)
                 continue
             start = ctx.now
             self.processing[slot] = proc  # type: ignore[assignment]
@@ -550,7 +551,7 @@ class IndustrialServer(IndustrialNode):
                 remaining -= ctx.now - start
                 if intr.cause == "calendar" and remaining <= 1e-9:
                     remaining = 0.0  # finished exactly when availability ended: complete, never paused/restarted
-                if interruptions is not None:
+                if interruptions is not None and remaining > 1e-9:  # remaining 0 at that instant = completed, not interrupted
                     interruptions.append({"t": ctx.now, "cause": intr.cause, "remaining_s": round(remaining, 6)})
                 if intr.cause == "preempt":
                     if ctx.counting:
@@ -593,14 +594,16 @@ class IndustrialServer(IndustrialNode):
         ctx.log("setup_start", e, self.id, frm=frm, to=key, duration_s=round(sample, 6), resources=row["resources"])
         held = yield from self._timed(e, slot, held, sample, self.setup_policy, self.setup_gating, self.setup_uses, task,
                                       NodeState.SETUP, _SETUP_EVENTS, row["interruptions"])
-        self.setup_state = key  # only now: an interrupted/paused setup never counts as done
+        if self.setup_state != frm:  # contract: nothing but a COMPLETED setup changes the state (checked, not assumed)
+            ctx.violation(f"'{self.id}': setup state changed to '{self.setup_state}' during the {frm}->{key} setup")
+        self.setup_state = key  # only now: an interrupted/paused/restarted setup never counts as done
         row["end"] = ctx.now
         row["elapsed_s"] = ctx.now - row["start"]
         row["counted"] = ctx.counting
         ctx.record.setups.append(row)
         if ctx.counting:
             ctx.record.node_setups[self.id] += 1
-        ctx.log("setup_end", e, self.id, frm=frm, to=key)
+        ctx.log("setup_end", e, self.id, frm=frm, to=key, setup_state=key)
         release_units(ctx, held)
 
     def _breakdowns(self) -> Proc:
@@ -612,13 +615,13 @@ class IndustrialServer(IndustrialNode):
             if self.ctx.counting:
                 self.ctx.record.node_failures[self.id] += 1
             self._refresh()
-            self.ctx.log("down", None, self.id)
+            self.ctx.log("down", None, self.id, **({"setup_state": self.setup_state} if self.setup is not None else {}))
             for slot in sorted(self.processing):
                 self._interrupt(slot, "failure")
             yield self.ctx.env.timeout(f.mttr.sample_seconds(rng))  # type: ignore[union-attr]
             self.down = False
             self._refresh()
-            self.ctx.log("up", None, self.id)
+            self.ctx.log("up", None, self.id, **({"setup_state": self.setup_state} if self.setup is not None else {}))
             evt, self.up_event = self.up_event, self.ctx.env.event()
             evt.succeed()
 
