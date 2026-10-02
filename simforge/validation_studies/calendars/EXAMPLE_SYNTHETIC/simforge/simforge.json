@@ -6,16 +6,31 @@
  ],
  "ok": true,
  "availability_hash": "7c2fc585f3524005",
+ "node_resources": {
+  "src": [],
+  "machine_a": [
+   "operator_1"
+  ],
+  "out": []
+ },
+ "components": {
+  "src": "source",
+  "machine_a": "manual_assembly",
+  "out": "sink"
+ },
  "calendar_anchor": {
   "mode": "dated",
   "start_date": "2026-10-05",
   "start_time": "00:00",
   "timezone": "Europe/Madrid"
  },
+ "policies": {
+  "machine_a": "PAUSE_RESUME"
+ },
  "seed": 1,
  "horizon_s": 604800.0,
  "warmup_s": 0.0,
- "run_id": "4ae1ce6a57",
+ "run_id": "6e71190008",
  "units_completed": 232.0,
  "targets": {
   "Machine_A": {
@@ -26,6 +41,38 @@
    "break_s": 0,
    "off_shift_s": 316800.0,
    "calendar_time_s": 604800.0,
+   "daily": {
+    "2026-10-05": {
+     "available": 57600.0,
+     "break": 0
+    },
+    "2026-10-06": {
+     "available": 57600.0,
+     "break": 0
+    },
+    "2026-10-07": {
+     "available": 57600.0,
+     "break": 0
+    },
+    "2026-10-08": {
+     "available": 57600.0,
+     "break": 0
+    },
+    "2026-10-09": {
+     "available": 57600.0,
+     "break": 0
+    },
+    "2026-10-10": {
+     "available": 0.0,
+     "break": 0
+    },
+    "2026-10-11": {
+     "available": 0.0,
+     "break": 0
+    }
+   },
+   "has_overnight": false,
+   "non_working_days": [],
    "paused_by_calendar_s": 325800.0,
    "busy_outside_planned_s": 0.0,
    "transitions": [
@@ -1977,6 +2024,38 @@
    "break_s": 4500.0,
    "off_shift_s": 460800.0,
    "calendar_time_s": 604800.0,
+   "daily": {
+    "2026-10-05": {
+     "available": 27900.0,
+     "break": 900.0
+    },
+    "2026-10-06": {
+     "available": 27900.0,
+     "break": 900.0
+    },
+    "2026-10-07": {
+     "available": 27900.0,
+     "break": 900.0
+    },
+    "2026-10-08": {
+     "available": 27900.0,
+     "break": 900.0
+    },
+    "2026-10-09": {
+     "available": 27900.0,
+     "break": 900.0
+    },
+    "2026-10-10": {
+     "available": 0.0,
+     "break": 0.0
+    },
+    "2026-10-11": {
+     "available": 0.0,
+     "break": 0.0
+    }
+   },
+   "has_overnight": false,
+   "non_working_days": [],
    "engine_planned_states_s": 139500.0,
    "working_s": 139500.0,
    "idle_available_s": 0.0,

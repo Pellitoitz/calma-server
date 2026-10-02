@@ -24,6 +24,68 @@
   ],
   "break": [],
   "holidays": [],
+  "rows": [
+   {
+    "date": "2026-10-05",
+    "kind": "SHIFT",
+    "overnight": false
+   },
+   {
+    "date": "2026-10-05",
+    "kind": "SHIFT",
+    "overnight": false
+   },
+   {
+    "date": "2026-10-06",
+    "kind": "SHIFT",
+    "overnight": false
+   },
+   {
+    "date": "2026-10-06",
+    "kind": "SHIFT",
+    "overnight": false
+   },
+   {
+    "date": "2026-10-07",
+    "kind": "SHIFT",
+    "overnight": false
+   },
+   {
+    "date": "2026-10-07",
+    "kind": "SHIFT",
+    "overnight": false
+   },
+   {
+    "date": "2026-10-08",
+    "kind": "SHIFT",
+    "overnight": false
+   },
+   {
+    "date": "2026-10-08",
+    "kind": "SHIFT",
+    "overnight": false
+   },
+   {
+    "date": "2026-10-09",
+    "kind": "SHIFT",
+    "overnight": false
+   },
+   {
+    "date": "2026-10-09",
+    "kind": "SHIFT",
+    "overnight": false
+   },
+   {
+    "date": "2026-10-10",
+    "kind": "OFF",
+    "overnight": false
+   },
+   {
+    "date": "2026-10-11",
+    "kind": "OFF",
+    "overnight": false
+   }
+  ],
   "horizon": 604800.0
  },
  "Operator_1": {
@@ -92,6 +154,68 @@
    ]
   ],
   "holidays": [],
+  "rows": [
+   {
+    "date": "2026-10-05",
+    "kind": "SHIFT",
+    "overnight": false
+   },
+   {
+    "date": "2026-10-05",
+    "kind": "BREAK",
+    "overnight": false
+   },
+   {
+    "date": "2026-10-06",
+    "kind": "SHIFT",
+    "overnight": false
+   },
+   {
+    "date": "2026-10-06",
+    "kind": "BREAK",
+    "overnight": false
+   },
+   {
+    "date": "2026-10-07",
+    "kind": "SHIFT",
+    "overnight": false
+   },
+   {
+    "date": "2026-10-07",
+    "kind": "BREAK",
+    "overnight": false
+   },
+   {
+    "date": "2026-10-08",
+    "kind": "SHIFT",
+    "overnight": false
+   },
+   {
+    "date": "2026-10-08",
+    "kind": "BREAK",
+    "overnight": false
+   },
+   {
+    "date": "2026-10-09",
+    "kind": "SHIFT",
+    "overnight": false
+   },
+   {
+    "date": "2026-10-09",
+    "kind": "BREAK",
+    "overnight": false
+   },
+   {
+    "date": "2026-10-10",
+    "kind": "OFF",
+    "overnight": false
+   },
+   {
+    "date": "2026-10-11",
+    "kind": "OFF",
+    "overnight": false
+   }
+  ],
   "horizon": 604800.0
  }
 }

@@ -2,16 +2,25 @@
 study_id: EXAMPLE_SYNTHETIC
 synthetic: true
 plant_case: "Machine_A (2 shifts 06-14, 14-22, Mon-Fri) worked by Operator_1 (06-14 Mon-Fri, break 10:00-10:15). Invented."
-period_start: "2026-10-05T00:00:00"   # local wall-clock in `timezone`; must equal the model's start_date/start_time
-period_end: "2026-10-12T00:00:00"     # period length must equal the model horizon
+period_start: "2026-10-05T00:00:00"   # local wall-clock in `timezone`; = model start_date + start_time
+period_end: "2026-10-12T00:00:00"     # period length = model horizon
 timezone: Europe/Madrid
 warmup_s: 0
 seed: 1
-targets:                               # name used in calendar_rows.csv / observed_events.csv -> model element
+targets:                               # alias used in the CSV files -> model element
   Machine_A: {node: machine_a}
   Operator_1: {resource: operator_1}
-calendar_source: "invented for the example"
-calendar_confirmed_by: "nobody (synthetic)"
-extraction_date: "2026-10-02"
-boundary_policy: {operation: machine_a, policy: PAUSE_RESUME, confirmed_by: "nobody (synthetic)"}
+sources:                               # every row/event points to one of these via source_ref
+  plan:
+    source_type: HR_SCHEDULE
+    source_reference: "invented shift plan"
+    confirmed_by_role: "nobody (synthetic)"
+    extraction_date: "2026-10-02"
+    clock_sync_status: CONFIRMED_SYNCED   # irrelevant for a plan; required field
+data_streams:                          # which days each observed stream really covers (absent = NOT_AVAILABLE)
+  observed_events: null
+  observed_metrics: null
+  failures: null
+additional_constraints: []             # [] = plant confirmed nothing else is needed (synthetic: assumed)
+boundary_policy: {operation: machine_a, policy: PAUSE_RESUME, confirmed_by_role: "nobody (synthetic)"}
 engineer_sign_off: {name: "", date: "", notes: ""}

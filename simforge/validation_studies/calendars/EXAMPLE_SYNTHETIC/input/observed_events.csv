@@ -1,1 +1,1 @@
-timestamp,resource,event,precision_s,source
+timestamp,target,event,evidence_type,source_ref,temporal_resolution,note

@@ -1,0 +1,17 @@
+capability,synthetic,real,evidence,synthetic_tests
+shift_start_end,SYNTHETICALLY_VALIDATED,NOT_OBSERVED_IN_REAL_DATA,"exercised, but study is NOT_TESTED: exact match on Machine_A 5 day(s) 2026-10-05…2026-10-09; Operator_1 5 day(s) 2026-10-05…2026-10-09",test_calendars.py
+breaks,SYNTHETICALLY_VALIDATED,NOT_OBSERVED_IN_REAL_DATA,"exercised, but study is NOT_TESTED: exact match on Operator_1 5 day(s) 2026-10-05…2026-10-09",test_calendars.py
+multiple_shifts,SYNTHETICALLY_VALIDATED,NOT_OBSERVED_IN_REAL_DATA,"exercised, but study is NOT_TESTED: exact match on Machine_A 5 day(s) 2026-10-05…2026-10-09",test_calendars.py
+overnight_shift,SYNTHETICALLY_VALIDATED,NOT_OBSERVED_IN_REAL_DATA,not present in the period,test_calendars.py
+holiday,SYNTHETICALLY_VALIDATED,NOT_OBSERVED_IN_REAL_DATA,not present in the period,test_calendars.py
+overtime,SYNTHETICALLY_VALIDATED,NOT_OBSERVED_IN_REAL_DATA,not present in the period,test_calendars.py
+extra_shift,SYNTHETICALLY_VALIDATED,NOT_OBSERVED_IN_REAL_DATA,not present in the period,test_calendars.py
+calendar_day,SYNTHETICALLY_VALIDATED,NOT_OBSERVED_IN_REAL_DATA,not present in the period,test_calendars_closure.py (E)
+shifts_starting_on_date,SYNTHETICALLY_VALIDATED,NOT_OBSERVED_IN_REAL_DATA,not present in the period,test_calendars_closure.py (E)
+FINISH_CURRENT,SYNTHETICALLY_VALIDATED,NOT_OBSERVED_IN_REAL_DATA,policy not used by any target operation in this case,test_calendars.py
+PAUSE_RESUME,SYNTHETICALLY_VALIDATED,NOT_OBSERVED_IN_REAL_DATA,Machine_A: no observed operation crossed a boundary under PAUSE_RESUME,test_calendars_closure.py (A-D + preventive)
+STOP_RESTART,SYNTHETICALLY_VALIDATED,NOT_OBSERVED_IN_REAL_DATA,policy not used by any target operation in this case,test_calendars_closure.py (I)
+DST_spring,SYNTHETICALLY_VALIDATED,NOT_OBSERVED_IN_REAL_DATA,not present in the period,test_calendars_closure.py (F)
+DST_autumn,SYNTHETICALLY_VALIDATED,NOT_OBSERVED_IN_REAL_DATA,not present in the period,test_real_calendar_validation.py (fall DST)
+source_calendar,SYNTHETICALLY_VALIDATED,NOT_APPLICABLE,no calendared source among the study targets,test_calendars_closure.py (J)
+machine_operator_calendar_intersection,SYNTHETICALLY_VALIDATED,NOT_OBSERVED_IN_REAL_DATA,"exercised, but study is NOT_TESTED: calendars differ in the period; every SimForge start/resume lies inside the independently computed joint availability",test_calendars.py

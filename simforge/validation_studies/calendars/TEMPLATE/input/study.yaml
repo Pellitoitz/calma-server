@@ -1,21 +1,49 @@
-# Real calendar validation study. Copy TEMPLATE/ to <STUDY_ID>/ and fill in. Anonymise: Machine_A, Operator_1, ...
-# No personal data: no names of operators, no badge numbers. Only roles/aliases.
+# Real calendar validation study. Copy TEMPLATE/ to <STUDY_ID>/ and fill in.
+# Anonymise (Machine_A, Operator_1). Roles, never personal names. Do not invent anything: unknown = leave empty.
 study_id: ""                 # e.g. CAL_2026_W41_LINE1
 synthetic: false
-plant_case: ""               # one machine + one operator, 1-2 shifts, one week (what, why this case)
+plant_case: ""               # one machine + one operator, 1-2 shifts, one week (what and why this case)
 period_start: ""             # local wall-clock, e.g. "2026-10-05T00:00:00" (= model start_date + start_time)
-period_end: ""               # e.g. "2026-10-12T00:00:00" (period length = model horizon)
-timezone: ""                 # IANA, e.g. Europe/Madrid (MANDATORY, no default)
-warmup_s: 0                  # metrics/events are compared on [warmup, end)
+period_end: ""               # e.g. "2026-10-12T00:00:00" (length = model horizon)
+timezone: ""                 # IANA, e.g. Europe/Madrid (MANDATORY). Say if the period crosses a DST change.
+warmup_s: 0
 seed: 1
 targets:                     # alias used in the CSV files -> element in input/model.yaml
   # Machine_A: {node: machine_a}
   # Operator_1: {resource: operator_1}
-calendar_source: ""          # e.g. "HR shift plan export", "MES calendar", "supervisor sheet"
-calendar_confirmed_by: ""    # role, e.g. "production supervisor line 1" (MANDATORY)
-extraction_date: ""
-boundary_policy:             # what REALLY happens at shift end. Never inferred.
+
+# Where each piece of data comes from. Rows/events reference these ids in `source_ref`.
+sources:
+  # shift_plan:
+  #   source_type: HR_SCHEDULE      # PLC | MES | ERP | SHIFT_SHEET | HR_SCHEDULE | MANUAL_OBSERVATION | ENGINEER_CONFIRMATION | OTHER
+  #   source_reference: "HR plan export W41 (anonymised)"
+  #   confirmed_by_role: "production supervisor line 1"
+  #   extraction_date: "2026-10-20"
+  #   clock_sync_status: CONFIRMED_SYNCED   # CONFIRMED_SYNCED | KNOWN_OFFSET | UNKNOWN
+  # plc_m1:
+  #   source_type: PLC
+  #   source_reference: "PLC Machine_A cycle log"
+  #   confirmed_by_role: "maintenance technician"
+  #   extraction_date: "2026-10-20"
+  #   clock_sync_status: KNOWN_OFFSET
+  #   known_offset_s: 90             # source clock minus reference clock (+90 = PLC is 90 s ahead)
+  #   offset_reference: "NTP comparison 2026-10-19"
+  #   apply_offset: false            # true = corrected timestamps are used and listed in the report
+
+# Days each OBSERVED stream really covers. Not declared = NOT_AVAILABLE (never "nothing happened").
+data_streams:
+  observed_events: null      # e.g. {from: 2026-10-05, to: 2026-10-11}
+  observed_metrics: null
+  failures: null             # breakdown records; without them "no failures" can NOT be assumed
+
+# "Besides the machine and the operator, is anything else needed for this station to produce?"
+# (supervisor, technician, shared tool, oven, fixture, released material, production permit, downstream equipment...)
+# Answer is MANDATORY. [] only if the plant confirmed there is nothing else. Not modelled -> MODEL_SCOPE_DIFFERENCE.
+additional_constraints:
+  # - {constraint: "quality release of first part", modelled: false, note: "first part each shift waits for QA"}
+
+boundary_policy:             # what REALLY happens to the part in process at shift end / break start. Never inferred.
   operation: ""              # node id
   policy: MISSING            # FINISH_CURRENT | PAUSE_RESUME | STOP_RESTART | MISSING | REQUIRES_ENGINEER_CONFIRMATION
-  confirmed_by: ""
-engineer_sign_off: {name: "", date: "", notes: ""}   # filled ONLY after reviewing VALIDATION_REPORT.md
+  confirmed_by_role: ""
+engineer_sign_off: {name: "", date: "", notes: ""}   # role; filled ONLY after reviewing VALIDATION_REPORT.md

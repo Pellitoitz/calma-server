@@ -1,1 +1,1 @@
-resource,date,start,end,kind,note
+resource,date,start,end,kind,evidence_type,source_ref,temporal_resolution,note
