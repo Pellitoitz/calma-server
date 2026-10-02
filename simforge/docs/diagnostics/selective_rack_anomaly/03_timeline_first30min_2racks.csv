@@ -1,0 +1,60 @@
+t,operator_state,operator_location,selective_state,feeding_wip,wip_target,input_buffer_level,available_racks,racks_in_assembly,racks_in_transport,racks_in_input_buffer,racks_in_selective,racks_in_review,candidate_tasks,selected_task,decision_reason
+0,assembly,manual_assembly,starved,0,2,0,1,1,0,0,0,0,manual_assembly,manual_assembly,feed WIP 0 < target 2 -> feeder task (keep 'selective_soldering' fed)
+120.0,transport_load,manual_assembly,starved,1,2,0,1,1,0,0,0,0,transport_1,transport_1,feed WIP 1 < target 2 -> feeder task (keep 'selective_soldering' fed)
+125.0,transport_travel,buffer_de_entrada,starved,,,,0,1,1,0,0,0,,,
+133.333333,transport_travel,buffer_de_entrada,starved,,,,0,1,1,0,0,0,,,
+138.333333,transport_unload,buffer_de_entrada,busy,0,2,0,0,1,0,0,1,0,manual_assembly,manual_assembly,feed WIP 0 < target 2 -> feeder task (keep 'selective_soldering' fed)
+146.666333,idle,manual_assembly,busy,,,,0,1,0,0,1,0,,,
+146.666667,assembly,manual_assembly,busy,,,,0,1,0,0,1,0,,,
+266.666667,transport_load,manual_assembly,starved,1,2,0,0,1,0,0,0,1,transport_1|inspection,transport_1,feed WIP 1 < target 2 -> feeder task (keep 'selective_soldering' fed)
+271.666667,transport_travel,buffer_de_entrada,starved,,,,0,0,1,0,0,1,,,
+280.0,transport_travel,buffer_de_entrada,starved,,,,0,0,1,0,0,1,,,
+285.0,transport_unload,buffer_de_entrada,busy,0,2,0,0,0,0,0,1,1,inspection,inspection,feed WIP 0 < target but no feeder task waiting -> non-feeder task
+289.166667,walking,inspection,busy,,,,0,0,0,0,1,1,,,
+349.166667,inspection,inspection,starved,0,2,0,0,1,0,0,0,1,inspection,inspection,feed WIP 0 < target but no feeder task waiting -> non-feeder task
+409.166667,walking,manual_assembly,starved,0,2,0,1,1,0,0,0,0,manual_assembly,manual_assembly,feed WIP 0 < target 2 -> feeder task (keep 'selective_soldering' fed)
+421.666667,assembly,manual_assembly,starved,,,,1,1,0,0,0,0,,,
+541.666667,transport_load,manual_assembly,starved,1,2,0,1,1,0,0,0,0,transport_1,transport_1,feed WIP 1 < target 2 -> feeder task (keep 'selective_soldering' fed)
+546.666667,transport_travel,buffer_de_entrada,starved,,,,0,1,1,0,0,0,,,
+555.0,transport_travel,buffer_de_entrada,starved,,,,0,1,1,0,0,0,,,
+560.0,transport_unload,buffer_de_entrada,busy,0,2,0,0,1,0,0,1,0,manual_assembly,manual_assembly,feed WIP 0 < target 2 -> feeder task (keep 'selective_soldering' fed)
+568.333,idle,manual_assembly,busy,,,,0,1,0,0,1,0,,,
+568.333333,assembly,manual_assembly,busy,,,,0,1,0,0,1,0,,,
+688.333333,transport_load,manual_assembly,starved,1,2,0,0,1,0,0,0,1,transport_1|inspection,transport_1,feed WIP 1 < target 2 -> feeder task (keep 'selective_soldering' fed)
+693.333333,transport_travel,buffer_de_entrada,starved,,,,0,0,1,0,0,1,,,
+701.666666,transport_travel,buffer_de_entrada,starved,,,,0,0,1,0,0,1,,,
+706.666666,transport_unload,buffer_de_entrada,starved,,,,0,0,1,0,0,1,,,
+706.666667,walking,inspection,busy,0,2,0,0,0,0,0,1,1,inspection,inspection,feed WIP 0 < target but no feeder task waiting -> non-feeder task
+710.833333,walking,inspection,busy,,,,0,0,0,0,1,1,,,
+770.833333,inspection,inspection,starved,0,2,0,0,1,0,0,0,1,inspection,inspection,feed WIP 0 < target but no feeder task waiting -> non-feeder task
+830.833333,walking,manual_assembly,starved,0,2,0,1,1,0,0,0,0,manual_assembly,manual_assembly,feed WIP 0 < target 2 -> feeder task (keep 'selective_soldering' fed)
+843.333333,assembly,manual_assembly,starved,,,,1,1,0,0,0,0,,,
+963.333333,transport_load,manual_assembly,starved,1,2,0,1,1,0,0,0,0,transport_1,transport_1,feed WIP 1 < target 2 -> feeder task (keep 'selective_soldering' fed)
+968.333333,transport_travel,buffer_de_entrada,starved,,,,0,1,1,0,0,0,,,
+976.666666,transport_travel,buffer_de_entrada,starved,,,,0,1,1,0,0,0,,,
+981.666666,transport_unload,buffer_de_entrada,starved,,,,0,1,1,0,0,0,,,
+981.666667,walking,manual_assembly,busy,0,2,0,0,1,0,0,1,0,manual_assembly,manual_assembly,feed WIP 0 < target 2 -> feeder task (keep 'selective_soldering' fed)
+989.999667,idle,manual_assembly,busy,,,,0,1,0,0,1,0,,,
+990.0,assembly,manual_assembly,busy,,,,0,1,0,0,1,0,,,
+1110.0,transport_load,manual_assembly,starved,1,2,0,0,1,0,0,0,1,transport_1|inspection,transport_1,feed WIP 1 < target 2 -> feeder task (keep 'selective_soldering' fed)
+1115.0,transport_travel,buffer_de_entrada,starved,,,,0,0,1,0,0,1,,,
+1123.333333,transport_travel,buffer_de_entrada,starved,,,,0,0,1,0,0,1,,,
+1128.333333,transport_unload,buffer_de_entrada,busy,0,2,0,0,0,0,0,1,1,inspection,inspection,feed WIP 0 < target but no feeder task waiting -> non-feeder task
+1132.5,walking,inspection,busy,,,,0,0,0,0,1,1,,,
+1192.5,inspection,inspection,starved,0,2,0,0,1,0,0,0,1,inspection,inspection,feed WIP 0 < target but no feeder task waiting -> non-feeder task
+1252.5,walking,manual_assembly,starved,0,2,0,1,1,0,0,0,0,manual_assembly,manual_assembly,feed WIP 0 < target 2 -> feeder task (keep 'selective_soldering' fed)
+1265.0,assembly,manual_assembly,starved,,,,1,1,0,0,0,0,,,
+1385.0,transport_load,manual_assembly,starved,1,2,0,1,1,0,0,0,0,transport_1,transport_1,feed WIP 1 < target 2 -> feeder task (keep 'selective_soldering' fed)
+1390.0,transport_travel,buffer_de_entrada,starved,,,,0,1,1,0,0,0,,,
+1398.333333,transport_travel,buffer_de_entrada,starved,,,,0,1,1,0,0,0,,,
+1403.333333,transport_unload,buffer_de_entrada,busy,0,2,0,0,1,0,0,1,0,manual_assembly,manual_assembly,feed WIP 0 < target 2 -> feeder task (keep 'selective_soldering' fed)
+1411.666333,walking,manual_assembly,busy,,,,0,1,0,0,1,0,,,
+1411.666667,assembly,manual_assembly,busy,,,,0,1,0,0,1,0,,,
+1531.666667,transport_load,manual_assembly,starved,1,2,0,0,1,0,0,0,1,transport_1|inspection,transport_1,feed WIP 1 < target 2 -> feeder task (keep 'selective_soldering' fed)
+1536.666667,transport_travel,buffer_de_entrada,starved,,,,0,0,1,0,0,1,,,
+1545.0,transport_travel,buffer_de_entrada,starved,,,,0,0,1,0,0,1,,,
+1550.0,transport_unload,buffer_de_entrada,busy,0,2,0,0,0,0,0,1,1,inspection,inspection,feed WIP 0 < target but no feeder task waiting -> non-feeder task
+1554.166667,walking,inspection,busy,,,,0,0,0,0,1,1,,,
+1614.166667,inspection,inspection,starved,0,2,0,0,1,0,0,0,1,inspection,inspection,feed WIP 0 < target but no feeder task waiting -> non-feeder task
+1674.166667,walking,manual_assembly,starved,0,2,0,1,1,0,0,0,0,manual_assembly,manual_assembly,feed WIP 0 < target 2 -> feeder task (keep 'selective_soldering' fed)
+1686.666667,assembly,manual_assembly,starved,,,,1,1,0,0,0,0,,,

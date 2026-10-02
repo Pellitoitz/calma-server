@@ -1,0 +1,446 @@
+isms_version: '0.1'
+meta:
+  name: Soldadura selectiva
+  description: 'Tengo un proceso de soldadura selectiva.
+
+
+    Los circuitos se montan manualmente en bastidores.
+
+
+    Hay un número limitado de bastidores.
+
+
+    Después del montaje los bastidores se transportan hasta la selectiva.
+
+
+    Existe un buffer de entrada.
+
+
+    La selectiva procesa los bastidores.
+
+
+    Después pasan a revisión y limpieza.
+
+
+    El mismo operario realiza montaje, transporte y revisión.
+
+
+    Quiero que el operario mantenga alimentada la selectiva utilizando una estrategia
+    de WIP objetivo.
+
+
+    Quiero probar entre 1 y 10 bast'
+  tags: []
+  origin: ai_generated
+  generated_by:
+    interpreter: offline-rules
+    prompt_version: offline_rules_v2
+    compiler: compiler_v2
+    prototype_mode: false
+    at: '2026-10-02T04:57:54+00:00'
+simulation:
+  horizon:
+    value: 8.0
+    unit: h
+    provenance:
+      status: provided_by_client
+      source: description
+  warmup:
+    value: 0.0
+    unit: s
+  kind: terminating
+  replications: 1
+  base_seed: 12345
+  trace: false
+  dispatch_timing: end_of_timestep
+  check_invariants: true
+entities:
+- id: unit
+  name: Unit
+  description: contains circuitos
+parameters:
+- id: circuitos_per_unit
+  value: 4.0
+  unit: circuitos
+  description: Número de circuitos por unidad/bastidor
+  role: fixed
+  provenance:
+    status: provided_by_client
+    source: answer
+    note: 'answer: 4'
+    timestamp: '2026-10-02T04:57:54Z'
+- id: manual_assembly_time
+  value: 30.0
+  unit: s
+  description: Tiempo de proceso de 'Manual assembly' por circuito
+  role: fixed
+  provenance:
+    status: provided_by_client
+    source: answer
+    note: 'answer: 30'
+    timestamp: '2026-10-02T04:57:54Z'
+- id: transport_1_load_time
+  value: 5.0
+  unit: s
+  description: Tiempo de carga en 'Transporte 1'
+  role: fixed
+  provenance:
+    status: provided_by_client
+    source: answer
+    note: 'answer: 5'
+    timestamp: '2026-10-02T04:57:54Z'
+- id: transport_1_unload_time
+  value: 5.0
+  unit: s
+  description: Tiempo de descarga en 'Transporte 1'
+  role: fixed
+  provenance:
+    status: provided_by_client
+    source: answer
+    note: 'answer: 5'
+    timestamp: '2026-10-02T04:57:54Z'
+- id: buffer_de_entrada_capacity
+  value: 3.0
+  unit: units
+  description: Capacidad de 'Buffer de entrada'
+  role: fixed
+  provenance:
+    status: provided_by_client
+    source: answer
+    note: 'answer: 3'
+    timestamp: '2026-10-02T04:57:54Z'
+- id: selective_soldering_time
+  value: 20.0
+  unit: s
+  description: Tiempo de proceso de 'Selective soldering'
+  role: fixed
+  provenance:
+    status: provided_by_client
+    source: answer
+    note: 'answer: 20'
+    timestamp: '2026-10-02T04:57:54Z'
+- id: inspection_time
+  value: 15.0
+  unit: s
+  description: Tiempo de proceso de 'Revisión y limpieza' por circuito
+  role: fixed
+  provenance:
+    status: provided_by_client
+    source: answer
+    note: 'answer: 15'
+    timestamp: '2026-10-02T04:57:54Z'
+- id: racks_count
+  value: 1.0
+  unit: units
+  description: Número de bastidores
+  role: decision_variable
+  provenance:
+    status: assumed
+    source: assumed
+    note: baseline = first experiment level
+    timestamp: '2026-10-02T04:57:54Z'
+- id: operator_1_count
+  value: 1.0
+  unit: units
+  description: Número de Operario
+  role: fixed
+  provenance:
+    status: provided_by_client
+    source: description
+    timestamp: '2026-10-02T04:57:54Z'
+- id: dist_manual_assembly_buffer_de_entrada
+  value: 10.0
+  unit: m
+  description: Distancia Manual assembly ↔ Buffer de entrada
+  role: fixed
+  provenance:
+    status: provided_by_client
+    source: answer
+    note: 'answer: 10'
+    timestamp: '2026-10-02T04:57:54Z'
+- id: dist_buffer_de_entrada_inspection
+  value: 5.0
+  unit: m
+  description: Distancia Buffer de entrada ↔ Revisión y limpieza
+  role: fixed
+  provenance:
+    status: provided_by_client
+    source: answer
+    note: 'answer: 5'
+    timestamp: '2026-10-02T04:57:54Z'
+- id: operator_walking_speed
+  value: 1.2
+  unit: m/s
+  description: Velocidad del operario andando
+  role: fixed
+  provenance:
+    status: provided_by_client
+    source: answer
+    note: 'answer: 1.2'
+    timestamp: '2026-10-02T04:57:54Z'
+- id: wip_target
+  value: 2.0
+  unit: units
+  description: WIP objetivo delante de la estación protegida
+  role: fixed
+  provenance:
+    status: provided_by_client
+    source: answer
+    note: 'answer: 2'
+    timestamp: '2026-10-02T04:57:54Z'
+resources:
+- id: racks
+  name: bastidores
+  kind: carrier
+  quantity: $racks_count
+  dispatch: fifo
+- id: operator_1
+  name: Operario
+  kind: operator
+  quantity: $operator_1_count
+  dispatch: wip_target
+  wip_target:
+    protected_node: selective_soldering
+    feed_nodes:
+    - buffer_de_entrada
+    feeder_nodes:
+    - manual_assembly
+    - transport_1
+    target: $wip_target
+    count_feeder_in_process: true
+    unblock_protected: true
+  travel:
+    speed:
+      value: $operator_walking_speed
+      unit: m/s
+    metric: euclidean
+    distances:
+    - a: manual_assembly
+      b: buffer_de_entrada
+      distance:
+        value: $dist_manual_assembly_buffer_de_entrada
+        unit: m
+    - a: manual_assembly
+      b: inspection
+      distance:
+        value: $dist_manual_assembly_buffer_de_entrada + $dist_buffer_de_entrada_inspection
+        unit: m
+    - a: buffer_de_entrada
+      b: inspection
+      distance:
+        value: $dist_buffer_de_entrada_inspection
+        unit: m
+    locations: {}
+  home: manual_assembly
+nodes:
+- id: source
+  name: Source
+  component: source
+  params:
+    arrival: infinite
+  priority: 0
+  seize: []
+  release: []
+  release_via: {}
+  notes: ''
+- id: manual_assembly
+  name: Manual assembly
+  component: manual_assembly
+  component_version: 1.0.0
+  params:
+    process_time:
+      dist: constant
+      unit: s
+      value: $manual_assembly_time
+    work_units: $circuitos_per_unit
+    resources:
+    - resource: operator_1
+  priority: 0
+  seize:
+  - resource: racks
+    quantity: 1
+  release: []
+  release_via: {}
+  notes: ''
+- id: transport_1
+  name: Transporte 1
+  component: rack_transport
+  component_version: 1.0.0
+  params:
+    capacity: 1
+    load_time:
+      dist: constant
+      unit: s
+      value: $transport_1_load_time
+    unload_time:
+      dist: constant
+      unit: s
+      value: $transport_1_unload_time
+    reserve_destination: true
+    return_empty: false
+    resources:
+    - resource: operator_1
+    origin: manual_assembly
+    destination: buffer_de_entrada
+    distance:
+      value: $dist_manual_assembly_buffer_de_entrada
+      unit: m
+    speed:
+      value: $operator_walking_speed
+      unit: m/s
+  priority: 0
+  seize: []
+  release: []
+  release_via: {}
+  notes: ''
+- id: buffer_de_entrada
+  name: Buffer de entrada
+  component: buffer
+  component_version: 1.0.0
+  params:
+    capacity: $buffer_de_entrada_capacity
+  priority: 0
+  seize: []
+  release: []
+  release_via: {}
+  notes: ''
+- id: selective_soldering
+  name: Selective soldering
+  component: selective_soldering
+  component_version: 1.0.0
+  params:
+    process_time:
+      dist: constant
+      unit: s
+      value: $selective_soldering_time
+  priority: 0
+  seize: []
+  release: []
+  release_via: {}
+  notes: ''
+- id: inspection
+  name: Revisión y limpieza
+  component: inspection
+  component_version: 1.0.0
+  params:
+    process_time:
+      dist: constant
+      unit: s
+      value: $inspection_time
+    work_units: $circuitos_per_unit
+    resources:
+    - resource: operator_1
+  priority: 0
+  seize: []
+  release:
+  - racks
+  release_via: {}
+  notes: ''
+- id: sink
+  name: Sink
+  component: sink
+  params: {}
+  priority: 0
+  seize: []
+  release: []
+  release_via: {}
+  notes: ''
+edges:
+- source: source
+  target: manual_assembly
+- source: manual_assembly
+  target: transport_1
+- source: transport_1
+  target: buffer_de_entrada
+- source: buffer_de_entrada
+  target: selective_soldering
+- source: selective_soldering
+  target: inspection
+- source: inspection
+  target: sink
+assumptions:
+- id: a1
+  text: 'Suministro infinito (la primera estación nunca espera material): no se indicó
+    la llegada.'
+  path: nodes.source.params.arrival
+  origin: ai
+  accepted: false
+- id: a2
+  text: '''Transporte 1'': 1 unidad por viaje (no se indicó).'
+  path: nodes.transport_1.params.capacity
+  origin: ai
+  accepted: false
+- id: a3
+  text: '''Transporte 1'': el viaje empieza sólo cuando hay sitio en el destino (evita
+    que el operario espere cargado).'
+  path: nodes.transport_1.params.reserve_destination
+  origin: ai
+  accepted: false
+- id: a4
+  text: Número de bastidores del caso base = 1 (primer nivel del experimento); el
+    experimento lo varía.
+  path: parameters.racks_count.value
+  origin: ai
+  accepted: false
+- id: a5
+  text: 'Layout lineal en el orden del flujo: la distancia entre dos puntos no consecutivos
+    es la suma de los tramos.'
+  path: resources
+  origin: ai
+  accepted: false
+- id: a6
+  text: '''Transporte 1'': velocidad cargado = velocidad andando del operario.'
+  path: nodes.transport_1.params.speed
+  origin: ai
+  accepted: false
+- id: a7
+  text: El operario empieza en 'Manual assembly'.
+  path: resources.operator_1.home
+  origin: ai
+  accepted: false
+- id: a8
+  text: WIP que alimenta 'Selective soldering' = contenido de Buffer de entrada +
+    unidades en proceso en las tareas alimentadoras.
+  path: resources.operator_1.wip_target.feed_nodes
+  origin: ai
+  accepted: false
+- id: a9
+  text: El operario no interrumpe una tarea a medias (sin preemption); si la estación
+    protegida está bloqueada, atiende primero aguas abajo.
+  path: resources.operator_1.wip_target
+  origin: ai
+  accepted: false
+- id: a10
+  text: '''Revisión y limpieza'' se modela como un único paso (inspection).'
+  origin: ai
+  accepted: false
+- id: a11
+  text: Cada unidad toma un rack en 'Manual assembly' y lo libera al terminar 'Revisión
+    y limpieza'.
+  origin: ai
+  accepted: false
+- id: a12
+  text: Tiempos de proceso expresados por circuito (× circuitos por unidad).
+  origin: ai
+  accepted: false
+missing: []
+approval:
+  approved: false
+  note: ''
+experiments:
+- name: bastidores 1..10
+  factors:
+  - path: parameters.racks_count.value
+    values:
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+    - 10
+  max_scenarios: 500
+custom_rule_candidates: []
