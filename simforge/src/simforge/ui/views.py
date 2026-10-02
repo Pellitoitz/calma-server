@@ -373,8 +373,14 @@ def run_tab(app: SimForgeApp, project: Project) -> None:
             app.approve_model(project, approver)
             st.rerun()
     if c3.button("RUN SIMULATION", type="primary", disabled=not report.ok or pending, width="stretch"):
-        with st.spinner("Simulating..."):
-            st.session_state["last_run"] = app.run_simulation(project, model, replications=int(reps), trace=trace, keep_records=True)
+        from ..errors import user_message
+        try:
+            with st.spinner("RUNNING — simulating (no progress percentage: the engine does not know it in advance)..."):
+                st.session_state["last_run"] = app.run_simulation(project, model, replications=int(reps), trace=trace,
+                                                                  keep_records=True)
+            st.success(f"COMPLETED — run {st.session_state['last_run'].run_id}")
+        except Exception as e:  # noqa: BLE001 - a failed run is never stored; the error is shown, categorised
+            st.error(f"FAILED — {user_message(e)} (nothing stored as completed; see the project history)")
     if not report.ok:
         st.error("The model has verification errors; fix them in the Model tab.")
         issues_table(report)

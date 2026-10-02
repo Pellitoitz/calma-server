@@ -7,7 +7,8 @@ name = "simforge"
 version = "0.1.0"
 description = "Local AI-assisted industrial discrete-event simulation workbench"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.11,<3.12"   # 1.0 contract: Python 3.11 only (the tested version)
+classifiers = ["Programming Language :: Python :: 3.11", "Operating System :: OS Independent"]
 license = { text = "Proprietary (personal use)" }
 dependencies = [
     "simpy>=4.1,<5",          # MIT  - DES kernel (hidden behind simforge.engine)
@@ -22,11 +23,11 @@ ui = ["streamlit>=1.35", "pandas>=2.1"]   # Apache-2.0 / BSD
 llm = ["anthropic>=0.40"]                  # MIT
 excel = ["openpyxl>=3.1"]                  # MIT
 data = ["numpy>=1.24", "scipy>=1.11", "openpyxl>=3.1"]   # BSD / BSD / MIT - data import & distribution fitting
-dev = ["pytest>=8"]
+dev = ["pytest>=8", "ruff>=0.4"]
 all = ["simforge[ui,llm,excel,data,dev]"]
 
 [project.scripts]
-simforge = "simforge.cli:app"
+simforge = "simforge.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -37,3 +38,10 @@ simforge = ["library/components/*.yaml", "library/rules/*.yaml", "ai/prompts/*.t
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
+markers = [
+    "release: 1.0 release-readiness suite (golden workflow, persistence, CLI/UI smoke)",
+    "validation: real-data validation protocols (calendars, economics)",
+    "regression: frozen reference results (examples 01-05, golden engine traces, benchmarks)",
+    "integration: services / CLI / UI end-to-end flows",
+    "unit: everything else (fast)",
+]

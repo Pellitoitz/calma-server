@@ -1,0 +1,38 @@
+# SimForge 1.0 golden project — BASELINE. Synthetic, non-confidential teaching case (not a real plant).
+# Line: arrivals -> manual assembly (operator) -> buffer (5) -> test machine -> finished goods.
+meta: {name: Golden line — baseline, description: "1.0 reference workflow: assembly + buffer + test"}
+simulation:
+  horizon: {value: 8, unit: h}
+  warmup: {value: 30, unit: min}
+  replications: 5
+  base_seed: 1000
+resources:
+  - {id: operator, name: Assembly operator, quantity: 1}
+nodes:
+  - {id: arrivals, component: source, params: {arrival: interarrival, interarrival: {dist: exponential, mean: 50, unit: s}}}
+  - {id: assembly, name: Manual assembly, component: manual_assembly,
+     params: {process_time: {dist: triangular, low: 30, mode: 38, high: 50, unit: s}, resources: [{resource: operator}]}}
+  - {id: buffer, name: Buffer, component: buffer, params: {capacity: 5}}
+  - {id: test, name: Test machine, component: machine, params: {process_time: {dist: constant, value: 46, unit: s}}}
+  - {id: finished, name: Finished goods, component: sink}
+edges:
+  - {source: arrivals, target: assembly}
+  - {source: assembly, target: buffer}
+  - {source: buffer, target: test}
+  - {source: test, target: finished}
+economics:
+  currency: EUR
+  scope: [labor, machine, energy, material]
+  labor:
+    - {resource: operator, paid_time: CALENDAR_WINDOW,
+       rate: {value: 32.0, currency: EUR, basis: PER_PAID_HOUR, provenance: {status: assumed, source: "teaching value"}}}
+  machine:
+    - {node: test, rate: {value: 18.0, currency: EUR, basis: PER_PROCESSING_HOUR, provenance: {status: assumed, source: "teaching value"}}}
+  energy:
+    price: {value: 0.22, currency: EUR, basis: PER_KWH, provenance: {status: assumed, source: "teaching value"}}
+    power_kw: {test: {PROCESSING: 3.5}}
+  material:
+    - {rate: {value: 4.10, currency: EUR, basis: PER_GOOD_UNIT, provenance: {status: assumed, source: "teaching value"}}}
+  capex:
+    - {category: none, amount: {value: 0, currency: EUR, basis: FIXED}, note: "explicit 0: no investment in the current line"}
+  annualization: {mode: REPEAT_RUN, runs_per_year: 460, provenance: {status: assumed, source: "teaching value: 230 days x 2 shifts"}}

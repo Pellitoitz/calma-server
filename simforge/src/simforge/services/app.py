@@ -332,9 +332,19 @@ class SimForgeApp:
         if model is None:
             raise ValueError("El proyecto no tiene modelo.")
         self._check_approval(project, model)
-        res = run_simulation(model, self.registry, replications=replications, trace=trace, cache=project, keep_records=keep_records)
-        project.save_run(res, project.meta.current_version)
-        project.log("system", "run_simulation", result=f"run {res.run_id}: TH={res.kpis.mean('throughput_per_hour'):.2f}/h")
+        version = project.version_of(model)  # the version ACTUALLY executed (None = unsaved model), never "current"
+        try:
+            res = run_simulation(model, self.registry, replications=replications, trace=trace, cache=project,
+                                 keep_records=keep_records)
+        except KeyboardInterrupt:
+            project.log("system", "run_interrupted", result=f"model v{version}: interrupted; no run stored")
+            raise
+        except Exception as e:  # a failed run is never stored as a result; the error is kept for diagnosis
+            project.log("system", "run_failed", result=f"model v{version}: {type(e).__name__}: {e}"[:2000])
+            raise
+        project.save_run(res, version)
+        project.log("system", "run_simulation", result=f"run {res.run_id} (model v{version}): "
+                    f"TH={res.kpis.mean('throughput_per_hour'):.2f}/h")
         return res
 
     # --------------------------------------------------------------- economics (>= 0.9.0, post-run, no DES)
@@ -342,7 +352,13 @@ class SimForgeApp:
         row = project.db.execute("SELECT model_version, model_hash FROM runs WHERE run_id = ?", (run_id,)).fetchone()
         if not row:
             raise ValueError(f"No existe la ejecución '{run_id}'.")
-        return project.load_version(row[0])
+        if row[0] is None:
+            raise ValueError(f"La ejecución '{run_id}' es de un modelo no guardado como versión: su modelo no se puede "
+                             "recuperar del proyecto (nunca se sustituye por la versión actual).")
+        model = project.load_version(row[0])
+        if model.content_hash() != row[1]:
+            raise ValueError(f"La versión v{row[0]} no coincide con el hash físico del run '{run_id}'.")
+        return model
 
     def evaluate_economics(self, project: Project, run_id: str, assumptions=None):
         """Evaluate a STORED physical run with economic assumptions (default: those of the current model version).
@@ -370,7 +386,7 @@ class SimForgeApp:
             raise ValueError("El proyecto no tiene modelo.")
         self._check_approval(project, model)
         res = run_experiment(model, spec, self.registry, cache=project, progress=progress)
-        project.save_experiment(res, project.meta.current_version)
+        project.save_experiment(res, project.version_of(model))
         project.log("system", "run_experiment", request=spec.model_dump_json(), result=f"experiment {res.experiment_id}: {len(res.scenarios)} scenarios")
         return res
 
@@ -498,13 +514,15 @@ class SimForgeApp:
     def generate_report(self, project: Project, run_id: str | None = None, experiment_id: str | None = None) -> dict[str, Path]:
         from ..reporting.report import build_markdown, markdown_to_html, results_csv
 
-        model = project.current_model()
-        if model is None:
-            raise ValueError("El proyecto no tiene modelo.")
         runs = project.runs(1)
         run = project.load_run(run_id) if run_id else (project.load_run(runs[0]["run_id"]) if runs else None)
+        # the report describes the model OF THE RUN (never the current version next to another version's results)
+        model = self.run_model_of(project, run.run_id) if run else project.current_model()
+        if model is None:
+            raise ValueError("El proyecto no tiene modelo.")
         exp = project.load_experiment(experiment_id) if experiment_id else None
-        md = build_markdown(model, self.validate_model(model), run, exp, project.name)
+        evals = [project.load_evaluation(e["evaluation_id"]) for e in project.evaluations(run.run_id)] if run else []
+        md = build_markdown(model, self.validate_model(model), run, exp, project.name, evaluations=evals)
         stamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
         out = project.root / "reports"
         out.mkdir(exist_ok=True)

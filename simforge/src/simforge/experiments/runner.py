@@ -34,8 +34,18 @@ class ResultCache(Protocol):
     def put(self, key: str, kpis: dict[str, float]) -> None: ...
 
 
-def cache_key(model_hash: str, seed: int) -> str:
-    return hashlib.sha256(f"{model_hash}|{ENGINE_NAME}|{ENGINE_VERSION}|{seed}".encode()).hexdigest()[:24]
+def components_fingerprint(registry: ComponentRegistry, component_versions: dict[str, str]) -> str:
+    """Hash of the FULL definitions (behaviour, defaults...) of the library components a model resolved to: a new or
+    edited library version changes the physics without changing the model's content hash."""
+    import json
+    defs = [registry.get(cid, ver).model_dump(mode="json") for cid, ver in sorted(component_versions.items())]
+    return hashlib.sha256(json.dumps(defs, sort_keys=True, default=str).encode()).hexdigest()[:16]
+
+
+def cache_key(model_hash: str, seed: int, components: str = "") -> str:
+    """Physical result cache key: physical model hash (economics excluded) + engine + version + seed + the library
+    component definitions used. Anything else that changes the physics lives inside the model hash."""
+    return hashlib.sha256(f"{model_hash}|{ENGINE_NAME}|{ENGINE_VERSION}|{seed}|{components}".encode()).hexdigest()[:24]
 
 
 @dataclass
@@ -97,9 +107,10 @@ def run_simulation(
     t0 = time.perf_counter()
     started = datetime.now(timezone.utc).isoformat(timespec="seconds")
     per_rep, records, hits = [], [], 0
+    comps = components_fingerprint(registry, cm.component_versions) if cache else ""
     for i in range(reps):
         seed = seed0 + i
-        key = cache_key(h, seed)
+        key = cache_key(h, seed, comps)
         cached = cache.get(key) if (cache and not trace and not keep_records) else None
         if cached is not None:
             per_rep.append(cached)

@@ -34,6 +34,15 @@ def fmt(key: str, v: float | None) -> str:
     return f"{v:,.2f}"
 
 
+def fmt_unit(key: str, v: float | None) -> str:
+    """fmt() + the unit when fmt() does not already show it (seconds/minutes and percentages carry their own)."""
+    txt = fmt(key, v)
+    _, unit, _ = metric_info(key)
+    if txt == "—" or txt.endswith(("%", " s", " min")) or not unit or unit == "s":
+        return txt
+    return f"{txt} {unit}"
+
+
 def flow_text(model: ISMSModel) -> str:
     order, cur, seen = [], next((n.id for n in model.nodes if n.component == "source"), None), set()
     while cur and cur not in seen:
@@ -88,7 +97,7 @@ def _table(headers: list[str], rows: list[list[str]]) -> str:
 
 
 def build_markdown(model: ISMSModel, report: VerificationReport, run: SimulationResult | None,
-                   experiment: ExperimentResult | None = None, project_name: str = "") -> str:
+                   experiment: ExperimentResult | None = None, project_name: str = "", evaluations: list | None = None) -> str:
     L: list[str] = []
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     L += [f"# Simulation report — {model.meta.name}", "", f"*Project:* {project_name} · *Generated:* {now} · "
@@ -181,8 +190,8 @@ def build_markdown(model: ISMSModel, report: VerificationReport, run: Simulation
 
     # 5. results
     if run:
-        L += ["## 5. Results", "", _table(["KPI", "Mean", "Std", "95% CI", "n"],
-              [[metric_info(r['metric'])[0], fmt(r["metric"], r["mean"]), fmt(r["metric"], r["std"]) if r["n"] > 1 else "—",
+        L += ["## 5. Results", "", _table(["KPI", "Unit", "Mean", "Std", "95% CI", "n"],
+              [[metric_info(r['metric'])[0], metric_info(r["metric"])[1] or "—", fmt(r["metric"], r["mean"]), fmt(r["metric"], r["std"]) if r["n"] > 1 else "—",
                 f"{fmt(r['metric'], r['ci95_low'])} – {fmt(r['metric'], r['ci95_high'])}" if r["n"] > 1 else "—", str(r["n"])]
                for r in kpi_rows(run, HEADLINE)]), ""]
         node_rows = []
@@ -215,8 +224,28 @@ def build_markdown(model: ISMSModel, report: VerificationReport, run: Simulation
                 rows.append([str(s.index), f, "ERROR", s.error or "", ""])
         L += [f"## 7. Experiment: {experiment.spec.name}", "", _table(["#", "Factors", "Throughput/h", "Avg WIP", "Avg lead time"], rows), ""]
 
-    L += ["## 8. Economic impact", "", "NOT IMPLEMENTED in v0.1 (economics layer pending). No monetary figures are reported.", "",
-          "## 9. Risks and next steps", ""]
+    L += ["## 8. Economic evaluation", ""]
+    if evaluations:
+        L += ["Economic evaluations of this physical run (post-run layer, engine >= 0.9.0; facts only, no recommendation). "
+              "`evaluated_total_cost` = sum of the INCLUDED lines of the evaluated categories: NOT a full production cost.", "",
+              _table(["Evaluation", "Status", "Currency", "evaluated_total_cost (mean)", "Included categories", "Coverage",
+                      "Economic hash"],
+                     [[f"`{e.evaluation_id}`", e.status, e.currency,
+                       f"{e.totals['evaluated_total_cost']['mean']:,.2f}" if e.totals.get("evaluated_total_cost") else "—",
+                       ", ".join(e.totals["included_categories"]) or "—",
+                       ", ".join(f"{k}={v}" for k, v in e.coverage.items() if v != "NOT_REQUESTED") or "—",
+                       f"`{e.economic_hash}`"] for e in evaluations]), ""]
+    else:
+        L += ["No economic evaluation of this run. Economics is a separate post-run layer (`simforge project evaluate`, "
+              "Economics tab); this report contains no monetary figures.", ""]
+    L += ["## 9. Validation status", "",
+          "- Software: SimForge capabilities are SYNTHETICALLY_VALIDATED by automated tests (see "
+          "docs/release/1.0_capability_matrix.md); this is not REAL_DATA_VALIDATED industrial validation.",
+          "- Real-data validation: calendars and economics have real-data protocols; no real economic case executed "
+          "(NOT_EXECUTED).",
+          f"- This model: engineer approval **{'YES' if model.is_approved else 'NO'}**. Whether it represents the real "
+          "system is the engineer's validation, not established by SimForge.", "",
+          "## 10. Risks and next steps", ""]
     if not model.is_approved:
         L.append("- Validate the model against real data (throughput, WIP, utilisations) and approve it.")
     if any(not a.accepted for a in model.assumptions):
@@ -225,9 +254,12 @@ def build_markdown(model: ISMSModel, report: VerificationReport, run: Simulation
         L.append("- Increase replications (stochastic model).")
     L.append("- Recommendations must be evaluated as scenarios (compare against baseline) before acting.")
     if run:
-        L += ["", "## Reproducibility", "", f"model_hash `{run.model_hash}` · engine {run.engine} {run.engine_version} · "
-              f"app {run.app_version} · seeds {run.seeds[0]}..{run.seeds[-1]} · components "
-              + ", ".join(f"{k}@{v}" for k, v in sorted(run.component_versions.items())) + f" · run `{run.run_id}`"]
+        L += ["", "## Reproducibility", "", f"run `{run.run_id}` · started {run.started_at} · model_hash `{run.model_hash}` · "
+              f"engine {run.engine} {run.engine_version} · app {run.app_version} · horizon {run.horizon_s:g} s · warm-up "
+              f"{run.warmup_s:g} s · replications {len(run.seeds)} · seeds {run.seeds[0]}..{run.seeds[-1]}"
+              + (f" · availability_hash `{run.availability_hash}`" if run.availability_hash else "") + " · components "
+              + ", ".join(f"{k}@{v}" for k, v in sorted(run.component_versions.items())),
+              "", "Full identity: `simforge project manifest <project> <run_id>` (reproducibility manifest)."]
     return "\n".join(L) + "\n"
 
 

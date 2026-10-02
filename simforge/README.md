@@ -10,15 +10,23 @@ Objetivo del producto: reducir el tiempo que tarda un ingeniero de procesos en p
 
 ---
 
-## Instalación (Python ≥ 3.11)
+## Instalación (Python 3.11 — única versión soportada en 1.0)
 
 ```bash
 cd simforge
-python -m venv .venv && source .venv/bin/activate      # Windows: .venv\Scripts\activate
-pip install -e ".[all]"                                 # núcleo + UI + LLM + tests
-cp .env.example .env                                    # opcional: ANTHROPIC_API_KEY
-pytest                                                  # 61 tests, sin red
+python3.11 -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install -e ".[ui,data,dev]"                         # núcleo + UI + datos + tests (sin LLM: todo funciona offline)
+pytest                                                  # suite completa, sin red
+python scripts/release/check_release.py                 # puerta de release 1.0: PASS / FAIL
 ```
+
+LLM opcional (asistente EXPERIMENTAL): `pip install -e ".[llm]"` y `ANTHROPIC_API_KEY` en `.env`. Con la clave, el texto
+del asistente sale de la máquina (la UI lo avisa).
+
+**Documentación de usuario:** [`docs/user/`](docs/user/01_getting_started.md) (primeros pasos, tutorial de punta a punta,
+glosario, solución de problemas). **Estado 1.0:** [`docs/release/`](docs/release/1.0_release_criteria.md) ·
+[`KNOWN_LIMITATIONS.md`](KNOWN_LIMITATIONS.md) · [`CHANGELOG.md`](CHANGELOG.md). Ninguna capacidad está validada con datos
+reales (todas SYNTHETICALLY_VALIDATED): ver [`docs/user/13_validation_status.md`](docs/user/13_validation_status.md).
 
 Instalación mínima (sólo motor + CLI, sin UI ni LLM): `pip install -e .`
 

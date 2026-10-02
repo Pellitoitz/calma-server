@@ -1,0 +1,60 @@
+{
+  "note": "Engine results of the golden project (engine 0.9.0, default library). Synthetic teaching case: these numbers are a software regression reference, NOT a validation of any real line.",
+  "engine_version": "0.9.0",
+  "baseline": {
+    "seeds": [
+      1000,
+      1001,
+      1002,
+      1003,
+      1004
+    ],
+    "units_completed": 532.0,
+    "kpis_mean": {
+      "units_completed": 532.0,
+      "throughput_per_hour": 70.9333,
+      "avg_wip": 6.7559,
+      "avg_lead_time_s": 340.3149,
+      "node.test.utilization": 0.9063,
+      "node.assembly.utilization": 0.7769,
+      "resource.operator.utilization": 0.7764
+    },
+    "economics": {
+      "status": "COMPLETE_FOR_REQUESTED_SCOPE",
+      "evaluated_total_cost_mean": 2548.78,
+      "cost_per_good_unit_mean": 4.7913
+    }
+  },
+  "alternative": {
+    "seeds": [
+      1000,
+      1001,
+      1002,
+      1003,
+      1004
+    ],
+    "units_completed": 533.8,
+    "kpis_mean": {
+      "units_completed": 533.8,
+      "throughput_per_hour": 71.1733,
+      "avg_wip": 3.2139,
+      "avg_lead_time_s": 162.3914,
+      "node.test.utilization": 0.7903,
+      "node.assembly.utilization": 0.7783,
+      "resource.operator.utilization": 0.7777
+    },
+    "economics": {
+      "status": "COMPLETE_FOR_REQUESTED_SCOPE",
+      "evaluated_total_cost_mean": 2557.62,
+      "cost_per_good_unit_mean": 4.7918
+    }
+  },
+  "comparison": {
+    "status": "COMPARABLE",
+    "paired": true,
+    "savings_per_run": -8.84,
+    "annual_savings": -4067.75,
+    "incremental_capex": 24000.0,
+    "payback_status": "NOT_REACHED"
+  }
+}

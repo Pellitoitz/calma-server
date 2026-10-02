@@ -48,8 +48,10 @@ def test_report_contents(registry):
     res = run_simulation(m, registry)
     exp = run_experiment(m, m.experiments[0], registry)
     md = build_markdown(m, rep, res, exp, "demo")
+    # (1.0 audit) the report no longer claims economics is "NOT IMPLEMENTED": it exists since engine 0.9.0
     for section in ["Executive summary", "Assumptions", "Verification and validation", "Results", "Diagnostics",
-                    "Experiment", "Economic impact", "NOT IMPLEMENTED", "Reproducibility", "not approved"]:
+                    "Experiment", "Economic evaluation", "No economic evaluation of this run", "Validation status",
+                    "Reproducibility", "not approved"]:
         assert section in md, section
     assert f"{res.kpis.mean('throughput_per_hour'):.2f}" in md  # numbers come from the engine
     html = markdown_to_html(md)

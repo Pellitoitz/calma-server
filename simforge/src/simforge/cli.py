@@ -61,9 +61,12 @@ def _registry() -> ComponentRegistry:
 def _load(path: Path):
     try:
         return load_model(path)
-    except (ModelFormatError, FileNotFoundError) as e:
-        typer.secho(str(e), fg="red")
-        raise typer.Exit(2) from None
+    except FileNotFoundError as e:
+        typer.secho(f"PERSISTENCE_ERROR: file not found: {e.filename or path}", fg="red")
+        raise typer.Exit(1) from None
+    except ModelFormatError as e:
+        typer.secho(f"MODEL_VALIDATION_ERROR: {e}", fg="red")
+        raise typer.Exit(1) from None
 
 
 @app.command()
@@ -82,12 +85,12 @@ def run(model_file: Path, reps: Optional[int] = typer.Option(None, help="Replica
         seed: Optional[int] = None, trace_dir: Optional[Path] = typer.Option(None, help="Write event/decision logs here"),
         as_json: bool = typer.Option(False, "--json", help="Print full result as JSON")):
     """Run a simulation and print KPIs."""
-    from .reporting.report import HEADLINE, fmt, kpi_rows
+    from .reporting.report import HEADLINE, fmt, fmt_unit, kpi_rows
     model = _load(model_file)
     try:
         res = run_simulation(model, _registry(), replications=reps, base_seed=seed, trace=bool(trace_dir))
     except ModelError as e:
-        typer.secho(str(e), fg="red")
+        typer.secho(f"MODEL_VALIDATION_ERROR: {e}", fg="red")
         raise typer.Exit(1) from None
     if as_json:
         typer.echo(json.dumps(res.to_dict(), indent=2, default=str))
@@ -95,7 +98,7 @@ def run(model_file: Path, reps: Optional[int] = typer.Option(None, help="Replica
     typer.secho(f"{model.meta.name} | run {res.run_id} | {len(res.seeds)} rep(s) | model {res.model_hash} | {res.wall_time_s}s", bold=True)
     for r in kpi_rows(res, HEADLINE):
         ci = f"  ± {fmt(r['metric'], (r['ci95_high'] - r['ci95_low']) / 2)}" if r["n"] > 1 else ""
-        typer.echo(f"  {r['label']:<22} {fmt(r['metric'], r['mean']):>14}{ci}")
+        typer.echo(f"  {r['label']:<22} {fmt_unit(r['metric'], r['mean']):>20}{ci}")
     for k, st in res.kpis.stats.items():
         if k.endswith(".utilization"):
             typer.echo(f"  {k:<40} {fmt(k, st.mean):>8}")
@@ -430,5 +433,69 @@ def ui(port: int = 8501):
                                       "--theme.primaryColor", "#2a78d6"]))
 
 
+# ------------------------------------------------------------------------------------------------ entry point (1.0)
+def _dispatch_click(argv: list[str]) -> int:
+    """Run the click command. Usage errors / --help / Ctrl+C are handled the click way (exit codes 2 / 0 / 130);
+    everything else propagates to _dispatch_errors."""
+    def kind(e: BaseException) -> set[str]:  # typer may vendor its own click: match the click classes by name
+        return {c.__name__ for c in type(e).__mro__}
+    cmd = typer.main.get_command(app)
+    try:
+        rv = cmd.main(args=argv, prog_name="simforge", standalone_mode=False)
+    except Exception as e:  # noqa: BLE001
+        k = kind(e)
+        if "Exit" in k and hasattr(e, "exit_code"):
+            return e.exit_code
+        if "Abort" in k:
+            raise KeyboardInterrupt from e
+        if "ClickException" in k:
+            e.show()
+            return e.exit_code
+        raise
+    return rv if isinstance(rv, int) else 0
+
+
+def _dispatch_errors(argv: list[str]) -> int:
+    """`CATEGORY: message` (simforge.errors) instead of a raw traceback; an INTERNAL_ERROR keeps its traceback in a
+    local log file (SIMFORGE_DEBUG=1 also prints it)."""
+    import os
+    import traceback
+
+    from .errors import EXIT_CODES, classify, user_message, write_log
+    try:
+        return _dispatch_click(argv)
+    except KeyboardInterrupt:
+        typer.secho("INTERRUPTED: stopped by the user; nothing was stored as completed.", err=True, fg="red")
+        return 130
+    except Exception as e:  # noqa: BLE001 - last line of defence: categorise, never a raw traceback
+        cat = classify(e)
+        msg = user_message(e)
+        if cat == "INTERNAL_ERROR":
+            path = write_log(e, argv)
+            msg += f"\n  This looks like a bug. Diagnostic log: {path}" if path else ""
+        if os.environ.get("SIMFORGE_DEBUG"):
+            traceback.print_exception(e)
+        typer.secho(msg, err=True, fg="red")
+        return EXIT_CODES.get(cat, 1)
+
+
+def _dispatch(argv: list[str]) -> int:
+    return _dispatch_errors(argv)
+
+
+def run_cli(argv: list[str]) -> tuple[int, str]:
+    """(exit code, combined output) — used by the release smoke tests."""
+    import contextlib
+    import io
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf), contextlib.redirect_stderr(buf):
+        code = _dispatch(argv)
+    return code, buf.getvalue()
+
+
+def main() -> None:
+    sys.exit(_dispatch(sys.argv[1:]))
+
+
 if __name__ == "__main__":
-    app()
+    main()

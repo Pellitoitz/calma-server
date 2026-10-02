@@ -297,7 +297,7 @@ def project_approve(slug: str, by: str = typer.Option(..., help="engineer name")
 @project_app.command("run")
 def project_run(slug: str, reps: Optional[int] = None):
     """Run the current model (refused if it needs approval). Records seeds, engine version, model hash."""
-    from .reporting.report import HEADLINE, fmt, kpi_rows
+    from .reporting.report import HEADLINE, fmt, fmt_unit, kpi_rows
     from .services.app import ApprovalRequired
     sf = _sf()
     p = _proj(sf, slug)
@@ -310,4 +310,115 @@ def project_run(slug: str, reps: Optional[int] = None):
                 bold=True)
     for r in kpi_rows(res, HEADLINE):
         ci = f"  ± {fmt(r['metric'], (r['ci95_high'] - r['ci95_low']) / 2)}" if r["n"] > 1 else ""
-        typer.echo(f"  {r['label']:<22} {fmt(r['metric'], r['mean']):>14}{ci}")
+        typer.echo(f"  {r['label']:<22} {fmt_unit(r['metric'], r['mean']):>20}{ci}")
+
+
+# ------------------------------------------------------------------------------------------------ 1.0 workflow commands
+# Thin wrappers of existing services (no new capability): they make the golden workflow possible from the CLI.
+@project_app.command("save")
+def project_save(slug: str, model: Path, message: str = typer.Option("", "-m", help="version message"), by: str = "engineer"):
+    """Save a model file as a NEW immutable version of the project (becomes current; approval is not carried over)."""
+    from .domain.io import load_model
+    sf = _sf()
+    v = sf.save_model(_proj(sf, slug), load_model(model), message or f"from {model.name}", actor="user")
+    typer.echo(f"v{v} <- {model}")
+
+
+@project_app.command("checkout")
+def project_checkout(slug: str, version: int):
+    """Make an existing version current (nothing is lost: versions are immutable)."""
+    sf = _sf()
+    _proj(sf, slug).checkout(version)
+    typer.echo(f"current version -> v{version}")
+
+
+@project_app.command("baseline")
+def project_baseline(slug: str, version: Optional[int] = typer.Option(None, help="default: current version")):
+    """Mark a version as the baseline (scenarios are derived from it)."""
+    sf = _sf()
+    p = _proj(sf, slug)
+    v = version or p.meta.current_version
+    p.set_baseline(v)
+    typer.echo(f"baseline = v{v}")
+
+
+@project_app.command("scenario")
+def project_scenario(slug: str, name: str, model: Path, message: str = typer.Option("", "-m")):
+    """Create a named scenario (a new version, derived from the baseline) from a model file; it becomes current."""
+    from .domain.io import load_model
+    sf = _sf()
+    v = _proj(sf, slug).create_scenario(name, load_model(model), message)
+    typer.echo(f"scenario '{name}' = v{v}")
+
+
+@project_app.command("runs")
+def project_runs(slug: str, limit: int = 20):
+    """Stored runs (only COMPLETED runs are stored; failed / interrupted runs are in the history)."""
+    sf = _sf()
+    for r in _proj(sf, slug).runs(limit):
+        typer.echo(f"{r['run_id']}  model v{r['model_version']}  {r['created_at']}  reps {r['replications']}  COMPLETED")
+
+
+@project_app.command("evaluate")
+def project_evaluate(slug: str, run_id: str,
+                     economics: Optional[Path] = typer.Option(None, help="economics YAML file"),
+                     from_run: bool = typer.Option(False, "--from-run", help="use the economics block of the run's own model "
+                                                   "version (default: the CURRENT version's block, as in the UI)")):
+    """Economic evaluation of a STORED run (no simulation is executed). Always prints which assumptions were used."""
+    from .cli_economics import _spec, print_evaluation
+    sf = _sf()
+    p = _proj(sf, slug)
+    if economics:
+        spec, source = _spec(str(economics)), f"file {economics}"
+    elif from_run:
+        spec, source = getattr(sf.run_model_of(p, run_id), "economics", None), "the run's own model version"
+    else:
+        spec, source = getattr(p.current_model(), "economics", None), f"current model v{p.meta.current_version}"
+    if spec is None:
+        typer.secho(f"ECONOMICS_ERROR: no economic assumptions in {source}", fg="red")
+        raise typer.Exit(1)
+    typer.echo(f"assumptions: {source} · economic_hash {spec.economic_hash()}")
+    print_evaluation(sf.evaluate_economics(p, run_id, spec))
+
+
+@project_app.command("compare")
+def project_compare(slug: str, baseline_eval: str, alternative_eval: str):
+    """Compare two stored economic evaluations (facts only: deltas, savings, payback; no ranking or recommendation)."""
+    sf = _sf()
+    c = sf.compare_economics(_proj(sf, slug), baseline_eval, alternative_eval)
+    typer.echo(json.dumps(c.to_dict(), indent=2, default=str))
+
+
+@project_app.command("report")
+def project_report(slug: str, run_id: Optional[str] = typer.Option(None, help="default: latest run")):
+    """Markdown + HTML + KPI CSV report of a run (describes the model version of THAT run)."""
+    sf = _sf()
+    for k, path in sf.generate_report(_proj(sf, slug), run_id=run_id).items():
+        typer.echo(f"{k}: {path}")
+
+
+@project_app.command("manifest")
+def project_manifest(slug: str, run_id: str, output: Optional[Path] = typer.Option(None, "-o")):
+    """Reproducibility manifest of a stored run (versions, hashes, seeds, approval, datasets, economic evaluations)."""
+    from .reporting.manifest import build_manifest
+    sf = _sf()
+    text = json.dumps(build_manifest(_proj(sf, slug), run_id), indent=2, allow_nan=False)
+    if output:
+        output.write_text(text, encoding="utf-8")
+        typer.echo(f"manifest: {output}")
+    else:
+        typer.echo(text)
+
+
+@project_app.command("export")
+def project_export(slug: str, dest: Path, attachments: bool = typer.Option(False, help="include attachments/")):
+    """Portable .simproject archive (model versions, database, runs, reports; never secrets)."""
+    sf = _sf()
+    typer.echo(f"exported: {sf.workspace.export_project(slug, dest, include_attachments=attachments)}")
+
+
+@project_app.command("import")
+def project_import(archive: Path):
+    """Import a .simproject archive into the workspace (a new slug if it already exists)."""
+    sf = _sf()
+    typer.echo(f"Project: {sf.workspace.import_project(archive).meta.slug}")

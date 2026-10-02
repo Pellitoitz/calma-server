@@ -104,7 +104,7 @@ MIGRATIONS: list[str] = [
         input_tokens INTEGER, output_tokens INTEGER, est_cost_usd REAL, latency_ms REAL
     );
     """,
-    # 2 - economic evaluations (engine >= 0.9.0): many evaluations per physical run, referenced (never copied)
+    # 3 - economic evaluations (engine >= 0.9.0): many evaluations per physical run, referenced (never copied)
     """
     CREATE TABLE economic_evaluations (
         evaluation_id TEXT PRIMARY KEY,
@@ -125,19 +125,51 @@ MIGRATIONS: list[str] = [
 
 
 def connect(path: Path) -> sqlite3.Connection:
+    path = Path(path)
+    existed = path.exists() and path.stat().st_size > 0
     conn = sqlite3.connect(path, check_same_thread=False)  # Streamlit reruns on worker threads
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
-    migrate(conn)
+    try:
+        if existed:
+            pending = _pending(conn)
+            if pending and _done(conn):  # existing project, schema upgrade: keep a copy of the pre-migration DB first
+                backup = path.with_name(f"{path.name}.pre-migration-v{max(_done(conn))}.bak")
+                if not backup.exists():
+                    dst = sqlite3.connect(backup)
+                    conn.backup(dst)
+                    dst.close()
+        migrate(conn)
+    except Exception:
+        conn.close()
+        raise
     return conn
 
 
-def migrate(conn: sqlite3.Connection) -> int:
+def _done(conn: sqlite3.Connection) -> set[int]:
     conn.execute("CREATE TABLE IF NOT EXISTS schema_migrations (version INTEGER PRIMARY KEY, applied_at TEXT DEFAULT CURRENT_TIMESTAMP)")
-    done = {r[0] for r in conn.execute("SELECT version FROM schema_migrations")}
-    for i, sql in enumerate(MIGRATIONS, start=1):
-        if i not in done:
-            conn.executescript(sql)
-            conn.execute("INSERT INTO schema_migrations(version) VALUES (?)", (i,))
-            conn.commit()
+    conn.commit()
+    return {r[0] for r in conn.execute("SELECT version FROM schema_migrations")}
+
+
+def _pending(conn: sqlite3.Connection) -> list[int]:
+    done = _done(conn)
+    return [i for i in range(1, len(MIGRATIONS) + 1) if i not in done]
+
+
+def schema_version(conn: sqlite3.Connection) -> int:
+    done = _done(conn)
+    return max(done) if done else 0
+
+
+def migrate(conn: sqlite3.Connection) -> int:
+    """Apply pending migrations in order. Each migration is ATOMIC (its DDL and its schema_migrations row commit
+    together or not at all), so a failed migration leaves the database exactly as before and can be retried."""
+    for i in _pending(conn):
+        try:
+            conn.executescript(f"BEGIN;\n{MIGRATIONS[i - 1]}\n;INSERT INTO schema_migrations(version) VALUES ({i});\nCOMMIT;")
+        except sqlite3.Error:
+            if conn.in_transaction:
+                conn.execute("ROLLBACK")
+            raise
     return len(MIGRATIONS)

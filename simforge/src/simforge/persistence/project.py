@@ -114,6 +114,16 @@ class Project:
     def current_model(self) -> ISMSModel | None:
         return self.load_version() if self.meta.current_version else None
 
+    def version_of(self, model: ISMSModel) -> int | None:
+        """Saved version whose content is exactly `model` (physical content hash; current version first, then the
+        latest match). None = the model was never saved: a run of it is NOT attributed to another version."""
+        h = model.content_hash()
+        cur = self.meta.current_version
+        if cur is not None and self.load_version(cur).content_hash() == h:
+            return cur
+        row = self.db.execute("SELECT MAX(version) FROM model_versions WHERE content_hash = ?", (h,)).fetchone()
+        return row[0] if row and row[0] is not None else None
+
     def versions(self) -> list[VersionInfo]:
         rows = self.db.execute("SELECT version, created_at, author, message, parent, content_hash, label FROM model_versions ORDER BY version")
         return [VersionInfo(*r) for r in rows]
