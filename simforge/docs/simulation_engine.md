@@ -45,6 +45,22 @@ Distancia, velocidad, carga y descarga son obligatorias. El recurso cuenta como 
 `$id` en expresiones seguras (`1 - $branch2_share`, `$circuits_per_rack`) en tiempos (`work_units`), capacidades,
 cantidades, probabilidades de ruta, distancias y velocidades. Valor `null` → modelo INCOMPLETE, con la lista de usos.
 
+## Distribuciones de tiempo (motor ≥ 0.4.0)
+
+`constant`, `uniform`, `triangular`, `normal`, `lognormal` (media y desviación de la variable), `exponential`,
+`gamma` (`shape`, `scale`), `weibull` (`shape`, `scale`), `empirical` (re-muestreo uniforme de valores observados).
+Todas en `unit` (ms, s, min, h...). Reglas:
+
+* Ninguna muestra negativa pasa en silencio: si una distribución sin truncamiento produce t < 0 el motor lanza
+  `NegativeSampleError`. No existe `max(0, x)` ni re-muestreo oculto (cambiarían la distribución).
+* `normal` con P(t < 0) > 1e-9 no valida salvo que declare `truncation: {lower: 0, reason: "..."}`.
+* El truncamiento es **explícito** (`lower`, `upper`, `reason`), se aplica por rechazo dentro de la ventana y
+  `mean_seconds()` devuelve la media truncada. Forma parte del modelo (y de su hash).
+* Cada nodo tiene streams propios por (semilla de réplica, nodo, propósito): el mismo seed reproduce exactamente la
+  misma secuencia, y escenarios distintos comparten números aleatorios (CRN) en los nodos que no cambian.
+* Los valores derivados de datos llevan `provenance.data` (dataset, versión, hash, ajuste, decisión): ver
+  `docs/data_import.md`.
+
 ## Cambios de semántica en el motor 0.2.0 (fase benchmark)
 
 - **Recogida física en transportes**: la unidad conserva su plaza aguas arriba hasta que se carga (`loading_area` para zonas de espera explícitas).

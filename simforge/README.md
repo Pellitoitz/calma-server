@@ -64,6 +64,15 @@ verificación → **aprobación del ingeniero** → simulación. Cambios por cha
 registradas; `compare_model_specs` (textual vs estructural vs resultados); métricas de tiempo ahorrado; auditoría IA.
 Detalle: [`docs/ai_orchestration.md`](docs/ai_orchestration.md).
 
+## Datos medidos (CSV/XLSX → distribución → parámetro)
+
+Importar un estudio de tiempos (CSV o XLSX, sin ejecutar nada del archivo) → validación fila a fila (nada se borra ni
+se rellena) → estadística, outliers *candidatos*, dependencia serial → ajuste de 7 familias con ranking AIC y
+plausibilidad industrial (P1…P99.9) → **decisión del ingeniero** (determinista / empírica / ajustada / no aplicar /
+rechazar) → nueva versión del modelo con procedencia `data` (dataset, hash, ajuste) y **aprobación invalidada**.
+Sin IA, totalmente offline. Ejemplo completo: `bash examples/data/run_e2e.sh`.
+Detalle: [`docs/data_import.md`](docs/data_import.md) y [`docs/distribution_fitting.md`](docs/distribution_fitting.md).
+
 ## Ejemplo (MVP)
 
 ```
@@ -126,4 +135,4 @@ Datos de cliente (`workspace/`, configurable con `SIMFORGE_WORKSPACE`) y bibliot
 
 ## Estado honesto (v0.1)
 
-Funciona de verdad: todo lo descrito arriba. **NO implementado todavía** (y el esquema lo rechaza en vez de ignorarlo): turnos/calendarios, mix de productos y setups, routing condicional/"first available", economía (coste/unidad, CAPEX, ROI), energía, optimización (sólo grid), PDF/PPT nativos, importación de Excel/CSV de estudios de tiempos, integración AnyLogic (ver `docs/anylogic.md`, todo marcado TO VERIFY).
+Funciona de verdad: todo lo descrito arriba. **NO implementado todavía** (y el esquema lo rechaza en vez de ignorarlo): turnos/calendarios, mix de productos y setups, routing condicional/"first available", economía (coste/unidad, CAPEX, ROI), energía, optimización (sólo grid), PDF/PPT nativos, integración AnyLogic (ver `docs/anylogic.md`, todo marcado TO VERIFY).

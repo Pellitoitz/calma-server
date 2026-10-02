@@ -7,6 +7,7 @@
     simforge parse "Fuente infinita. Un operario monta 60 s..." -o model.yaml
     simforge library list | show <id> | docs
     simforge ai new "Linea MVP" "Fuente infinita. Un operario monta..."   (AI orchestration, see `simforge ai --help`)
+    simforge data import <project> tiempos.xlsx ...   (measured data -> distributions, see `simforge data --help`)
     simforge ui
 """
 
@@ -33,6 +34,10 @@ bench_app = typer.Typer(help="Benchmark against a reference model (e.g. AnyLogic
 app.add_typer(bench_app, name="benchmark")
 ai_app = typer.Typer(help="AI orchestration on workspace projects: describe -> match -> ask -> approve -> run", no_args_is_help=True)
 app.add_typer(ai_app, name="ai")
+from .cli_data import data_app, project_app  # noqa: E402
+
+app.add_typer(data_app, name="data")
+app.add_typer(project_app, name="project")
 
 
 def _registry() -> ComponentRegistry:

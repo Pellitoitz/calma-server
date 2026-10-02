@@ -1,0 +1,45 @@
+# END-TO-END DATA EXAMPLE (docs/data_import.md). Same line as examples/05_selective_soldering.yaml, but the manual
+# assembly time is expressed PER CIRCUIT: 4 circuits per rack (work_units: 4). Its process_time is replaced by the
+# measured data of examples/data/synthetic/tiempos_montaje.xlsx (SYNTHETIC TEST DATA).
+#
+# Benchmark case (simplified): racks (bastidores) circulate in a closed loop.
+# Operator loads 4 circuits on a rack (assembly, 4 x 30 s assumed), rack waits in buffer (3),
+# selective soldering 200 s (automatic), operator reviews/unloads (80 s) and the
+# rack returns to assembly. Operator priority: keep the selective fed (assembly first).
+# Distances: operator walks between assembly and review.
+meta: {name: Selective soldering racks (assembly per circuit), domain: electronics, tags: [benchmark, racks, selective]}
+simulation: {horizon: {value: 8, unit: h}}
+resources:
+  - {id: operator_1, name: Operator, kind: operator, quantity: 1, dispatch: priority, home: assembly,
+     travel: {speed: {value: 1.0, unit: m/s}}}
+  - {id: racks, name: Racks (bastidores), kind: carrier, quantity: 6}
+nodes:
+  - {id: src, component: source}
+  - id: assembly
+    name: Manual assembly
+    component: manual_assembly
+    priority: 1
+    seize: [{resource: racks}]
+    position: {x: 0, y: 0}
+    params: {process_time: {dist: constant, value: 30, provenance: {status: assumed, note: 'estimate before the time study'}}, work_units: 4,
+             resources: [{resource: operator_1}]}
+  - {id: selective_in, name: Selective input buffer, component: buffer, params: {capacity: 3}}
+  - {id: selective, name: Selective soldering, component: selective_soldering, position: {x: 4, y: 0},
+     params: {process_time: {dist: constant, value: 200}}}
+  - id: review
+    name: Review
+    component: inspection
+    priority: 2
+    release: [racks]
+    position: {x: 8, y: 0}
+    params: {process_time: {dist: constant, value: 80}, resources: [{resource: operator_1}]}
+  - {id: out, component: sink}
+edges:
+  - {source: src, target: assembly}
+  - {source: assembly, target: selective_in}
+  - {source: selective_in, target: selective}
+  - {source: selective, target: review}
+  - {source: review, target: out}
+experiments:
+  - name: racks 1-10
+    factors: [{path: resources.racks.quantity, values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}]

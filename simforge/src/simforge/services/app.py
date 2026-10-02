@@ -65,6 +65,25 @@ class ApprovalRequired(RuntimeError):
     """An AI-generated model must be reviewed and approved by the engineer before its first run."""
 
 
+def data_linked_paths(model: ISMSModel) -> list[str]:
+    """Paths of values whose provenance links to an imported dataset."""
+    out: list[str] = []
+
+    def walk(x: Any, path: str) -> None:
+        if isinstance(x, dict):
+            prov = x.get("provenance")
+            if isinstance(prov, dict) and prov.get("data"):
+                out.append(path)
+            for k, v in x.items():
+                if k != "provenance":
+                    walk(v, f"{path}.{k}" if path else k)
+        elif isinstance(x, list):
+            for i, v in enumerate(x):
+                walk(v, f"{path}.{v['id'] if isinstance(v, dict) and 'id' in v else i}")
+    walk(model.model_dump(mode="json", exclude={"approval": True, "meta": True}), "")
+    return out
+
+
 class SimForgeApp:
     def __init__(self, workspace: Path | None = None, library_dir: Path | None = None,
                  provider: LLMProvider | None | str = "auto"):
@@ -89,6 +108,11 @@ class SimForgeApp:
                               a.repairs, a.accepted, a.input_tokens, a.output_tokens, a.est_cost_usd, a.latency_ms)
 
         return LLMInterpreter(self.provider, self.registry, anon, log_usage, log_audit)
+
+    def data(self, project: Project):
+        """Data import & distribution fitting on a project (offline, no LLM)."""
+        from ..data.service import DataService
+        return DataService(project, self.registry)
 
     # ----------------------------------------------------------------- projects
     def create_project(self, name: str, description: str = "") -> Project:
@@ -256,8 +280,13 @@ class SimForgeApp:
 
     def approval_pending(self, project: Project, model: ISMSModel) -> bool:
         """AI-generated models need ONE engineer approval before their first run. Later edited versions may run
-        (they are reported as derived, not approved)."""
-        if model.meta.origin != "ai_generated" or model.is_approved:
+        (they are reported as derived, not approved). A model with values derived from imported data (provenance.data)
+        must be approved in its exact current content: applying data is a semantic change."""
+        if model.is_approved:
+            return False
+        if data_linked_paths(model):
+            return True
+        if model.meta.origin != "ai_generated":
             return False
         return not any(project.load_version(v.version).is_approved for v in project.versions() if v.author not in ("ai",))
 
@@ -265,6 +294,10 @@ class SimForgeApp:
         if not self.approval_pending(project, model):
             return
         rep = self.validate_model(model)
+        if data_linked_paths(model):
+            raise ApprovalRequired("El modelo contiene parámetros derivados de datos importados "
+                                   f"({', '.join(data_linked_paths(model))}) y esta versión no está aprobada: revisa los cambios "
+                                   f"y apruébala antes de ejecutar (estado: {rep.readiness.value}).")
         raise ApprovalRequired("Modelo generado por IA: revisa el flujo, componentes, parámetros y supuestos y apruébalo "
                                f"antes de la primera ejecución (estado: {rep.readiness.value}).")
 

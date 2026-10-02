@@ -1,0 +1,162 @@
+# Output of: bash examples/data/run_e2e.sh  (SYNTHETIC TEST DATA; timestamps, run ids and the temp workspace path vary per run)
+
+$ simforge project new E2E montaje --model examples/data/e2e_selective_per_circuit.yaml
+v1 <- examples/data/e2e_selective_per_circuit.yaml
+Project: e2e_montaje
+
+$ simforge project approve e2e_montaje --by ingeniera_ana --note modelo base revisado
+v2 approved by ingeniera_ana
+
+$ simforge project run e2e_montaje --reps 5
+run 1a4b2aee6b | model v2 3bafcebd4fd97e37 | engine 0.4.0 | seeds [12345, 12346, 12347, 12348, 12349]
+  Units completed                   130  ± 0
+  Throughput                      16.25  ± 0
+  Units scrapped                      0  ± 0
+  Average WIP                      5.94  ± 0
+  Average lead time            21.4 min  ± 0 s
+  P90 lead time                21.6 min  ± 0 s
+
+$ simforge data preview examples/data/synthetic/tiempos_montaje.xlsx
+Sheets: ['LEEME', 'Hoja1']
+Varias hojas: indica --sheet.
+
+$ simforge data preview examples/data/synthetic/tiempos_montaje.xlsx --sheet Hoja1
+Sheets: ['LEEME', 'Hoja1']
+Sheet: Hoja1  delimiter: None  decimal: None  encoding: None
+Columns: ['Fecha', 'Operario', 'Tiempo']   rows: 87
+  Fecha                    datetime
+  Operario                 text
+  Tiempo                   number (0 no-number, 1 vacías)
+  2026-09-14 07:02:43 | Ana | 37
+  2026-09-14 07:05:29.200000 | Luis | 37.8
+  2026-09-14 07:07:57.400000 | Ana | 33.3
+  2026-09-14 07:10:22 | Luis | 32.4
+  2026-09-14 07:12:18.600000 | Ana | 25.4
+  2026-09-14 07:13:22.400000 | Luis | 12.2
+  2026-09-14 07:15:15.400000 | Ana | 24.5
+  2026-09-14 07:16:56.800000 | Luis | 21.6
+  2026-09-14 07:19:13 | Ana | 30.3
+  2026-09-14 07:21:12.800000 | Luis | 26.2
+
+$ simforge data import e2e_montaje examples/data/synthetic/tiempos_montaje.xlsx --name montaje --sheet Hoja1 --column Tiempo --unit s --timestamp Fecha --quantity PROCESSING_TIME --basis PER_CIRCUIT --synthetic --by ingeniera_ana --description estudio de tiempos montaje manual (sintético)
+[SYNTHETIC TEST DATA] montaje@v1: 87 filas {'VALID': 86, 'WARNING': 0, 'INVALID': 1, 'REQUIRES_REVIEW': 0} | PROCESSING_TIME | PER_CIRCUIT | unidad s | hash e9be4f5edb30f744
+Siguiente: simforge data inspect e2e_montaje montaje@v1
+
+$ simforge data inspect e2e_montaje montaje@v1
+*** SYNTHETIC TEST DATA — no son medidas de planta ***
+DATASET:      montaje@v1  — estudio de tiempos montaje manual (sintético)
+SOURCE:       tiempos_montaje.xlsx  | Sheet: Hoja1  | Column: Tiempo
+FILE SHA256:  3c0fd96c7aa02928…   DATASET HASH: e9be4f5edb30f744
+QUANTITY:     PROCESSING_TIME  (SUPPORTED: time per entity, or per work unit if the node has work_units != 1)
+UNIT:         s  (normalizado: s)
+BASIS:        PER_CIRCUIT
+OBSERVATIONS: 87
+VALID: 86   WARNING: 0   INVALID: 1   REQUIRES_REVIEW: 0
+  INVALID row 46: '' -> MISSING_VALUE (no se rellena)
+USED FOR ANALYSIS: n = 86  (USABLE_WITH_CAUTION: 30 <= n < 100: ajuste útil para el cuerpo; colas (P99+) extrapoladas)
+MEAN:   31.17 s   (IC95 28.67 – 33.67)
+MEDIAN: 31.2 s   STD: 11.67 s   CV: 0.3743
+MIN/MAX: 12.2 / 95   Q1/Q3: 24.42 / 34.5   IQR: 10.08
+PERCENTILES: P5=18.35  P10=21.25  P25=24.42  P50=31.2  P75=34.5  P90=38.2  P95=41.42  P99=—
+SKEWNESS: 3.262   EXCESS KURTOSIS: 15.97
+BOOTSTRAP 95% (seed 12345): mean 28.93–33.75  median 28.05–32.45  P95 37.2–78.17
+ORDER: timestamp   LAG-1: 0.04032 -> NO_EVIDENCE_OF_SERIAL_DEPENDENCE   TREND: NO_CLEAR_TREND
+POTENTIAL OUTLIERS: 2 (IQR fences 9.312–49.61, MAD z>3.5); sin revisar: [20, 61]
+  idx 20: 95 s (high) IQR_EXTREME, MAD(z=8.6)
+  idx 61: 88.5 s (high) IQR_EXTREME, MAD(z=7.7)
+STATUS:       REQUIRES_ENGINEER_REVIEW
+
+$ simforge data rows e2e_montaje montaje@v1 KEEP 20 61 --reason ciclos largos reales: caída de tornillo anotada en el parte --by ingeniera_ana --method IQR/MAD
+KEEP [20, 61] by ingeniera_ana: ciclos largos reales: caída de tornillo anotada en el parte
+
+$ simforge data fit e2e_montaje montaje@v1 --by ingeniera_ana
+CANDIDATE RANKING  (fit fit_6f0d7ee6c91c, n = 86, USABLE_WITH_CAUTION; ranking por AIC, ΔAIC ≤ 2 = equivalentes)
+  #  distribution status                     AIC   ΔAIC      BIC     KS      AD     CvM       P50     P95     P99   P99.9  warnings
+  1  lognormal    OK                       625.8   0.00    630.8  0.111    1.34   0.188     29.64   48.83   60.04    75.7  -
+  2  gamma        OK                       634.8   8.93    639.7  0.131    1.83   0.245     30.15   48.84   58.36   70.33  -
+  3  weibull      OK                       668.2  42.38    673.1  0.190    5.71   0.891     30.19   53.45   63.22   74.06  MASS_BELOW_OBSERVED_MIN
+  4  normal       REQUIRES_TRUNCATION      669.6  43.77    674.5  0.185    4.45   0.657     31.17   50.25   58.15   67.01  NEGATIVE_SUPPORT,MASS_BELOW_OBSERVED_MIN
+  5  triangular   OK                       706.5  80.66    713.9  0.367   14.70   3.081     36.05   77.02    87.5   93.29  MEAN_MISMATCH
+  6  exponential  OK                       765.6 139.75    768.0  0.406   21.21   4.429     21.61   93.38   143.5   215.3  TAIL_EXTRAPOLATION,EXTREME_TAIL,MASS_BELOW_OBSERVED_MIN
+  7  uniform      OK                       767.6 141.78    772.5  0.596   43.16   9.588      53.6   91.74   95.13   95.89  MEAN_MISMATCH
+     OBSERVED                                                                                31.2   41.42       —       —
+  unidad: s. p-valores KS/CvM son NOMINALES (parámetros estimados con los mismos datos): no deciden nada.
+  [WARNING] weibull: MASS_BELOW_OBSERVED_MIN — 6.6% de las muestras serían menores que el mínimo observado (12.2)
+  [CRITICAL] normal: NEGATIVE_SUPPORT — P(t < 0) = 0.0036: genera tiempos negativos; solo usable con truncamiento explícito
+  [WARNING] normal: MASS_BELOW_OBSERVED_MIN — 5.1% de las muestras serían menores que el mínimo observado (12.2)
+  [CRITICAL] triangular: MEAN_MISMATCH — media ajustada difiere 26.6% de la observada (afecta directamente al throughput)
+  [WARNING] exponential: TAIL_EXTRAPOLATION — P99.9 ajustado = 215.3 es 2.3× el máximo observado (95): la cola genera ciclos más largos que ninguno medido
+  [WARNING] exponential: EXTREME_TAIL — P(t > 3·máx observado) = 0.00011
+  [WARNING] exponential: MASS_BELOW_OBSERVED_MIN — 32.4% de las muestras serían menores que el mínimo observado (12.2)
+  [CRITICAL] uniform: MEAN_MISMATCH — media ajustada difiere 72.0% de la observada (afecta directamente al throughput)
+OPTIONS: DETERMINISTIC mean=31.17 median=31.2 s | EMPIRICAL n=86 (re-muestrea SOLO valores observados: no genera nada fuera del rango medido (ni más corto ni más largo))
+SUGGESTED CANDIDATE: lognormal — SUGGESTED_CANDIDATE - REQUIRES ENGINEER ACCEPTANCE — menor AIC entre candidatos sin problemas CRÍTICOS de plausibilidad (ΔAIC = 0.00)
+  note: SYNTHETIC TEST DATA: no son medidas de planta
+
+Nada se ha aplicado. Decide: simforge data decide e2e_montaje montaje@v1 USE_FITTED --fit fit_6f0d7ee6c91c --candidate <familia> --by <ingeniero>  (o USE_EMPIRICAL / USE_DETERMINISTIC --derivation MEAN|MEDIAN|ENGINEER_VALUE)
+
+$ simforge data decide e2e_montaje montaje@v1 USE_FITTED --fit fit_6f0d7ee6c91c --candidate lognormal --by ingeniera_ana --reason menor AIC; P99.9 (~76 s) coherente con los atascos observados (95 s)
+dec_001: USE_FITTED by ingeniera_ana (n=86) -> {'dist': 'lognormal', 'mean': 31.040412987606974, 'std': 9.637345150853449, 'unit': 's'}
+Aplicar: simforge data apply e2e_montaje montaje@v1 dec_001 --target nodes.<id>.params.<param> --target-basis <BASIS> --by <ingeniero>
+
+$ simforge data apply e2e_montaje montaje@v1 dec_001 --target nodes.assembly.params.process_time --target-basis PER_CIRCUIT --by ingeniera_ana --ack WORK_UNITS_SCALING
+Model v3 (from v2): nodes.assembly.params.process_time
+  before: {'dist': 'constant', 'value': 30, 'provenance': {'status': 'assumed', 'note': 'estimate before the time study'}}
+  after:  {'dist': 'lognormal', 'mean': 31.040412987606974, 'std': 9.637345150853449, 'unit': 's'}
+  provenance: assumed
+  WORK_UNITS_SCALING: work_units = 4 multiplica una única muestra
+  approval: INVALIDATED (new version, re-approval needed) -> simforge project approve e2e_montaje --by <ingeniero>
+
+# the new version is NOT approved: running is refused until the engineer approves it
+El modelo contiene parámetros derivados de datos importados (nodes.assembly.params.process_time) y esta versión no está aprobada: revisa los cambios y apruébala antes de ejecutar (estado: EXECUTABLE).
+
+$ simforge project approve e2e_montaje --by ingeniera_ana --note tiempo de montaje desde datos montaje@v1 (lognormal)
+v4 approved by ingeniera_ana
+
+$ simforge project run e2e_montaje --reps 5
+run d6b8ffc05f | model v4 a2b6e554c54fe1c9 | engine 0.4.0 | seeds [12345, 12346, 12347, 12348, 12349]
+  Units completed                124.60  ± 1.42
+  Throughput                      15.57  ± 0.18
+  Units scrapped                      0  ± 0
+  Average WIP                      5.89  ± 0.01
+  Average lead time            22.2 min  ± 17 s
+  P90 lead time                24.3 min  ± 23 s
+
+$ simforge project versions e2e_montaje
+  v1    2026-10-02T09:38:22+00:00 user         approved=False 3bafcebd4fd97e37  imported from e2e_selective_per_circuit.yaml
+  v2    2026-10-02T09:38:23+00:00 ingeniera_ana approved=True  3bafcebd4fd97e37  engineer approval by ingeniera_ana
+  v3    2026-10-02T09:38:31+00:00 ingeniera_ana approved=False a2b6e554c54fe1c9  data montaje@v1 -> nodes.assembly.params.process_time (USE_FITTED)
+* v4    2026-10-02T09:38:32+00:00 ingeniera_ana approved=True  a2b6e554c54fe1c9  engineer approval by ingeniera_ana
+
+$ simforge data trace e2e_montaje nodes.assembly.params.process_time
+{
+ "path": "nodes.assembly.params.process_time",
+ "value": {
+  "dist": "lognormal",
+  "mean": 31.040412987606974,
+  "std": 9.637345150853449,
+  "unit": "s"
+ },
+ "data_link": {
+  "dataset_id": "montaje@v1",
+  "dataset_version": 1,
+  "content_hash": "e9be4f5edb30f744",
+  "source_file": "tiempos_montaje.xlsx",
+  "column": "Tiempo",
+  "original_unit": "s",
+  "basis": "PER_CIRCUIT",
+  "n_used": 86,
+  "n_excluded": 0,
+  "decision": "FITTED",
+  "derivation": null,
+  "fit_id": "fit_6f0d7ee6c91c",
+  "fit_summary": "lognormal MLE (loc=0); AIC 625.8 (ΔAIC 0.00); KS 0.111; n=86",
+  "conversion": null,
+  "decided_by": "ingeniera_ana",
+  "decided_at": "2026-10-02T09:38:30Z"
+ },
+ "dataset_present": true,
+ "dataset_hash_matches": true
+}
+STATUS:       APPLIED (model v3)
+
