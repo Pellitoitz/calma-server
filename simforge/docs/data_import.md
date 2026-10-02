@@ -4,6 +4,9 @@
 > SimForge no "adivina la distribución": convierte mediciones en una decisión de modelado informada, reproducible
 > y firmada por el ingeniero. Todo funciona sin IA y sin conexión.
 
+Estado: **SYNTHETICALLY_VALIDATED** (sólo datos sintéticos). Para validarlo con el primer estudio real:
+[`real_data_validation_protocol.md`](real_data_validation_protocol.md).
+
 Este documento explica el flujo completo para un ingeniero de procesos. El ajuste estadístico y cómo leerlo están en
 [`distribution_fitting.md`](distribution_fitting.md).
 
@@ -182,15 +185,20 @@ Reglas que SimForge impone:
   volver a ajustar.
 * Los avisos de plausibilidad (cola extrapolada, masa por debajo del mínimo, media desplazada...) hay que aceptarlos
   explícitamente (`--accept TAIL_EXTRAPOLATION`), o elegir otra opción.
-* `normal` con masa negativa sólo con truncamiento declarado (`--trunc-lower 0 --trunc-reason "..."`).
-* Con n < 10, `USE_FITTED` y `USE_EMPIRICAL` exigen `--accept VERY_SMALL_SAMPLE`.
+* `normal` con masa negativa sólo con truncamiento declarado (`--trunc-lower 0 --trunc-reason "..."
+  --trunc-bound-type MODELLING_BOUND`); el tipo de límite (PHYSICAL_BOUND / MODELLING_BOUND) es obligatorio y el método
+  queda registrado como `FIT_THEN_TRUNCATE`.
+* Con n < 10, `USE_FITTED` exige `--accept VERY_SMALL_SAMPLE`; `USE_EMPIRICAL` sólo avisa (y lo registra), mostrando
+  observed_min, observed_max y n: la empírica nunca genera nada fuera de ese rango.
+* Antes de decidir puedes comprobar la estabilidad con `simforge data holdout` (ajuste con el 70 % inicial, validación
+  con el 30 % final; ver [`distribution_fitting.md`](distribution_fitting.md#holdout-temporal)).
 * Un valor determinista registra si es MEAN, MEDIAN o ENGINEER_VALUE: una media no se etiqueta como medida individual.
 
 ## 6. Aplicar al modelo
 
 ```bash
 simforge data apply <p> montaje@v1 dec_001 --target nodes.assembly.params.process_time \
-    --target-basis PER_CIRCUIT --by ana [--ack WORK_UNITS_SCALING]
+    --target-basis PER_CIRCUIT --aggregation sum_iid --by ana
 ```
 
 Comprobaciones antes de escribir nada:
@@ -200,11 +208,13 @@ Comprobaciones antes de escribir nada:
 * unidad conocida y **base del dato = base del destino**. Si difieren, conversión explícita:
   `--factor 4 --formula "t_rack = 4 · t_circuito" --inputs '{"circuits_per_rack": 4}'`. El valor resultante queda
   como CALCULATED con la fórmula y las entradas en su procedencia;
-* **escalar una distribución no es sumar tiempos**: `k·X` tiene la misma media que la suma de k tiempos independientes
-  pero más variabilidad (desviación ×k en vez de ×√k). Por eso una conversión de una distribución exige
-  `--ack SCALING_IS_NOT_SUM`, y aplicar una distribución a un nodo con `work_units ≠ 1` exige
-  `--ack WORK_UNITS_SCALING` (el motor multiplica **una** muestra por `work_units`). Si eso no representa tu proceso,
-  mide en la base del destino;
+* **agregación de `work_units`** (decisión estructurada, guardada en el modelo): si el nodo tiene `work_units ≠ 1`, el
+  tiempo es aleatorio y el nodo no la declara, hay que elegir `--aggregation sum_iid` (X1+…+Xk, una muestra
+  independiente por unidad), `scale_sample` (k·X) o `single_sample` (X, la muestra ya es la entidad completa). Si la
+  base del dato coincide con la del destino, SimForge **propone** `sum_iid` pero no la aplica sola. Detalle y
+  varianzas: [`distribution_fitting.md`](distribution_fitting.md#base-work_units-y-agregación-motor--050);
+* **escalar una distribución con un factor de base es `k·X`**, no la suma de k tiempos independientes: sólo se permite
+  declarándolo (`--conversion-mode scale_sample`); para sumar tiempos independientes usa `work_units` + `sum_iid`;
 * el modelo resultante debe verificar sin errores.
 
 Resultado: **nueva versión del modelo** (la anterior queda intacta) con `approval` invalidada, y en el parámetro:
@@ -229,10 +239,14 @@ process_time:
       n_used: 86
       n_excluded: 0
       decision: FITTED
-      fit_id: fit_6f0d7ee6c91c
+      fit_id: fit_9b3e929cd03d
       fit_summary: "lognormal MLE (loc=0); AIC 625.8 (ΔAIC 0.00); KS 0.111; n=86"
+      parameter_sources: {mean: {source: ESTIMATED_FROM_DATA, method: "MLE, loc fijado en 0 ..."}, std: {...}}
       decided_by: ana
       decided_at: 2026-10-02T09:30:48Z
+# y en el mismo nodo, en la misma versión:
+work_units: 4
+work_units_aggregation: sum_iid   # decisión estructurada (parte del hash del modelo)
 ```
 
 Los datos sintéticos (`--synthetic`) se aplican con estado `assumed`: nunca aparecen como medidos.
@@ -273,8 +287,8 @@ con Gamma(k=16, θ=1.875) s, una celda vacía y dos ciclos largos de 95 y 88.5 s
 | inspect | media 31.17 s, mediana 31.2 s, CV 0.37; 2 outliers candidatos (idx 20 y 61); STATUS REQUIRES_ENGINEER_REVIEW |
 | rows KEEP 20 61 | se conservan: ciclos largos reales |
 | fit | lognormal (AIC 625.8), gamma (ΔAIC 8.9), weibull, normal (REQUIRES_TRUNCATION), triangular, exponencial, uniforme; sugerido: lognormal |
-| decide + apply | `dec_001` lognormal → modelo v3, aprobación invalidada; run rechazado |
-| approve + run (5 réplicas) | 124.6 ± 1.4 unidades en 8 h (frente a 130 con 30 s/circuito fijos): la variabilidad del montaje, que comparte operario con la revisión, cuesta ~4 % de producción |
+| decide + apply | `dec_001` lognormal por circuito, `--aggregation sum_iid` (propuesta por SimForge, confirmada por la ingeniera) → modelo v3, aprobación invalidada; run rechazado |
+| approve + run (5 réplicas) | 127.2 ± 1.0 unidades en 8 h (frente a 130 con 30 s/circuito fijos): la variabilidad del montaje, que comparte operario con la revisión, cuesta ~2 % de producción. Con `scale_sample` (4·X, el comportamiento anterior a 0.5.0) salía 124.6 ± 1.4 |
 
 Los generadores de todos los datos sintéticos (casos A–H: constantes, sesgados, llegadas exponenciales, vacíos,
 outliers, coma decimal, XLSX con varias hojas, por operario/producto) están en
@@ -288,7 +302,7 @@ con Q-Q → decisión → aplicación al modelo. Son las mismas llamadas que la 
 
 ## Limitaciones conocidas
 
-* Las familias no tienen parámetro de desplazamiento (localización): todas empiezan en 0. Un proceso con un mínimo
+* Lognormal, exponencial, gamma y weibull no tienen parámetro de desplazamiento (localización): empiezan en 0. Un proceso con un mínimo
   físico duro (nunca menos de 40 s) se aproxima; la plausibilidad muestra la masa por debajo del mínimo observado.
 * La distribución empírica re-muestrea los valores observados: no genera nada fuera del rango medido ni valores
   intermedios.

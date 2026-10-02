@@ -18,11 +18,12 @@ import numpy as np
 #   USABLE_WITH_CAUTION 30..99    fit meaningful for the body; tails (P99+) are extrapolation
 #   LARGER_SAMPLE       >= 100    fit and GOF informative; P99.9 still extrapolated unless n is in the thousands
 SIZE_LIMITS = [(10, "VERY_SMALL_SAMPLE"), (30, "SMALL_SAMPLE"), (100, "USABLE_WITH_CAUTION")]
+SIZE_CLASS_KIND = "SIMFORGE_HEURISTIC"  # context for the engineer, not a universal statistical validity threshold
 SIZE_TEXT = {
     "VERY_SMALL_SAMPLE": "n < 10: evidencia muy débil; preferir valor determinista o empírico, y medir más",
     "SMALL_SAMPLE": "10 <= n < 30: los tests de bondad de ajuste apenas discriminan; varias familias 'pasan'",
-    "USABLE_WITH_CAUTION": "30 <= n < 100: ajuste útil para el cuerpo; colas (P99+) extrapoladas",
-    "LARGER_SAMPLE": "n >= 100: ajuste y bondad de ajuste informativos; P99.9 sigue siendo extrapolación salvo n muy grande",
+    "USABLE_WITH_CAUTION": "30 <= n < 100: el cuerpo de la distribución está razonablemente informado; colas (P99+) extrapoladas; n = 30 no es un umbral de suficiencia",
+    "LARGER_SAMPLE": "n >= 100: el ajuste y la bondad de ajuste discriminan mejor; no implica datos suficientes ni representativos; P99.9 sigue siendo extrapolación",
 }
 MIN_FIT_N = 5  # below this a 2-parameter fit is degenerate: not computed
 SERIAL_THRESHOLD_Z = 2.0  # |r1| > 2/sqrt(n) -> POSSIBLE_SERIAL_DEPENDENCE
@@ -39,7 +40,7 @@ def describe(x: list[float] | np.ndarray, n_missing: int = 0, n_excluded: int = 
     a = np.asarray(x, dtype=float)
     n = int(a.size)
     out: dict[str, Any] = {"n": n, "n_missing_or_invalid": n_missing, "n_excluded": n_excluded, "size_class": size_class(n),
-                           "size_class_meaning": SIZE_TEXT[size_class(n)]}
+                           "size_class_kind": SIZE_CLASS_KIND, "size_class_meaning": SIZE_TEXT[size_class(n)]}
     if n == 0:
         return out
     levels = [1, 5, 10, 25, 50, 75, 90, 95, 99]
@@ -79,8 +80,10 @@ def lag1(x: list[float] | np.ndarray) -> dict[str, Any]:
     d = a - a.mean()
     r1 = float(np.sum(d[1:] * d[:-1]) / np.sum(d * d))
     limit = SERIAL_THRESHOLD_Z / math.sqrt(n)
-    flag = "POSSIBLE_SERIAL_DEPENDENCE" if abs(r1) > limit else "NO_EVIDENCE_OF_SERIAL_DEPENDENCE"
-    return {"lag1": r1, "n": int(n), "limit": limit, "flag": flag,
+    # screening only: a flag is never "confirmed"; other lags (e.g. per batch of 4) are not inspected
+    flag = "POSSIBLE_SERIAL_DEPENDENCE" if abs(r1) > limit else "NO_LAG1_EVIDENCE"
+    return {"lag1": r1, "n": int(n), "limit": limit, "flag": flag, "method": "SCREENING_HEURISTIC |r1| > 2/sqrt(n)",
+            "lags_inspected": [1], "limitations": "solo lag 1; no descarta dependencia en otros retardos ni estacionalidad",
             "meaning": ("las observaciones consecutivas están correlacionadas (aprendizaje, desgaste, lotes, turnos...). "
                         "Una distribución i.i.d. (la que usa el motor) no reproduce esa dependencia"
                         if flag == "POSSIBLE_SERIAL_DEPENDENCE" else "")}

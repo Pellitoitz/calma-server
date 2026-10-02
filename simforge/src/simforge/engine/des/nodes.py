@@ -281,7 +281,7 @@ class IndustrialServer(IndustrialNode):
         # 3) process: suspended during failures; pre-emptible by the resource's dispatch strategy
         self._set(slot, NodeState.BUSY)
         ctx.log("start_process", e, self.id)
-        remaining = self.p.process_time.sample_seconds(self.rng_time) * self.p.work_units  # type: ignore[union-attr]
+        remaining = self.p.sample_entity_seconds(self.rng_time)  # work_units aggregation (behaviors.py)
         proc = ctx.env.active_process
         while remaining > 1e-12:
             if self.down:

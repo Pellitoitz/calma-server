@@ -91,10 +91,10 @@ def test_zeros_make_positive_families_not_applicable():
 def test_fit_failure_is_reported_not_hidden(monkeypatch):
     real = fitting._fit_family
 
-    def boom(name, a):
+    def boom(name, a, bounds=None):
         if name == "weibull":
             raise RuntimeError("optimizer did not converge")
-        return real(name, a)
+        return real(name, a, bounds)
     monkeypatch.setattr(fitting, "_fit_family", boom)
     rep = fit_candidates(RNG.gamma(9, 5, 80).tolist(), "s")
     w = candidate(rep, "weibull")
@@ -139,7 +139,7 @@ def test_lag1_detects_serial_dependence():
     for i in range(1, 300):
         ar[i] = 0.7 * ar[i - 1] + e[i]
     assert stats.lag1((ar + 50).tolist())["flag"] == "POSSIBLE_SERIAL_DEPENDENCE"
-    assert stats.lag1((e + 50).tolist())["flag"] == "NO_EVIDENCE_OF_SERIAL_DEPENDENCE"
+    assert stats.lag1((e + 50).tolist())["flag"] == "NO_LAG1_EVIDENCE"
 
 
 def test_bootstrap_is_reproducible_and_brackets_the_mean():

@@ -57,7 +57,7 @@ def profile_text(p: dict, fit: dict | None = None) -> str:
     if p.get("group") or p.get("pooled"):
         L.append(f"SUBSET: {p.get('group') or 'todos'}{'  (grupos MEZCLADOS por decisión explícita)' if p.get('pooled') else ''}")
     s = p["stats"]
-    L.append(f"USED FOR ANALYSIS: n = {s['n']}  ({s['size_class']}: {s['size_class_meaning']})")
+    L.append(f"USED FOR ANALYSIS: n = {s['n']}  ({s['size_class']} [heurística SimForge, no umbral de validez]: {s['size_class_meaning']})")
     if s["n"]:
         L += [f"MEAN:   {_f(s['mean'], u)}   (IC95 {_f(s.get('mean_ci95', [None])[0])} – {_f(s.get('mean_ci95', [None, None])[1])})",
               f"MEDIAN: {_f(s['median'], u)}   STD: {_f(s['std'], u)}   CV: {_f(s['cv'])}",
@@ -69,7 +69,7 @@ def profile_text(p: dict, fit: dict | None = None) -> str:
             L.append(f"BOOTSTRAP 95% (seed {b['seed']}): mean {_f(b['mean'][0])}–{_f(b['mean'][1])}  "
                      f"median {_f(b['median'][0])}–{_f(b['median'][1])}  P95 {_f(b['p95'][0])}–{_f(b['p95'][1])}")
         sr = p["serial"]
-        L.append(f"ORDER: {p['order']}   LAG-1: {_f(sr.get('lag1'))} -> {sr['flag']}   TREND: {p['trend'].get('flag')}")
+        L.append(f"ORDER: {p['order']}   LAG-1: {_f(sr.get('lag1'))} -> {sr['flag']} (screening, solo lag 1)   TREND: {p['trend'].get('flag')}")
         o = p["outliers"]
         if o.get("evaluated"):
             L.append(f"POTENTIAL OUTLIERS: {len(o['candidates'])} (IQR fences {_f(o['iqr_fences'][0])}–{_f(o['iqr_fences'][1])}, "
@@ -85,7 +85,9 @@ def profile_text(p: dict, fit: dict | None = None) -> str:
 
 def fit_text(r: dict) -> str:
     u = r["unit"]
-    L = [f"CANDIDATE RANKING  (fit {r.get('fit_id')}, n = {r['n']}, {r['size_class']}; ranking por AIC, ΔAIC ≤ 2 = equivalentes)"]
+    L = [f"STATISTICAL RANKING  (fit {r.get('fit_id')}, n = {r['n']}, {r['size_class']} [heurística SimForge])",
+         "  orden por AIC: menor AIC = mejor compromiso estadístico entre candidatos, NO la distribución verdadera; "
+         "ΔAIC ≤ 2 = soporte estadístico similar (heurística interpretativa)"]
     L.append(f"  {'#':<3}{'distribution':<13}{'status':<21}{'AIC':>9}{'ΔAIC':>7}{'BIC':>9}{'KS':>7}{'AD':>8}{'CvM':>8}  "
              f"{'P50':>8}{'P95':>8}{'P99':>8}{'P99.9':>8}  warnings")
     for c in r["candidates"]:
@@ -107,9 +109,19 @@ def fit_text(r: dict) -> str:
         for f in c["plausibility"]["flags"]:
             if f["severity"] != "INFO":
                 L.append(f"  [{f['severity']}] {c['family']}: {f['code']} — {f['text']}")
+    for c in ok:
+        if c["family"] in ("uniform", "triangular"):
+            L.append(f"  {c['family']} parámetros: " + "; ".join(f"{k}={_f(v.get('value'))} [{v['source']}: {v['method']}]"
+                                                              for k, v in c["parameter_sources"].items()))
+    if r.get("bounds"):
+        b = r["bounds"]
+        L.append(f"  límites declarados ({b['source']}): [{b.get('low')}, {b.get('high')}] — usados solo por uniforme/triangular")
     opts = r["options"]
-    L.append(f"OPTIONS: DETERMINISTIC mean={_f(opts['DETERMINISTIC']['MEAN'])} median={_f(opts['DETERMINISTIC']['MEDIAN'])} {u} | "
-             f"EMPIRICAL n={opts['EMPIRICAL']['n']} ({opts['EMPIRICAL']['note']})")
+    e = opts["EMPIRICAL"]
+    L.append(f"OPTIONS: DETERMINISTIC mean={_f(opts['DETERMINISTIC']['MEAN'])} median={_f(opts['DETERMINISTIC']['MEDIAN'])} {u}")
+    L.append(f"         EMPIRICAL n={e['sample_size']} soporte [{_f(e['observed_min'])}, {_f(e['observed_max'])}] {u}: {e['note']}")
+    for w in e.get("warnings", []):
+        L.append(f"         [WARNING] {w}")
     s = r.get("suggested")
     if s:
         L.append(f"SUGGESTED CANDIDATE: {s['family']} — {s['status']} — {s['why']}"
@@ -118,4 +130,28 @@ def fit_text(r: dict) -> str:
         L.append("SUGGESTED CANDIDATE: ninguno (ver notas)")
     for n in r.get("notes", []):
         L.append(f"  note: {n}")
+    return "\n".join(L)
+
+
+def holdout_text(h: dict) -> str:
+    u = h["unit"]
+    L = [f"HOLDOUT TEMPORAL ({h['train_fraction']:.0%} ajuste / {1 - h['train_fraction']:.0%} validación, propuesta, no ley) — "
+         f"orden: {h['order']}; corte en la fila {h['split_at_row']}",
+         f"  n ajuste = {h['n_train']}, n validación = {h['n_test']}; validación observada: media {_f(h['test_observed']['mean'])}, "
+         f"P50 {_f(h['test_observed']['P50'])}, P95 {_f(h['test_observed']['P95'])} {u}"]
+    tt = h["train_vs_test"]
+    L.append(f"  ajuste vs validación (KS 2 muestras): D={tt['ks_stat']:.3f} p={tt['p_value']:.3g} -> {tt['flag']}"
+             + (f" — {tt['meaning']}" if tt["meaning"] else ""))
+    L.append(f"  {'familia':<12}{'loglik/obs':>11}{'KS valid.':>10}{'p':>8}{'media pred':>11}{'P50 pred':>10}{'P95 pred':>10}")
+    for c in sorted(h["candidates"], key=lambda c: c.get("holdout_rank", 99)):
+        if c["status"] != "OK":
+            L.append(f"  {c['family']:<12} {c['status']}: {c.get('reason', '')}")
+            continue
+        ll = f"{c['test_mean_loglik']:.3f}" if c["test_mean_loglik"] is not None else "−∞"
+        L.append(f"  {c['family']:<12}{ll:>11}{c['test_ks_stat']:>10.3f}{c['test_ks_p']:>8.3g}{c['predicted']['mean']:>11.4g}"
+                 f"{c['predicted']['P50']:>10.4g}{c['predicted']['P95']:>10.4g}")
+    e = h["empirical_train"]
+    L.append(f"  empírica (ajuste): P50 {_f(e['P50'])} P95 {_f(e['P95'])} máx {_f(e['max'])}; {e['test_above_train_max']} valores de "
+             "validación por encima del máximo de ajuste")
+    L.append("  p-valores de validación: parámetros no estimados con estos datos (no optimistas), pero suponen independencia.")
     return "\n".join(L)

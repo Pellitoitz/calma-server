@@ -27,7 +27,7 @@ FIT=$(python -m simforge.cli data inspect $P montaje@v1 --json | python -c "impo
 sf data decide $P montaje@v1 USE_FITTED --fit "$FIT" --candidate lognormal --by ingeniera_ana \
    --reason "menor AIC; P99.9 (~76 s) coherente con los atascos observados (95 s)"
 sf data apply $P montaje@v1 dec_001 --target nodes.assembly.params.process_time --target-basis PER_CIRCUIT \
-   --by ingeniera_ana --ack WORK_UNITS_SCALING
+   --by ingeniera_ana --aggregation sum_iid
 echo; echo "# the new version is NOT approved: running is refused until the engineer approves it"
 python -m simforge.cli project run $P || true
 sf project approve $P --by ingeniera_ana --note "tiempo de montaje desde datos montaje@v1 (lognormal)"

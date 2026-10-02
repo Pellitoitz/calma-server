@@ -132,6 +132,13 @@ def data_tab(app: SimForgeApp, project: Project) -> None:
     st.session_state["engineer"] = by
     if st.button("Ajustar", disabled=not by):
         st.session_state["fit"] = _err(lambda: ds.fit(did, by=by, group=group, pooled=pooled, physical_min=pmin, physical_max=pmax))
+    with st.expander("Validación temporal (holdout): ajustar con la primera parte, comprobar con la final"):
+        frac = st.slider("Fracción para ajustar (propuesta 70 %)", 0.5, 0.9, 0.7, 0.05)
+        if st.button("Ejecutar holdout"):
+            from ..data.report import holdout_text
+            h = _err(lambda: ds.holdout(did, frac, group=group, pooled=pooled, by=by or "engineer"))
+            if h:
+                st.code(holdout_text(h), language=None)
     fit = st.session_state.get("fit")
     if fit and fit.get("dataset_id") == did:
         st.code(fit_text(fit), language=None)
@@ -153,14 +160,16 @@ def data_tab(app: SimForgeApp, project: Project) -> None:
         val = b.number_input("Valor del ingeniero", value=None)
         tl = a.number_input("Truncamiento inferior (opcional)", value=None)
         tr = a.text_input("Motivo del truncamiento")
-        accept = b.multiselect("Avisos aceptados explícitamente", ["VERY_SMALL_SAMPLE", "TAIL_EXTRAPOLATION", "EXTREME_TAIL",
+        tbt = a.selectbox("Tipo de límite", [None, "MODELLING_BOUND", "PHYSICAL_BOUND"])
+        accept = b.multiselect("Avisos aceptados explícitamente", ["VERY_SMALL_SAMPLE", "TRUNCATION_SHIFTS_MEAN",
+                                                                  "DATA_OUTSIDE_PHYSICAL_BOUND", "TAIL_EXTRAPOLATION", "EXTREME_TAIL",
                                                                   "MASS_BELOW_OBSERVED_MIN", "MEAN_MISMATCH", "BELOW_PHYSICAL_MIN",
                                                                   "ABOVE_PHYSICAL_MAX"])
         reason = st.text_input("Motivo de la decisión")
         if st.form_submit_button("Registrar decisión", disabled=not by):
             ev = _err(lambda: ds.decide(did, decision, by, reason=reason, group=group, pooled=pooled, derivation=deriv,
                                         engineer_value=val, fit_id=(fit or {}).get("fit_id"), candidate=cand,
-                                        truncation={"lower": tl, "reason": tr} if tl is not None else None, accept_warnings=accept))
+                                        truncation={"lower": tl, "reason": tr, "bound_type": tbt} if tl is not None else None, accept_warnings=accept))
             if ev:
                 st.success(f"{ev.decision_id}: {ev.decision.value} -> {ev.distribution or 'nada que aplicar'}")
 
@@ -189,12 +198,16 @@ def data_tab(app: SimForgeApp, project: Project) -> None:
         factor = a.number_input("Factor de conversión de base (si difiere)", value=None)
         formula = b.text_input("Fórmula", placeholder="t_rack = 4 · t_circuito")
         inputs = c.text_input("Entradas (JSON)", placeholder='{"circuits_per_rack": 4}')
-        ack = st.multiselect("Semántica entendida", ["WORK_UNITS_SCALING", "SCALING_IS_NOT_SUM"],
-                             help="work_units y conversiones multiplican UNA muestra: la variabilidad escala ×k, no ×√k")
+        agg = st.selectbox("Agregación de work_units del nodo destino", [None, "sum_iid", "scale_sample", "single_sample"],
+                           help="sum_iid: X1+…+Xk (una muestra por unidad) · scale_sample: k·X · single_sample: X (entidad completa). "
+                                "Obligatoria si work_units ≠ 1 y el tiempo es aleatorio y el nodo no la declara.")
+        scale = st.checkbox("La conversión de base de una distribución es k·X (scale_sample)")
         if st.form_submit_button("Aplicar (crea nueva versión del modelo)"):
             import json
             conv = {"factor": factor, "formula": formula, "inputs": json.loads(inputs) if inputs else None} if factor else None
-            r = _err(lambda: ds.apply(did, d, tgt, tb, by or "engineer", conversion=conv, acknowledge=ack))
+            if conv and scale:
+                conv["aggregation"] = "scale_sample"
+            r = _err(lambda: ds.apply(did, d, tgt, tb, by or "engineer", conversion=conv, aggregation=agg))
             if r:
                 st.success(f"Modelo v{r['version']}: {r['target']} = {r['new']} ({r['provenance']}). {r['approval']}")
                 for w in r["warnings"]:

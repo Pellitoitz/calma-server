@@ -53,11 +53,16 @@ Todas en `unit` (ms, s, min, h...). Reglas:
 
 * Ninguna muestra negativa pasa en silencio: si una distribución sin truncamiento produce t < 0 el motor lanza
   `NegativeSampleError`. No existe `max(0, x)` ni re-muestreo oculto (cambiarían la distribución).
-* `normal` con P(t < 0) > 1e-9 no valida salvo que declare `truncation: {lower: 0, reason: "..."}`.
-* El truncamiento es **explícito** (`lower`, `upper`, `reason`), se aplica por rechazo dentro de la ventana y
+* `normal` con P(t < 0) > 1e-9 no valida salvo que declare `truncation: {lower: 0, reason: "...", bound_type: MODELLING_BOUND}`.
+* El truncamiento es **explícito** (`lower`, `upper`, `reason`, `bound_type`), se aplica por rechazo dentro de la ventana y
   `mean_seconds()` devuelve la media truncada. Forma parte del modelo (y de su hash).
 * Cada nodo tiene streams propios por (semilla de réplica, nodo, propósito): el mismo seed reproduce exactamente la
   misma secuencia, y escenarios distintos comparten números aleatorios (CRN) en los nodos que no cambian.
+* `work_units = k` en un nodo de proceso: cómo se combinan las muestras lo declara `work_units_aggregation`
+  (`sum_iid` = X1+…+Xk, `scale_sample` = k·X, `single_sample` = X). Sin declarar se mantiene el k·X histórico y se
+  avisa si el tiempo es aleatorio. Ver `docs/distribution_fitting.md`.
+* Truncamiento: `bound_type` obligatorio (`PHYSICAL_BOUND` / `MODELLING_BOUND`), `method` (`DECLARED` /
+  `FIT_THEN_TRUNCATE`) y `provenance`.
 * Los valores derivados de datos llevan `provenance.data` (dataset, versión, hash, ajuste, decisión): ver
   `docs/data_import.md`.
 
@@ -145,6 +150,7 @@ sigue BLOCKED) e IN_TRANSPORT cuentan si su nodo es *feeder*; en buffer cuenta s
 
 | Versión | Cambio | Modelos afectados (medido) |
 |---|---|---|
+| 0.5.0 | Agregación explícita de `work_units` (`work_units_aggregation`: `sum_iid` X1+…+Xk, `scale_sample` k·X, `single_sample` X); no declarada = k·X histórico con aviso `WORK_UNITS_AGGREGATION_UNDECLARED` (fuera del verificador congelado, en `validation/semantics.py`); KPIs/diagnóstico usan el factor de la política; truncamiento con `bound_type` obligatorio (PHYSICAL_BOUND / MODELLING_BOUND), `method` (DECLARED / FIT_THEN_TRUNCATE) y procedencia | Ninguno: 01–05, MVP 359, golden y el modelo e2e dan resultados idénticos a 0.4.0 (medido) y los hashes no cambian. El ejemplo de datos e2e cambia porque ahora decide `sum_iid` (127.2 ± 1.0) en vez del k·X reconocido (124.6 ± 1.4) |
 | 0.4.0 | Distribuciones `gamma` y `weibull`; truncamiento **explícito** (`truncation: {lower, upper, reason}`, muestreo por rechazo, media truncada); una muestra negativa sin truncamiento declarado es un error (`NegativeSampleError`), ya no se re-muestrea en silencio; `normal` con P(t<0) > 1e-9 exige truncamiento declarado; `Provenance.data` (enlace a dataset/ajuste) | Ninguno de 01–05, MVP 359, golden ni selectiva (hash de contenido y resultados idénticos, test `test_engine_0_4_0_*`). Modelos externos con `normal` de masa negativa no despreciable dejan de validar: hay que declarar el truncamiento |
 | 0.3.0 | Resolución de un instante a punto fijo + desempate explícito; estado único de carrier con `reserved:<transporte>`; `feed_wip` sin doble conteo | `05_selective_soldering` 132 → 130 (contrato del instante); selectiva de test 2 bastidores 136 → 133 (contrato); benchmark sintético 3–10 bastidores (desempate; sin reserva ya no hay interbloqueo). Sin cambio: 01–04, MVP 359, golden. Detalle: `docs/diagnostics/selective_rack_anomaly.md` §17 |
 | 0.2.0 | Recogida física en transportes, estados de operario, invariantes | — |

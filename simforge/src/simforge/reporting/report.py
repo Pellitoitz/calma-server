@@ -138,6 +138,9 @@ def build_markdown(model: ISMSModel, report: VerificationReport, run: Simulation
             prov = (pt.get("provenance") or {}).get("status", "")
             vals = ", ".join(f"{k}={v}" for k, v in pt.items() if k not in ("dist", "unit", "provenance"))
             pt_txt = f"{pt['dist']}({vals}) {pt.get('unit', 's')}" + (f" [{prov}]" if prov else "")
+        if p.get("work_units", 1) != 1:
+            agg = p.get("work_units_aggregation")
+            pt_txt += f" × {p['work_units']} units ({agg or 'UNDECLARED: legacy scale_sample k·X'})"
         res = ", ".join(r["resource"] for r in p.get("resources", []))
         rows.append([n.name or n.id, f"`{n.component}`", pt_txt, str(p.get("capacity", 1 if n.component != "buffer" else "∞")),
                      res or "—", str(n.priority) if res else "—"])

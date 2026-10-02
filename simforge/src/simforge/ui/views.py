@@ -44,7 +44,7 @@ def process_graph(model: ISMSModel, report: VerificationReport | None = None) ->
         elif isinstance(p.get("capacity", 1), str) or p.get("capacity", 1) > 1:
             label.append(f"x{p['capacity']}")
         if "work_units" in p:
-            label.append(f"× {p['work_units']} units")
+            label.append(f"× {p['work_units']} units ({p.get('work_units_aggregation') or 'k·X legacy'})")
         shape = {"source": "ellipse", "sink": "ellipse", "buffer": "cylinder"}.get(n.component, "box")
         if n.component in ("transport", "rack_transport"):
             shape = "cds"

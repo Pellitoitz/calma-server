@@ -8,7 +8,8 @@
     simforge data rows linea_selectiva montaje@v1 KEEP 20 61 --reason "ciclos largos reales" --by ana
     simforge data fit linea_selectiva montaje@v1 --by ana
     simforge data decide linea_selectiva montaje@v1 USE_FITTED --fit fit_... --candidate lognormal --by ana
-    simforge data apply linea_selectiva montaje@v1 dec_... --target nodes.assembly.params.process_time --target-basis PER_CIRCUIT --by ana
+    simforge data apply linea_selectiva montaje@v1 dec_... --target nodes.assembly.params.process_time --target-basis PER_CIRCUIT \
+        --aggregation sum_iid --by ana
     simforge project approve linea_selectiva --by ana
     simforge project run linea_selectiva
 """
@@ -173,16 +174,31 @@ def rows(slug: str, dataset: str, action: str = typer.Argument(..., help="KEEP |
 @data_app.command("fit")
 def fit(slug: str, dataset: str, by: str = typer.Option(...), group: Optional[list[str]] = typer.Option(None),
         pooled: bool = False, physical_min: Optional[float] = typer.Option(None, help="physically impossible below (dataset unit)"),
-        physical_max: Optional[float] = None, as_json: bool = typer.Option(False, "--json")):
+        physical_max: Optional[float] = None, as_json: bool = typer.Option(False, "--json"),
+        bound_low: Optional[float] = typer.Option(None, help="uniform/triangular lower bound (needs --bound-source)"),
+        bound_high: Optional[float] = typer.Option(None, help="uniform/triangular upper bound (needs --bound-source)"),
+        bound_source: Optional[str] = typer.Option(None, help="ENGINEER_BOUNDS | PROCESS_SPECIFICATION")):
     """Fit candidate distributions: ranking (AIC), GOF evidence, industrial plausibility, SUGGESTED candidate."""
     from .data.report import fit_text
     sf = _sf()
     r = _run(lambda: sf.data(_proj(sf, slug)).fit(dataset, by=by, group=_pairs(group, "--group"), pooled=pooled,
-                                                  physical_min=physical_min, physical_max=physical_max))
+                                                  physical_min=physical_min, physical_max=physical_max,
+                                                  bounds=({"low": bound_low, "high": bound_high, "source": bound_source}
+                                                          if bound_source else None)))
     typer.echo(json.dumps(r, indent=1, ensure_ascii=False, default=str) if as_json else fit_text(r))
     if not as_json:
         typer.echo(f"\nNada se ha aplicado. Decide: simforge data decide {slug} {dataset} USE_FITTED --fit {r['fit_id']} "
                    "--candidate <familia> --by <ingeniero>  (o USE_EMPIRICAL / USE_DETERMINISTIC --derivation MEAN|MEDIAN|ENGINEER_VALUE)")
+
+
+@data_app.command("holdout")
+def holdout(slug: str, dataset: str, train: float = typer.Option(0.7, help="fraction used to fit (time order); 0.7 is a proposal"),
+            group: Optional[list[str]] = typer.Option(None), pooled: bool = False, by: str = "engineer"):
+    """Temporal holdout: fit on the first part, check against later observations the fit never saw (changes nothing)."""
+    from .data.report import holdout_text
+    sf = _sf()
+    h = _run(lambda: sf.data(_proj(sf, slug)).holdout(dataset, train, group=_pairs(group, "--group"), pooled=pooled, by=by))
+    typer.echo(holdout_text(h))
 
 
 @data_app.command("decide")
@@ -193,6 +209,7 @@ def decide(slug: str, dataset: str,
            value: Optional[float] = typer.Option(None, help="ENGINEER_VALUE in the dataset unit"),
            fit_id: Optional[str] = typer.Option(None, "--fit"), candidate: Optional[str] = None,
            trunc_lower: Optional[float] = None, trunc_upper: Optional[float] = None, trunc_reason: Optional[str] = None,
+           trunc_bound_type: Optional[str] = typer.Option(None, help="PHYSICAL_BOUND | MODELLING_BOUND (mandatory with truncation)"),
            accept: Optional[list[str]] = typer.Option(None, help="plausibility warning codes explicitly accepted")):
     """Record the ENGINEER DECISION (nothing reaches the model until `data apply`)."""
     trunc = None
@@ -200,13 +217,15 @@ def decide(slug: str, dataset: str,
         if not trunc_reason:
             typer.secho("El truncamiento necesita --trunc-reason.", fg="red")
             raise typer.Exit(2)
-        trunc = {"lower": trunc_lower, "upper": trunc_upper, "reason": trunc_reason}
+        trunc = {"lower": trunc_lower, "upper": trunc_upper, "reason": trunc_reason, "bound_type": trunc_bound_type}
     sf = _sf()
     ev = _run(lambda: sf.data(_proj(sf, slug)).decide(dataset, decision.upper(), by, reason=reason, group=_pairs(group, "--group"),
                                                       pooled=pooled, derivation=derivation.upper() if derivation else None,
                                                       engineer_value=value, fit_id=fit_id, candidate=candidate, truncation=trunc,
                                                       accept_warnings=accept))
     typer.secho(f"{ev.decision_id}: {ev.decision.value} by {ev.by} (n={ev.n_used}) -> {ev.distribution or 'nada que aplicar'}", fg="green")
+    for w in ev.warnings:
+        typer.secho(f"  {w}", fg="yellow")
     if ev.distribution:
         typer.echo(f"Aplicar: simforge data apply {slug} {dataset} {ev.decision_id} --target nodes.<id>.params.<param> "
                    "--target-basis <BASIS> --by <ingeniero>")
@@ -217,13 +236,16 @@ def apply(slug: str, dataset: str, decision_id: str, target: str = typer.Option(
           target_basis: str = typer.Option(..., help="what ONE sample of the target represents (PER_CIRCUIT, PER_RACK...)"),
           by: str = typer.Option(...), factor: Optional[float] = typer.Option(None, help="explicit basis conversion factor"),
           formula: Optional[str] = None, inputs: Optional[str] = typer.Option(None, help='JSON, e.g. {"circuits_per_rack": 4}'),
-          ack: Optional[list[str]] = typer.Option(None, help="acknowledged semantics: SCALING_IS_NOT_SUM, WORK_UNITS_SCALING")):
+          conversion_mode: Optional[str] = typer.Option(None, help="scale_sample: the ONLY way a factor converts a distribution (k·X)"),
+          aggregation: Optional[str] = typer.Option(None, help="target node work_units_aggregation: sum_iid | scale_sample | single_sample")):
     """Write the decided value into the current model -> NEW model version, approval invalidated."""
     conv = None
     if factor is not None:
         conv = {"factor": factor, "formula": formula or "", "inputs": json.loads(inputs) if inputs else None}
+        if conversion_mode:
+            conv["aggregation"] = conversion_mode
     sf = _sf()
-    r = _run(lambda: sf.data(_proj(sf, slug)).apply(dataset, decision_id, target, target_basis, by, conversion=conv, acknowledge=ack))
+    r = _run(lambda: sf.data(_proj(sf, slug)).apply(dataset, decision_id, target, target_basis, by, conversion=conv, aggregation=aggregation))
     typer.secho(f"Model v{r['version']} (from v{r['parent']}): {r['target']}", bold=True)
     typer.echo(f"  before: {r['previous']}\n  after:  {r['new']}\n  provenance: {r['provenance']}")
     for w in r["warnings"]:

@@ -72,6 +72,7 @@ plausibilidad industrial (P1…P99.9) → **decisión del ingeniero** (determini
 rechazar) → nueva versión del modelo con procedencia `data` (dataset, hash, ajuste) y **aprobación invalidada**.
 Sin IA, totalmente offline. Ejemplo completo: `bash examples/data/run_e2e.sh`.
 Detalle: [`docs/data_import.md`](docs/data_import.md) y [`docs/distribution_fitting.md`](docs/distribution_fitting.md).
+Estado: SYNTHETICALLY_VALIDATED; validación con datos reales: [`docs/real_data_validation_protocol.md`](docs/real_data_validation_protocol.md).
 
 ## Ejemplo (MVP)
 

@@ -106,7 +106,7 @@ def compute_run_kpis(rec: RunRecord, cm: CompiledModel) -> dict[str, float]:
             k[f"node.{nid}.preemptions"] = rec.node_preemptions.get(nid, 0)
             p: ServerParams = cn.params  # type: ignore[assignment]
             if p.process_time is not None and denom:
-                ideal = (p.ideal_cycle_time or p.process_time).mean_seconds() * (1 if p.ideal_cycle_time else p.work_units)
+                ideal = (p.ideal_cycle_time or p.process_time).mean_seconds() * (1 if p.ideal_cycle_time else p.entity_time_factor())
                 down = st.get(NodeState.DOWN, 0.0)
                 run_time = denom - down
                 a = run_time / denom

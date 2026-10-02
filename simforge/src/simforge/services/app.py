@@ -28,7 +28,8 @@ from ..domain.paths import diff, get_value, set_value
 from ..experiments.runner import ExperimentResult, SimulationResult, run_experiment, run_simulation, validate_experiment
 from ..library.registry import ComponentRegistry
 from ..persistence.project import Project, Workspace
-from ..validation.verifier import VerificationReport, verify
+from ..validation.semantics import verify_model as verify
+from ..validation.verifier import VerificationReport
 
 
 def default_workspace() -> Path:

@@ -164,6 +164,7 @@ class DecisionEvent(BaseModel):
     n_used: int = 0
     n_excluded: int = 0
     state_hash: str = ""  # hash of (dataset content + exclusions) the decision was made on
+    warnings: list[str] = Field(default_factory=list)  # warnings shown and recorded (not blocking)
 
 
 class FitEvent(BaseModel):
@@ -191,7 +192,8 @@ class ApplyEvent(BaseModel):
     conversion: dict | None = None
     by: str
     at: datetime = Field(default_factory=now_utc)
-    warnings_acknowledged: list[str] = Field(default_factory=list)
+    warnings_acknowledged: list[str] = Field(default_factory=list)  # kept for logs written before engine 0.5.0
+    work_units_aggregation: str | None = None  # aggregation set on the target node by this application, if changed
 
 
 Event = RowEvent | DecisionEvent | FitEvent | ApplyEvent

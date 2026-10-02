@@ -25,7 +25,8 @@ from .domain.io import ModelFormatError, dump_model, load_model
 from .domain.isms import ExperimentSpec, Factor
 from .experiments.runner import ExperimentError, run_experiment, run_simulation
 from .library.registry import ComponentRegistry
-from .validation.verifier import ModelError, verify
+from .validation.semantics import verify_model as verify
+from .validation.verifier import ModelError
 
 app = typer.Typer(add_completion=False, help="SimForge - AI-assisted industrial simulation (local).", no_args_is_help=True)
 lib_app = typer.Typer(help="Component library", no_args_is_help=True)

@@ -61,13 +61,25 @@ class BufferParams(BaseModel):
     discipline: Literal["fifo", "lifo"] = "fifo"
 
 
+# How `process_time` combines with `work_units` = k (engine >= 0.5.0). Declared explicitly in the model; part of its hash.
+#   sum_iid       T = X1 + ... + Xk   one independent sample per work unit (e.g. time measured per circuit, k circuits)
+#   scale_sample  T = k * X           ONE sample multiplied: perfectly correlated units (Var = k^2 Var(X))
+#   single_sample T = X               one sample is already the whole entity: work_units does not multiply the time
+# Undeclared (None) keeps the historical behaviour (k * X) so existing models do not change; it is reported as
+# WORK_UNITS_AGGREGATION_UNDECLARED whenever k != 1 and the time is random (simforge.validation.semantics).
+WorkUnitsAggregation = Literal["sum_iid", "scale_sample", "single_sample"]
+LEGACY_AGGREGATION = "scale_sample"
+
+
 class ServerParams(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     capacity: int = Field(default=1, ge=1, description="Parallel slots (identical stations)")
     process_time: Duration | None = None  # None -> model INCOMPLETE
     work_units: float = Field(default=1, gt=0, description="process_time is per work unit (e.g. per circuit); "
-                              "time per entity = sampled time x work_units. Use '$circuits_per_rack'.")
+                              "how samples combine is work_units_aggregation. Use '$circuits_per_rack'.")
+    work_units_aggregation: WorkUnitsAggregation | None = Field(
+        default=None, description="sum_iid (X1+..+Xk) | scale_sample (k*X) | single_sample (X); undeclared = legacy k*X")
     resources: list[ResourceUse] = Field(default_factory=list, description="Held during processing")
     yield_rate: float = Field(default=1.0, gt=0, le=1)
     on_reject: str = Field(default="scrap", description="'scrap' or id of a rework node")
@@ -79,7 +91,28 @@ class ServerParams(BaseModel):
         ids = [r.resource for r in self.resources]
         if len(ids) != len(set(ids)):
             raise ValueError("un mismo recurso aparece dos veces en 'resources'")
+        if self.work_units_aggregation == "sum_iid" and not float(self.work_units).is_integer():
+            raise ValueError(f"work_units_aggregation 'sum_iid' necesita un número entero de unidades (work_units = {self.work_units})")
         return self
+
+    @property
+    def aggregation(self) -> str:
+        """Effective aggregation (legacy k*X when undeclared)."""
+        return self.work_units_aggregation or LEGACY_AGGREGATION
+
+    def sample_entity_seconds(self, rng) -> float:
+        """Processing time of one entity. All samples come from the node's own stream `rng` (reproducible)."""
+        pt = self.process_time
+        agg = self.aggregation
+        if agg == "single_sample":
+            return pt.sample_seconds(rng)  # type: ignore[union-attr]
+        if agg == "sum_iid":
+            return sum(pt.sample_seconds(rng) for _ in range(int(self.work_units)))  # type: ignore[union-attr]
+        return pt.sample_seconds(rng) * self.work_units  # type: ignore[union-attr]
+
+    def entity_time_factor(self) -> float:
+        """Mean entity time = mean(process_time) x this factor (same for sum_iid and scale_sample)."""
+        return 1.0 if self.aggregation == "single_sample" else float(self.work_units)
 
 
 class TransportParams(BaseModel):

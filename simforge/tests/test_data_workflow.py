@@ -150,9 +150,15 @@ def test_decisions_deterministic_empirical_fitted(env):
         ds.decide(did, "USE_FITTED", by="ana", fit_id=fit["fit_id"], candidate="exponential")
     with pytest.raises(DataDecisionRequired, match="truncamiento"):
         ds.decide(did, "USE_FITTED", by="ana", fit_id=fit["fit_id"], candidate="normal")
+    with pytest.raises(DataDecisionRequired, match="bound_type"):
+        ds.decide(did, "USE_FITTED", by="ana", fit_id=fit["fit_id"], candidate="normal",
+                  truncation={"lower": 0, "reason": "tiempos no negativos"}, accept_warnings=["MASS_BELOW_OBSERVED_MIN"])
     nt = ds.decide(did, "USE_FITTED", by="ana", fit_id=fit["fit_id"], candidate="normal",
-                   truncation={"lower": 0, "reason": "tiempos no negativos"}, accept_warnings=["MASS_BELOW_OBSERVED_MIN"])
-    assert nt.distribution["truncation"]["lower"] == 0
+                   truncation={"lower": 0, "reason": "tiempos no negativos", "bound_type": "MODELLING_BOUND"},
+                   accept_warnings=["MASS_BELOW_OBSERVED_MIN"])
+    tr = nt.distribution["truncation"]
+    assert tr["lower"] == 0 and tr["method"] == "FIT_THEN_TRUNCATE" and tr["provenance"]["source"] == "engineer:ana"
+    assert any(w.startswith("FIT_THEN_TRUNCATE") for w in nt.warnings)
     ln = ds.decide(did, "USE_FITTED", by="ana", fit_id=fit["fit_id"], candidate="lognormal")
     assert ln.decision is Decision.USE_FITTED and ln.decision_id == "dec_006"
     # data changed after the fit -> the fit is stale
@@ -169,13 +175,16 @@ def test_apply_creates_version_with_provenance_and_invalidates_approval(env):
     assert p.current_model().is_approved
     fit = ds.fit(did, by="ana")
     dec = ds.decide(did, "USE_FITTED", by="ana", fit_id=fit["fit_id"], candidate="gamma")
-    with pytest.raises(DataDecisionRequired, match="WORK_UNITS_SCALING"):
+    with pytest.raises(DataDecisionRequired, match="PROPUESTA: sum_iid"):  # proposed, never inferred
         ds.apply(did, dec.decision_id, TARGET, "PER_CIRCUIT", by="ana")
     with pytest.raises(DataDecisionRequired, match="Base del dato"):
-        ds.apply(did, dec.decision_id, TARGET, "PER_RACK", by="ana", acknowledge=["WORK_UNITS_SCALING"])
+        ds.apply(did, dec.decision_id, TARGET, "PER_RACK", by="ana", aggregation="sum_iid")
     before = p.meta.current_version
-    r = ds.apply(did, dec.decision_id, TARGET, "PER_CIRCUIT", by="ana", acknowledge=["WORK_UNITS_SCALING"])
+    r = ds.apply(did, dec.decision_id, TARGET, "PER_CIRCUIT", by="ana", aggregation="sum_iid")
     assert r["version"] == before + 1 and r["was_approved"] is True
+    assert r["work_units_aggregation_change"] == (None, "sum_iid")
+    assert p.current_model().nodes[1].params["work_units_aggregation"] == "sum_iid"
+    assert ds.state(did).applications[-1].work_units_aggregation == "sum_iid"
     m = p.current_model()
     assert not m.is_approved and "invalidated" in m.approval.note
     pt = m.nodes[1].params["process_time"]
@@ -210,8 +219,11 @@ def test_basis_conversion_is_explicit_and_calculated(env):
     assert pt["value"] == pytest.approx(4 * mean.distribution["value"]) and pt["provenance"]["status"] == "calculated"
     assert pt["provenance"]["data"]["conversion"]["to_basis"] == "PER_RACK" and "CONVERSION" in r["warnings"][0]
     emp = ds.decide(did, "USE_EMPIRICAL", by="ana")
-    with pytest.raises(DataDecisionRequired, match="SCALING_IS_NOT_SUM"):
+    with pytest.raises(DataDecisionRequired, match="scale_sample"):
         ds.apply(did, emp.decision_id, TARGET, "PER_RACK", by="ana", conversion=conv)
+    r = ds.apply(did, emp.decision_id, TARGET, "PER_RACK", by="ana", conversion={**conv, "aggregation": "scale_sample"})
+    pt = p.current_model().nodes[1].params["process_time"]
+    assert pt["dist"] == "empirical" and pt["provenance"]["data"]["conversion"]["aggregation"] == "scale_sample"
 
 
 def test_apply_refuses_unsupported_targets_and_quantities(env):
@@ -284,7 +296,7 @@ def test_historical_run_is_reproducible_after_source_changes(env, tmp_path):
     sf, p, ds = env
     did = _import_e2e(ds).meta.dataset_id
     emp = ds.decide(did, "USE_EMPIRICAL", by="ana")
-    v = ds.apply(did, emp.decision_id, TARGET, "PER_CIRCUIT", by="ana", acknowledge=["WORK_UNITS_SCALING"])["version"]
+    v = ds.apply(did, emp.decision_id, TARGET, "PER_CIRCUIT", by="ana", aggregation="sum_iid")["version"]
     sf.approve_model(p, by="ana")
     run = sf.run_simulation(p, replications=3)
     # the Excel changes later and is re-imported: a NEW dataset version; the stored model version is untouched
@@ -340,15 +352,15 @@ def test_cli_end_to_end(tmp_path, monkeypatch):
     ok("data", "decide", "e2e", "montaje@v1", "USE_FITTED", "--fit", fit_id, "--candidate", "lognormal", "--by", "ana")
     r = runner.invoke(cli, ["data", "apply", "e2e", "montaje@v1", "dec_001", "--target", TARGET, "--target-basis", "PER_CIRCUIT",
                             "--by", "ana"])
-    assert r.exit_code == 1 and "WORK_UNITS_SCALING" in r.output
+    assert r.exit_code == 1 and "PROPUESTA: sum_iid" in r.output
     out = ok("data", "apply", "e2e", "montaje@v1", "dec_001", "--target", TARGET, "--target-basis", "PER_CIRCUIT", "--by", "ana",
-             "--ack", "WORK_UNITS_SCALING")
+             "--aggregation", "sum_iid")
     assert "INVALIDATED" in out
     r = runner.invoke(cli, ["project", "run", "e2e"])
     assert r.exit_code == 1 and "derivados de datos" in r.output
     ok("project", "approve", "e2e", "--by", "ana")
     out = ok("project", "run", "e2e", "--reps", "2")
-    assert "engine 0.4.0" in out and "seeds [12345, 12346]" in out
+    assert "engine 0.5.0" in out and "seeds [12345, 12346]" in out
     assert '"fit_id": "' + fit_id in ok("data", "trace", "e2e", TARGET)
     assert "APPLIED" in ok("data", "inspect", "e2e", "montaje@v1")
     assert "montaje@v1" in ok("data", "list", "e2e")
@@ -379,7 +391,7 @@ def test_ui_data_tab_renders_profile_and_fits(tmp_path, monkeypatch):
     next(t for t in at.text_input if t.key == "eng").input("ana").run()
     next(b for b in at.button if b.label == "Ajustar").click().run()
     assert not at.exception
-    assert any("CANDIDATE RANKING" in c.value for c in at.code)
+    assert any("STATISTICAL RANKING" in c.value for c in at.code)
 
 
 def test_experiment_with_data_derived_distribution_uses_recorded_seeds(env):
@@ -389,7 +401,7 @@ def test_experiment_with_data_derived_distribution_uses_recorded_seeds(env):
     did = _import_e2e(ds).meta.dataset_id
     fit = ds.fit(did, by="ana")
     d = ds.decide(did, "USE_FITTED", by="ana", fit_id=fit["fit_id"], candidate="gamma")
-    ds.apply(did, d.decision_id, TARGET, "PER_CIRCUIT", by="ana", acknowledge=["WORK_UNITS_SCALING"])
+    ds.apply(did, d.decision_id, TARGET, "PER_CIRCUIT", by="ana", aggregation="sum_iid")
     sf.approve_model(p, by="ana")
     from simforge.domain.isms import ExperimentSpec, Factor
     spec = ExperimentSpec(name="racks", factors=[Factor(path="resources.racks.quantity", values=[2, 4])], replications=3)

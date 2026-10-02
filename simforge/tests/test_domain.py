@@ -48,7 +48,7 @@ def test_no_negative_samples():
     with pytest.raises(ValidationError, match="explicit truncation"):
         Normal(mean=1, std=5)
     rng = random.Random(1)
-    trunc = {"lower": 0, "reason": "durations are non-negative"}
+    trunc = {"lower": 0, "reason": "durations are non-negative", "bound_type": "MODELLING_BOUND"}
     for d in [Normal(mean=1, std=5, truncation=trunc), LogNormal(mean=5, std=10), Exponential(mean=3), Uniform(low=0, high=1)]:
         assert min(d.sample_seconds(rng) for _ in range(5000)) >= 0
 

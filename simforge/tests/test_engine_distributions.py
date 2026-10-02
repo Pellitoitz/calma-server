@@ -53,30 +53,34 @@ def test_normal_with_negative_mass_requires_explicit_truncation():
     with pytest.raises(ValidationError, match="explicit truncation"):
         Normal(mean=10, std=6)
     Normal(mean=50, std=5)  # P(t<0) ~ 1e-23: accepted
-    n = Normal(mean=10, std=6, truncation={"lower": 0, "reason": "times cannot be negative"})
+    n = Normal(mean=10, std=6, truncation={"lower": 0, "reason": "times cannot be negative", "bound_type": "MODELLING_BOUND"})
     assert "truncated[0,]" in n.describe()
 
 
 def test_truncation_needs_reason_and_valid_bounds():
     with pytest.raises(ValidationError):
-        Truncation(lower=0, reason="")
+        Truncation(lower=0, reason="", bound_type="MODELLING_BOUND")
     with pytest.raises(ValidationError):
-        Truncation(reason="no bounds")
+        Truncation(reason="no bounds", bound_type="MODELLING_BOUND")
     with pytest.raises(ValidationError):
-        Truncation(lower=5, upper=5, reason="empty window")
+        Truncation(lower=5, upper=5, reason="empty window", bound_type="MODELLING_BOUND")
     with pytest.raises(ValidationError):
-        Truncation(lower=-1, reason="negative lower")
+        Truncation(lower=-1, reason="negative lower", bound_type="MODELLING_BOUND")
+    with pytest.raises(ValidationError):
+        Truncation(lower=0, reason="bound type is mandatory")  # never defaulted
+    t = Truncation(lower=8, reason="nunca menos de 8 s (husillo)", bound_type="PHYSICAL_BOUND")
+    assert t.method == "DECLARED"
 
 
 def test_truncated_samples_stay_in_window_and_mean_is_conditional():
-    d = Normal(mean=10, std=6, truncation={"lower": 0, "upper": 20, "reason": "observed range"})
+    d = Normal(mean=10, std=6, truncation={"lower": 0, "upper": 20, "reason": "observed range", "bound_type": "MODELLING_BOUND"})
     rng = random.Random(3)
     xs = [d.sample_seconds(rng) for _ in range(20000)]
     assert 0 <= min(xs) and max(xs) <= 20
     # analytic mean of N(10,6) truncated to [0,20] is 10 (symmetric window)
     assert d.mean_seconds() == pytest.approx(10, abs=1e-6)
     assert sum(xs) / len(xs) == pytest.approx(10, abs=0.15)
-    one_sided = Normal(mean=10, std=6, truncation={"lower": 0, "reason": "non-negative"})
+    one_sided = Normal(mean=10, std=6, truncation={"lower": 0, "reason": "non-negative", "bound_type": "MODELLING_BOUND"})
     assert one_sided.mean_seconds() > 10  # truncating the left tail raises the mean
 
 
@@ -90,7 +94,7 @@ def test_negative_raw_sample_raises_instead_of_silent_resampling():
 
 
 def test_impossible_truncation_window_raises():
-    d = Uniform(low=0, high=1, truncation={"lower": 5, "upper": 6, "reason": "outside support"})
+    d = Uniform(low=0, high=1, truncation={"lower": 5, "upper": 6, "reason": "outside support", "bound_type": "MODELLING_BOUND"})
     with pytest.raises(ValueError, match="zero probability"):
         d.sample_seconds(random.Random(1))
 
@@ -116,7 +120,7 @@ def test_units_apply_to_new_distributions():
 
 
 @pytest.mark.parametrize("d", [Gamma(shape=2, scale=3), Weibull(shape=1.5, scale=4), Empirical(values=[1, 2, 3, 9]),
-                               Normal(mean=3, std=2, truncation={"lower": 0, "reason": "non-negative"})])
+                               Normal(mean=3, std=2, truncation={"lower": 0, "reason": "non-negative", "bound_type": "MODELLING_BOUND"})])
 def test_same_seed_same_sequence(d):
     a, b = random.Random(7), random.Random(7)
     assert [d.sample_seconds(a) for _ in range(200)] == [d.sample_seconds(b) for _ in range(200)]

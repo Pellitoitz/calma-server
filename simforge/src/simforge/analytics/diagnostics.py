@@ -74,7 +74,7 @@ def capacity_bounds(cm: CompiledModel) -> list[CapacityBound]:
         if c.behavior is not Behavior.SERVER or visits[n] == 0:
             continue
         p: ServerParams = c.params  # type: ignore[assignment]
-        mean = p.process_time.mean_seconds() * p.work_units if p.process_time else 0.0
+        mean = p.process_time.mean_seconds() * p.entity_time_factor() if p.process_time else 0.0
         avail = 1.0
         if p.failures:
             mtbf, mttr = p.failures.mtbf.mean_seconds(), p.failures.mttr.mean_seconds()
@@ -113,7 +113,7 @@ def capacity_bounds(cm: CompiledModel) -> list[CapacityBound]:
             for pn in path_nodes:
                 pc = cm.nodes[pn]
                 if pc.behavior is Behavior.SERVER and pc.params.process_time:
-                    hold += pc.params.process_time.mean_seconds() * pc.params.work_units
+                    hold += pc.params.process_time.mean_seconds() * pc.params.entity_time_factor()
                 elif pc.behavior is Behavior.TRANSPORT:
                     hold += _trip_cycle(pc.params, with_return=False)
                 via = pc.node.release_via.get(s.resource)

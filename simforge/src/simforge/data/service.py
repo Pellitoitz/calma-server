@@ -16,10 +16,11 @@ from pydantic import TypeAdapter
 
 from ..domain.isms import Approval, ISMSModel
 from ..domain.paths import diff, get_value, set_value
-from ..domain.values import DataLink, Duration, Provenance, ValueStatus
+from ..domain.units import Dimension, to_base
+from ..domain.values import DataLink, Duration, Provenance, Truncation, ValueStatus
 from ..library.registry import ComponentRegistry
 from ..persistence.project import Project
-from ..validation.verifier import verify
+from ..validation.semantics import verify_model as verify
 from . import fitting, outliers, stats
 from .dataset import (
     ApplyEvent,
@@ -40,6 +41,7 @@ from .store import DatasetError, DatasetStore, slug
 from .validation import interpret
 
 _DURATION = TypeAdapter(Duration)
+AGGREGATIONS = ("sum_iid", "scale_sample", "single_sample")
 
 
 class DataDecisionRequired(DatasetError):
@@ -265,13 +267,15 @@ class DataService:
 
     # ===================================================================== fit
     def fit(self, dataset_id: str, by: str = "engineer", group: dict[str, str] | None = None, pooled: bool = False,
-            physical_min: float | None = None, physical_max: float | None = None) -> dict:
+            physical_min: float | None = None, physical_max: float | None = None, bounds: dict | None = None) -> dict:
+        """bounds: {"low", "high", "source": ENGINEER_BOUNDS | PROCESS_SPECIFICATION} for uniform/triangular (never invented)."""
         st = self.state(dataset_id)
         rows = self._select(st, group, pooled)
         notes = [n for n in st.meta.import_notes if n.startswith("ROUNDED_DATA")]
         if st.meta.synthetic:
             notes.insert(0, "SYNTHETIC TEST DATA: no son medidas de planta")
-        report = fitting.fit_candidates([o.value for o in rows], st.meta.analysis_unit, physical_min, physical_max, notes=notes)
+        report = fitting.fit_candidates([o.value for o in rows], st.meta.analysis_unit, physical_min, physical_max, notes=notes,
+                                        bounds=bounds)
         report["fit_id"] = "fit_" + hashlib.sha256(f"{report.get('fit_id')}|{st.state_hash}|{sorted((group or {}).items())}|{pooled}".encode()).hexdigest()[:12]
         report["dataset_id"], report["state_hash"], report["group"], report["pooled"] = dataset_id, st.state_hash, group or {}, pooled
         report["serial"] = stats.lag1([o.value for o in rows])
@@ -283,6 +287,28 @@ class DataService:
             self.project.log(by, "data_fit", request=dataset_id,
                              result=f"{report['fit_id']}: sugerido {report['suggested']['family'] if report['suggested'] else 'ninguno'}")
         return report
+
+    def holdout(self, dataset_id: str, train_fraction: float = 0.7, group: dict[str, str] | None = None,
+                pooled: bool = False, by: str = "engineer") -> dict:
+        """Temporal holdout check (validation aid, changes nothing): fit on the first `train_fraction` of the rows in time
+        order (file order if there is no timestamp, stated) and compare with the remaining rows. 70/30 is a proposal."""
+        if not 0.5 <= train_fraction <= 0.9:
+            raise DatasetError("train_fraction debe estar entre 0.5 y 0.9.")
+        st = self.state(dataset_id)
+        rows = self._select(st, group, pooled)
+        n = len(rows)
+        cut = int(round(n * train_fraction))
+        if cut < 10 or n - cut < 5:
+            raise DatasetError(f"Holdout con n = {n}: hacen falta ≥ 10 filas para ajustar y ≥ 5 para validar.")
+        x = [o.value for o in rows]
+        out = fitting.evaluate_holdout(x[:cut], x[cut:], st.meta.analysis_unit)
+        has_ts = bool(st.meta.mapping.timestamp) and all(o.timestamp for o in rows)
+        out.update({"dataset_id": dataset_id, "state_hash": st.state_hash, "train_fraction": train_fraction,
+                    "order": "timestamp" if has_ts else "file order (sin marca de tiempo: se asume que el archivo está en orden)",
+                    "split_at_row": rows[cut].row, "group": group or {}, "pooled": pooled})
+        self.project.log(by, "data_holdout", request=dataset_id,
+                         result=f"{train_fraction:.0%}/{1 - train_fraction:.0%}: {out['train_vs_test']['flag']}")
+        return out
 
     def get_fit(self, dataset_id: str, fit_id: str) -> FitEvent:
         for f in self.state(dataset_id).fits:
@@ -301,6 +327,11 @@ class DataService:
         m = st.meta
         dist: dict | None = None
         rows: list[Observation] = []
+        warnings: list[str] = []
+        if truncation is not None:
+            if decision is not Decision.USE_FITTED:
+                raise DatasetError("El truncamiento solo se aplica a una distribución ajustada (USE_FITTED).")
+            truncation = self._truncation(truncation, by)
         if decision in (Decision.USE_DETERMINISTIC, Decision.USE_EMPIRICAL, Decision.USE_FITTED):
             rows = self._select(st, group, pooled)
             if not rows and not (decision is Decision.USE_DETERMINISTIC and derivation == "ENGINEER_VALUE"):
@@ -319,9 +350,9 @@ class DataService:
                     v = d["mean"] if derivation == "MEAN" else d["median"]
                 dist = {"dist": "constant", "value": v, "unit": m.analysis_unit}
             elif decision is Decision.USE_EMPIRICAL:
-                if n < 10 and "VERY_SMALL_SAMPLE" not in accept:
-                    raise DataDecisionRequired(f"Empírica con n = {n} < 10: solo reproduce {n} valores. Acéptalo explícitamente "
-                                               "(accept_warnings=['VERY_SMALL_SAMPLE']) o mide más.")
+                info = fitting.empirical_info(x)  # small sample: warned and recorded, not blocked
+                warnings += info["warnings"] + [f"EMPIRICAL_SUPPORT: [{info['observed_min']:g}, {info['observed_max']:g}] "
+                                                f"{m.analysis_unit}, n = {n}: no genera valores fuera de lo observado"]
                 dist = {"dist": "empirical", "values": x, "unit": m.analysis_unit}
             else:
                 if not fit_id or not candidate:
@@ -339,7 +370,7 @@ class DataService:
                 if c["status"] == "REQUIRES_TRUNCATION" and not (truncation and truncation.get("lower") is not None
                                                                    and truncation["lower"] >= 0):
                     raise DataDecisionRequired(f"'{candidate}' tiene masa negativa: solo con truncamiento explícito "
-                                               "(truncation={'lower': 0, 'reason': '...'}).")
+                                               "(truncation={'lower': 0, 'reason': '...', 'bound_type': 'MODELLING_BOUND'}).")
                 flags = c["plausibility"]["flags"]
                 pending = [f["code"] for f in flags if f["severity"] in ("WARNING", "CRITICAL")
                            and f["code"] not in accept and not (f["code"] == "NEGATIVE_SUPPORT" and truncation)]
@@ -349,15 +380,50 @@ class DataService:
                 dist = {**c["params"], "unit": m.analysis_unit}
                 if truncation:
                     dist["truncation"] = truncation
+                    self._check_truncation(truncation, x, dist, accept, warnings)
             if SUPPORT[m.quantity_type]["dimension"].value == "time" and m.analysis_unit != UNKNOWN_UNIT:
                 _DURATION.validate_python(dist)  # the engine must accept it as is
         ev = DecisionEvent(decision_id=f"dec_{len(st.decisions) + 1:03d}", decision=decision, by=by, reason=reason, group=group or {},
                            pooled=pooled, derivation=derivation, engineer_value=engineer_value, fit_id=fit_id, candidate=candidate,
                            truncation=truncation, accepted_warnings=accept, distribution=dist, rows_used=[o.index for o in rows],
-                           n_used=len(rows), n_excluded=len(st.excluded) + len(st.marked_invalid), state_hash=st.state_hash)
+                           n_used=len(rows), n_excluded=len(st.excluded) + len(st.marked_invalid), state_hash=st.state_hash,
+                           warnings=warnings)
         self.store.append(dataset_id, ev)
         self.project.log(by, "data_decision", request=dataset_id, result=f"{ev.decision_id}: {decision.value} {candidate or derivation or ''}")
         return ev
+
+    @staticmethod
+    def _truncation(t: dict, by: str) -> dict:
+        """Normalise an engineer truncation: bound_type is mandatory; method FIT_THEN_TRUNCATE (parameters were fitted
+        without truncation); provenance = the engineer's declaration."""
+        if not t.get("bound_type"):
+            raise DataDecisionRequired("Truncamiento: indica bound_type = PHYSICAL_BOUND (límite físico del proceso) o "
+                                       "MODELLING_BOUND (recurso de modelado, p. ej. normal truncada en 0). No se asume.")
+        full = {**t, "method": "FIT_THEN_TRUNCATE",
+                "provenance": Provenance(status=ValueStatus.PROVIDED_BY_CLIENT, source=f"engineer:{by}", note=t.get("reason"),
+                                         timestamp=now_utc()).model_dump(mode="json")}
+        Truncation.model_validate(full)  # same validation as the engine
+        return full
+
+    @staticmethod
+    def _check_truncation(t: dict, x: list[float], dist: dict, accept: list[str], warnings: list[str]) -> None:
+        lo, hi = t.get("lower"), t.get("upper")
+        outside = [v for v in x if (lo is not None and v < lo) or (hi is not None and v > hi)]
+        if outside and t["bound_type"] == "PHYSICAL_BOUND" and "DATA_OUTSIDE_PHYSICAL_BOUND" not in accept:
+            raise DataDecisionRequired(f"{len(outside)} observaciones están fuera del límite físico declarado [{lo}, {hi}] "
+                                       f"(p. ej. {outside[:3]}): o el límite o los datos están mal. Revísalo, o acéptalo "
+                                       "explícitamente (DATA_OUTSIDE_PHYSICAL_BOUND).")
+        if outside:
+            warnings.append(f"TRUNCATION_EXCLUDES_OBSERVED: {len(outside)} valores observados quedan fuera de la ventana")
+        d = _DURATION.validate_python(dist)
+        k = to_base(1.0, dist["unit"], Dimension.TIME)
+        mean_t, mean_obs = d.mean_seconds() / k, sum(x) / len(x)
+        rel = abs(mean_t - mean_obs) / mean_obs if mean_obs else 0.0
+        msg = (f"FIT_THEN_TRUNCATE: la media de la distribución truncada ({mean_t:.4g}) difiere {rel:.1%} de la observada "
+               f"({mean_obs:.4g}): los parámetros se ajustaron SIN truncamiento")
+        if rel > fitting.MEAN_TOL_WARN and "TRUNCATION_SHIFTS_MEAN" not in accept:
+            raise DataDecisionRequired(msg + ". Acéptalo explícitamente (TRUNCATION_SHIFTS_MEAN) o elige otra familia.")
+        warnings.append(msg)
 
     def get_decision(self, dataset_id: str, decision_id: str) -> DecisionEvent:
         for d in self.state(dataset_id).decisions:
@@ -395,9 +461,13 @@ class DataService:
         return node_id, current
 
     def apply(self, dataset_id: str, decision_id: str, target: str, target_basis: Basis | str, by: str,
-              conversion: dict | None = None, acknowledge: list[str] | None = None) -> dict:
-        """Write the decided value into the CURRENT model as a NEW version (approval invalidated). Returns a summary."""
-        ack = list(acknowledge or [])
+              conversion: dict | None = None, aggregation: str | None = None) -> dict:
+        """Write the decided value into the CURRENT model as a NEW version (approval invalidated). Returns a summary.
+
+        aggregation: work_units_aggregation of the target node (sum_iid | scale_sample | single_sample). Required when the
+        node has work_units != 1 and the decided time is random and the node does not already declare one."""
+        if aggregation is not None and aggregation not in AGGREGATIONS:
+            raise DatasetError(f"Agregación desconocida '{aggregation}'. Opciones: {', '.join(AGGREGATIONS)}.")
         target_basis = Basis(target_basis)
         st = self.state(dataset_id)
         meta = st.meta
@@ -425,23 +495,37 @@ class DataService:
             k = float(conversion["factor"])
             if k <= 0:
                 raise DatasetError("El factor de conversión debe ser > 0.")
-            if dist["dist"] not in ("constant",) and "SCALING_IS_NOT_SUM" not in ack:
+            if dist["dist"] != "constant" and conversion.get("aggregation") != "scale_sample":
                 raise DataDecisionRequired(
-                    "Escalar una distribución por k modela k·X (una muestra multiplicada), NO la suma de k tiempos independientes: "
-                    "la media coincide pero la variabilidad es mayor (desv. ×k en lugar de ×√k). Confírmalo con "
-                    "acknowledge=['SCALING_IS_NOT_SUM'] o ajusta datos medidos en la base del destino.")
+                    "Convertir la base de una distribución con un factor solo puede representar k·X (scale_sample: una muestra "
+                    "multiplicada, Var = k²·Var(X)), no la suma de k tiempos independientes (Var = k·Var(X)). Si cada unidad "
+                    "se trabaja por separado, aplica el dato en su base a un nodo con work_units = k y work_units_aggregation "
+                    "= sum_iid. Si de verdad es k·X, decláralo: conversion['aggregation'] = 'scale_sample'.")
             dist = _scale(dist, k)
-            warnings.append(f"CONVERSION: {meta.basis.value} -> {target_basis.value}: {conversion['formula']} (×{k:g})")
-        # ---- engine semantics the engineer must know about
+            warnings.append(f"CONVERSION: {meta.basis.value} -> {target_basis.value}: {conversion['formula']} (×{k:g}"
+                            + (", scale_sample" if dist["dist"] != "constant" else "") + ")")
+        # ---- work_units aggregation: a structured decision, never inferred
+        agg_change = None
         if target.endswith("params.process_time"):
             node = next(n for n in model.nodes if n.id == node_id)
             wu = node.params.get("work_units", 1)
-            if wu != 1 and dist["dist"] != "constant":
-                if "WORK_UNITS_SCALING" not in ack:
-                    raise DataDecisionRequired(
-                        f"El nodo '{node_id}' tiene work_units = {wu}: el motor multiplica UNA muestra por work_units "
-                        "(variabilidad ×k, no ×√k). Confírmalo con acknowledge=['WORK_UNITS_SCALING'].")
-                warnings.append(f"WORK_UNITS_SCALING: work_units = {wu} multiplica una única muestra")
+            declared = node.params.get("work_units_aggregation")
+            random_time = not (dist["dist"] == "constant" or (dist["dist"] == "empirical" and len(set(dist["values"])) <= 1))
+            if aggregation is None and wu != 1 and random_time and not declared:
+                proposal = "sum_iid" if meta.basis is target_basis else None
+                raise DataDecisionRequired(
+                    f"El nodo '{node_id}' tiene work_units = {wu} y el tiempo decidido es aleatorio: declara cómo se combinan "
+                    "las muestras (aggregation): sum_iid = X1+…+Xk (una muestra independiente por unidad), scale_sample = k·X "
+                    "(una muestra multiplicada), single_sample = X (la muestra ya es la entidad completa)."
+                    + (f" PROPUESTA: {proposal} (dato {meta.basis.value} y destino por unidad de trabajo); confírmala." if proposal else ""))
+            if aggregation is not None and aggregation != declared:
+                agg_change = (declared, aggregation)
+            eff = aggregation or declared
+            if wu != 1 and eff:
+                warnings.append(f"WORK_UNITS_AGGREGATION: work_units = {wu}, {eff}"
+                                + (f" (antes: {declared or 'no declarada = k·X histórico'})" if agg_change else ""))
+            if eff == "single_sample" and wu != 1:
+                warnings.append("single_sample: work_units no multiplica el tiempo; cada muestra debe representar la entidad completa")
         if meta.quantity_type is QuantityType.DISTANCE:
             if dist["dist"] != "constant":
                 raise DatasetError("DISTANCE: el motor solo admite una distancia fija; aplica una decisión determinista.")
@@ -458,16 +542,17 @@ class DataService:
             status = ValueStatus.PROVIDED_BY_CLIENT
         else:
             status = ValueStatus(meta.measurement_status)
-        fit_summary = None
+        fit_summary = sources = None
         if dec.decision is Decision.USE_FITTED:
             c = fitting.candidate(self.get_fit(dataset_id, dec.fit_id).result, dec.candidate)
+            sources = c.get("parameter_sources")
             fit_summary = (f"{dec.candidate} {c['method']}; AIC {c['aic']:.1f} (ΔAIC {c['delta_aic']:.2f}); "
                            f"KS {c['gof']['ks_stat']:.3f}; n={dec.n_used}")
         link = DataLink(dataset_id=dataset_id, dataset_version=meta.version, content_hash=meta.content_hash,
                         source_file=meta.source_file, column=meta.mapping.value, original_unit=meta.analysis_unit,
                         basis=meta.basis.value, n_used=dec.n_used, n_excluded=dec.n_excluded,
                         decision={"USE_DETERMINISTIC": "DETERMINISTIC", "USE_EMPIRICAL": "EMPIRICAL", "USE_FITTED": "FITTED"}[dec.decision.value],
-                        derivation=dec.derivation, fit_id=dec.fit_id, fit_summary=fit_summary,
+                        derivation=dec.derivation, fit_id=dec.fit_id, fit_summary=fit_summary, parameter_sources=sources,
                         conversion=({**conversion, "from_basis": meta.basis.value, "to_basis": target_basis.value}
                                     if conversion else None),
                         decided_by=dec.by, decided_at=dec.at)
@@ -476,6 +561,8 @@ class DataService:
         prov = Provenance(status=status, source=meta.source_file, note=note, timestamp=now_utc(), data=link)
         new_value = {**dist, "provenance": prov.model_dump(mode="json")}
         new_model = set_value(model, target, new_value)
+        if agg_change:
+            new_model = set_value(new_model, f"nodes.{node_id}.params.work_units_aggregation", agg_change[1])
         new_model = new_model.model_copy(update={"approval": Approval(note=f"invalidated: {target} changed from data {dataset_id}")})
         rep, _ = verify(new_model, self.registry)
         if not rep.ok:
@@ -487,8 +574,9 @@ class DataService:
                          result=f"v{v} (approval invalidated; was approved: {model.is_approved})")
         self.store.append(dataset_id, ApplyEvent(decision_id=decision_id, project_model_version=v, parent_model_version=parent,
                                                  target=target, target_basis=target_basis.value, conversion=conversion, by=by,
-                                                 warnings_acknowledged=ack))
+                                                 work_units_aggregation=(agg_change[1] if agg_change else None)))
         return {"version": v, "parent": parent, "target": target, "previous": current, "new": dist, "provenance": status.value,
+                "work_units_aggregation_change": agg_change,
                 "warnings": warnings, "was_approved": model.is_approved, "approval": "INVALIDATED (new version, re-approval needed)",
                 "changes": changes}
 

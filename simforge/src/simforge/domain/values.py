@@ -46,6 +46,7 @@ class DataLink(BaseModel):
     derivation: str | None = None  # DETERMINISTIC: MEAN | MEDIAN | ENGINEER_VALUE
     fit_id: str | None = None
     fit_summary: str | None = None
+    parameter_sources: dict | None = None  # per parameter: ESTIMATED_FROM_DATA / CALCULATED_BOUNDS / ENGINEER_BOUNDS...
     conversion: dict | None = None  # explicit basis/unit conversion: {"formula": ..., "inputs": {...}}
     decided_by: str
     decided_at: datetime
@@ -126,6 +127,13 @@ class Truncation(BaseModel):
     lower: float | None = Field(default=None, ge=0)
     upper: float | None = None
     reason: str = Field(min_length=3)
+    # PHYSICAL_BOUND: the process physically cannot go beyond it ("never under 8 s").
+    # MODELLING_BOUND: a modelling device (e.g. a normal truncated at 0 to avoid impossible times).
+    bound_type: Literal["PHYSICAL_BOUND", "MODELLING_BOUND"]
+    # DECLARED: written by the engineer. FIT_THEN_TRUNCATE: parameters were fitted WITHOUT truncation and the fitted
+    # distribution was truncated afterwards (NOT a truncated-distribution fit; that method is not implemented).
+    method: Literal["DECLARED", "FIT_THEN_TRUNCATE"] = "DECLARED"
+    provenance: Provenance | None = None
 
     @model_validator(mode="after")
     def _bounds(self) -> "Truncation":
@@ -311,7 +319,7 @@ class Normal(_Dist):
         if p_neg > 1e-9 and not lower_ok:
             raise ValueError(f"normal N({self.mean:g}, {self.std:g}) gives P(t < 0) = {p_neg:.2g}: durations cannot be negative. "
                              "Use a positive distribution (lognormal, gamma, weibull) or declare an explicit truncation, "
-                             "e.g. truncation: {lower: 0, reason: '...'}")
+                             "e.g. truncation: {lower: 0, reason: '...', bound_type: MODELLING_BOUND}")
         return self
 
     def p_negative(self) -> float:
