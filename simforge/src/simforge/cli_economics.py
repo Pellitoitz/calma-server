@@ -50,12 +50,15 @@ def print_evaluation(ev) -> None:
         q = f"{ln.quantity['mean']:.3f} {ln.unit}" if ln.quantity else "—"
         v = f"{ln.value['mean']:,.2f}" if ln.value else "—"
         typer.echo(f"{ln.line_id:<26}{ln.status:<28}{ln.basis:<30}{q:>14}{v:>16}  {ln.formula_id}")
-    typer.echo(f"evaluated_total_cost: {_fmt(ev.totals['evaluated_total_cost'], c)} (categories {ev.totals['included_categories']}; "
-               "NOT a full production cost unless coverage says so)")
+    typer.echo(f"evaluated_total_cost: {_fmt(ev.totals['evaluated_total_cost'], c)} = sum of INCLUDED lines (complete categories "
+               f"{ev.totals['included_categories']}; evaluated categories only, NOT a full production cost)")
+    typer.echo("  breakdown: " + ", ".join(f"{k} {_fmt(v, c)} [{ev.totals['by_category_coverage'][k]}]"
+                                           for k, v in ev.totals["by_category"].items()))
     typer.echo(f"cost_per_produced_unit: {_fmt(ev.unit_costs['cost_per_produced_unit'], c)} · cost_per_good_unit: "
-               f"{_fmt(ev.unit_costs['cost_per_good_unit'], c)}")
+               f"{_fmt(ev.unit_costs['cost_per_good_unit'], c)} (mean of per-replication ratios)")
     if ev.revenue["status"] == "AVAILABLE":
-        typer.echo(f"revenue: {_fmt(ev.revenue['revenue'], c)} · evaluated_net_result: {_fmt(ev.revenue['evaluated_net_result'], c)}")
+        typer.echo(f"revenue: {_fmt(ev.revenue['revenue'], c)} · evaluated_net_result: {_fmt(ev.revenue['evaluated_net_result'], c)} "
+                   f"(revenue - cost of {ev.revenue['cost_categories_in_net_result']}; NOT a profit)")
     a = ev.annualized
     typer.echo("annualized: " + (f"{_fmt(a['evaluated_total_cost'], c)}/year (x{a['runs_per_year']} runs)" if a["status"] == "AVAILABLE"
                                  else f"MISSING ({a['reason']})"))
@@ -114,21 +117,25 @@ def compare(baseline: str, alternative: str, seed: Optional[int] = typer.Option(
     c = compare_evaluations(eb, ea, mb, ma)
     ccy = eb.currency
     typer.echo(f"comparison {c.status} · paired={c.paired} (delta = alternative - baseline; savings = baseline - alternative)")
-    for w in c.errors + c.warnings:
-        typer.secho(f"  ! {w}", fg="yellow")
+    for x in c.checks:
+        typer.secho(f"  {x['level']} [{x['check']}] {x['detail']}", fg={"HARD_INCOMPATIBILITY": "red", "WARNING": "yellow"}.get(x["level"]))
     for k, d in c.physical_deltas.items():
         pct = f" ({d['delta_pct']:+.1f}%)" if d["delta_pct"] is not None else ""
         typer.echo(f"  {k}: {d['baseline']:.3f} -> {d['alternative']:.3f}  delta {d['delta']:+.3f}{pct}")
     for k, d in c.cost_deltas.items():
         typer.echo(f"  cost {k}: delta {d['mean']:+,.2f} {ccy}")
-    typer.echo(f"  evaluated savings (run): {c.savings['mean']:+,.2f} {ccy}")
+    typer.echo(f"  evaluated savings (run): {c.savings['mean']:+,.2f} {ccy} ({c.savings['definition']})")
     if c.annual["status"] == "AVAILABLE":
         typer.echo(f"  evaluated savings (year): {c.annual['savings_per_year']['mean']:+,.2f} {ccy}")
     else:
         typer.echo(f"  annual: {c.annual['status']} ({c.annual.get('reason', '')})")
     if c.capex["status"] == "AVAILABLE":
         typer.echo(f"  incremental CAPEX: {c.capex['incremental']:,.2f} {ccy}")
+    else:
+        typer.echo(f"  incremental CAPEX: {c.capex['status']} (never assumed 0)")
     p = c.payback
     typer.echo("  simple payback: " + (f"{p['years']:.2f} years" if p["status"] == "AVAILABLE" else f"{p['status']} ({p.get('reason', '')})")
                + f"  [{p['formula']}]")
+    r = c.annual_return_on_incremental_capex
+    typer.echo("  annual return on incremental CAPEX: " + (f"{r['value']:.3f}" if r["status"] == "AVAILABLE" else r["status"]))
     typer.echo(f"  {c.note}")

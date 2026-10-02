@@ -176,12 +176,19 @@ class Project:
 
     # ------------------------------------------------------------------ economic evaluations (>= 0.9.0)
     def save_evaluation(self, ev, assumptions) -> None:
-        """Store an economic evaluation REFERENCING its physical run (the run itself is not copied)."""
+        """Store an economic evaluation REFERENCING its physical run (the run itself is not copied). The evaluation id
+        is deterministic (run + economic hash + version): re-evaluating keeps the stored row and its approval."""
+        result = json.dumps(ev.to_dict(), allow_nan=False)
+        row = self.db.execute("SELECT result_json FROM economic_evaluations WHERE evaluation_id = ?", (ev.evaluation_id,)).fetchone()
+        if row is not None:
+            if json.loads(row[0]) != json.loads(result):
+                raise RuntimeError(f"evaluation {ev.evaluation_id}: same identity, different result (non-deterministic?)")
+            return
         self.db.execute(
-            "INSERT OR REPLACE INTO economic_evaluations(evaluation_id, run_id, physical_model_hash, economic_hash, "
+            "INSERT INTO economic_evaluations(evaluation_id, run_id, physical_model_hash, economic_hash, "
             "economics_engine_version, status, created_at, assumptions_json, result_json) VALUES (?,?,?,?,?,?,?,?,?)",
             (ev.evaluation_id, ev.run_id, ev.physical_model_hash, ev.economic_hash, ev.economics_engine_version, ev.status,
-             _now(), assumptions.model_dump_json(), json.dumps(ev.to_dict())))
+             _now(), assumptions.model_dump_json(), result))
         self.db.commit()
 
     def evaluations(self, run_id: str | None = None) -> list[dict[str, Any]]:

@@ -40,7 +40,7 @@ import re
 from enum import Enum
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_serializer, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_serializer
 
 from .values import Provenance
 
@@ -102,7 +102,7 @@ class Money(_Strict):
     def _finite(cls, v):
         if v is not None and not math.isfinite(v):
             raise ValueError("el valor económico debe ser finito")
-        return v
+        return v + 0.0 if v is not None else None  # -0.0 -> 0.0 (an explicit zero is data, never MISSING)
 
     @model_serializer(mode="wrap")
     def _keep_missing(self, handler):
@@ -160,6 +160,13 @@ class Annualization(_Strict):
     runs_per_year: float  # how many times per year the evaluated run represents the operation (explicit)
     provenance: Provenance | None = None
 
+    @field_validator("runs_per_year")
+    @classmethod
+    def _finite(cls, v: float) -> float:
+        if not math.isfinite(v):
+            raise ValueError("runs_per_year debe ser finito (> 0 lo comprueba el verificador)")
+        return v
+
 
 class EconomicsSpec(_Strict):
     currency: str
@@ -181,14 +188,17 @@ class EconomicsSpec(_Strict):
     def _ccy(cls, v: str) -> str:
         return Money._ccy(v)
 
-    @model_validator(mode="after")
-    def _scope(self) -> "EconomicsSpec":
-        bad = [c for c in self.scope if c not in CATEGORIES]
+    @field_validator("scope")
+    @classmethod
+    def _scope(cls, v: list[str]) -> list[str]:
+        bad = [c for c in v if c not in CATEGORIES]
         if bad:
             raise ValueError(f"scope {bad} desconocido; categorías: {list(CATEGORIES)}")
-        return self
+        return [c for c in CATEGORIES if c in v]  # a set of categories: order / duplicates are not semantic
 
     def economic_hash(self) -> str:
+        """Every field of the block is semantic for the evaluation (values, bases, rules, provenance, references and notes
+        all appear in the audit trail); only key order and scope order/duplicates are not (normalised)."""
         return hashlib.sha256(json.dumps(self.model_dump(mode="json"), sort_keys=True).encode()).hexdigest()[:16]
 
     def all_money(self) -> list[tuple[str, Money]]:

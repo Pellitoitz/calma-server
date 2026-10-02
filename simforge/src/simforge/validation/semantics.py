@@ -59,7 +59,9 @@ def verify_model(model: ISMSModel, registry: ComponentRegistry):
     prod = getattr(model, "production", None)
     maint = getattr(model, "maintenance", None)
     if spec is None and prod is None and maint is None:
-        rep, compiled = verify(model, registry)
+        # non-physical blocks (economics) never reach the frozen verifier: it sees the physical core (same content hash)
+        physical = model.core() if getattr(model, "economics", None) is not None else model  # type: ignore[attr-defined]
+        rep, compiled = verify(physical, registry)
         rep.issues.extend(semantic_issues(model, registry))
         return rep, compiled
     core = model.core()  # type: ignore[attr-defined]

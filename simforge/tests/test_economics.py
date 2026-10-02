@@ -88,7 +88,8 @@ def test_44_energy_price_change_without_rerunning():
     assert total(b) == pytest.approx(30)
     assert a.run_id == b.run_id and a.physical_model_hash == b.physical_model_hash and a.economic_hash != b.economic_hash
     none = evaluate_run(run, m, spec(scope=["energy"], energy={"price": money(0.2, "PER_KWH")}))
-    assert none.coverage["energy"] == "NOT_APPLICABLE"  # no declared power: no kWh, never estimated
+    # closure 0.9.0: requested energy without declared power is MISSING (never estimated, never 0, never "complete")
+    assert none.coverage["energy"] == "MISSING" and none.status == "PARTIAL_MISSING_INPUTS"
 
 
 # ------------------------------------------------------------------------------------ 45: unit costs
@@ -143,7 +144,8 @@ def test_47_run_vs_annualized():
 
 
 def test_48_capex_and_simple_payback():
-    b, a = pair(per_run(100000, 1), per_run(80000, 1, capex=50000))
+    # closure 0.9.0: the baseline declares its CAPEX explicitly (0); an undeclared CAPEX is unknown, never 0
+    b, a = pair(per_run(100000, 1, capex=0), per_run(80000, 1, capex=50000))
     c = compare_evaluations(b, a)
     assert c.annual["savings_per_year"]["mean"] == 20000 and c.capex["incremental"] == 50000
     assert c.payback["status"] == "AVAILABLE" and c.payback["years"] == 2.5
@@ -152,10 +154,10 @@ def test_48_capex_and_simple_payback():
 
 
 def test_49_no_payback_when_savings_are_negative():
-    b, a = pair(per_run(100000, 1), per_run(105000, 1, capex=50000))
+    b, a = pair(per_run(100000, 1, capex=0), per_run(105000, 1, capex=50000))
     c = compare_evaluations(b, a)
     assert c.payback["status"] == "NOT_REACHED" and "years" not in c.payback
-    missing = pair(per_run(100000, 1), spec(machine=[{"node": "m", "rate": money(80000, "FIXED_PER_RUN")}],
+    missing = pair(per_run(100000, 1, capex=0), spec(machine=[{"node": "m", "rate": money(80000, "FIXED_PER_RUN")}],
                                             annualization={"mode": "REPEAT_RUN", "runs_per_year": 1},
                                             capex=[{"category": "equipment", "amount": money(None, "FIXED")}]))
     c = compare_evaluations(*missing)
@@ -208,7 +210,7 @@ def test_52_maintenance_technician_costs():
 
 # ------------------------------------------------------------------------------------ 53/54: comparison facts
 def test_53_scenario_comparison_conventions_and_no_recommendation():
-    b, a = pair(per_run(120000, 1), per_run(100000, 1, capex=60000))
+    b, a = pair(per_run(120000, 1, capex=0), per_run(100000, 1, capex=60000))
     c = compare_evaluations(b, a)
     assert c.cost_deltas["machine"]["mean"] == -20000 and c.savings["mean"] == 20000  # delta = alt - base; savings = base - alt
     assert c.payback["years"] == 3

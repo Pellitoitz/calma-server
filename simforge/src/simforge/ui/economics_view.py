@@ -58,12 +58,13 @@ def economics_tab(app: SimForgeApp, project: Project) -> None:
     cats = {c: _m(v) for c, v in ev.totals["by_category"].items()}
     if cats:
         st.bar_chart(pd.Series(cats, name=f"evaluated cost ({ev.currency})"))
-    st.write(f"evaluated_total_cost: **{_m(ev.totals['evaluated_total_cost'])}** {ev.currency} (incluye sólo "
-             f"{ev.totals['included_categories']}) · coste/unidad producida: {_m(ev.unit_costs['cost_per_produced_unit']) if isinstance(ev.unit_costs['cost_per_produced_unit'], dict) else 'UNDEFINED_METRIC'}"
+    st.write(f"evaluated_total_cost: **{_m(ev.totals['evaluated_total_cost'])}** {ev.currency} (suma de líneas INCLUDED; categorías completas "
+             f"{ev.totals['included_categories']}; no es un coste completo de producción) · coste/unidad producida: {_m(ev.unit_costs['cost_per_produced_unit']) if isinstance(ev.unit_costs['cost_per_produced_unit'], dict) else 'UNDEFINED_METRIC'}"
              f" · coste/unidad buena: {_m(ev.unit_costs['cost_per_good_unit']) if isinstance(ev.unit_costs['cost_per_good_unit'], dict) else 'UNDEFINED_METRIC'}")
     st.write("Anualizado: " + (f"{_m(ev.annualized['evaluated_total_cost'])} {ev.currency}/año" if ev.annualized["status"] == "AVAILABLE"
                                else f"MISSING ({ev.annualized['reason']})"))
-    st.write(f"CAPEX: {ev.capex['status']} · total {ev.capex['total']} · missing {ev.capex['missing']}")
+    st.write(f"CAPEX: {ev.capex['status']} · total {ev.capex['total'] if ev.capex['total'] is not None else '—'} · missing "
+             f"{ev.capex['missing']} (inversión: no se anualiza)")
     if len(ids) >= 2:
         st.subheader("Comparación (delta = alternativa − base; ahorro = base − alternativa)")
         c1, c2 = st.columns(2)
@@ -72,7 +73,7 @@ def economics_tab(app: SimForgeApp, project: Project) -> None:
         if b != a:
             c = app.compare_economics(project, b, a)
             st.write(f"**{c.status}** · emparejada: {c.paired}")
-            for w in c.errors + c.warnings:
+            for w in [f"{x['level']} [{x['check']}] {x['detail']}" for x in c.checks]:
                 st.warning(w)
             st.dataframe(pd.DataFrame([{"KPI": k, **v} for k, v in c.physical_deltas.items()]), hide_index=True)
             st.dataframe(pd.DataFrame([{"cost": k, "delta": v.get("mean"), "mode": v.get("mode")} for k, v in c.cost_deltas.items()]),

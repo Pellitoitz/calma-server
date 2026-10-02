@@ -69,8 +69,10 @@ class PhysicalView:
         return self.T * self.units[r], [f"measured window x {self.units[r]} unit(s) (no calendar: always available)"]
 
     def resource_task_h(self, r: str, task: str):
-        keys = [f"resource.{r}.task_h.{task}", f"resource.{r}.task_h.working:{task}"]
-        return sum(self._g(k) or 0.0 for k in keys), keys
+        """Hours the resource is SEIZED by the task (working + walking for it, incl. outside planned). Waiting for the
+        resource (e.g. `waiting_for_repair_resource_h`) is NOT resource time and is never valued here."""
+        key = f"resource.{r}.task_h.{task}"
+        return self._g(key) or 0.0, [key]
 
     def node_processing_h(self, n: str):
         u, out = self._g(f"node.{n}.utilization"), self._g(f"node.{n}.busy_outside_planned_h") or 0.0
@@ -186,13 +188,18 @@ class Line:
     note: str = ""
 
 
+def _clean(x):
+    """Statistics are finite numbers or None (e.g. the CI of n = 1): NaN is never serialised as an economic result."""
+    return None if x is None or not math.isfinite(x) else x + 0.0
+
+
 def _stat(values: list[float | None]) -> dict[str, float] | None:
     vals = [v for v in values if v is not None]
     if not vals:
         return None
     s = summarize(vals)
-    return {"n": s.n, "mean": s.mean, "std": s.std, "ci95_low": s.ci95_low, "ci95_high": s.ci95_high,
-            "min": s.min, "max": s.max}
+    return {"n": s.n, "mean": _clean(s.mean), "std": _clean(s.std), "ci95_low": _clean(s.ci95_low),
+            "ci95_high": _clean(s.ci95_high), "min": _clean(s.min), "max": _clean(s.max)}
 
 
 @dataclass
@@ -221,6 +228,8 @@ class EconomicEvaluation:
     physical: dict[str, Any]  # physical KPIs used for comparisons (means), referenced from the run, not recomputed
     uncertainty_label: str = UNCERTAINTY_LABEL
     formulas: dict[str, str] = field(default_factory=dict)
+    requested_scope: list[str] = field(default_factory=list)  # COMPLETE_FOR_REQUESTED_SCOPE refers to THESE categories
+    coverage_detail: dict[str, Any] = field(default_factory=dict)  # e.g. energy: declared / not declared power states
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -267,6 +276,7 @@ def evaluate_run(run, model, spec: EconomicsSpec | None = None, registry=None) -
     T = (run.horizon_s - run.warmup_s) / 3600
     views = [PhysicalView(k, T, units, slots) for k in run.per_replication]
     lines: list[Line] = []
+    coverage_detail: dict[str, Any] = {}
 
     def add(line_id, category, target, money: Money, basis, formula, scope="shared", status=None, note="", **kw):
         qs, srcs, unit = [], [], ""
@@ -284,6 +294,7 @@ def evaluate_run(run, model, spec: EconomicsSpec | None = None, registry=None) -
             else:
                 status = "INCLUDED"
         vals = [None if (q is None or money.value is None) else money.value * q for q in qs]
+        _finite(line_id, vals)
         ln = Line(line_id, category, target, scope, basis.value, formula, status, _param(money), srcs, unit, qs, vals, note=note)
         ln.quantity, ln.value = _stat(qs), _stat(vals)
         lines.append(ln)
@@ -300,10 +311,15 @@ def evaluate_run(run, model, spec: EconomicsSpec | None = None, registry=None) -
     if spec.energy is not None:
         price = spec.energy.price
         if not spec.energy.power_kw:
-            lines.append(Line("energy", "energy", "run", "shared", "PER_KWH", "energy_kwh_v1", "NOT_APPLICABLE", _param(price),
-                              ["no declared electrical power: SimForge does not model energy (never estimated)"], "kWh",
-                              [None] * len(views), [None] * len(views)))
+            lines.append(Line("energy", "energy", "run", "shared", "PER_KWH", "energy_kwh_v1", "MISSING", _param(price),
+                              ["declared electrical power MISSING: SimForge does not model energy (never estimated, never 0)"],
+                              "kWh", [None] * len(views), [None] * len(views)))
+        prod = getattr(model, "production", None)
         for nid, states in spec.energy.power_kw.items():
+            applicable = ["PROCESSING"] + (["SETUP"] if prod is not None and nid in prod.setups else [])
+            coverage_detail.setdefault("energy", {})[nid] = {
+                "declared_states": [x for x in applicable if x in states],
+                "not_declared_states": [x for x in applicable if x not in states]}
             kwh, srcs = [], []
             for v in views:
                 total, ok = 0.0, True
@@ -317,6 +333,7 @@ def evaluate_run(run, model, spec: EconomicsSpec | None = None, registry=None) -
                 kwh.append(total if ok else None)
             status = ("MISSING" if price.value is None else "NOT_APPLICABLE" if any(q is None for q in kwh) else "INCLUDED")
             vals = [None if q is None or price.value is None else price.value * q for q in kwh]
+            _finite(f"energy.{nid}", vals)
             ln = Line(f"energy.{nid}", "energy", nid, "shared", "PER_KWH", "energy_kwh_v1", status, _param(price),
                       [f"declared power_kW {states} x state hours", *srcs], "kWh", kwh, vals,
                       note="kWh CALCULATED post-run from DECLARED power; not part of the DES")
@@ -338,6 +355,7 @@ def evaluate_run(run, model, spec: EconomicsSpec | None = None, registry=None) -
             status = ("REQUIRES_ENGINEER_DECISION" if f"maintenance.{i}" in red_lines else "MISSING" if money.value is None else "INCLUDED")
             q = [a for a, _ in qs]
             vals = [None if money.value is None else money.value * a for a in q]
+            _finite(f"maintenance.{i}", vals)
             ln = Line(f"maintenance.{i}", "maintenance", f"{x.resource}@{task}", "shared", money.basis.value,
                       "maintenance_labor_v1", status, _param(money), qs[0][1] if qs else [], "h", q, vals)
             ln.quantity, ln.value = _stat(q), _stat(vals)
@@ -354,7 +372,11 @@ def evaluate_run(run, model, spec: EconomicsSpec | None = None, registry=None) -
     n = len(views)
     costs = [ln for ln in lines if ln.status == "INCLUDED"]
     total = [sum(ln.value_per_rep[r] for ln in costs) for r in range(n)]
-    by_cat = {c: [sum(ln.value_per_rep[r] for ln in costs if ln.category == c) for r in range(n)] for c in CATEGORIES}
+    _finite("evaluated_total_cost", total)
+    # breakdown over EVERY category with an INCLUDED line (also when the category is partially MISSING), so that
+    # sum(by_category) == evaluated_total_cost always; `coverage` says whether the category is complete
+    with_lines = [c for c in CATEGORIES if any(ln.category == c for ln in costs)]
+    by_cat = {c: [sum(ln.value_per_rep[r] for ln in costs if ln.category == c) for r in range(n)] for c in with_lines}
     # coverage (structured, no arbitrary percentage)
     coverage: dict[str, str] = {}
     for c in CATEGORIES:
@@ -398,7 +420,7 @@ def evaluate_run(run, model, spec: EconomicsSpec | None = None, registry=None) -
         f = ann.runs_per_year
         annualized = {"status": "AVAILABLE", "formula_id": "annualized_v1", "mode": ann.mode, "runs_per_year": f,
                       "evaluated_total_cost": _stat([t * f for t in total]),
-                      "by_category": {c: _stat([v * f for v in vs]) for c, vs in by_cat.items() if coverage[c] == "INCLUDED"},
+                      "by_category": {c: _stat([v * f for v in vs]) for c, vs in by_cat.items()},
                       "revenue": _stat([r * f for r in revenue]) if revenue is not None else None}
     # CAPEX (economic only; MISSING != 0)
     items = [{"category": c.category, "value": c.amount.value, "currency": c.amount.currency, "note": c.note,
@@ -407,7 +429,7 @@ def evaluate_run(run, model, spec: EconomicsSpec | None = None, registry=None) -
              "total": sum(i["value"] for i in items if i["value"] is not None) if items else None,
              "missing": [i["category"] for i in items if i["value"] is None],
              "status": "NOT_DECLARED" if not items else ("PARTIAL_MISSING_INPUTS" if any(i["value"] is None for i in items) else "COMPLETE")}
-    physical = {k: _stat([kp.get(k) for kp in run.per_replication]) for k in
+    physical = {k: _stat([_clean(kp.get(k)) for kp in run.per_replication]) for k in
                 ("units_completed", "units_scrapped", "throughput_per_hour", "avg_lead_time_s", "avg_wip")}
     eid = hashlib.sha256(f"{run.run_id}|{spec.economic_hash()}|{ECONOMICS_ENGINE_VERSION}".encode()).hexdigest()[:12]
     return EconomicEvaluation(
@@ -416,20 +438,31 @@ def evaluate_run(run, model, spec: EconomicsSpec | None = None, registry=None) -
         seeds=list(run.seeds), horizon_s=run.horizon_s, warmup_s=run.warmup_s, lines=lines, coverage=coverage,
         out_of_scope=list(OUT_OF_SCOPE),
         totals={"formula_id": "evaluated_total_cost_v1", "evaluated_total_cost": _stat(total), "per_rep": total,
-                "by_category": {c: _stat(v) for c, v in by_cat.items() if coverage[c] == "INCLUDED"},
-                "by_category_per_rep": {c: v for c, v in by_cat.items() if coverage[c] == "INCLUDED"},
+                "by_category": {c: _stat(v) for c, v in by_cat.items()},
+                "by_category_per_rep": dict(by_cat),
+                "by_category_coverage": {c: coverage[c] for c in by_cat},
                 "included_categories": [c for c in CATEGORIES if coverage[c] == "INCLUDED"]},
         unit_costs={"cost_per_produced_unit": _stat(cpp) if all(v is not None for v in cpp) else "UNDEFINED_METRIC",
                     "cost_per_good_unit": _stat(cpg) if all(v is not None for v in cpg) else "UNDEFINED_METRIC",
                     "formula_ids": ["cost_per_produced_unit_v1", "cost_per_good_unit_v1"],
+                    "statistic": "mean_of_per_replication_ratios",  # mean(cost_i / units_i), NOT mean(cost) / mean(units)
+                    "per_rep": {"cost_per_produced_unit": cpp, "cost_per_good_unit": cpg},
                     "denominators": {"produced": "good + scrapped units (window)", "good": "units completed (window)"}},
         revenue={"status": "NOT_DECLARED" if not spec.revenue else ("AVAILABLE" if revenue is not None else "MISSING"),
                  "revenue": _stat(revenue) if revenue is not None else None,
                  "evaluated_net_result": _stat(net) if net is not None else None,
                  "per_rep": revenue, "net_per_rep": net,
+                 "cost_categories_in_net_result": list(by_cat) if net is not None else [],
                  "note": "evaluated_net_result = revenue - evaluated_total_cost over the evaluated categories only; NOT a profit"},
         products=products, annualized=annualized, capex=capex,
-        issues=[str(i) for i in issues], physical=physical, formulas=dict(FORMULAS))
+        issues=[str(i) for i in issues], physical=physical, formulas=dict(FORMULAS),
+        requested_scope=list(spec.scope) or [c for c in CATEGORIES if c in {ln.category for ln in lines}],
+        coverage_detail=coverage_detail)
+
+
+def _finite(what: str, vals) -> None:
+    if any(v is not None and not math.isfinite(v) for v in vals):
+        raise EconomicsError(f"{what}: valor económico no finito (desbordamiento): revisa los supuestos.")
 
 
 def spec_from_json(text: str) -> EconomicsSpec:

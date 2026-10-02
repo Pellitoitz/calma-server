@@ -92,8 +92,8 @@ def economics_issues(spec: EconomicsSpec, model, registry: ComponentRegistry) ->
                 if s == "SETUP" and not setups_at(nid):
                     add(Level.WARNING, "ECONOMICS_NOT_APPLICABLE", f"energy '{nid}': potencia SETUP sin setups en el nodo.", p)
         if not spec.energy.power_kw:
-            add(Level.WARNING, "ECONOMICS_NOT_APPLICABLE", "energy: sin potencia declarada no hay kWh (SimForge no modela "
-                "energía y no la estima).", "economics.energy")
+            add(Level.WARNING, "ECONOMIC_INPUT_MISSING", "energy: potencia declarada MISSING: sin ella no hay kWh (SimForge "
+                "no modela energía y no la estima; nunca 0).", "economics.energy")
     for cat in ("material", "revenue"):
         for i, x in enumerate(getattr(spec, cat)):
             if x.product is not None:

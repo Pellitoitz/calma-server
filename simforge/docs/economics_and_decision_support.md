@@ -88,8 +88,9 @@ SETUP+OPERATING, PLANNED+CALENDAR) → `REQUIRES_ENGINEER_DECISION`. `PER_SETUP_
 ## 7. Energía
 
 SimForge **no modela energía y no estima kWh**. kWh = Σ potencia declarada (`power_kw[nodo][PROCESSING|SETUP]`) ×
-horas simuladas en ese estado. Sin potencia declarada → NOT_APPLICABLE. Cambiar el precio o la potencia no requiere
-re-simular (caso 44: 20 → 30).
+horas simuladas en ese estado. Bloque `energy` sin potencia declarada → **MISSING** (no 0, no NOT_APPLICABLE; cierre
+0.9.0). Potencia parcial por estados: `coverage_detail.energy[nodo]` lista `declared_states` / `not_declared_states`
+(un estado sin potencia no se valora). Cambiar el precio o la potencia no requiere re-simular (caso 44: 20 → 30).
 
 ## 8. Material y scrap (sin doble conteo)
 
@@ -114,7 +115,10 @@ precio declarado no se convierte en ingresos (caso 54).
 
 ## 11. Totales, costes unitarios, cobertura y estados
 
-- `evaluated_total_cost` = Σ líneas INCLUDED, con desglose por categoría (`by_category`).
+- `evaluated_total_cost` = Σ líneas INCLUDED y aditivas (MEMO, REVENUE, MISSING, NOT_APPLICABLE y
+  REQUIRES_ENGINEER_DECISION excluidas). **No** es "total production cost", "full cost" ni "fully loaded cost".
+  Desglose `by_category` sobre toda categoría con alguna línea INCLUDED (Σ by_category = total siempre);
+  `by_category_coverage` dice si la categoría está completa (cierre 0.9.0).
 - `cost_per_produced_unit` = total / (buenas + scrap); `cost_per_good_unit` = total / buenas. Denominador 0 en
   alguna réplica → `UNDEFINED_METRIC` (caso 45: 10 / 12.5).
 - Cobertura por categoría: `INCLUDED | MISSING | NOT_APPLICABLE | REQUIRES_ENGINEER_DECISION | NOT_REQUESTED`;
@@ -139,8 +143,8 @@ Los valores del run y los anualizados se presentan por separado. Anualizar exige
   listan (`mismatched_categories`) y no entran en el total común.
 - **Emparejada** (common random numbers) si semillas y réplicas coinciden: estadísticas de la diferencia réplica a
   réplica; si no, diferencia de medias.
-- CAPEX incremental = alt − base (separado del OPEX, sin amortización). MISSING ≠ 0: CAPEX MISSING → payback
-  `UNDEFINED_METRIC`.
+- CAPEX incremental = alt − base (separado del OPEX, sin amortización) sólo si ambos lados declaran CAPEX completo.
+  MISSING ≠ 0 y **no declarado ≠ 0** (cierre 0.9.0): una alternativa sin inversión declara una partida explícita de 0.
 - `simple_payback_v1` = CAPEX incremental / ahorro anual. Ahorro ≤ 0 → `NOT_REACHED` (nunca negativo); CAPEX ≤ 0 o
   sin anualización → `UNDEFINED_METRIC`. Caso 48: 2.5 años; caso 53: −20 000 / +20 000 / 3 años.
 - `annual_return_on_incremental_capex` = ahorro anual / CAPEX incremental (nombre explícito; no "ROI").
@@ -185,9 +189,151 @@ simforge economics compare BASE.yaml ALT.yaml [--seed S] [--replications N]   # 
 Pestaña **Economics**: supuestos, hash, issues, "Evaluar (sin re-simular)" sobre un run guardado, cobertura,
 líneas, gráfico por categoría, totales, costes unitarios, anualizado, CAPEX y comparación.
 
-## 19. Limitaciones (0.9)
+## 19. Cierre técnico 0.9.0: contratos fijados
+
+Tests: `tests/test_economics_closure.py`. Cada contrato tiene al menos un test.
+
+**Frontera física ↔ económica.** Un run físico admite N evaluaciones. Cada una referencia `run_id`,
+`physical_model_hash`, `economic_hash` y `economics_engine_version`:
+
+- mismo run + misma economía → mismo `evaluation_id`;
+- otra economía u otro run → otro id;
+- física incompatible → `EconomicsError`; nunca se aplica en silencio.
+
+Un modelo cuya **única** extensión es `economics` llega al verificador congelado como `core()` físico (mismo hash). Es
+un bug corregido: antes no se podía simular.
+
+**Hash económico.** Todo campo del bloque es semántico, incluidas procedencia, referencia y notas, porque aparecen en
+la auditoría. No son semánticos el orden de claves ni el orden o los duplicados de `scope`, que se normaliza al orden
+de `CATEGORIES`. `30` y `30.0` dan el mismo hash.
+
+**MISSING ≠ 0.** `value: null` sobrevive a YAML/JSON, SQLite, al hash, a la evaluación y a la comparación. Un 0
+explícito es un dato: se guarda con su procedencia, su línea es INCLUDED y vale 0. Además, `-0.0` se normaliza a `0.0`.
+
+**COMPLETE_FOR_REQUESTED_SCOPE.** Significa que todas las categorías **solicitadas** (`requested_scope`, o las
+declaradas si no hay `scope`) tienen sus entradas y que no queda ninguna decisión pendiente. **No** significa "modelo
+económico completo". Lo no solicitado aparece como `NOT_REQUESTED` y `out_of_scope` sigue visible.
+
+**Doble conteo.** Se marcan como `REQUIRES_ENGINEER_DECISION` (no se suman):
+
+- el mismo recurso en dos líneas `labor` (paid / planned / busy);
+- técnico en `labor` y en `*_LABOR`;
+- máquina con bases solapadas (igual base, PROCESSING+OPERATING, SETUP+OPERATING, PLANNED+CALENDAR);
+- `PER_CONSUMED_UNIT` junto con `scrap`;
+- material o ingresos a la vez globales y por producto.
+
+Combinaciones independientes que **no** se bloquean:
+
+- PROCESSING + SETUP;
+- material PER_GOOD_UNIT + scrap;
+- REPAIR_LABOR + PER_FAILURE + downtime.
+
+El significado de `downtime` (coste declarado por hora de parada) frente a una tarifa de máquina PER_PLANNED/CALENDAR
+del mismo nodo, que también cubre esas horas, es responsabilidad del ingeniero (LIMITATION). Ambas fuentes físicas son
+visibles en la auditoría.
+
+**Tiempo pagado.** Es una base de valoración declarada, no una inferencia laboral ni contable.
+
+- `CALENDAR_WINDOW` = ventana medida (horizonte − warm-up) × unidades. Es la ventana del run, **no** la duración del
+  turno, e incluye fuera de turno y descansos.
+- `PLANNED_AVAILABLE` = tiempo planificado disponible dentro de la ventana: turnos menos descansos, con las
+  excepciones de calendario ya aplicadas en el KPI.
+- `DECLARED` = horas declaradas × unidades.
+
+Ejemplos medidos:
+
+| Caso | CALENDAR_WINDOW | PLANNED_AVAILABLE |
+|---|---|---|
+| Turno 06–14, run 0–10 h | 10 | 4 |
+| Turno 06–14, run 24 h | 24 | 8 |
+| Dos turnos, run 24 h | 24 | 16 |
+| Descanso de 30 min | 14 | 7,5 |
+| Warm-up de 8 h | 6 | 6 |
+
+**Recorte al horizonte.** Toda base temporal sale de KPIs medidos en [warm-up, horizonte]: tiempo pagado y
+planificado, horas de máquina, kWh, downtime y horas de técnico. Economics no completa ninguna actividad: un trabajo
+sin terminar cuenta sus horas de proceso, pero no un ciclo ni una unidad.
+
+**Anualización.** `valor anual = valor del run × runs_per_year` (REPEAT_RUN), con `runs_per_year` explícito, finito
+y > 0. Es una extrapolación económica pura: no hay DES, ni demanda, ni días o turnos por año. Además:
+
+- el CAPEX **nunca** se multiplica: no hay `capex` dentro de `annualized`;
+- los costes unitarios no se anualizan: el ratio anual coincide con el del run.
+
+**CAPEX incremental.** Requiere CAPEX declarado y completo en ambos lados:
+
+- alguno de los dos sin declarar → `NOT_DECLARED`;
+- alguna partida MISSING → `MISSING`;
+- en ambos casos el payback queda `UNDEFINED_METRIC`.
+
+**Payback simple y retorno.** El payback es `AVAILABLE` sólo si se cumplen a la vez:
+
+- CAPEX incremental > 0;
+- ahorro anual > 0;
+- anualización válida y con la misma base en ambos lados;
+- ambas evaluaciones `COMPLETE_FOR_REQUESTED_SCOPE`;
+- cobertura idéntica.
+
+Si no:
+
+- ahorro ≤ 0 → `NOT_REACHED`;
+- CAPEX incremental ≤ 0 → `UNDEFINED_METRIC` (nunca "0 años");
+- entradas incompletas → `UNDEFINED_METRIC`;
+- cobertura distinta o doble conteo pendiente → `REQUIRES_ENGINEER_DECISION`.
+
+`annual_return_on_incremental_capex_v1` = ahorro anual / CAPEX incremental. Sólo existe con CAPEX incremental > 0 y
+puede ser ≤ 0 si el ahorro es ≤ 0; es aritmética, no una recomendación.
+
+**Ingresos.** Sólo unidades buenas × precio explícito: el scrap nunca genera ingresos. No se infiere demanda
+satisfecha, ventas perdidas ni coste de oportunidad. `cost_categories_in_net_result` lista las categorías restadas.
+
+**Energía.** Ver §7. Mantenimiento: las horas de técnico son el tiempo en que el recurso está **tomado** por
+`<nodo>#repair` / `<nodo>#pm` (trabajo + desplazamiento). Las esperas de recurso (`waiting_for_repair_resource_h`,
+`waiting_for_pm_h`) no son horas de técnico. Las averías y el downtime no cuestan nada sin entrada explícita.
+
+**Productos y setups.** Con `allocation_policy: NONE`, se cumple Σ directos + compartidos = total. Operario, setup,
+mantenimiento y máquina son compartidos. El setup pertenece al nodo y a la transición, nunca a un producto (contrato
+0.7).
+
+**Réplicas y ratios.** Cada réplica física tiene su evaluación por línea. Los costes unitarios son la **media de los
+ratios por réplica**: `mean(coste_i / unidades_i)`, no `mean(coste) / mean(unidades)`. `unit_costs.per_rep` y
+`unit_costs.statistic = mean_of_per_replication_ratios` lo hacen explícito. No se publica ningún ratio agregado.
+
+**Comparación emparejada.** Requiere evidencia de números aleatorios comunes: mismas semillas, mismas réplicas y mismo
+horizonte y warm-up. Entonces se resumen los `delta_i = alt_i − base_i`, con su propio IC. En otro caso se da sólo la
+diferencia de medias y no hay intervalo.
+
+**Comparabilidad.** Cada comprobación lleva un nivel (`checks[]`). No hay normalización ni ponderación automática.
+
+| Nivel | Comprobaciones | Efecto |
+|---|---|---|
+| HARD_INCOMPATIBILITY | moneda | → NOT_COMPARABLE |
+| WARNING | horizonte, demanda, mix, calendarios, base de anualización, cobertura | avisos |
+| INFORMATIONAL | réplicas distintas, unidades buenas distintas | información |
+
+Una física distinta es lo que se compara: nunca bloquea. Las categorías que faltan en un lado nunca se rellenan con 0.
+El ahorro se calcula sobre las categorías comunes y lo dice (`savings.definition`, `coverage_match`).
+
+**Fórmulas y versiones.** `FORMULAS` (evaluación) y `COMPARISON_FORMULAS` (comparación) llevan versión `_vN`; cada
+línea y cada indicador guarda su `formula_id`. Un cambio futuro será `_v2` con otro
+`ECONOMICS_ENGINE_VERSION` y, por tanto, otro `evaluation_id`: lo histórico nunca se reinterpreta.
+
+**Persistencia y aprobación.** Reevaluar el mismo run con la misma economía conserva la fila y su aprobación (bug
+corregido: `INSERT OR REPLACE` borraba la aprobación). Si una misma identidad diera otro resultado, se produce un error.
+Cambiar el precio de la energía no toca la aprobación física, pero crea otra evaluación sin aprobar.
+
+**Robustez numérica.** Entradas NaN o ±inf se rechazan, y lo mismo `runs_per_year` no finito. Un desbordamiento →
+`EconomicsError`. Las estadísticas nunca serializan NaN: el IC con n = 1 es `None`. El JSON de evaluación y comparación
+es estricto (`allow_nan=False`).
+
+**Determinismo.** Mismo run + mismos supuestos + misma versión → resultado idéntico byte a byte. No hay RNG económico.
+
+**Invariancia física.** Añadir, cambiar o quitar `economics` deja intactos el hash, los KPIs, la traza y 01–05.
+
+## 20. Limitaciones (0.9)
 
 Sin FX, sin NPV/IRR, sin amortización, sin impuestos/overhead/financiación, sin coste de oportunidad ni lost revenue,
 sin modelo de periodos (FIXED_PER_PERIOD), sin asignación de costes compartidos, sin scrap por producto, sin modelo
-físico de energía, sin incertidumbre de precios, sin optimización ni recomendación, sin IA. No validado con datos
-económicos reales.
+físico de energía, sin incertidumbre de precios, sin optimización ni recomendación, sin IA, sin ratio agregado
+(pooled) de costes unitarios, sin normalización por horizonte/demanda/mix, sin semántica automática de solapamiento
+downtime ↔ tarifa horaria de máquina del mismo nodo. No validado con datos económicos reales (NOT_TESTED).
