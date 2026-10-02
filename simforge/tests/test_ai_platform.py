@@ -78,8 +78,10 @@ def test_offline_generation_is_deterministic(tmp_path):
     a = app.parse_process(app.create_project("a"), MVP_SPEC_TEXT)
     b = app.parse_process(app.create_project("b"), MVP_SPEC_TEXT)
     assert a.outcome.draft == b.outcome.draft
-    strip = {"meta"}
-    assert a.outcome.model.model_dump(exclude=strip) == b.outcome.model.model_dump(exclude=strip)
+    import re
+    def norm(m):  # provenance timestamps (1 s resolution) legitimately differ between two generations
+        return re.sub(r'"timestamp":"[^"]*"', '"timestamp":"-"', m.model_dump_json(exclude={"meta"}))
+    assert norm(a.outcome.model) == norm(b.outcome.model)
 
 
 def test_controlled_tools(tmp_path):
