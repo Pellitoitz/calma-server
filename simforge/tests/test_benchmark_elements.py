@@ -195,8 +195,13 @@ def test_experiment_over_model_parameter(registry):
 
 # =============================================================== WIP_TARGET_PRIORITY
 class _Node:
+    _next = [1000]  # distinct fake entity ids per node: no unit is shared between nodes in these unit tests
+
     def __init__(self, occ=0, states=None):
         self._occ, self._st = occ, states or {}
+        n = occ + sum(self._st.values())
+        self._ids = list(range(_Node._next[0], _Node._next[0] + n))
+        _Node._next[0] += n
 
     def occupancy(self):
         return self._occ
@@ -204,10 +209,18 @@ class _Node:
     def state_counts(self):
         return self._st
 
+    def held_entities(self):
+        return set(self._ids[: self._occ])
+
+    def in_process_entities(self):
+        k = self._st.get(NodeState.BUSY, 0) + self._st.get(NodeState.BLOCKED, 0)
+        return set(self._ids[self._occ: self._occ + k])
+
 
 class _Req:
     def __init__(self, seq, node):
         self.seq, self.node, self.t, self.priority, self.entity, self.resume = seq, node, 0.0, 0, seq, False
+        self.node_rank = 0
 
 
 class _Pool:

@@ -1,0 +1,626 @@
+t,transport_state,feed_wip,buffer_de_entrada,manual_assembly(in process),transport_1(in process),shared,units_by_state,physical_units_that_could_count,same_unit_counted_twice
+120.0,blocked,1,0,1,1,1,"{""reserved:transport_1"": [1]}",1,False
+120.0,waiting_resource,1,0,1,0,0,"{""reserved:transport_1"": [1]}",1,False
+120.0,busy,1,0,1,1,1,"{""reserved:transport_1"": [1]}",1,False
+138.333333,blocked,1,0,0,1,0,"{""manual_assembly"": [2], ""transport_1"": [1]}",2,False
+138.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [1], ""manual_assembly"": [2]}",2,False
+266.666667,blocked,1,0,1,1,1,"{""inspection"": [1], ""reserved:transport_1"": [2]}",1,False
+266.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [1], ""reserved:transport_1"": [2]}",1,False
+266.666667,busy,1,0,1,1,1,"{""inspection"": [1], ""reserved:transport_1"": [2]}",1,False
+285.0,blocked,1,0,0,1,0,"{""inspection"": [1], ""manual_assembly"": [3], ""transport_1"": [2]}",2,False
+285.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [2], ""inspection"": [1], ""manual_assembly"": [3]}",2,False
+413.333333,blocked,1,0,1,1,1,"{""inspection"": [1], ""reserved:transport_1"": [3], ""selective_soldering"": [2]}",1,False
+413.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [1], ""reserved:transport_1"": [3], ""selective_soldering"": [2]}",1,False
+498.333333,busy,1,0,1,1,1,"{""inspection"": [2], ""reserved:transport_1"": [3]}",1,False
+516.666667,blocked,1,0,0,1,0,"{""inspection"": [2], ""manual_assembly"": [4], ""transport_1"": [3]}",2,False
+516.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [3], ""inspection"": [2], ""manual_assembly"": [4]}",2,False
+645.0,blocked,1,0,1,1,1,"{""inspection"": [2], ""reserved:transport_1"": [4], ""selective_soldering"": [3]}",1,False
+645.0,waiting_resource,1,0,1,0,0,"{""inspection"": [2], ""reserved:transport_1"": [4], ""selective_soldering"": [3]}",1,False
+730.0,busy,1,0,1,1,1,"{""inspection"": [3], ""reserved:transport_1"": [4]}",1,False
+748.333333,blocked,1,0,0,1,0,"{""inspection"": [3], ""manual_assembly"": [5], ""transport_1"": [4]}",2,False
+748.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [4], ""inspection"": [3], ""manual_assembly"": [5]}",2,False
+876.666667,blocked,1,0,1,1,1,"{""inspection"": [3], ""reserved:transport_1"": [5], ""selective_soldering"": [4]}",1,False
+876.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [3], ""reserved:transport_1"": [5], ""selective_soldering"": [4]}",1,False
+961.666667,busy,1,0,1,1,1,"{""inspection"": [4], ""reserved:transport_1"": [5]}",1,False
+980.0,blocked,1,0,0,1,0,"{""inspection"": [4], ""manual_assembly"": [6], ""transport_1"": [5]}",2,False
+980.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [5], ""inspection"": [4], ""manual_assembly"": [6]}",2,False
+1108.333333,blocked,1,0,1,1,1,"{""inspection"": [4], ""reserved:transport_1"": [6], ""selective_soldering"": [5]}",1,False
+1108.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [4], ""reserved:transport_1"": [6], ""selective_soldering"": [5]}",1,False
+1193.333333,busy,1,0,1,1,1,"{""inspection"": [5], ""reserved:transport_1"": [6]}",1,False
+1211.666667,blocked,1,0,0,1,0,"{""inspection"": [5], ""manual_assembly"": [7], ""transport_1"": [6]}",2,False
+1211.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [6], ""inspection"": [5], ""manual_assembly"": [7]}",2,False
+1340.0,blocked,1,0,1,1,1,"{""inspection"": [5], ""reserved:transport_1"": [7], ""selective_soldering"": [6]}",1,False
+1340.0,waiting_resource,1,0,1,0,0,"{""inspection"": [5], ""reserved:transport_1"": [7], ""selective_soldering"": [6]}",1,False
+1425.0,busy,1,0,1,1,1,"{""inspection"": [6], ""reserved:transport_1"": [7]}",1,False
+1443.333333,blocked,1,0,0,1,0,"{""inspection"": [6], ""manual_assembly"": [8], ""transport_1"": [7]}",2,False
+1443.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [7], ""inspection"": [6], ""manual_assembly"": [8]}",2,False
+1571.666667,blocked,1,0,1,1,1,"{""inspection"": [6], ""reserved:transport_1"": [8], ""selective_soldering"": [7]}",1,False
+1571.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [6], ""reserved:transport_1"": [8], ""selective_soldering"": [7]}",1,False
+1656.666667,busy,1,0,1,1,1,"{""inspection"": [7], ""reserved:transport_1"": [8]}",1,False
+1675.0,blocked,1,0,0,1,0,"{""inspection"": [7], ""manual_assembly"": [9], ""transport_1"": [8]}",2,False
+1675.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [8], ""inspection"": [7], ""manual_assembly"": [9]}",2,False
+1803.333333,blocked,1,0,1,1,1,"{""inspection"": [7], ""reserved:transport_1"": [9], ""selective_soldering"": [8]}",1,False
+1803.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [7], ""reserved:transport_1"": [9], ""selective_soldering"": [8]}",1,False
+1888.333333,busy,1,0,1,1,1,"{""inspection"": [8], ""reserved:transport_1"": [9]}",1,False
+1906.666667,blocked,1,0,0,1,0,"{""inspection"": [8], ""manual_assembly"": [10], ""transport_1"": [9]}",2,False
+1906.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [9], ""inspection"": [8], ""manual_assembly"": [10]}",2,False
+2035.0,blocked,1,0,1,1,1,"{""inspection"": [8], ""reserved:transport_1"": [10], ""selective_soldering"": [9]}",1,False
+2035.0,waiting_resource,1,0,1,0,0,"{""inspection"": [8], ""reserved:transport_1"": [10], ""selective_soldering"": [9]}",1,False
+2120.0,busy,1,0,1,1,1,"{""inspection"": [9], ""reserved:transport_1"": [10]}",1,False
+2138.333333,blocked,1,0,0,1,0,"{""inspection"": [9], ""manual_assembly"": [11], ""transport_1"": [10]}",2,False
+2138.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [10], ""inspection"": [9], ""manual_assembly"": [11]}",2,False
+2266.666667,blocked,1,0,1,1,1,"{""inspection"": [9], ""reserved:transport_1"": [11], ""selective_soldering"": [10]}",1,False
+2266.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [9], ""reserved:transport_1"": [11], ""selective_soldering"": [10]}",1,False
+2351.666667,busy,1,0,1,1,1,"{""inspection"": [10], ""reserved:transport_1"": [11]}",1,False
+2370.0,blocked,1,0,0,1,0,"{""inspection"": [10], ""manual_assembly"": [12], ""transport_1"": [11]}",2,False
+2370.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [11], ""inspection"": [10], ""manual_assembly"": [12]}",2,False
+2498.333333,blocked,1,0,1,1,1,"{""inspection"": [10], ""reserved:transport_1"": [12], ""selective_soldering"": [11]}",1,False
+2498.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [10], ""reserved:transport_1"": [12], ""selective_soldering"": [11]}",1,False
+2583.333333,busy,1,0,1,1,1,"{""inspection"": [11], ""reserved:transport_1"": [12]}",1,False
+2601.666667,blocked,1,0,0,1,0,"{""inspection"": [11], ""manual_assembly"": [13], ""transport_1"": [12]}",2,False
+2601.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [12], ""inspection"": [11], ""manual_assembly"": [13]}",2,False
+2730.0,blocked,1,0,1,1,1,"{""inspection"": [11], ""reserved:transport_1"": [13], ""selective_soldering"": [12]}",1,False
+2730.0,waiting_resource,1,0,1,0,0,"{""inspection"": [11], ""reserved:transport_1"": [13], ""selective_soldering"": [12]}",1,False
+2815.0,busy,1,0,1,1,1,"{""inspection"": [12], ""reserved:transport_1"": [13]}",1,False
+2833.333333,blocked,1,0,0,1,0,"{""inspection"": [12], ""manual_assembly"": [14], ""transport_1"": [13]}",2,False
+2833.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [13], ""inspection"": [12], ""manual_assembly"": [14]}",2,False
+2961.666667,blocked,1,0,1,1,1,"{""inspection"": [12], ""reserved:transport_1"": [14], ""selective_soldering"": [13]}",1,False
+2961.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [12], ""reserved:transport_1"": [14], ""selective_soldering"": [13]}",1,False
+3046.666667,busy,1,0,1,1,1,"{""inspection"": [13], ""reserved:transport_1"": [14]}",1,False
+3065.0,blocked,1,0,0,1,0,"{""inspection"": [13], ""manual_assembly"": [15], ""transport_1"": [14]}",2,False
+3065.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [14], ""inspection"": [13], ""manual_assembly"": [15]}",2,False
+3193.333333,blocked,1,0,1,1,1,"{""inspection"": [13], ""reserved:transport_1"": [15], ""selective_soldering"": [14]}",1,False
+3193.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [13], ""reserved:transport_1"": [15], ""selective_soldering"": [14]}",1,False
+3278.333333,busy,1,0,1,1,1,"{""inspection"": [14], ""reserved:transport_1"": [15]}",1,False
+3296.666667,blocked,1,0,0,1,0,"{""inspection"": [14], ""manual_assembly"": [16], ""transport_1"": [15]}",2,False
+3296.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [15], ""inspection"": [14], ""manual_assembly"": [16]}",2,False
+3425.0,blocked,1,0,1,1,1,"{""inspection"": [14], ""reserved:transport_1"": [16], ""selective_soldering"": [15]}",1,False
+3425.0,waiting_resource,1,0,1,0,0,"{""inspection"": [14], ""reserved:transport_1"": [16], ""selective_soldering"": [15]}",1,False
+3510.0,busy,1,0,1,1,1,"{""inspection"": [15], ""reserved:transport_1"": [16]}",1,False
+3528.333333,blocked,1,0,0,1,0,"{""inspection"": [15], ""manual_assembly"": [17], ""transport_1"": [16]}",2,False
+3528.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [16], ""inspection"": [15], ""manual_assembly"": [17]}",2,False
+3656.666667,blocked,1,0,1,1,1,"{""inspection"": [15], ""reserved:transport_1"": [17], ""selective_soldering"": [16]}",1,False
+3656.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [15], ""reserved:transport_1"": [17], ""selective_soldering"": [16]}",1,False
+3741.666667,busy,1,0,1,1,1,"{""inspection"": [16], ""reserved:transport_1"": [17]}",1,False
+3760.0,blocked,1,0,0,1,0,"{""inspection"": [16], ""manual_assembly"": [18], ""transport_1"": [17]}",2,False
+3760.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [17], ""inspection"": [16], ""manual_assembly"": [18]}",2,False
+3888.333333,blocked,1,0,1,1,1,"{""inspection"": [16], ""reserved:transport_1"": [18], ""selective_soldering"": [17]}",1,False
+3888.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [16], ""reserved:transport_1"": [18], ""selective_soldering"": [17]}",1,False
+3973.333333,busy,1,0,1,1,1,"{""inspection"": [17], ""reserved:transport_1"": [18]}",1,False
+3991.666667,blocked,1,0,0,1,0,"{""inspection"": [17], ""manual_assembly"": [19], ""transport_1"": [18]}",2,False
+3991.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [18], ""inspection"": [17], ""manual_assembly"": [19]}",2,False
+4120.0,blocked,1,0,1,1,1,"{""inspection"": [17], ""reserved:transport_1"": [19], ""selective_soldering"": [18]}",1,False
+4120.0,waiting_resource,1,0,1,0,0,"{""inspection"": [17], ""reserved:transport_1"": [19], ""selective_soldering"": [18]}",1,False
+4205.0,busy,1,0,1,1,1,"{""inspection"": [18], ""reserved:transport_1"": [19]}",1,False
+4223.333333,blocked,1,0,0,1,0,"{""inspection"": [18], ""manual_assembly"": [20], ""transport_1"": [19]}",2,False
+4223.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [19], ""inspection"": [18], ""manual_assembly"": [20]}",2,False
+4351.666667,blocked,1,0,1,1,1,"{""inspection"": [18], ""reserved:transport_1"": [20], ""selective_soldering"": [19]}",1,False
+4351.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [18], ""reserved:transport_1"": [20], ""selective_soldering"": [19]}",1,False
+4436.666667,busy,1,0,1,1,1,"{""inspection"": [19], ""reserved:transport_1"": [20]}",1,False
+4455.0,blocked,1,0,0,1,0,"{""inspection"": [19], ""manual_assembly"": [21], ""transport_1"": [20]}",2,False
+4455.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [20], ""inspection"": [19], ""manual_assembly"": [21]}",2,False
+4583.333333,blocked,1,0,1,1,1,"{""inspection"": [19], ""reserved:transport_1"": [21], ""selective_soldering"": [20]}",1,False
+4583.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [19], ""reserved:transport_1"": [21], ""selective_soldering"": [20]}",1,False
+4668.333333,busy,1,0,1,1,1,"{""inspection"": [20], ""reserved:transport_1"": [21]}",1,False
+4686.666667,blocked,1,0,0,1,0,"{""inspection"": [20], ""manual_assembly"": [22], ""transport_1"": [21]}",2,False
+4686.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [21], ""inspection"": [20], ""manual_assembly"": [22]}",2,False
+4815.0,blocked,1,0,1,1,1,"{""inspection"": [20], ""reserved:transport_1"": [22], ""selective_soldering"": [21]}",1,False
+4815.0,waiting_resource,1,0,1,0,0,"{""inspection"": [20], ""reserved:transport_1"": [22], ""selective_soldering"": [21]}",1,False
+4900.0,busy,1,0,1,1,1,"{""inspection"": [21], ""reserved:transport_1"": [22]}",1,False
+4918.333333,blocked,1,0,0,1,0,"{""inspection"": [21], ""manual_assembly"": [23], ""transport_1"": [22]}",2,False
+4918.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [22], ""inspection"": [21], ""manual_assembly"": [23]}",2,False
+5046.666667,blocked,1,0,1,1,1,"{""inspection"": [21], ""reserved:transport_1"": [23], ""selective_soldering"": [22]}",1,False
+5046.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [21], ""reserved:transport_1"": [23], ""selective_soldering"": [22]}",1,False
+5131.666667,busy,1,0,1,1,1,"{""inspection"": [22], ""reserved:transport_1"": [23]}",1,False
+5150.0,blocked,1,0,0,1,0,"{""inspection"": [22], ""manual_assembly"": [24], ""transport_1"": [23]}",2,False
+5150.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [23], ""inspection"": [22], ""manual_assembly"": [24]}",2,False
+5278.333333,blocked,1,0,1,1,1,"{""inspection"": [22], ""reserved:transport_1"": [24], ""selective_soldering"": [23]}",1,False
+5278.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [22], ""reserved:transport_1"": [24], ""selective_soldering"": [23]}",1,False
+5363.333333,busy,1,0,1,1,1,"{""inspection"": [23], ""reserved:transport_1"": [24]}",1,False
+5381.666667,blocked,1,0,0,1,0,"{""inspection"": [23], ""manual_assembly"": [25], ""transport_1"": [24]}",2,False
+5381.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [24], ""inspection"": [23], ""manual_assembly"": [25]}",2,False
+5510.0,blocked,1,0,1,1,1,"{""inspection"": [23], ""reserved:transport_1"": [25], ""selective_soldering"": [24]}",1,False
+5510.0,waiting_resource,1,0,1,0,0,"{""inspection"": [23], ""reserved:transport_1"": [25], ""selective_soldering"": [24]}",1,False
+5595.0,busy,1,0,1,1,1,"{""inspection"": [24], ""reserved:transport_1"": [25]}",1,False
+5613.333333,blocked,1,0,0,1,0,"{""inspection"": [24], ""manual_assembly"": [26], ""transport_1"": [25]}",2,False
+5613.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [25], ""inspection"": [24], ""manual_assembly"": [26]}",2,False
+5741.666667,blocked,1,0,1,1,1,"{""inspection"": [24], ""reserved:transport_1"": [26], ""selective_soldering"": [25]}",1,False
+5741.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [24], ""reserved:transport_1"": [26], ""selective_soldering"": [25]}",1,False
+5826.666667,busy,1,0,1,1,1,"{""inspection"": [25], ""reserved:transport_1"": [26]}",1,False
+5845.0,blocked,1,0,0,1,0,"{""inspection"": [25], ""manual_assembly"": [27], ""transport_1"": [26]}",2,False
+5845.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [26], ""inspection"": [25], ""manual_assembly"": [27]}",2,False
+5973.333333,blocked,1,0,1,1,1,"{""inspection"": [25], ""reserved:transport_1"": [27], ""selective_soldering"": [26]}",1,False
+5973.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [25], ""reserved:transport_1"": [27], ""selective_soldering"": [26]}",1,False
+6058.333333,busy,1,0,1,1,1,"{""inspection"": [26], ""reserved:transport_1"": [27]}",1,False
+6076.666667,blocked,1,0,0,1,0,"{""inspection"": [26], ""manual_assembly"": [28], ""transport_1"": [27]}",2,False
+6076.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [27], ""inspection"": [26], ""manual_assembly"": [28]}",2,False
+6205.0,blocked,1,0,1,1,1,"{""inspection"": [26], ""reserved:transport_1"": [28], ""selective_soldering"": [27]}",1,False
+6205.0,waiting_resource,1,0,1,0,0,"{""inspection"": [26], ""reserved:transport_1"": [28], ""selective_soldering"": [27]}",1,False
+6290.0,busy,1,0,1,1,1,"{""inspection"": [27], ""reserved:transport_1"": [28]}",1,False
+6308.333333,blocked,1,0,0,1,0,"{""inspection"": [27], ""manual_assembly"": [29], ""transport_1"": [28]}",2,False
+6308.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [28], ""inspection"": [27], ""manual_assembly"": [29]}",2,False
+6436.666667,blocked,1,0,1,1,1,"{""inspection"": [27], ""reserved:transport_1"": [29], ""selective_soldering"": [28]}",1,False
+6436.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [27], ""reserved:transport_1"": [29], ""selective_soldering"": [28]}",1,False
+6521.666667,busy,1,0,1,1,1,"{""inspection"": [28], ""reserved:transport_1"": [29]}",1,False
+6540.0,blocked,1,0,0,1,0,"{""inspection"": [28], ""manual_assembly"": [30], ""transport_1"": [29]}",2,False
+6540.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [29], ""inspection"": [28], ""manual_assembly"": [30]}",2,False
+6668.333333,blocked,1,0,1,1,1,"{""inspection"": [28], ""reserved:transport_1"": [30], ""selective_soldering"": [29]}",1,False
+6668.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [28], ""reserved:transport_1"": [30], ""selective_soldering"": [29]}",1,False
+6753.333333,busy,1,0,1,1,1,"{""inspection"": [29], ""reserved:transport_1"": [30]}",1,False
+6771.666667,blocked,1,0,0,1,0,"{""inspection"": [29], ""manual_assembly"": [31], ""transport_1"": [30]}",2,False
+6771.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [30], ""inspection"": [29], ""manual_assembly"": [31]}",2,False
+6900.0,blocked,1,0,1,1,1,"{""inspection"": [29], ""reserved:transport_1"": [31], ""selective_soldering"": [30]}",1,False
+6900.0,waiting_resource,1,0,1,0,0,"{""inspection"": [29], ""reserved:transport_1"": [31], ""selective_soldering"": [30]}",1,False
+6985.0,busy,1,0,1,1,1,"{""inspection"": [30], ""reserved:transport_1"": [31]}",1,False
+7003.333333,blocked,1,0,0,1,0,"{""inspection"": [30], ""manual_assembly"": [32], ""transport_1"": [31]}",2,False
+7003.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [31], ""inspection"": [30], ""manual_assembly"": [32]}",2,False
+7131.666667,blocked,1,0,1,1,1,"{""inspection"": [30], ""reserved:transport_1"": [32], ""selective_soldering"": [31]}",1,False
+7131.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [30], ""reserved:transport_1"": [32], ""selective_soldering"": [31]}",1,False
+7216.666667,busy,1,0,1,1,1,"{""inspection"": [31], ""reserved:transport_1"": [32]}",1,False
+7235.0,blocked,1,0,0,1,0,"{""inspection"": [31], ""manual_assembly"": [33], ""transport_1"": [32]}",2,False
+7235.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [32], ""inspection"": [31], ""manual_assembly"": [33]}",2,False
+7363.333333,blocked,1,0,1,1,1,"{""inspection"": [31], ""reserved:transport_1"": [33], ""selective_soldering"": [32]}",1,False
+7363.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [31], ""reserved:transport_1"": [33], ""selective_soldering"": [32]}",1,False
+7448.333333,busy,1,0,1,1,1,"{""inspection"": [32], ""reserved:transport_1"": [33]}",1,False
+7466.666667,blocked,1,0,0,1,0,"{""inspection"": [32], ""manual_assembly"": [34], ""transport_1"": [33]}",2,False
+7466.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [33], ""inspection"": [32], ""manual_assembly"": [34]}",2,False
+7595.0,blocked,1,0,1,1,1,"{""inspection"": [32], ""reserved:transport_1"": [34], ""selective_soldering"": [33]}",1,False
+7595.0,waiting_resource,1,0,1,0,0,"{""inspection"": [32], ""reserved:transport_1"": [34], ""selective_soldering"": [33]}",1,False
+7680.0,busy,1,0,1,1,1,"{""inspection"": [33], ""reserved:transport_1"": [34]}",1,False
+7698.333333,blocked,1,0,0,1,0,"{""inspection"": [33], ""manual_assembly"": [35], ""transport_1"": [34]}",2,False
+7698.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [34], ""inspection"": [33], ""manual_assembly"": [35]}",2,False
+7826.666667,blocked,1,0,1,1,1,"{""inspection"": [33], ""reserved:transport_1"": [35], ""selective_soldering"": [34]}",1,False
+7826.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [33], ""reserved:transport_1"": [35], ""selective_soldering"": [34]}",1,False
+7911.666667,busy,1,0,1,1,1,"{""inspection"": [34], ""reserved:transport_1"": [35]}",1,False
+7930.0,blocked,1,0,0,1,0,"{""inspection"": [34], ""manual_assembly"": [36], ""transport_1"": [35]}",2,False
+7930.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [35], ""inspection"": [34], ""manual_assembly"": [36]}",2,False
+8058.333333,blocked,1,0,1,1,1,"{""inspection"": [34], ""reserved:transport_1"": [36], ""selective_soldering"": [35]}",1,False
+8058.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [34], ""reserved:transport_1"": [36], ""selective_soldering"": [35]}",1,False
+8143.333333,busy,1,0,1,1,1,"{""inspection"": [35], ""reserved:transport_1"": [36]}",1,False
+8161.666667,blocked,1,0,0,1,0,"{""inspection"": [35], ""manual_assembly"": [37], ""transport_1"": [36]}",2,False
+8161.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [36], ""inspection"": [35], ""manual_assembly"": [37]}",2,False
+8290.0,blocked,1,0,1,1,1,"{""inspection"": [35], ""reserved:transport_1"": [37], ""selective_soldering"": [36]}",1,False
+8290.0,waiting_resource,1,0,1,0,0,"{""inspection"": [35], ""reserved:transport_1"": [37], ""selective_soldering"": [36]}",1,False
+8375.0,busy,1,0,1,1,1,"{""inspection"": [36], ""reserved:transport_1"": [37]}",1,False
+8393.333333,blocked,1,0,0,1,0,"{""inspection"": [36], ""manual_assembly"": [38], ""transport_1"": [37]}",2,False
+8393.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [37], ""inspection"": [36], ""manual_assembly"": [38]}",2,False
+8521.666667,blocked,1,0,1,1,1,"{""inspection"": [36], ""reserved:transport_1"": [38], ""selective_soldering"": [37]}",1,False
+8521.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [36], ""reserved:transport_1"": [38], ""selective_soldering"": [37]}",1,False
+8606.666667,busy,1,0,1,1,1,"{""inspection"": [37], ""reserved:transport_1"": [38]}",1,False
+8625.0,blocked,1,0,0,1,0,"{""inspection"": [37], ""manual_assembly"": [39], ""transport_1"": [38]}",2,False
+8625.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [38], ""inspection"": [37], ""manual_assembly"": [39]}",2,False
+8753.333333,blocked,1,0,1,1,1,"{""inspection"": [37], ""reserved:transport_1"": [39], ""selective_soldering"": [38]}",1,False
+8753.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [37], ""reserved:transport_1"": [39], ""selective_soldering"": [38]}",1,False
+8838.333333,busy,1,0,1,1,1,"{""inspection"": [38], ""reserved:transport_1"": [39]}",1,False
+8856.666667,blocked,1,0,0,1,0,"{""inspection"": [38], ""manual_assembly"": [40], ""transport_1"": [39]}",2,False
+8856.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [39], ""inspection"": [38], ""manual_assembly"": [40]}",2,False
+8985.0,blocked,1,0,1,1,1,"{""inspection"": [38], ""reserved:transport_1"": [40], ""selective_soldering"": [39]}",1,False
+8985.0,waiting_resource,1,0,1,0,0,"{""inspection"": [38], ""reserved:transport_1"": [40], ""selective_soldering"": [39]}",1,False
+9070.0,busy,1,0,1,1,1,"{""inspection"": [39], ""reserved:transport_1"": [40]}",1,False
+9088.333333,blocked,1,0,0,1,0,"{""inspection"": [39], ""manual_assembly"": [41], ""transport_1"": [40]}",2,False
+9088.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [40], ""inspection"": [39], ""manual_assembly"": [41]}",2,False
+9216.666667,blocked,1,0,1,1,1,"{""inspection"": [39], ""reserved:transport_1"": [41], ""selective_soldering"": [40]}",1,False
+9216.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [39], ""reserved:transport_1"": [41], ""selective_soldering"": [40]}",1,False
+9301.666667,busy,1,0,1,1,1,"{""inspection"": [40], ""reserved:transport_1"": [41]}",1,False
+9320.0,blocked,1,0,0,1,0,"{""inspection"": [40], ""manual_assembly"": [42], ""transport_1"": [41]}",2,False
+9320.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [41], ""inspection"": [40], ""manual_assembly"": [42]}",2,False
+9448.333333,blocked,1,0,1,1,1,"{""inspection"": [40], ""reserved:transport_1"": [42], ""selective_soldering"": [41]}",1,False
+9448.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [40], ""reserved:transport_1"": [42], ""selective_soldering"": [41]}",1,False
+9533.333333,busy,1,0,1,1,1,"{""inspection"": [41], ""reserved:transport_1"": [42]}",1,False
+9551.666667,blocked,1,0,0,1,0,"{""inspection"": [41], ""manual_assembly"": [43], ""transport_1"": [42]}",2,False
+9551.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [42], ""inspection"": [41], ""manual_assembly"": [43]}",2,False
+9680.0,blocked,1,0,1,1,1,"{""inspection"": [41], ""reserved:transport_1"": [43], ""selective_soldering"": [42]}",1,False
+9680.0,waiting_resource,1,0,1,0,0,"{""inspection"": [41], ""reserved:transport_1"": [43], ""selective_soldering"": [42]}",1,False
+9765.0,busy,1,0,1,1,1,"{""inspection"": [42], ""reserved:transport_1"": [43]}",1,False
+9783.333333,blocked,1,0,0,1,0,"{""inspection"": [42], ""manual_assembly"": [44], ""transport_1"": [43]}",2,False
+9783.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [43], ""inspection"": [42], ""manual_assembly"": [44]}",2,False
+9911.666667,blocked,1,0,1,1,1,"{""inspection"": [42], ""reserved:transport_1"": [44], ""selective_soldering"": [43]}",1,False
+9911.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [42], ""reserved:transport_1"": [44], ""selective_soldering"": [43]}",1,False
+9996.666667,busy,1,0,1,1,1,"{""inspection"": [43], ""reserved:transport_1"": [44]}",1,False
+10015.0,blocked,1,0,0,1,0,"{""inspection"": [43], ""manual_assembly"": [45], ""transport_1"": [44]}",2,False
+10015.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [44], ""inspection"": [43], ""manual_assembly"": [45]}",2,False
+10143.333333,blocked,1,0,1,1,1,"{""inspection"": [43], ""reserved:transport_1"": [45], ""selective_soldering"": [44]}",1,False
+10143.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [43], ""reserved:transport_1"": [45], ""selective_soldering"": [44]}",1,False
+10228.333333,busy,1,0,1,1,1,"{""inspection"": [44], ""reserved:transport_1"": [45]}",1,False
+10246.666667,blocked,1,0,0,1,0,"{""inspection"": [44], ""manual_assembly"": [46], ""transport_1"": [45]}",2,False
+10246.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [45], ""inspection"": [44], ""manual_assembly"": [46]}",2,False
+10375.0,blocked,1,0,1,1,1,"{""inspection"": [44], ""reserved:transport_1"": [46], ""selective_soldering"": [45]}",1,False
+10375.0,waiting_resource,1,0,1,0,0,"{""inspection"": [44], ""reserved:transport_1"": [46], ""selective_soldering"": [45]}",1,False
+10460.0,busy,1,0,1,1,1,"{""inspection"": [45], ""reserved:transport_1"": [46]}",1,False
+10478.333333,blocked,1,0,0,1,0,"{""inspection"": [45], ""manual_assembly"": [47], ""transport_1"": [46]}",2,False
+10478.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [46], ""inspection"": [45], ""manual_assembly"": [47]}",2,False
+10606.666667,blocked,1,0,1,1,1,"{""inspection"": [45], ""reserved:transport_1"": [47], ""selective_soldering"": [46]}",1,False
+10606.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [45], ""reserved:transport_1"": [47], ""selective_soldering"": [46]}",1,False
+10691.666667,busy,1,0,1,1,1,"{""inspection"": [46], ""reserved:transport_1"": [47]}",1,False
+10710.0,blocked,1,0,0,1,0,"{""inspection"": [46], ""manual_assembly"": [48], ""transport_1"": [47]}",2,False
+10710.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [47], ""inspection"": [46], ""manual_assembly"": [48]}",2,False
+10838.333333,blocked,1,0,1,1,1,"{""inspection"": [46], ""reserved:transport_1"": [48], ""selective_soldering"": [47]}",1,False
+10838.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [46], ""reserved:transport_1"": [48], ""selective_soldering"": [47]}",1,False
+10923.333333,busy,1,0,1,1,1,"{""inspection"": [47], ""reserved:transport_1"": [48]}",1,False
+10941.666667,blocked,1,0,0,1,0,"{""inspection"": [47], ""manual_assembly"": [49], ""transport_1"": [48]}",2,False
+10941.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [48], ""inspection"": [47], ""manual_assembly"": [49]}",2,False
+11070.0,blocked,1,0,1,1,1,"{""inspection"": [47], ""reserved:transport_1"": [49], ""selective_soldering"": [48]}",1,False
+11070.0,waiting_resource,1,0,1,0,0,"{""inspection"": [47], ""reserved:transport_1"": [49], ""selective_soldering"": [48]}",1,False
+11155.0,busy,1,0,1,1,1,"{""inspection"": [48], ""reserved:transport_1"": [49]}",1,False
+11173.333333,blocked,1,0,0,1,0,"{""inspection"": [48], ""manual_assembly"": [50], ""transport_1"": [49]}",2,False
+11173.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [49], ""inspection"": [48], ""manual_assembly"": [50]}",2,False
+11301.666667,blocked,1,0,1,1,1,"{""inspection"": [48], ""reserved:transport_1"": [50], ""selective_soldering"": [49]}",1,False
+11301.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [48], ""reserved:transport_1"": [50], ""selective_soldering"": [49]}",1,False
+11386.666667,busy,1,0,1,1,1,"{""inspection"": [49], ""reserved:transport_1"": [50]}",1,False
+11405.0,blocked,1,0,0,1,0,"{""inspection"": [49], ""manual_assembly"": [51], ""transport_1"": [50]}",2,False
+11405.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [50], ""inspection"": [49], ""manual_assembly"": [51]}",2,False
+11533.333333,blocked,1,0,1,1,1,"{""inspection"": [49], ""reserved:transport_1"": [51], ""selective_soldering"": [50]}",1,False
+11533.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [49], ""reserved:transport_1"": [51], ""selective_soldering"": [50]}",1,False
+11618.333333,busy,1,0,1,1,1,"{""inspection"": [50], ""reserved:transport_1"": [51]}",1,False
+11636.666667,blocked,1,0,0,1,0,"{""inspection"": [50], ""manual_assembly"": [52], ""transport_1"": [51]}",2,False
+11636.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [51], ""inspection"": [50], ""manual_assembly"": [52]}",2,False
+11765.0,blocked,1,0,1,1,1,"{""inspection"": [50], ""reserved:transport_1"": [52], ""selective_soldering"": [51]}",1,False
+11765.0,waiting_resource,1,0,1,0,0,"{""inspection"": [50], ""reserved:transport_1"": [52], ""selective_soldering"": [51]}",1,False
+11850.0,busy,1,0,1,1,1,"{""inspection"": [51], ""reserved:transport_1"": [52]}",1,False
+11868.333333,blocked,1,0,0,1,0,"{""inspection"": [51], ""manual_assembly"": [53], ""transport_1"": [52]}",2,False
+11868.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [52], ""inspection"": [51], ""manual_assembly"": [53]}",2,False
+11996.666667,blocked,1,0,1,1,1,"{""inspection"": [51], ""reserved:transport_1"": [53], ""selective_soldering"": [52]}",1,False
+11996.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [51], ""reserved:transport_1"": [53], ""selective_soldering"": [52]}",1,False
+12081.666667,busy,1,0,1,1,1,"{""inspection"": [52], ""reserved:transport_1"": [53]}",1,False
+12100.0,blocked,1,0,0,1,0,"{""inspection"": [52], ""manual_assembly"": [54], ""transport_1"": [53]}",2,False
+12100.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [53], ""inspection"": [52], ""manual_assembly"": [54]}",2,False
+12228.333333,blocked,1,0,1,1,1,"{""inspection"": [52], ""reserved:transport_1"": [54], ""selective_soldering"": [53]}",1,False
+12228.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [52], ""reserved:transport_1"": [54], ""selective_soldering"": [53]}",1,False
+12313.333333,busy,1,0,1,1,1,"{""inspection"": [53], ""reserved:transport_1"": [54]}",1,False
+12331.666667,blocked,1,0,0,1,0,"{""inspection"": [53], ""manual_assembly"": [55], ""transport_1"": [54]}",2,False
+12331.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [54], ""inspection"": [53], ""manual_assembly"": [55]}",2,False
+12460.0,blocked,1,0,1,1,1,"{""inspection"": [53], ""reserved:transport_1"": [55], ""selective_soldering"": [54]}",1,False
+12460.0,waiting_resource,1,0,1,0,0,"{""inspection"": [53], ""reserved:transport_1"": [55], ""selective_soldering"": [54]}",1,False
+12545.0,busy,1,0,1,1,1,"{""inspection"": [54], ""reserved:transport_1"": [55]}",1,False
+12563.333333,blocked,1,0,0,1,0,"{""inspection"": [54], ""manual_assembly"": [56], ""transport_1"": [55]}",2,False
+12563.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [55], ""inspection"": [54], ""manual_assembly"": [56]}",2,False
+12691.666667,blocked,1,0,1,1,1,"{""inspection"": [54], ""reserved:transport_1"": [56], ""selective_soldering"": [55]}",1,False
+12691.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [54], ""reserved:transport_1"": [56], ""selective_soldering"": [55]}",1,False
+12776.666667,busy,1,0,1,1,1,"{""inspection"": [55], ""reserved:transport_1"": [56]}",1,False
+12795.0,blocked,1,0,0,1,0,"{""inspection"": [55], ""manual_assembly"": [57], ""transport_1"": [56]}",2,False
+12795.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [56], ""inspection"": [55], ""manual_assembly"": [57]}",2,False
+12923.333333,blocked,1,0,1,1,1,"{""inspection"": [55], ""reserved:transport_1"": [57], ""selective_soldering"": [56]}",1,False
+12923.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [55], ""reserved:transport_1"": [57], ""selective_soldering"": [56]}",1,False
+13008.333333,busy,1,0,1,1,1,"{""inspection"": [56], ""reserved:transport_1"": [57]}",1,False
+13026.666667,blocked,1,0,0,1,0,"{""inspection"": [56], ""manual_assembly"": [58], ""transport_1"": [57]}",2,False
+13026.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [57], ""inspection"": [56], ""manual_assembly"": [58]}",2,False
+13155.0,blocked,1,0,1,1,1,"{""inspection"": [56], ""reserved:transport_1"": [58], ""selective_soldering"": [57]}",1,False
+13155.0,waiting_resource,1,0,1,0,0,"{""inspection"": [56], ""reserved:transport_1"": [58], ""selective_soldering"": [57]}",1,False
+13240.0,busy,1,0,1,1,1,"{""inspection"": [57], ""reserved:transport_1"": [58]}",1,False
+13258.333333,blocked,1,0,0,1,0,"{""inspection"": [57], ""manual_assembly"": [59], ""transport_1"": [58]}",2,False
+13258.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [58], ""inspection"": [57], ""manual_assembly"": [59]}",2,False
+13386.666667,blocked,1,0,1,1,1,"{""inspection"": [57], ""reserved:transport_1"": [59], ""selective_soldering"": [58]}",1,False
+13386.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [57], ""reserved:transport_1"": [59], ""selective_soldering"": [58]}",1,False
+13471.666667,busy,1,0,1,1,1,"{""inspection"": [58], ""reserved:transport_1"": [59]}",1,False
+13490.0,blocked,1,0,0,1,0,"{""inspection"": [58], ""manual_assembly"": [60], ""transport_1"": [59]}",2,False
+13490.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [59], ""inspection"": [58], ""manual_assembly"": [60]}",2,False
+13618.333333,blocked,1,0,1,1,1,"{""inspection"": [58], ""reserved:transport_1"": [60], ""selective_soldering"": [59]}",1,False
+13618.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [58], ""reserved:transport_1"": [60], ""selective_soldering"": [59]}",1,False
+13703.333333,busy,1,0,1,1,1,"{""inspection"": [59], ""reserved:transport_1"": [60]}",1,False
+13721.666667,blocked,1,0,0,1,0,"{""inspection"": [59], ""manual_assembly"": [61], ""transport_1"": [60]}",2,False
+13721.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [60], ""inspection"": [59], ""manual_assembly"": [61]}",2,False
+13850.0,blocked,1,0,1,1,1,"{""inspection"": [59], ""reserved:transport_1"": [61], ""selective_soldering"": [60]}",1,False
+13850.0,waiting_resource,1,0,1,0,0,"{""inspection"": [59], ""reserved:transport_1"": [61], ""selective_soldering"": [60]}",1,False
+13935.0,busy,1,0,1,1,1,"{""inspection"": [60], ""reserved:transport_1"": [61]}",1,False
+13953.333333,blocked,1,0,0,1,0,"{""inspection"": [60], ""manual_assembly"": [62], ""transport_1"": [61]}",2,False
+13953.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [61], ""inspection"": [60], ""manual_assembly"": [62]}",2,False
+14081.666667,blocked,1,0,1,1,1,"{""inspection"": [60], ""reserved:transport_1"": [62], ""selective_soldering"": [61]}",1,False
+14081.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [60], ""reserved:transport_1"": [62], ""selective_soldering"": [61]}",1,False
+14166.666667,busy,1,0,1,1,1,"{""inspection"": [61], ""reserved:transport_1"": [62]}",1,False
+14185.0,blocked,1,0,0,1,0,"{""inspection"": [61], ""manual_assembly"": [63], ""transport_1"": [62]}",2,False
+14185.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [62], ""inspection"": [61], ""manual_assembly"": [63]}",2,False
+14313.333333,blocked,1,0,1,1,1,"{""inspection"": [61], ""reserved:transport_1"": [63], ""selective_soldering"": [62]}",1,False
+14313.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [61], ""reserved:transport_1"": [63], ""selective_soldering"": [62]}",1,False
+14398.333333,busy,1,0,1,1,1,"{""inspection"": [62], ""reserved:transport_1"": [63]}",1,False
+14416.666667,blocked,1,0,0,1,0,"{""inspection"": [62], ""manual_assembly"": [64], ""transport_1"": [63]}",2,False
+14416.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [63], ""inspection"": [62], ""manual_assembly"": [64]}",2,False
+14545.0,blocked,1,0,1,1,1,"{""inspection"": [62], ""reserved:transport_1"": [64], ""selective_soldering"": [63]}",1,False
+14545.0,waiting_resource,1,0,1,0,0,"{""inspection"": [62], ""reserved:transport_1"": [64], ""selective_soldering"": [63]}",1,False
+14630.0,busy,1,0,1,1,1,"{""inspection"": [63], ""reserved:transport_1"": [64]}",1,False
+14648.333333,blocked,1,0,0,1,0,"{""inspection"": [63], ""manual_assembly"": [65], ""transport_1"": [64]}",2,False
+14648.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [64], ""inspection"": [63], ""manual_assembly"": [65]}",2,False
+14776.666667,blocked,1,0,1,1,1,"{""inspection"": [63], ""reserved:transport_1"": [65], ""selective_soldering"": [64]}",1,False
+14776.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [63], ""reserved:transport_1"": [65], ""selective_soldering"": [64]}",1,False
+14861.666667,busy,1,0,1,1,1,"{""inspection"": [64], ""reserved:transport_1"": [65]}",1,False
+14880.0,blocked,1,0,0,1,0,"{""inspection"": [64], ""manual_assembly"": [66], ""transport_1"": [65]}",2,False
+14880.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [65], ""inspection"": [64], ""manual_assembly"": [66]}",2,False
+15008.333333,blocked,1,0,1,1,1,"{""inspection"": [64], ""reserved:transport_1"": [66], ""selective_soldering"": [65]}",1,False
+15008.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [64], ""reserved:transport_1"": [66], ""selective_soldering"": [65]}",1,False
+15093.333333,busy,1,0,1,1,1,"{""inspection"": [65], ""reserved:transport_1"": [66]}",1,False
+15111.666667,blocked,1,0,0,1,0,"{""inspection"": [65], ""manual_assembly"": [67], ""transport_1"": [66]}",2,False
+15111.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [66], ""inspection"": [65], ""manual_assembly"": [67]}",2,False
+15240.0,blocked,1,0,1,1,1,"{""inspection"": [65], ""reserved:transport_1"": [67], ""selective_soldering"": [66]}",1,False
+15240.0,waiting_resource,1,0,1,0,0,"{""inspection"": [65], ""reserved:transport_1"": [67], ""selective_soldering"": [66]}",1,False
+15325.0,busy,1,0,1,1,1,"{""inspection"": [66], ""reserved:transport_1"": [67]}",1,False
+15343.333333,blocked,1,0,0,1,0,"{""inspection"": [66], ""manual_assembly"": [68], ""transport_1"": [67]}",2,False
+15343.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [67], ""inspection"": [66], ""manual_assembly"": [68]}",2,False
+15471.666667,blocked,1,0,1,1,1,"{""inspection"": [66], ""reserved:transport_1"": [68], ""selective_soldering"": [67]}",1,False
+15471.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [66], ""reserved:transport_1"": [68], ""selective_soldering"": [67]}",1,False
+15556.666667,busy,1,0,1,1,1,"{""inspection"": [67], ""reserved:transport_1"": [68]}",1,False
+15575.0,blocked,1,0,0,1,0,"{""inspection"": [67], ""manual_assembly"": [69], ""transport_1"": [68]}",2,False
+15575.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [68], ""inspection"": [67], ""manual_assembly"": [69]}",2,False
+15703.333333,blocked,1,0,1,1,1,"{""inspection"": [67], ""reserved:transport_1"": [69], ""selective_soldering"": [68]}",1,False
+15703.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [67], ""reserved:transport_1"": [69], ""selective_soldering"": [68]}",1,False
+15788.333333,busy,1,0,1,1,1,"{""inspection"": [68], ""reserved:transport_1"": [69]}",1,False
+15806.666667,blocked,1,0,0,1,0,"{""inspection"": [68], ""manual_assembly"": [70], ""transport_1"": [69]}",2,False
+15806.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [69], ""inspection"": [68], ""manual_assembly"": [70]}",2,False
+15935.0,blocked,1,0,1,1,1,"{""inspection"": [68], ""reserved:transport_1"": [70], ""selective_soldering"": [69]}",1,False
+15935.0,waiting_resource,1,0,1,0,0,"{""inspection"": [68], ""reserved:transport_1"": [70], ""selective_soldering"": [69]}",1,False
+16020.0,busy,1,0,1,1,1,"{""inspection"": [69], ""reserved:transport_1"": [70]}",1,False
+16038.333333,blocked,1,0,0,1,0,"{""inspection"": [69], ""manual_assembly"": [71], ""transport_1"": [70]}",2,False
+16038.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [70], ""inspection"": [69], ""manual_assembly"": [71]}",2,False
+16166.666667,blocked,1,0,1,1,1,"{""inspection"": [69], ""reserved:transport_1"": [71], ""selective_soldering"": [70]}",1,False
+16166.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [69], ""reserved:transport_1"": [71], ""selective_soldering"": [70]}",1,False
+16251.666667,busy,1,0,1,1,1,"{""inspection"": [70], ""reserved:transport_1"": [71]}",1,False
+16270.0,blocked,1,0,0,1,0,"{""inspection"": [70], ""manual_assembly"": [72], ""transport_1"": [71]}",2,False
+16270.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [71], ""inspection"": [70], ""manual_assembly"": [72]}",2,False
+16398.333333,blocked,1,0,1,1,1,"{""inspection"": [70], ""reserved:transport_1"": [72], ""selective_soldering"": [71]}",1,False
+16398.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [70], ""reserved:transport_1"": [72], ""selective_soldering"": [71]}",1,False
+16483.333333,busy,1,0,1,1,1,"{""inspection"": [71], ""reserved:transport_1"": [72]}",1,False
+16501.666667,blocked,1,0,0,1,0,"{""inspection"": [71], ""manual_assembly"": [73], ""transport_1"": [72]}",2,False
+16501.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [72], ""inspection"": [71], ""manual_assembly"": [73]}",2,False
+16630.0,blocked,1,0,1,1,1,"{""inspection"": [71], ""reserved:transport_1"": [73], ""selective_soldering"": [72]}",1,False
+16630.0,waiting_resource,1,0,1,0,0,"{""inspection"": [71], ""reserved:transport_1"": [73], ""selective_soldering"": [72]}",1,False
+16715.0,busy,1,0,1,1,1,"{""inspection"": [72], ""reserved:transport_1"": [73]}",1,False
+16733.333333,blocked,1,0,0,1,0,"{""inspection"": [72], ""manual_assembly"": [74], ""transport_1"": [73]}",2,False
+16733.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [73], ""inspection"": [72], ""manual_assembly"": [74]}",2,False
+16861.666667,blocked,1,0,1,1,1,"{""inspection"": [72], ""reserved:transport_1"": [74], ""selective_soldering"": [73]}",1,False
+16861.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [72], ""reserved:transport_1"": [74], ""selective_soldering"": [73]}",1,False
+16946.666667,busy,1,0,1,1,1,"{""inspection"": [73], ""reserved:transport_1"": [74]}",1,False
+16965.0,blocked,1,0,0,1,0,"{""inspection"": [73], ""manual_assembly"": [75], ""transport_1"": [74]}",2,False
+16965.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [74], ""inspection"": [73], ""manual_assembly"": [75]}",2,False
+17093.333333,blocked,1,0,1,1,1,"{""inspection"": [73], ""reserved:transport_1"": [75], ""selective_soldering"": [74]}",1,False
+17093.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [73], ""reserved:transport_1"": [75], ""selective_soldering"": [74]}",1,False
+17178.333333,busy,1,0,1,1,1,"{""inspection"": [74], ""reserved:transport_1"": [75]}",1,False
+17196.666667,blocked,1,0,0,1,0,"{""inspection"": [74], ""manual_assembly"": [76], ""transport_1"": [75]}",2,False
+17196.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [75], ""inspection"": [74], ""manual_assembly"": [76]}",2,False
+17325.0,blocked,1,0,1,1,1,"{""inspection"": [74], ""reserved:transport_1"": [76], ""selective_soldering"": [75]}",1,False
+17325.0,waiting_resource,1,0,1,0,0,"{""inspection"": [74], ""reserved:transport_1"": [76], ""selective_soldering"": [75]}",1,False
+17410.0,busy,1,0,1,1,1,"{""inspection"": [75], ""reserved:transport_1"": [76]}",1,False
+17428.333333,blocked,1,0,0,1,0,"{""inspection"": [75], ""manual_assembly"": [77], ""transport_1"": [76]}",2,False
+17428.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [76], ""inspection"": [75], ""manual_assembly"": [77]}",2,False
+17556.666667,blocked,1,0,1,1,1,"{""inspection"": [75], ""reserved:transport_1"": [77], ""selective_soldering"": [76]}",1,False
+17556.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [75], ""reserved:transport_1"": [77], ""selective_soldering"": [76]}",1,False
+17641.666667,busy,1,0,1,1,1,"{""inspection"": [76], ""reserved:transport_1"": [77]}",1,False
+17660.0,blocked,1,0,0,1,0,"{""inspection"": [76], ""manual_assembly"": [78], ""transport_1"": [77]}",2,False
+17660.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [77], ""inspection"": [76], ""manual_assembly"": [78]}",2,False
+17788.333333,blocked,1,0,1,1,1,"{""inspection"": [76], ""reserved:transport_1"": [78], ""selective_soldering"": [77]}",1,False
+17788.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [76], ""reserved:transport_1"": [78], ""selective_soldering"": [77]}",1,False
+17873.333333,busy,1,0,1,1,1,"{""inspection"": [77], ""reserved:transport_1"": [78]}",1,False
+17891.666667,blocked,1,0,0,1,0,"{""inspection"": [77], ""manual_assembly"": [79], ""transport_1"": [78]}",2,False
+17891.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [78], ""inspection"": [77], ""manual_assembly"": [79]}",2,False
+18020.0,blocked,1,0,1,1,1,"{""inspection"": [77], ""reserved:transport_1"": [79], ""selective_soldering"": [78]}",1,False
+18020.0,waiting_resource,1,0,1,0,0,"{""inspection"": [77], ""reserved:transport_1"": [79], ""selective_soldering"": [78]}",1,False
+18105.0,busy,1,0,1,1,1,"{""inspection"": [78], ""reserved:transport_1"": [79]}",1,False
+18123.333333,blocked,1,0,0,1,0,"{""inspection"": [78], ""manual_assembly"": [80], ""transport_1"": [79]}",2,False
+18123.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [79], ""inspection"": [78], ""manual_assembly"": [80]}",2,False
+18251.666667,blocked,1,0,1,1,1,"{""inspection"": [78], ""reserved:transport_1"": [80], ""selective_soldering"": [79]}",1,False
+18251.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [78], ""reserved:transport_1"": [80], ""selective_soldering"": [79]}",1,False
+18336.666667,busy,1,0,1,1,1,"{""inspection"": [79], ""reserved:transport_1"": [80]}",1,False
+18355.0,blocked,1,0,0,1,0,"{""inspection"": [79], ""manual_assembly"": [81], ""transport_1"": [80]}",2,False
+18355.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [80], ""inspection"": [79], ""manual_assembly"": [81]}",2,False
+18483.333333,blocked,1,0,1,1,1,"{""inspection"": [79], ""reserved:transport_1"": [81], ""selective_soldering"": [80]}",1,False
+18483.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [79], ""reserved:transport_1"": [81], ""selective_soldering"": [80]}",1,False
+18568.333333,busy,1,0,1,1,1,"{""inspection"": [80], ""reserved:transport_1"": [81]}",1,False
+18586.666667,blocked,1,0,0,1,0,"{""inspection"": [80], ""manual_assembly"": [82], ""transport_1"": [81]}",2,False
+18586.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [81], ""inspection"": [80], ""manual_assembly"": [82]}",2,False
+18715.0,blocked,1,0,1,1,1,"{""inspection"": [80], ""reserved:transport_1"": [82], ""selective_soldering"": [81]}",1,False
+18715.0,waiting_resource,1,0,1,0,0,"{""inspection"": [80], ""reserved:transport_1"": [82], ""selective_soldering"": [81]}",1,False
+18800.0,busy,1,0,1,1,1,"{""inspection"": [81], ""reserved:transport_1"": [82]}",1,False
+18818.333333,blocked,1,0,0,1,0,"{""inspection"": [81], ""manual_assembly"": [83], ""transport_1"": [82]}",2,False
+18818.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [82], ""inspection"": [81], ""manual_assembly"": [83]}",2,False
+18946.666667,blocked,1,0,1,1,1,"{""inspection"": [81], ""reserved:transport_1"": [83], ""selective_soldering"": [82]}",1,False
+18946.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [81], ""reserved:transport_1"": [83], ""selective_soldering"": [82]}",1,False
+19031.666667,busy,1,0,1,1,1,"{""inspection"": [82], ""reserved:transport_1"": [83]}",1,False
+19050.0,blocked,1,0,0,1,0,"{""inspection"": [82], ""manual_assembly"": [84], ""transport_1"": [83]}",2,False
+19050.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [83], ""inspection"": [82], ""manual_assembly"": [84]}",2,False
+19178.333333,blocked,1,0,1,1,1,"{""inspection"": [82], ""reserved:transport_1"": [84], ""selective_soldering"": [83]}",1,False
+19178.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [82], ""reserved:transport_1"": [84], ""selective_soldering"": [83]}",1,False
+19263.333333,busy,1,0,1,1,1,"{""inspection"": [83], ""reserved:transport_1"": [84]}",1,False
+19281.666667,blocked,1,0,0,1,0,"{""inspection"": [83], ""manual_assembly"": [85], ""transport_1"": [84]}",2,False
+19281.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [84], ""inspection"": [83], ""manual_assembly"": [85]}",2,False
+19410.0,blocked,1,0,1,1,1,"{""inspection"": [83], ""reserved:transport_1"": [85], ""selective_soldering"": [84]}",1,False
+19410.0,waiting_resource,1,0,1,0,0,"{""inspection"": [83], ""reserved:transport_1"": [85], ""selective_soldering"": [84]}",1,False
+19495.0,busy,1,0,1,1,1,"{""inspection"": [84], ""reserved:transport_1"": [85]}",1,False
+19513.333333,blocked,1,0,0,1,0,"{""inspection"": [84], ""manual_assembly"": [86], ""transport_1"": [85]}",2,False
+19513.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [85], ""inspection"": [84], ""manual_assembly"": [86]}",2,False
+19641.666667,blocked,1,0,1,1,1,"{""inspection"": [84], ""reserved:transport_1"": [86], ""selective_soldering"": [85]}",1,False
+19641.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [84], ""reserved:transport_1"": [86], ""selective_soldering"": [85]}",1,False
+19726.666667,busy,1,0,1,1,1,"{""inspection"": [85], ""reserved:transport_1"": [86]}",1,False
+19745.0,blocked,1,0,0,1,0,"{""inspection"": [85], ""manual_assembly"": [87], ""transport_1"": [86]}",2,False
+19745.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [86], ""inspection"": [85], ""manual_assembly"": [87]}",2,False
+19873.333333,blocked,1,0,1,1,1,"{""inspection"": [85], ""reserved:transport_1"": [87], ""selective_soldering"": [86]}",1,False
+19873.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [85], ""reserved:transport_1"": [87], ""selective_soldering"": [86]}",1,False
+19958.333333,busy,1,0,1,1,1,"{""inspection"": [86], ""reserved:transport_1"": [87]}",1,False
+19976.666667,blocked,1,0,0,1,0,"{""inspection"": [86], ""manual_assembly"": [88], ""transport_1"": [87]}",2,False
+19976.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [87], ""inspection"": [86], ""manual_assembly"": [88]}",2,False
+20105.0,blocked,1,0,1,1,1,"{""inspection"": [86], ""reserved:transport_1"": [88], ""selective_soldering"": [87]}",1,False
+20105.0,waiting_resource,1,0,1,0,0,"{""inspection"": [86], ""reserved:transport_1"": [88], ""selective_soldering"": [87]}",1,False
+20190.0,busy,1,0,1,1,1,"{""inspection"": [87], ""reserved:transport_1"": [88]}",1,False
+20208.333333,blocked,1,0,0,1,0,"{""inspection"": [87], ""manual_assembly"": [89], ""transport_1"": [88]}",2,False
+20208.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [88], ""inspection"": [87], ""manual_assembly"": [89]}",2,False
+20336.666667,blocked,1,0,1,1,1,"{""inspection"": [87], ""reserved:transport_1"": [89], ""selective_soldering"": [88]}",1,False
+20336.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [87], ""reserved:transport_1"": [89], ""selective_soldering"": [88]}",1,False
+20421.666667,busy,1,0,1,1,1,"{""inspection"": [88], ""reserved:transport_1"": [89]}",1,False
+20440.0,blocked,1,0,0,1,0,"{""inspection"": [88], ""manual_assembly"": [90], ""transport_1"": [89]}",2,False
+20440.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [89], ""inspection"": [88], ""manual_assembly"": [90]}",2,False
+20568.333333,blocked,1,0,1,1,1,"{""inspection"": [88], ""reserved:transport_1"": [90], ""selective_soldering"": [89]}",1,False
+20568.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [88], ""reserved:transport_1"": [90], ""selective_soldering"": [89]}",1,False
+20653.333333,busy,1,0,1,1,1,"{""inspection"": [89], ""reserved:transport_1"": [90]}",1,False
+20671.666667,blocked,1,0,0,1,0,"{""inspection"": [89], ""manual_assembly"": [91], ""transport_1"": [90]}",2,False
+20671.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [90], ""inspection"": [89], ""manual_assembly"": [91]}",2,False
+20800.0,blocked,1,0,1,1,1,"{""inspection"": [89], ""reserved:transport_1"": [91], ""selective_soldering"": [90]}",1,False
+20800.0,waiting_resource,1,0,1,0,0,"{""inspection"": [89], ""reserved:transport_1"": [91], ""selective_soldering"": [90]}",1,False
+20885.0,busy,1,0,1,1,1,"{""inspection"": [90], ""reserved:transport_1"": [91]}",1,False
+20903.333333,blocked,1,0,0,1,0,"{""inspection"": [90], ""manual_assembly"": [92], ""transport_1"": [91]}",2,False
+20903.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [91], ""inspection"": [90], ""manual_assembly"": [92]}",2,False
+21031.666667,blocked,1,0,1,1,1,"{""inspection"": [90], ""reserved:transport_1"": [92], ""selective_soldering"": [91]}",1,False
+21031.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [90], ""reserved:transport_1"": [92], ""selective_soldering"": [91]}",1,False
+21116.666667,busy,1,0,1,1,1,"{""inspection"": [91], ""reserved:transport_1"": [92]}",1,False
+21135.0,blocked,1,0,0,1,0,"{""inspection"": [91], ""manual_assembly"": [93], ""transport_1"": [92]}",2,False
+21135.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [92], ""inspection"": [91], ""manual_assembly"": [93]}",2,False
+21263.333333,blocked,1,0,1,1,1,"{""inspection"": [91], ""reserved:transport_1"": [93], ""selective_soldering"": [92]}",1,False
+21263.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [91], ""reserved:transport_1"": [93], ""selective_soldering"": [92]}",1,False
+21348.333333,busy,1,0,1,1,1,"{""inspection"": [92], ""reserved:transport_1"": [93]}",1,False
+21366.666667,blocked,1,0,0,1,0,"{""inspection"": [92], ""manual_assembly"": [94], ""transport_1"": [93]}",2,False
+21366.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [93], ""inspection"": [92], ""manual_assembly"": [94]}",2,False
+21495.0,blocked,1,0,1,1,1,"{""inspection"": [92], ""reserved:transport_1"": [94], ""selective_soldering"": [93]}",1,False
+21495.0,waiting_resource,1,0,1,0,0,"{""inspection"": [92], ""reserved:transport_1"": [94], ""selective_soldering"": [93]}",1,False
+21580.0,busy,1,0,1,1,1,"{""inspection"": [93], ""reserved:transport_1"": [94]}",1,False
+21598.333333,blocked,1,0,0,1,0,"{""inspection"": [93], ""manual_assembly"": [95], ""transport_1"": [94]}",2,False
+21598.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [94], ""inspection"": [93], ""manual_assembly"": [95]}",2,False
+21726.666667,blocked,1,0,1,1,1,"{""inspection"": [93], ""reserved:transport_1"": [95], ""selective_soldering"": [94]}",1,False
+21726.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [93], ""reserved:transport_1"": [95], ""selective_soldering"": [94]}",1,False
+21811.666667,busy,1,0,1,1,1,"{""inspection"": [94], ""reserved:transport_1"": [95]}",1,False
+21830.0,blocked,1,0,0,1,0,"{""inspection"": [94], ""manual_assembly"": [96], ""transport_1"": [95]}",2,False
+21830.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [95], ""inspection"": [94], ""manual_assembly"": [96]}",2,False
+21958.333333,blocked,1,0,1,1,1,"{""inspection"": [94], ""reserved:transport_1"": [96], ""selective_soldering"": [95]}",1,False
+21958.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [94], ""reserved:transport_1"": [96], ""selective_soldering"": [95]}",1,False
+22043.333333,busy,1,0,1,1,1,"{""inspection"": [95], ""reserved:transport_1"": [96]}",1,False
+22061.666667,blocked,1,0,0,1,0,"{""inspection"": [95], ""manual_assembly"": [97], ""transport_1"": [96]}",2,False
+22061.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [96], ""inspection"": [95], ""manual_assembly"": [97]}",2,False
+22190.0,blocked,1,0,1,1,1,"{""inspection"": [95], ""reserved:transport_1"": [97], ""selective_soldering"": [96]}",1,False
+22190.0,waiting_resource,1,0,1,0,0,"{""inspection"": [95], ""reserved:transport_1"": [97], ""selective_soldering"": [96]}",1,False
+22275.0,busy,1,0,1,1,1,"{""inspection"": [96], ""reserved:transport_1"": [97]}",1,False
+22293.333333,blocked,1,0,0,1,0,"{""inspection"": [96], ""manual_assembly"": [98], ""transport_1"": [97]}",2,False
+22293.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [97], ""inspection"": [96], ""manual_assembly"": [98]}",2,False
+22421.666667,blocked,1,0,1,1,1,"{""inspection"": [96], ""reserved:transport_1"": [98], ""selective_soldering"": [97]}",1,False
+22421.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [96], ""reserved:transport_1"": [98], ""selective_soldering"": [97]}",1,False
+22506.666667,busy,1,0,1,1,1,"{""inspection"": [97], ""reserved:transport_1"": [98]}",1,False
+22525.0,blocked,1,0,0,1,0,"{""inspection"": [97], ""manual_assembly"": [99], ""transport_1"": [98]}",2,False
+22525.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [98], ""inspection"": [97], ""manual_assembly"": [99]}",2,False
+22653.333333,blocked,1,0,1,1,1,"{""inspection"": [97], ""reserved:transport_1"": [99], ""selective_soldering"": [98]}",1,False
+22653.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [97], ""reserved:transport_1"": [99], ""selective_soldering"": [98]}",1,False
+22738.333333,busy,1,0,1,1,1,"{""inspection"": [98], ""reserved:transport_1"": [99]}",1,False
+22756.666667,blocked,1,0,0,1,0,"{""inspection"": [98], ""manual_assembly"": [100], ""transport_1"": [99]}",2,False
+22756.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [99], ""inspection"": [98], ""manual_assembly"": [100]}",2,False
+22885.0,blocked,1,0,1,1,1,"{""inspection"": [98], ""reserved:transport_1"": [100], ""selective_soldering"": [99]}",1,False
+22885.0,waiting_resource,1,0,1,0,0,"{""inspection"": [98], ""reserved:transport_1"": [100], ""selective_soldering"": [99]}",1,False
+22970.0,busy,1,0,1,1,1,"{""inspection"": [99], ""reserved:transport_1"": [100]}",1,False
+22988.333333,blocked,1,0,0,1,0,"{""inspection"": [99], ""manual_assembly"": [101], ""transport_1"": [100]}",2,False
+22988.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [100], ""inspection"": [99], ""manual_assembly"": [101]}",2,False
+23116.666667,blocked,1,0,1,1,1,"{""inspection"": [99], ""reserved:transport_1"": [101], ""selective_soldering"": [100]}",1,False
+23116.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [99], ""reserved:transport_1"": [101], ""selective_soldering"": [100]}",1,False
+23201.666667,busy,1,0,1,1,1,"{""inspection"": [100], ""reserved:transport_1"": [101]}",1,False
+23220.0,blocked,1,0,0,1,0,"{""inspection"": [100], ""manual_assembly"": [102], ""transport_1"": [101]}",2,False
+23220.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [101], ""inspection"": [100], ""manual_assembly"": [102]}",2,False
+23348.333333,blocked,1,0,1,1,1,"{""inspection"": [100], ""reserved:transport_1"": [102], ""selective_soldering"": [101]}",1,False
+23348.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [100], ""reserved:transport_1"": [102], ""selective_soldering"": [101]}",1,False
+23433.333333,busy,1,0,1,1,1,"{""inspection"": [101], ""reserved:transport_1"": [102]}",1,False
+23451.666667,blocked,1,0,0,1,0,"{""inspection"": [101], ""manual_assembly"": [103], ""transport_1"": [102]}",2,False
+23451.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [102], ""inspection"": [101], ""manual_assembly"": [103]}",2,False
+23580.0,blocked,1,0,1,1,1,"{""inspection"": [101], ""reserved:transport_1"": [103], ""selective_soldering"": [102]}",1,False
+23580.0,waiting_resource,1,0,1,0,0,"{""inspection"": [101], ""reserved:transport_1"": [103], ""selective_soldering"": [102]}",1,False
+23665.0,busy,1,0,1,1,1,"{""inspection"": [102], ""reserved:transport_1"": [103]}",1,False
+23683.333333,blocked,1,0,0,1,0,"{""inspection"": [102], ""manual_assembly"": [104], ""transport_1"": [103]}",2,False
+23683.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [103], ""inspection"": [102], ""manual_assembly"": [104]}",2,False
+23811.666667,blocked,1,0,1,1,1,"{""inspection"": [102], ""reserved:transport_1"": [104], ""selective_soldering"": [103]}",1,False
+23811.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [102], ""reserved:transport_1"": [104], ""selective_soldering"": [103]}",1,False
+23896.666667,busy,1,0,1,1,1,"{""inspection"": [103], ""reserved:transport_1"": [104]}",1,False
+23915.0,blocked,1,0,0,1,0,"{""inspection"": [103], ""manual_assembly"": [105], ""transport_1"": [104]}",2,False
+23915.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [104], ""inspection"": [103], ""manual_assembly"": [105]}",2,False
+24043.333333,blocked,1,0,1,1,1,"{""inspection"": [103], ""reserved:transport_1"": [105], ""selective_soldering"": [104]}",1,False
+24043.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [103], ""reserved:transport_1"": [105], ""selective_soldering"": [104]}",1,False
+24128.333333,busy,1,0,1,1,1,"{""inspection"": [104], ""reserved:transport_1"": [105]}",1,False
+24146.666667,blocked,1,0,0,1,0,"{""inspection"": [104], ""manual_assembly"": [106], ""transport_1"": [105]}",2,False
+24146.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [105], ""inspection"": [104], ""manual_assembly"": [106]}",2,False
+24275.0,blocked,1,0,1,1,1,"{""inspection"": [104], ""reserved:transport_1"": [106], ""selective_soldering"": [105]}",1,False
+24275.0,waiting_resource,1,0,1,0,0,"{""inspection"": [104], ""reserved:transport_1"": [106], ""selective_soldering"": [105]}",1,False
+24360.0,busy,1,0,1,1,1,"{""inspection"": [105], ""reserved:transport_1"": [106]}",1,False
+24378.333333,blocked,1,0,0,1,0,"{""inspection"": [105], ""manual_assembly"": [107], ""transport_1"": [106]}",2,False
+24378.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [106], ""inspection"": [105], ""manual_assembly"": [107]}",2,False
+24506.666667,blocked,1,0,1,1,1,"{""inspection"": [105], ""reserved:transport_1"": [107], ""selective_soldering"": [106]}",1,False
+24506.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [105], ""reserved:transport_1"": [107], ""selective_soldering"": [106]}",1,False
+24591.666667,busy,1,0,1,1,1,"{""inspection"": [106], ""reserved:transport_1"": [107]}",1,False
+24610.0,blocked,1,0,0,1,0,"{""inspection"": [106], ""manual_assembly"": [108], ""transport_1"": [107]}",2,False
+24610.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [107], ""inspection"": [106], ""manual_assembly"": [108]}",2,False
+24738.333333,blocked,1,0,1,1,1,"{""inspection"": [106], ""reserved:transport_1"": [108], ""selective_soldering"": [107]}",1,False
+24738.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [106], ""reserved:transport_1"": [108], ""selective_soldering"": [107]}",1,False
+24823.333333,busy,1,0,1,1,1,"{""inspection"": [107], ""reserved:transport_1"": [108]}",1,False
+24841.666667,blocked,1,0,0,1,0,"{""inspection"": [107], ""manual_assembly"": [109], ""transport_1"": [108]}",2,False
+24841.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [108], ""inspection"": [107], ""manual_assembly"": [109]}",2,False
+24970.0,blocked,1,0,1,1,1,"{""inspection"": [107], ""reserved:transport_1"": [109], ""selective_soldering"": [108]}",1,False
+24970.0,waiting_resource,1,0,1,0,0,"{""inspection"": [107], ""reserved:transport_1"": [109], ""selective_soldering"": [108]}",1,False
+25055.0,busy,1,0,1,1,1,"{""inspection"": [108], ""reserved:transport_1"": [109]}",1,False
+25073.333333,blocked,1,0,0,1,0,"{""inspection"": [108], ""manual_assembly"": [110], ""transport_1"": [109]}",2,False
+25073.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [109], ""inspection"": [108], ""manual_assembly"": [110]}",2,False
+25201.666667,blocked,1,0,1,1,1,"{""inspection"": [108], ""reserved:transport_1"": [110], ""selective_soldering"": [109]}",1,False
+25201.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [108], ""reserved:transport_1"": [110], ""selective_soldering"": [109]}",1,False
+25286.666667,busy,1,0,1,1,1,"{""inspection"": [109], ""reserved:transport_1"": [110]}",1,False
+25305.0,blocked,1,0,0,1,0,"{""inspection"": [109], ""manual_assembly"": [111], ""transport_1"": [110]}",2,False
+25305.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [110], ""inspection"": [109], ""manual_assembly"": [111]}",2,False
+25433.333333,blocked,1,0,1,1,1,"{""inspection"": [109], ""reserved:transport_1"": [111], ""selective_soldering"": [110]}",1,False
+25433.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [109], ""reserved:transport_1"": [111], ""selective_soldering"": [110]}",1,False
+25518.333333,busy,1,0,1,1,1,"{""inspection"": [110], ""reserved:transport_1"": [111]}",1,False
+25536.666667,blocked,1,0,0,1,0,"{""inspection"": [110], ""manual_assembly"": [112], ""transport_1"": [111]}",2,False
+25536.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [111], ""inspection"": [110], ""manual_assembly"": [112]}",2,False
+25665.0,blocked,1,0,1,1,1,"{""inspection"": [110], ""reserved:transport_1"": [112], ""selective_soldering"": [111]}",1,False
+25665.0,waiting_resource,1,0,1,0,0,"{""inspection"": [110], ""reserved:transport_1"": [112], ""selective_soldering"": [111]}",1,False
+25750.0,busy,1,0,1,1,1,"{""inspection"": [111], ""reserved:transport_1"": [112]}",1,False
+25768.333333,blocked,1,0,0,1,0,"{""inspection"": [111], ""manual_assembly"": [113], ""transport_1"": [112]}",2,False
+25768.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [112], ""inspection"": [111], ""manual_assembly"": [113]}",2,False
+25896.666667,blocked,1,0,1,1,1,"{""inspection"": [111], ""reserved:transport_1"": [113], ""selective_soldering"": [112]}",1,False
+25896.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [111], ""reserved:transport_1"": [113], ""selective_soldering"": [112]}",1,False
+25981.666667,busy,1,0,1,1,1,"{""inspection"": [112], ""reserved:transport_1"": [113]}",1,False
+26000.0,blocked,1,0,0,1,0,"{""inspection"": [112], ""manual_assembly"": [114], ""transport_1"": [113]}",2,False
+26000.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [113], ""inspection"": [112], ""manual_assembly"": [114]}",2,False
+26128.333333,blocked,1,0,1,1,1,"{""inspection"": [112], ""reserved:transport_1"": [114], ""selective_soldering"": [113]}",1,False
+26128.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [112], ""reserved:transport_1"": [114], ""selective_soldering"": [113]}",1,False
+26213.333333,busy,1,0,1,1,1,"{""inspection"": [113], ""reserved:transport_1"": [114]}",1,False
+26231.666667,blocked,1,0,0,1,0,"{""inspection"": [113], ""manual_assembly"": [115], ""transport_1"": [114]}",2,False
+26231.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [114], ""inspection"": [113], ""manual_assembly"": [115]}",2,False
+26360.0,blocked,1,0,1,1,1,"{""inspection"": [113], ""reserved:transport_1"": [115], ""selective_soldering"": [114]}",1,False
+26360.0,waiting_resource,1,0,1,0,0,"{""inspection"": [113], ""reserved:transport_1"": [115], ""selective_soldering"": [114]}",1,False
+26445.0,busy,1,0,1,1,1,"{""inspection"": [114], ""reserved:transport_1"": [115]}",1,False
+26463.333333,blocked,1,0,0,1,0,"{""inspection"": [114], ""manual_assembly"": [116], ""transport_1"": [115]}",2,False
+26463.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [115], ""inspection"": [114], ""manual_assembly"": [116]}",2,False
+26591.666667,blocked,1,0,1,1,1,"{""inspection"": [114], ""reserved:transport_1"": [116], ""selective_soldering"": [115]}",1,False
+26591.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [114], ""reserved:transport_1"": [116], ""selective_soldering"": [115]}",1,False
+26676.666667,busy,1,0,1,1,1,"{""inspection"": [115], ""reserved:transport_1"": [116]}",1,False
+26695.0,blocked,1,0,0,1,0,"{""inspection"": [115], ""manual_assembly"": [117], ""transport_1"": [116]}",2,False
+26695.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [116], ""inspection"": [115], ""manual_assembly"": [117]}",2,False
+26823.333333,blocked,1,0,1,1,1,"{""inspection"": [115], ""reserved:transport_1"": [117], ""selective_soldering"": [116]}",1,False
+26823.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [115], ""reserved:transport_1"": [117], ""selective_soldering"": [116]}",1,False
+26908.333333,busy,1,0,1,1,1,"{""inspection"": [116], ""reserved:transport_1"": [117]}",1,False
+26926.666667,blocked,1,0,0,1,0,"{""inspection"": [116], ""manual_assembly"": [118], ""transport_1"": [117]}",2,False
+26926.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [117], ""inspection"": [116], ""manual_assembly"": [118]}",2,False
+27055.0,blocked,1,0,1,1,1,"{""inspection"": [116], ""reserved:transport_1"": [118], ""selective_soldering"": [117]}",1,False
+27055.0,waiting_resource,1,0,1,0,0,"{""inspection"": [116], ""reserved:transport_1"": [118], ""selective_soldering"": [117]}",1,False
+27140.0,busy,1,0,1,1,1,"{""inspection"": [117], ""reserved:transport_1"": [118]}",1,False
+27158.333333,blocked,1,0,0,1,0,"{""inspection"": [117], ""manual_assembly"": [119], ""transport_1"": [118]}",2,False
+27158.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [118], ""inspection"": [117], ""manual_assembly"": [119]}",2,False
+27286.666667,blocked,1,0,1,1,1,"{""inspection"": [117], ""reserved:transport_1"": [119], ""selective_soldering"": [118]}",1,False
+27286.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [117], ""reserved:transport_1"": [119], ""selective_soldering"": [118]}",1,False
+27371.666667,busy,1,0,1,1,1,"{""inspection"": [118], ""reserved:transport_1"": [119]}",1,False
+27390.0,blocked,1,0,0,1,0,"{""inspection"": [118], ""manual_assembly"": [120], ""transport_1"": [119]}",2,False
+27390.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [119], ""inspection"": [118], ""manual_assembly"": [120]}",2,False
+27518.333333,blocked,1,0,1,1,1,"{""inspection"": [118], ""reserved:transport_1"": [120], ""selective_soldering"": [119]}",1,False
+27518.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [118], ""reserved:transport_1"": [120], ""selective_soldering"": [119]}",1,False
+27603.333333,busy,1,0,1,1,1,"{""inspection"": [119], ""reserved:transport_1"": [120]}",1,False
+27621.666667,blocked,1,0,0,1,0,"{""inspection"": [119], ""manual_assembly"": [121], ""transport_1"": [120]}",2,False
+27621.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [120], ""inspection"": [119], ""manual_assembly"": [121]}",2,False
+27750.0,blocked,1,0,1,1,1,"{""inspection"": [119], ""reserved:transport_1"": [121], ""selective_soldering"": [120]}",1,False
+27750.0,waiting_resource,1,0,1,0,0,"{""inspection"": [119], ""reserved:transport_1"": [121], ""selective_soldering"": [120]}",1,False
+27835.0,busy,1,0,1,1,1,"{""inspection"": [120], ""reserved:transport_1"": [121]}",1,False
+27853.333333,blocked,1,0,0,1,0,"{""inspection"": [120], ""manual_assembly"": [122], ""transport_1"": [121]}",2,False
+27853.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [121], ""inspection"": [120], ""manual_assembly"": [122]}",2,False
+27981.666667,blocked,1,0,1,1,1,"{""inspection"": [120], ""reserved:transport_1"": [122], ""selective_soldering"": [121]}",1,False
+27981.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [120], ""reserved:transport_1"": [122], ""selective_soldering"": [121]}",1,False
+28066.666667,busy,1,0,1,1,1,"{""inspection"": [121], ""reserved:transport_1"": [122]}",1,False
+28085.0,blocked,1,0,0,1,0,"{""inspection"": [121], ""manual_assembly"": [123], ""transport_1"": [122]}",2,False
+28085.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [122], ""inspection"": [121], ""manual_assembly"": [123]}",2,False
+28213.333333,blocked,1,0,1,1,1,"{""inspection"": [121], ""reserved:transport_1"": [123], ""selective_soldering"": [122]}",1,False
+28213.333333,waiting_resource,1,0,1,0,0,"{""inspection"": [121], ""reserved:transport_1"": [123], ""selective_soldering"": [122]}",1,False
+28298.333333,busy,1,0,1,1,1,"{""inspection"": [122], ""reserved:transport_1"": [123]}",1,False
+28316.666667,blocked,1,0,0,1,0,"{""inspection"": [122], ""manual_assembly"": [124], ""transport_1"": [123]}",2,False
+28316.666667,starved,1,1,0,0,0,"{""buffer_de_entrada"": [123], ""inspection"": [122], ""manual_assembly"": [124]}",2,False
+28445.0,blocked,1,0,1,1,1,"{""inspection"": [122], ""reserved:transport_1"": [124], ""selective_soldering"": [123]}",1,False
+28445.0,waiting_resource,1,0,1,0,0,"{""inspection"": [122], ""reserved:transport_1"": [124], ""selective_soldering"": [123]}",1,False
+28530.0,busy,1,0,1,1,1,"{""inspection"": [123], ""reserved:transport_1"": [124]}",1,False
+28548.333333,blocked,1,0,0,1,0,"{""inspection"": [123], ""manual_assembly"": [125], ""transport_1"": [124]}",2,False
+28548.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [124], ""inspection"": [123], ""manual_assembly"": [125]}",2,False
+28676.666667,blocked,1,0,1,1,1,"{""inspection"": [123], ""reserved:transport_1"": [125], ""selective_soldering"": [124]}",1,False
+28676.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [123], ""reserved:transport_1"": [125], ""selective_soldering"": [124]}",1,False
+28761.666667,busy,1,0,1,1,1,"{""inspection"": [124], ""reserved:transport_1"": [125]}",1,False
+28780.0,blocked,1,0,0,1,0,"{""inspection"": [124], ""manual_assembly"": [126], ""transport_1"": [125]}",2,False
+28780.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [125], ""inspection"": [124], ""manual_assembly"": [126]}",2,False

@@ -1,0 +1,12 @@
+01_simple_line               decisions     0  ties    0  {}
+02_shared_operator           decisions   720  ties    0  {}
+03_machine_breakdowns        decisions     0  ties    0  {}
+04_rework_routing            decisions    52  ties    0  {}
+05_selective_soldering       decisions   267  ties    0  {}
+selective (test) racks=1     decisions   368  ties    0  {}
+selective (test) racks=2     decisions   402  ties    0  {}
+selective (test) racks=3     decisions   374  ties    0  {}
+selective (test) racks=4     decisions   374  ties    0  {}
+synthetic benchmark racks=2  decisions  1248  ties    1  {'assembly/transport_to_selective -> transport_to_selective (older unit)': 1}
+synthetic benchmark racks=3  decisions  1176  ties  236  {'assembly/transport_to_selective -> transport_to_selective (older unit)': 2, 'rack_return/transport_to_review -> transport_to_review (older unit)': 234}
+synthetic benchmark racks=4  decisions  1175  ties  236  {'assembly/transport_to_selective -> transport_to_selective (older unit)': 3, 'rack_return/transport_to_review -> transport_to_review (older unit)': 233}

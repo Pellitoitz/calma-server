@@ -53,8 +53,9 @@ class DesEngine:
                          dispatch_timing=sim.dispatch_timing, check_invariants=sim.check_invariants)
         ctx.model = model.model
         positions = {n.id: (n.position.x, n.position.y) for n in model.model.nodes if n.position}
-        for r in model.model.resources:
-            ctx.pools[r.id] = ResourcePool(ctx, r, positions)
+        ctx.node_rank = {n.id: i for i, n in enumerate(model.model.nodes)}
+        for i, r in enumerate(model.model.resources):
+            ctx.pools[r.id] = ResourcePool(ctx, r, positions, index=i)
         # sources last: they start pushing immediately and need every other node to exist
         order = sorted(model.nodes.values(), key=lambda c: c.behavior is Behavior.SOURCE)
         carrier_transports = {t for n in model.model.nodes for t in n.release_via.values()}

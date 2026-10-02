@@ -91,7 +91,7 @@ def test_transport_keeps_unit_upstream_until_loaded(registry):
                          "nodes": [{"id": "src", "component": "source"},
                                    {"id": "m1", "component": "machine", "params": {"process_time": C(1)}},
                                    {"id": "buf", "component": "buffer", "params": {"capacity": 2}},
-                                   {"id": "tr", "component": "transport", "params": {
+                                   {"id": "tr", "component": "transport", "priority": 1, "params": {
                                        "distance": {"value": 50, "unit": "m"}, "speed": {"value": 1, "unit": "m/s"},
                                        "load_time": C(0), "unload_time": C(0), "resources": [{"resource": "op"}]}},
                                    {"id": "out", "component": "sink"}],
@@ -121,17 +121,21 @@ def test_missing_travel_data_is_an_error_not_zero(registry):
 
 
 def deadlock_model(reserve: bool):
-    """Operator carries a unit to a full station that waits for the same operator (circular wait)."""
+    """Operator carries a unit to a full station that waits for the same operator (circular wait).
+    The precondition is EXPLICIT: static priority transport (1) before review (2). With engine 0.2.0 this deadlock
+    also appeared under FIFO, but only because of SimPy's internal ordering of two same-instant requests; since
+    0.3.0 same-instant ties go to the older unit (the review), so the FIFO variant no longer deadlocks."""
     return model_from_dict({
         "meta": {"name": "deadlock"}, "simulation": {"horizon": {"value": 1, "unit": "h"}},
-        "resources": [{"id": "op", "quantity": 1}],
+        "resources": [{"id": "op", "quantity": 1, "dispatch": "priority"}],
         "nodes": [{"id": "src", "component": "source"},
                   {"id": "m1", "component": "machine", "params": {"process_time": C(1)}},
                   {"id": "buf", "component": "buffer", "params": {"capacity": 5}},
-                  {"id": "tr", "component": "transport", "params": {
+                  {"id": "tr", "component": "transport", "priority": 1, "params": {
                       "distance": {"value": 1, "unit": "m"}, "speed": {"value": 1, "unit": "m/s"}, "load_time": C(0),
                       "unload_time": C(0), "resources": [{"resource": "op"}], "reserve_destination": reserve, "return_empty": False}},
-                  {"id": "review", "component": "inspection", "params": {"process_time": C(5), "resources": [{"resource": "op"}]}},
+                  {"id": "review", "component": "inspection", "priority": 2,
+                   "params": {"process_time": C(5), "resources": [{"resource": "op"}]}},
                   {"id": "out", "component": "sink"}],
         "edges": [{"source": a, "target": b} for a, b in [("src", "m1"), ("m1", "buf"), ("buf", "tr"), ("tr", "review"), ("review", "out")]]})
 
@@ -205,7 +209,15 @@ def test_synthetic_benchmark_full_pipeline(tmp_path, registry):
     assert "score" not in report.lower()
 
 
-def test_synthetic_benchmark_without_reservation_reports_deadlock(tmp_path, registry):
+def test_synthetic_benchmark_reports_engine_deadlocks(tmp_path, registry, monkeypatch):
+    """A deadlocked scenario is reported as an error and blocks validation (never reported as results).
+    The deadlock is injected: whether the no-reservation configuration deadlocks depends on same-instant tie
+    semantics (it did with engine 0.2.0, it does not with 0.3.0), so it is not a stable way to test reporting."""
+    from simforge.engine.des import engine as eng
+
+    def deadlocked_run(self, model, seed, trace=False):
+        raise eng.DeadlockError("DEADLOCK (injected for the reporting test)")
+    monkeypatch.setattr(eng.DesEngine, "run", deadlocked_run)
     d = synthetic_dir(tmp_path, **{"transport_to_selective.start_only_if_destination_has_room": False,
                                    "transport_to_review.start_only_if_destination_has_room": False})
     run = run_benchmark(d, registry, sensitivity=False, charts=False)

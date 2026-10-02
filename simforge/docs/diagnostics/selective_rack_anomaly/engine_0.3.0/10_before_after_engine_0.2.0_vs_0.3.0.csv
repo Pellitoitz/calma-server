@@ -1,0 +1,37 @@
+model,racks,old_production_0.2.0,new_production_0.3.0,difference,reason_if_changed
+01_simple_line,,59.0,59.0,0.0,
+02_shared_operator,,359.0,359.0,0.0,
+03_machine_breakdowns,,1889.05,1889.05,0.0,
+04_rework_routing,,477.5,477.5,0.0,
+05_selective_soldering,,132.0,130.0,-2.0,same-instant contract: 132 cascaded assembly requests (rack released at review end) did not compete in 0.2.0
+MVP (generated),,359.0,359.0,0.0,
+selective racks=1,,122.0,122.0,0.0,
+selective racks=2,,136.0,133.0,-3.0,same-instant contract: 68 cascaded assembly requests did not compete in 0.2.0 (ATATII -> ATI cycle)
+selective racks=3,,123.0,123.0,0.0,
+selective racks=4,,123.0,123.0,0.0,
+selective racks=5,,123.0,123.0,0.0,
+selective racks=6,,123.0,123.0,0.0,
+selective racks=7,,123.0,123.0,0.0,
+selective racks=8,,123.0,123.0,0.0,
+selective racks=9,,123.0,123.0,0.0,
+selective racks=10,,123.0,123.0,0.0,
+synthetic benchmark (reservation),1,174.0,174.0,0.0,
+synthetic benchmark (reservation),2,249.0,249.0,0.0,
+synthetic benchmark (reservation),3,248.0,234.0,-14.0,explicit tie-break (older unit first; empty rack returns last) replaced SimPy creation order in same-instant ties
+synthetic benchmark (reservation),4,227.0,233.0,6.0,explicit tie-break (older unit first; empty rack returns last) replaced SimPy creation order in same-instant ties
+synthetic benchmark (reservation),5,219.0,222.0,3.0,explicit tie-break (older unit first; empty rack returns last) replaced SimPy creation order in same-instant ties
+synthetic benchmark (reservation),6,218.0,217.0,-1.0,explicit tie-break (older unit first; empty rack returns last) replaced SimPy creation order in same-instant ties
+synthetic benchmark (reservation),7,218.0,216.0,-2.0,explicit tie-break (older unit first; empty rack returns last) replaced SimPy creation order in same-instant ties
+synthetic benchmark (reservation),8,218.0,216.0,-2.0,explicit tie-break (older unit first; empty rack returns last) replaced SimPy creation order in same-instant ties
+synthetic benchmark (reservation),9,218.0,216.0,-2.0,explicit tie-break (older unit first; empty rack returns last) replaced SimPy creation order in same-instant ties
+synthetic benchmark (reservation),10,218.0,216.0,-2.0,explicit tie-break (older unit first; empty rack returns last) replaced SimPy creation order in same-instant ties
+synthetic benchmark (NO reservation),1,174.0,174.0,0.0,
+synthetic benchmark (NO reservation),2,249.0,249.0,0.0,
+synthetic benchmark (NO reservation),3,DEADLOCK,234.0,DEADLOCK -> 234.0,explicit tie-break (older unit first; empty rack returns last) replaced SimPy creation order in same-instant ties - 0.2.0 deadlock depended on that order
+synthetic benchmark (NO reservation),4,DEADLOCK,233.0,DEADLOCK -> 233.0,explicit tie-break (older unit first; empty rack returns last) replaced SimPy creation order in same-instant ties - 0.2.0 deadlock depended on that order
+synthetic benchmark (NO reservation),5,DEADLOCK,222.0,DEADLOCK -> 222.0,explicit tie-break (older unit first; empty rack returns last) replaced SimPy creation order in same-instant ties - 0.2.0 deadlock depended on that order
+synthetic benchmark (NO reservation),6,DEADLOCK,217.0,DEADLOCK -> 217.0,explicit tie-break (older unit first; empty rack returns last) replaced SimPy creation order in same-instant ties - 0.2.0 deadlock depended on that order
+synthetic benchmark (NO reservation),7,DEADLOCK,216.0,DEADLOCK -> 216.0,explicit tie-break (older unit first; empty rack returns last) replaced SimPy creation order in same-instant ties - 0.2.0 deadlock depended on that order
+synthetic benchmark (NO reservation),8,DEADLOCK,216.0,DEADLOCK -> 216.0,explicit tie-break (older unit first; empty rack returns last) replaced SimPy creation order in same-instant ties - 0.2.0 deadlock depended on that order
+synthetic benchmark (NO reservation),9,DEADLOCK,216.0,DEADLOCK -> 216.0,explicit tie-break (older unit first; empty rack returns last) replaced SimPy creation order in same-instant ties - 0.2.0 deadlock depended on that order
+synthetic benchmark (NO reservation),10,DEADLOCK,216.0,DEADLOCK -> 216.0,explicit tie-break (older unit first; empty rack returns last) replaced SimPy creation order in same-instant ties - 0.2.0 deadlock depended on that order

@@ -1,0 +1,70 @@
+t,operator_state,operator_location,selective_state,feeding_wip,wip_target,input_buffer_level,available_racks,racks_in_assembly,racks_in_transport,racks_in_input_buffer,racks_in_selective,racks_in_review,candidate_tasks,selected_task,decision_reason
+0,assembly,manual_assembly,starved,0,2,0,2,1,0,0,0,0,manual_assembly,manual_assembly,feed WIP 0 < target 2 -> feeder task (keep 'selective_soldering' fed)
+120.0,transport_load,manual_assembly,starved,1,2,0,2,1,0,0,0,0,transport_1,transport_1,feed WIP 1 < target 2 -> feeder task (keep 'selective_soldering' fed)
+125.0,transport_travel,buffer_de_entrada,starved,,,,1,1,1,0,0,0,,,
+133.333333,transport_travel,buffer_de_entrada,starved,,,,1,1,1,0,0,0,,,
+138.333333,transport_unload,buffer_de_entrada,busy,0,2,0,1,1,0,0,1,0,manual_assembly,manual_assembly,feed WIP 0 < target 2 -> feeder task (keep 'selective_soldering' fed)
+146.666333,idle,manual_assembly,busy,,,,1,1,0,0,1,0,,,
+146.666667,assembly,manual_assembly,busy,,,,1,1,0,0,1,0,,,
+266.666667,transport_load,manual_assembly,starved,1,2,0,1,1,0,0,0,1,transport_1|inspection,transport_1,feed WIP 1 < target 2 -> feeder task (keep 'selective_soldering' fed)
+271.666667,transport_travel,buffer_de_entrada,starved,,,,0,1,1,0,0,1,,,
+280.0,transport_travel,buffer_de_entrada,starved,,,,0,1,1,0,0,1,,,
+285.0,transport_unload,buffer_de_entrada,busy,0,2,0,0,1,0,0,1,1,manual_assembly|inspection,manual_assembly,feed WIP 0 < target 2 -> feeder task (keep 'selective_soldering' fed)
+293.333,idle,manual_assembly,busy,,,,0,1,0,0,1,1,,,
+293.333333,assembly,manual_assembly,busy,,,,0,1,0,0,1,1,,,
+413.333333,walking,inspection,blocked,1,2,0,0,1,0,0,1,1,inspection|transport_1,inspection,"'selective_soldering' is BLOCKED (output full) -> downstream task first to unblock it (feed WIP 1, target 2)"
+425.833333,inspection,inspection,blocked,,,,0,1,0,0,1,1,,,
+485.833333,walking,manual_assembly,starved,1,2,0,1,1,0,0,0,1,transport_1|inspection,transport_1,feed WIP 1 < target 2 -> feeder task (keep 'selective_soldering' fed)
+498.333333,transport_load,manual_assembly,starved,,,,1,1,0,0,0,1,,,
+503.333333,transport_travel,buffer_de_entrada,starved,,,,0,1,1,0,0,1,,,
+511.666666,transport_travel,buffer_de_entrada,starved,,,,0,1,1,0,0,1,,,
+516.666666,transport_unload,buffer_de_entrada,starved,,,,0,1,1,0,0,1,,,
+516.666667,walking,manual_assembly,busy,0,2,0,0,1,0,0,1,1,manual_assembly|inspection,manual_assembly,feed WIP 0 < target 2 -> feeder task (keep 'selective_soldering' fed)
+524.999667,idle,manual_assembly,busy,,,,0,1,0,0,1,1,,,
+525.0,assembly,manual_assembly,busy,,,,0,1,0,0,1,1,,,
+645.0,walking,inspection,blocked,1,2,0,0,1,0,0,1,1,inspection|transport_1,inspection,"'selective_soldering' is BLOCKED (output full) -> downstream task first to unblock it (feed WIP 1, target 2)"
+657.5,inspection,inspection,blocked,,,,0,1,0,0,1,1,,,
+717.5,walking,manual_assembly,starved,1,2,0,1,1,0,0,0,1,transport_1|inspection,transport_1,feed WIP 1 < target 2 -> feeder task (keep 'selective_soldering' fed)
+730.0,transport_load,manual_assembly,starved,,,,1,1,0,0,0,1,,,
+735.0,transport_travel,buffer_de_entrada,starved,,,,0,1,1,0,0,1,,,
+743.333333,transport_travel,buffer_de_entrada,starved,,,,0,1,1,0,0,1,,,
+748.333333,transport_unload,buffer_de_entrada,busy,0,2,0,0,1,0,0,1,1,manual_assembly|inspection,manual_assembly,feed WIP 0 < target 2 -> feeder task (keep 'selective_soldering' fed)
+756.666333,idle,manual_assembly,busy,,,,0,1,0,0,1,1,,,
+756.666667,assembly,manual_assembly,busy,,,,0,1,0,0,1,1,,,
+876.666667,walking,inspection,blocked,1,2,0,0,1,0,0,1,1,inspection|transport_1,inspection,"'selective_soldering' is BLOCKED (output full) -> downstream task first to unblock it (feed WIP 1, target 2)"
+889.166667,inspection,inspection,blocked,,,,0,1,0,0,1,1,,,
+949.166667,walking,manual_assembly,starved,1,2,0,1,1,0,0,0,1,transport_1|inspection,transport_1,feed WIP 1 < target 2 -> feeder task (keep 'selective_soldering' fed)
+961.666667,transport_load,manual_assembly,starved,,,,1,1,0,0,0,1,,,
+966.666667,transport_travel,buffer_de_entrada,starved,,,,0,1,1,0,0,1,,,
+975.0,transport_travel,buffer_de_entrada,starved,,,,0,1,1,0,0,1,,,
+980.0,transport_unload,buffer_de_entrada,busy,0,2,0,0,1,0,0,1,1,manual_assembly|inspection,manual_assembly,feed WIP 0 < target 2 -> feeder task (keep 'selective_soldering' fed)
+988.333,idle,manual_assembly,busy,,,,0,1,0,0,1,1,,,
+988.333333,assembly,manual_assembly,busy,,,,0,1,0,0,1,1,,,
+1108.333333,walking,inspection,blocked,1,2,0,0,1,0,0,1,1,inspection|transport_1,inspection,"'selective_soldering' is BLOCKED (output full) -> downstream task first to unblock it (feed WIP 1, target 2)"
+1120.833333,inspection,inspection,blocked,,,,0,1,0,0,1,1,,,
+1180.833333,walking,manual_assembly,starved,1,2,0,1,1,0,0,0,1,transport_1|inspection,transport_1,feed WIP 1 < target 2 -> feeder task (keep 'selective_soldering' fed)
+1193.333333,transport_load,manual_assembly,starved,,,,1,1,0,0,0,1,,,
+1198.333333,transport_travel,buffer_de_entrada,starved,,,,0,1,1,0,0,1,,,
+1206.666666,transport_travel,buffer_de_entrada,starved,,,,0,1,1,0,0,1,,,
+1211.666666,transport_unload,buffer_de_entrada,starved,,,,0,1,1,0,0,1,,,
+1211.666667,walking,manual_assembly,busy,0,2,0,0,1,0,0,1,1,manual_assembly|inspection,manual_assembly,feed WIP 0 < target 2 -> feeder task (keep 'selective_soldering' fed)
+1219.999667,idle,manual_assembly,busy,,,,0,1,0,0,1,1,,,
+1220.0,assembly,manual_assembly,busy,,,,0,1,0,0,1,1,,,
+1340.0,walking,inspection,blocked,1,2,0,0,1,0,0,1,1,inspection|transport_1,inspection,"'selective_soldering' is BLOCKED (output full) -> downstream task first to unblock it (feed WIP 1, target 2)"
+1352.5,inspection,inspection,blocked,,,,0,1,0,0,1,1,,,
+1412.5,walking,manual_assembly,starved,1,2,0,1,1,0,0,0,1,transport_1|inspection,transport_1,feed WIP 1 < target 2 -> feeder task (keep 'selective_soldering' fed)
+1425.0,transport_load,manual_assembly,starved,,,,1,1,0,0,0,1,,,
+1430.0,transport_travel,buffer_de_entrada,starved,,,,0,1,1,0,0,1,,,
+1438.333333,transport_travel,buffer_de_entrada,starved,,,,0,1,1,0,0,1,,,
+1443.333333,transport_unload,buffer_de_entrada,busy,0,2,0,0,1,0,0,1,1,manual_assembly|inspection,manual_assembly,feed WIP 0 < target 2 -> feeder task (keep 'selective_soldering' fed)
+1451.666333,walking,manual_assembly,busy,,,,0,1,0,0,1,1,,,
+1451.666667,assembly,manual_assembly,busy,,,,0,1,0,0,1,1,,,
+1571.666667,walking,inspection,blocked,1,2,0,0,1,0,0,1,1,inspection|transport_1,inspection,"'selective_soldering' is BLOCKED (output full) -> downstream task first to unblock it (feed WIP 1, target 2)"
+1584.166667,inspection,inspection,blocked,,,,0,1,0,0,1,1,,,
+1644.166667,walking,manual_assembly,starved,1,2,0,1,1,0,0,0,1,transport_1|inspection,transport_1,feed WIP 1 < target 2 -> feeder task (keep 'selective_soldering' fed)
+1656.666667,transport_load,manual_assembly,starved,,,,1,1,0,0,0,1,,,
+1661.666667,transport_travel,buffer_de_entrada,starved,,,,0,1,1,0,0,1,,,
+1670.0,transport_travel,buffer_de_entrada,starved,,,,0,1,1,0,0,1,,,
+1675.0,transport_unload,buffer_de_entrada,busy,0,2,0,0,1,0,0,1,1,manual_assembly|inspection,manual_assembly,feed WIP 0 < target 2 -> feeder task (keep 'selective_soldering' fed)
+1683.333,idle,manual_assembly,busy,,,,0,1,0,0,1,1,,,
+1683.333333,assembly,manual_assembly,busy,,,,0,1,0,0,1,1,,,

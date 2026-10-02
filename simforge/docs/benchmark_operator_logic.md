@@ -25,12 +25,14 @@ AnyLogic logic. It is **not** a claim of equivalence.
    and an operator is free, or for pre-emption.
 
 Default timing: **after all events of the same timestamp** (`dispatch_timing: end_of_timestep`), so every request
-created at that instant competes. Alternative `immediate`: in event order, first come first decided.
+created at that instant competes, including requests cascaded from another resource decision of the same instant
+(engine ≥ 0.3.0; with 0.2.0 those cascaded requests did not compete - fixed). Alternative `immediate`: in event order,
+first come first decided. Mechanism and tie-break: `docs/simulation_engine.md`, "Resolución de un instante".
 **Measured sensitivity is large in the synthetic benchmark (up to −11 % production): AnyLogic's tie handling is a key input.**
 
 ## 2. Which variables does it use?
 
-`feed_wip`, `target`, `protected_node` state (BLOCKED or not), request order (FIFO sequence), `preempt_below`.
+`feed_wip` (distinct units, engine ≥ 0.3.0), `target`, `protected_node` state (BLOCKED or not), request order, `preempt_below`.
 It does **not** use: remaining processing time of the selective, racks available, queue at review, walking distances
 (distance only chooses *which* operator when there are several: the nearest free one).
 
@@ -46,7 +48,9 @@ Evaluated in this order:
 2. `feed_wip < target` and a feeder task waits → **feeder** (`WIP_BELOW_TARGET`).
 3. Otherwise, a non-feeder task waits → **non-feeder** (`WIP_AT_OR_ABOVE_TARGET` or `NO_FEEDER_WAITING`).
 4. Only feeder tasks waiting → feeder (`ONLY_FEEDER_WAITING`).
-Within a class: FIFO by request time; simultaneous requests by creation order.
+Within a class: FIFO by request time; simultaneous requests: older unit first (requests without a unit, e.g. empty
+carrier returns, last), then node declaration order, then request sequence (engine ≥ 0.3.0; 0.2.0 used SimPy's
+internal creation order). **Open decision: see the 0.3.0 checkpoint (loaded transport vs empty rack return).**
 
 ## 5. When does it leave review?
 

@@ -27,7 +27,10 @@ from simforge.analytics.kpis import compute_run_kpis  # noqa: E402
 from simforge.services.app import SimForgeApp  # noqa: E402
 from simforge.validation.verifier import compile_model  # noqa: E402
 
-OUT = ROOT / "docs" / "diagnostics" / "selective_rack_anomaly"
+from simforge import ENGINE_VERSION  # noqa: E402
+
+# results are kept per engine version: outputs of an older engine are never overwritten by a newer one
+OUT = ROOT / "docs" / "diagnostics" / "selective_rack_anomaly" / f"engine_{ENGINE_VERSION}"
 SPEED = 1.2
 SEL, BUF, ASM, TRN, INS = "selective_soldering", "buffer_de_entrada", "manual_assembly", "transport_1", "inspection"
 
@@ -124,38 +127,6 @@ def write_csv(name: str, rows: list[dict]) -> Path:
 
 
 # ----------------------------------------------------------------------------- counterfactuals (diagnostic only)
-from contextlib import contextmanager  # noqa: E402
-
-from simforge.engine.des import runtime as _rt  # noqa: E402
-
-
-@contextmanager
-def settled_operator_dispatch():
-    """DIAGNOSTIC ONLY (monkeypatch, never used by the product): operator decisions wait until NO other event
-    is pending at the current instant (incl. events cascaded from other end-of-timestep dispatches, e.g. a
-    rack grant that makes the assembly request the operator). Tests whether results depend on that ordering."""
-    orig = _rt.ResourcePool._schedule_dispatch
-
-    def patched(self):
-        if self.spec.kind.value != "operator" or self.ctx.dispatch_timing != "end_of_timestep":
-            return orig(self)
-        if self._dispatch_pending:
-            return
-        self._dispatch_pending = True
-        env = self.ctx.env
-
-        def fire():
-            others = [x for x in env._queue if x[0] == env.now]  # noqa: SLF001
-            if others:
-                self.ctx.at_end_of_timestep(fire)
-            else:
-                self._dispatch()
-        self.ctx.at_end_of_timestep(fire)
-    _rt.ResourcePool._schedule_dispatch = patched
-    try:
-        yield
-    finally:
-        _rt.ResourcePool._schedule_dispatch = orig
 
 
 def second_operator_for_inspection(model):
@@ -168,16 +139,12 @@ def second_operator_for_inspection(model):
     return model.model_copy(update={"resources": [*model.resources, op2], "nodes": nodes})
 
 
-def run_variant(racks: int, overrides: dict | None = None, transform=None, settled: bool = False):
+def run_variant(racks: int, overrides: dict | None = None, transform=None):
     m, reg = model_for(racks, overrides)
     if transform:
         m = transform(m)
     cm = compile_model(m, reg)
-    if settled:
-        with settled_operator_dispatch():
-            rec = DesEngine().run(cm, m.simulation.base_seed, trace=True)
-    else:
-        rec = DesEngine().run(cm, m.simulation.base_seed, trace=True)
+    rec = DesEngine().run(cm, m.simulation.base_seed, trace=True)
     return rec, compute_run_kpis(rec, cm)
 
 
@@ -198,7 +165,6 @@ VARIANTS = {
     "F_wip_target_3": {"overrides": {"parameters.wip_target.value": 3}},
     "F_wip_target_4": {"overrides": {"parameters.wip_target.value": 4}},
     "G_immediate_dispatch": {"overrides": {"simulation.dispatch_timing": "immediate"}},
-    "G_settled_end_of_timestep (diagnostic patch)": {"settled": True},
     "I_wip_target_without_rule1_unblock_protected": {"overrides": {"resources.operator_1.wip_target.unblock_protected": False}},
     "H_walking_free (speed 1000 m/s, operator only)": {"overrides": {"resources.operator_1.travel.speed": {"value": 1000, "unit": "m/s"}}},
 }
@@ -209,7 +175,7 @@ def counterfactuals(racks_list=(1, 2, 3, 4)) -> list[dict]:
     for name, v in VARIANTS.items():
         row = {"variant": name}
         for n in racks_list:
-            rec, k = run_variant(n, v.get("overrides"), v.get("transform"), v.get("settled", False))
+            rec, k = run_variant(n, v.get("overrides"), v.get("transform"))
             st = rec.resource_state_time["operator_1"]
             row[f"prod_{n}"] = k["units_completed"]
             row[f"op1_walk_s_{n}"] = round(st.get("walking", 0.0), 1)
@@ -384,7 +350,21 @@ def starvation_rows(rec, racks: int) -> tuple[list[dict], dict]:
     return rows, {k: round(v, 1) for k, v in agg.items()}
 
 
-def cycle_stats(rec, racks: int, period: str) -> dict:
+def detect_period(rec, racks: int) -> str:
+    """Smallest repeating operator-task pattern after the first hour (detected, not assumed)."""
+    code = {ASM: "A", TRN: "T", INS: "I"}
+    s = "".join(code[d["selected_task"]] for d in decisions_rows(rec, racks) if d["t"] >= 3600)
+    for p in range(1, 13):
+        for off in range(p):
+            body = s[off:off + p * ((len(s) - off) // p)]
+            if len(body) >= 3 * p and body == body[:p] * (len(body) // p):
+                return body[:p] if body[:p].startswith("A") or "A" not in body[:p] else \
+                    body[:p][body[:p].index("A"):] + body[:p][:body[:p].index("A")]
+    return s[:12]
+
+
+def cycle_stats(rec, racks: int, period: str | None = None) -> dict:
+    period = period or detect_period(rec, racks)
     """Steady-state cycle: decision sequence repeating `period` (e.g. 'ATATII'), measured after the 1st hour."""
     decs = [d for d in decisions_rows(rec, racks) if d["t"] >= 3600]
     code = {ASM: "A", TRN: "T", INS: "I"}
@@ -423,19 +403,14 @@ def feed_wip_probe(racks: int = 2) -> list[dict]:
         orig(self, v, state)
         pool = self.ctx.pools["operator_1"]
         feed, detail = pool.strategy.feed_wip(pool)
-        at_asm = sorted(e.id for e in self.ctx.live.values() if e.location == ASM and e.carriers)
-        in_trn = sorted(q[1].id for q in self.in_trip if q[0] == "unit")
-        in_buf = sorted(e.id for e in self.ctx.live.values() if e.location == BUF)
-        counted = []  # entities behind each counted unit (None = cannot be attributed)
-        counted += in_buf
-        if detail.get(f"{ASM}(in process)", 0):
-            counted += at_asm
-        if detail.get(f"{TRN}(in process)", 0):
-            counted += in_trn
+        # independent reference: physical state of each live unit (exactly one location per unit)
+        phys = {e.id: e.location for e in self.ctx.live.values()}
+        candidates = {i for i, loc in phys.items() if loc in (ASM, BUF, TRN, f"reserved:{TRN}")}
         samples.append({"t": round(self.ctx.now, 6), "transport_state": state, "feed_wip": feed, **detail,
-                        "entities_at_assembly": at_asm, "entities_in_transport_trip": in_trn, "entities_in_buffer": in_buf,
-                        "distinct_physical_units_counted": len(set(counted)),
-                        "same_unit_counted_twice": len(counted) != len(set(counted))})
+                        "units_by_state": {loc: sorted(i for i, x in phys.items() if x == loc) for loc in sorted(set(phys.values()))},
+                        "physical_units_that_could_count": len(candidates),
+                        "same_unit_counted_twice": feed > len(candidates)})
+
     _nodes.IndustrialTransport._set = patched
     try:
         m, reg = model_for(racks)
@@ -484,7 +459,7 @@ def main() -> None:
         agg.append({"racks": n, **{f"starved_while_{k}_s": v for k, v in starvation_rows(rec, n)[1].items()}})
     write_csv("04b_starvation_by_operator_activity.csv", agg)
     write_csv("05_counterfactuals.csv", counterfactuals())
-    write_csv("06_cycles.csv", [cycle_stats(run(2)[0], 2, "ATATII"), cycle_stats(run(3)[0], 3, "AIT")])
+    write_csv("06_cycles.csv", [cycle_stats(run(n)[0], n) for n in (1, 2, 3, 4)])
     print(f"CSV written to {OUT}")
 
 

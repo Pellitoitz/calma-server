@@ -10,6 +10,7 @@ Every decision returns (reason, system-state snapshot) for the decision log.
 
 from __future__ import annotations
 
+import math
 from typing import TYPE_CHECKING, Protocol
 
 from ...domain.isms import DispatchRule, Resource, WipTargetParams
@@ -29,12 +30,35 @@ class DispatchStrategy(Protocol):
     def watched_nodes(self) -> list[str]: ...
 
 
+def tie_key(r: "_Request") -> tuple:
+    """Deterministic order among requests the strategy considers equivalent (documented in docs/simulation_engine.md):
+    1) logical request time (older request first)
+    2) older unit first (lower entity id = entered the system earlier; requests without a unit go last)
+    3) declaration order of the requesting node in the ISMS
+    4) request sequence number (last resort; only reached by two requests of the same node and unit)
+    Never Python iteration order, hashes or SimPy's internal event order."""
+    return (r.t, r.entity if r.entity is not None else math.inf, r.node_rank, r.seq)
+
+
+def tie_note(chosen: "_Request", rivals: list["_Request"]) -> str:
+    """Explain which tie-break criterion decided among `rivals` (same strategy class), for the decision log."""
+    same_t = [r for r in rivals if r is not chosen and r.t == chosen.t]
+    if not same_t:
+        return ""
+    if all((r.entity if r.entity is not None else math.inf) != (chosen.entity if chosen.entity is not None else math.inf)
+           for r in same_t):
+        return f" [tie at t={chosen.t:.3f}s resolved by older unit]"
+    if all(r.node_rank != chosen.node_rank for r in same_t):
+        return f" [tie at t={chosen.t:.3f}s resolved by node declaration order]"
+    return f" [tie at t={chosen.t:.3f}s resolved by request sequence]"
+
+
 class FifoStrategy:
     rule = "fifo"
 
     def choose(self, pool, feasible):
-        r = min(feasible, key=lambda x: x.seq)
-        return r, f"FIFO: oldest request (waiting since t={r.t:.1f}s)", {}
+        r = min(feasible, key=tie_key)
+        return r, f"FIFO: oldest request (waiting since t={r.t:.1f}s){tie_note(r, feasible)}", {}
 
     def preempt_candidate(self, pool):
         return None
@@ -47,8 +71,9 @@ class PriorityStrategy(FifoStrategy):
     rule = "priority"
 
     def choose(self, pool, feasible):
-        r = min(feasible, key=lambda x: (x.priority, x.seq))
-        return r, f"PRIORITY: static priority: '{r.node}' has priority {r.priority} (lower = more urgent)", {}
+        r = min(feasible, key=lambda x: (x.priority, *tie_key(x)))
+        same = [x for x in feasible if x.priority == r.priority]
+        return r, f"PRIORITY: static priority: '{r.node}' has priority {r.priority} (lower = more urgent){tie_note(r, same)}", {}
 
 
 class WipTargetPriority:
@@ -64,16 +89,26 @@ class WipTargetPriority:
 
     # ---- system probes -------------------------------------------------
     def feed_wip(self, pool) -> tuple[int, dict]:
+        """Number of DISTINCT units that are: held by a feed node, or (count_feeder_in_process) in a BUSY/BLOCKED
+        slot or vehicle of a feeder node. Inclusion is the contract of WipTargetParams; a unit satisfying several
+        conditions (e.g. a rack still occupying the assembly place while the transport that reserved it is loading)
+        is counted ONCE. `detail` lists each source; 'shared' = units seen by more than one source."""
         nodes = pool.ctx.nodes
-        detail = {nid: nodes[nid].occupancy() for nid in self.p.feed_nodes}
-        total = sum(detail.values())
+        seen: dict[int, int] = {}
+        detail: dict[str, int] = {}
+        for nid in self.p.feed_nodes:
+            ids = nodes[nid].held_entities()
+            detail[nid] = len(ids)
+            for i in ids:
+                seen[i] = seen.get(i, 0) + 1
         if self.p.count_feeder_in_process:
             for nid in self.p.feeder_nodes:
-                c = nodes[nid].state_counts()
-                n = c.get(NodeState.BUSY, 0) + c.get(NodeState.BLOCKED, 0)
-                detail[f"{nid}(in process)"] = n
-                total += n
-        return total, detail
+                ids = nodes[nid].in_process_entities()
+                detail[f"{nid}(in process)"] = len(ids)
+                for i in ids:
+                    seen[i] = seen.get(i, 0) + 1
+        detail["shared"] = sum(1 for c in seen.values() if c > 1)
+        return len(seen), detail
 
     def _state(self, pool) -> tuple[int, bool, dict]:
         feed, detail = self.feed_wip(pool)
@@ -88,17 +123,23 @@ class WipTargetPriority:
         feed, blocked, state = self._state(pool)
         feeders = [r for r in feasible if r.node in self.feeders]
         others = [r for r in feasible if r.node not in self.feeders]
-        first = lambda rs: min(rs, key=lambda x: x.seq)  # noqa: E731 - FIFO within a class
+        def first(rs):  # FIFO within a class, deterministic tie-break (tie_key)
+            r = min(rs, key=tie_key)
+            return r, tie_note(r, rs)
         if blocked and others and self.p.unblock_protected:
-            return first(others), (f"PROTECTED_BLOCKED: '{self.p.protected_node}' is BLOCKED (output full) -> downstream task first "
-                                   f"to unblock it (feed WIP {feed}, target {self.target})"), state
+            r, tie = first(others)
+            return r, (f"PROTECTED_BLOCKED: '{self.p.protected_node}' is BLOCKED (output full) -> downstream task first "
+                       f"to unblock it (feed WIP {feed}, target {self.target}){tie}"), state
         if feed < self.target and feeders:
-            return first(feeders), f"WIP_BELOW_TARGET: feed WIP {feed} < target {self.target} -> feeder task (keep '{self.p.protected_node}' fed)", state
+            r, tie = first(feeders)
+            return r, f"WIP_BELOW_TARGET: feed WIP {feed} < target {self.target} -> feeder task (keep '{self.p.protected_node}' fed){tie}", state
         if others:
             why = (f"WIP_AT_OR_ABOVE_TARGET: feed WIP {feed} >= target {self.target}" if feed >= self.target
                    else f"NO_FEEDER_WAITING: feed WIP {feed} < target but no feeder task waiting")
-            return first(others), f"{why} -> non-feeder task", state
-        return first(feeders), f"ONLY_FEEDER_WAITING: only feeder tasks waiting (feed WIP {feed}, target {self.target})", state
+            r, tie = first(others)
+            return r, f"{why} -> non-feeder task{tie}", state
+        r, tie = first(feeders)
+        return r, f"ONLY_FEEDER_WAITING: only feeder tasks waiting (feed WIP {feed}, target {self.target}){tie}", state
 
     def preempt_candidate(self, pool):
         if self.preempt_below is None:

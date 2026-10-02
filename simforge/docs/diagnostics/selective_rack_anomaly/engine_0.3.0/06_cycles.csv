@@ -1,0 +1,5 @@
+racks,cycle_pattern,cycle_s,identical_cycles_after_1h,units_per_cycle,s_per_unit,op_assembly_s,op_idle_s,op_inspection_s,op_transport_load_s,op_transport_travel_s,op_transport_unload_s,op_walking_s,sel_busy_s,sel_starved_s,theoretical_8h_units_at_this_cycle,sel_blocked_s
+1,ATI,235.0,106,1,235.0,120.0,20.0,60.0,5.0,8.333,5.0,16.667,20.0,215.0,122.55,
+2,ATI,215.0,116,1,215.0,120.0,,60.0,5.0,8.333,5.0,16.667,20.0,150.833,133.95,44.167
+3,AIT,231.667,84,1,231.667,120.0,0.0,60.0,5.0,8.333,5.0,33.333,20.0,30.833,124.32,180.833
+4,AIT,231.667,84,1,231.667,120.0,0.0,60.0,5.0,8.333,5.0,33.333,20.0,30.833,124.32,180.833

@@ -58,6 +58,14 @@ class IndustrialNode:
     def state_counts(self) -> dict[str, int]:
         return {}
 
+    def held_entities(self) -> set[int]:
+        """Entities physically held by this node (counted by occupancy())."""
+        return set()
+
+    def in_process_entities(self) -> set[int]:
+        """Entities in a slot/vehicle that is BUSY or BLOCKED (the 'in process' notion of WIP_TARGET_PRIORITY)."""
+        return set()
+
     def record_wait(self, entity: Entity) -> None:
         if self.ctx.counting:
             self.ctx.record.node_wait[self.id].append(self.ctx.now - entity.node_entered)
@@ -122,6 +130,7 @@ class IndustrialBuffer(IndustrialNode):
         self.items: list[tuple[Entity, simpy.resources.resource.Request | None]] = []
         self._wake: simpy.Event | None = None
         self.level = LevelTracker(ctx, f"buffer:{self.id}", upper=self.p.capacity)
+        self._forwarding: Entity | None = None  # popped, still in the buffer until the next node accepts it
         ctx.env.process(self._forward())
 
     def reserve(self) -> Proc:
@@ -153,8 +162,10 @@ class IndustrialBuffer(IndustrialNode):
                 self._wake = self.ctx.env.event()
                 yield self._wake
             entity, req = self.items.pop(0 if self.p.discipline == "fifo" else -1)
+            self._forwarding = entity
             # the unit keeps its buffer space until the downstream node accepts it
             yield from self.next_node().enter(entity)
+            self._forwarding = None
             self.record_wait(entity)
             self.level.change(-1)
             self.ctx.changed(self.id)
@@ -163,6 +174,12 @@ class IndustrialBuffer(IndustrialNode):
 
     def occupancy(self) -> int:
         return self.level.level
+
+    def held_entities(self) -> set[int]:
+        ids = {e.id for e, _ in self.items}
+        if self._forwarding is not None:
+            ids.add(self._forwarding.id)
+        return ids
 
     def finalize(self) -> None:
         self.level.finalize()
@@ -177,6 +194,7 @@ class IndustrialServer(IndustrialNode):
         self.slots = simpy.Resource(ctx.env, self.p.capacity)
         self.free_slots = list(range(self.p.capacity))
         self.logical = [NodeState.STARVED] * self.p.capacity
+        self.slot_entity: list[Entity | None] = [None] * self.p.capacity
         self.trackers = [StateTracker(ctx, NodeState.STARVED) for _ in range(self.p.capacity)]
         self.rng_time = ctx.rng(self.id, "process_time")
         self.rng_yield = ctx.rng(self.id, "yield")
@@ -202,6 +220,13 @@ class IndustrialServer(IndustrialNode):
     def state_counts(self) -> dict[str, int]:
         return dict(Counter(NodeState.DOWN if self.down else st for st in self.logical))
 
+    def held_entities(self) -> set[int]:
+        return {e.id for e in self.slot_entity if e is not None}
+
+    def in_process_entities(self) -> set[int]:
+        return {e.id for e, st in zip(self.slot_entity, self.logical)
+                if e is not None and not self.down and st in (NodeState.BUSY, NodeState.BLOCKED)}
+
     def _refresh(self) -> None:
         for i, t in enumerate(self.trackers):
             t.set(NodeState.DOWN if self.down else self.logical[i])
@@ -220,6 +245,7 @@ class IndustrialServer(IndustrialNode):
         if on_accept:
             on_accept(entity)
         slot = self.free_slots.pop(0)
+        self.slot_entity[slot] = entity
         entity.node_entered = self.ctx.now
         self.ctx.place(entity, self.id)
         self.ctx.log("enter", entity, self.id, slot=slot)
@@ -244,7 +270,9 @@ class IndustrialServer(IndustrialNode):
             units: list[Unit] = yield pool.request(self.id, use.quantity, node.priority, e.id)
             e.carriers.append((use.resource, units))
             pool.pending -= len(units)
-            ctx.carrier_move(use.resource, len(units), f"granted:{self.id}", e.location or self.id)
+            for u in units:
+                u.granted_at = None
+            ctx.carrier_move(use.resource, units, f"granted:{self.id}", e.location or self.id)
             ctx.check_carriers(use.resource)
             ctx.log("carrier_seized", e, self.id, resource=use.resource, available=sum(1 for u in pool.units if not u.busy))
         # 2) operators / tools
@@ -313,6 +341,7 @@ class IndustrialServer(IndustrialNode):
             ctx.log("leave", e, self.id, to=target.id)
         self.free_slots.append(slot)
         self.free_slots.sort()
+        self.slot_entity[slot] = None
         self._set(slot, NodeState.STARVED)
         self.slots.release(req)
 
@@ -377,11 +406,11 @@ def release_carrier(ctx: SimContext, e: Entity, resource: str, via: str | None =
             del e.carriers[i]
             if via:
                 # the empty carrier travels back physically before it can be reused
-                ctx.carrier_move(rid, len(units), e.location or AVAILABLE, f"return:{via}")
+                ctx.carrier_move(rid, units, e.location or AVAILABLE, f"return:{via}")
                 ctx.nodes[via].carry_back(rid, units)
                 ctx.log("carrier_to_transport", e, via, resource=rid)
             else:
-                ctx.carrier_move(rid, len(units), e.location or AVAILABLE, AVAILABLE)
+                ctx.carrier_move(rid, units, e.location or AVAILABLE, AVAILABLE)
                 ctx.pools[rid].release(units)
                 ctx.log("carrier_released", e, None, resource=rid)
             ctx.check_carriers(rid)
@@ -391,7 +420,7 @@ def release_carrier(ctx: SimContext, e: Entity, resource: str, via: str | None =
 def release_all_carriers(ctx: SimContext, e: Entity) -> None:
     carriers, e.carriers = e.carriers, []
     for rid, units in carriers:
-        ctx.carrier_move(rid, len(units), e.location or AVAILABLE, AVAILABLE)
+        ctx.carrier_move(rid, units, e.location or AVAILABLE, AVAILABLE)
         ctx.pools[rid].release(units)
     if carriers:
         ctx.check_carriers()
@@ -426,6 +455,7 @@ class IndustrialTransport(IndustrialNode):
         self.in_trip: list[tuple] = []  # assigned to a trip (from pickup request until delivery)
         self.trackers = [StateTracker(ctx, NodeState.STARVED) for _ in range(self.p.fleet)]
         self.logical = [NodeState.STARVED] * self.p.fleet
+        self.vehicle_load: list[list[tuple]] = [[] for _ in range(self.p.fleet)]
         self.level = LevelTracker(ctx, f"transport:{self.id}")
         self.rng_load = ctx.rng(self.id, "load")
         self.rng_unload = ctx.rng(self.id, "unload")
@@ -444,8 +474,20 @@ class IndustrialTransport(IndustrialNode):
     def carriers_in_transit(self, rid: str) -> int:
         return sum(len(q[2]) for q in [*self.queue, *self.in_trip] if q[0] == "carrier" and q[1] == rid)
 
+    def carrier_returns(self, rid: str) -> list[tuple[str, list[Unit]]]:
+        """Empty carriers owned by this transport (queued or travelling back), for the carrier invariant."""
+        return [(self.id, q[2]) for q in [*self.queue, *self.in_trip] if q[0] == "carrier" and q[1] == rid]
+
     def state_counts(self) -> dict[str, int]:
         return dict(Counter(self.logical))
+
+    def held_entities(self) -> set[int]:
+        waiting = {q[1].id for q in self.queue if q[0] == "unit" and q[3] is not None}
+        return waiting | {q[1].id for q in self.aboard if q[0] == "unit"}
+
+    def in_process_entities(self) -> set[int]:
+        return {q[1].id for v, load in enumerate(self.vehicle_load) if self.logical[v] in (NodeState.BUSY, NodeState.BLOCKED)
+                for q in load if q[0] == "unit"}
 
     def _set(self, v: int, state: str) -> None:
         self.logical[v] = state
@@ -496,6 +538,12 @@ class IndustrialTransport(IndustrialNode):
             yield from self._wait_items(p.capacity if p.batch == "full" else 1)
             load = [self.queue.pop(0) for _ in range(min(p.capacity, len(self.queue)))]
             self.in_trip.extend(load)
+            self.vehicle_load[v] = load
+            for q in load:
+                if q[0] == "unit":
+                    # from now on the unit (and its carriers) belongs to this transport: RESERVED_FOR_TRANSPORT.
+                    # It may still occupy its upstream place (pickup semantics) - that is station capacity, not its state.
+                    ctx.place(q[1], f"reserved:{tid}")
             targets: dict[int, tuple] = {}
             for q in load:
                 if q[0] == "unit":
@@ -508,8 +556,9 @@ class IndustrialTransport(IndustrialNode):
             held: list[Unit] = []
             for use in p.resources:
                 self._set(v, NodeState.WAITING_RESOURCE)
+                rep = next((q[1] for q in load if q[0] == "unit"), None)  # unit being moved (tie-break: older unit first)
                 held.extend((yield from acquire_units(ctx, ctx.pools[use.resource], tid, use.quantity,
-                                                      self.cn.node.priority, None, walk_to=self.origin)))
+                                                      self.cn.node.priority, rep, walk_to=self.origin)))
             self._set(v, NodeState.BUSY)
             ctx.log("trip_start", None, tid, items=len(load), origin=self.origin, destination=self.destination,
                     resources=[u.name for u in held])
@@ -539,7 +588,7 @@ class IndustrialTransport(IndustrialNode):
                     target, token = targets[id(q)]
                     yield from target.enter(q[1], reservation=token)
                 else:
-                    ctx.carrier_move(q[1], len(q[2]), f"return:{tid}", AVAILABLE)
+                    ctx.carrier_move(q[1], q[2], f"return:{tid}", AVAILABLE)
                     self.aboard.remove(q)
                     self.in_trip.remove(q)
                     ctx.pools[q[1]].release(q[2])
@@ -565,6 +614,7 @@ class IndustrialTransport(IndustrialNode):
                     u.location = self.origin
             release_units(ctx, held)
             ctx.log("trip_end", None, tid)
+            self.vehicle_load[v] = []
             self._set(v, NodeState.STARVED)
 
     def finalize(self) -> None:

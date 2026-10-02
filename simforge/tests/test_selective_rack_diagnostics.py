@@ -1,8 +1,8 @@
 """Regression coverage for the selective-soldering rack anomaly (docs/diagnostics/selective_rack_anomaly.md).
 
-Deliberately NO golden numbers (136 / 123): it is not yet decided which value is "correct". These tests pin
-invariants and relations demonstrated in the diagnosis, and the two contract violations found (xfail strict:
-they turn into failures - i.e. reminders - the day the engine is changed and they start passing).
+Deliberately NO golden numbers: these tests pin invariants and relations demonstrated in the diagnosis.
+The two defects found (same-instant contract, feed-WIP double count) were pinned as xfail(strict) and are fixed
+since engine 0.3.0; their tests now pass as regular tests.
 """
 
 import sys
@@ -68,15 +68,15 @@ def test_feed_wip_target_is_never_reached_at_decisions(racks):
     assert feeds <= {0, 1}
 
 
-@pytest.mark.xfail(strict=True, reason="ENGINE: end_of_timestep dispatch does not let requests cascaded from another "
-                                       "end-of-timestep dispatch (rack grant -> assembly request) compete; contract in "
-                                       "docs/benchmark_operator_logic.md says every request created at that instant competes")
 def test_end_of_timestep_every_simultaneous_request_competes():
+    """Fixed in engine 0.3.0 (was xfail): requests cascaded at the same instant compete (68 misses with 0.2.0)."""
     rec, _, _ = S.run(2)
     assert S.missed_simultaneous_requests(rec) == []
 
 
-@pytest.mark.xfail(strict=True, reason="WIP_TARGET_PRIORITY: a rack waiting for pickup is counted at the assembly "
-                                       "(BLOCKED) AND at the transport (BLOCKED/BUSY) -> one physical unit counted twice")
 def test_feed_wip_counts_each_physical_unit_once():
-    assert not any(p["same_unit_counted_twice"] for p in S.feed_wip_probe(2))
+    """Fixed in engine 0.3.0 (was xfail): a rack seen both at the assembly place (BLOCKED) and by the transport that
+    reserved it counts once ('shared'); the feed WIP never exceeds the number of physical units that could count."""
+    samples = S.feed_wip_probe(2)
+    assert not any(p["same_unit_counted_twice"] for p in samples)
+    assert any(p["shared"] for p in samples)  # the overlap window exists and is deduplicated

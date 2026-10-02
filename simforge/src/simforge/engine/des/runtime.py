@@ -21,6 +21,11 @@ from ..base import ResourceState, RunRecord, TimeSeries
 LOW_PRIORITY = 2  # SimPy: 0 urgent, 1 normal. 2 = "end of current time step"
 MAX_SERIES_POINTS = 50_000
 AVAILABLE = "available"  # location of carriers idle in their pool
+MAX_DECISIONS_PER_INSTANT = 100_000  # guard: a same-instant resolution that never reaches a fixed point is an error
+
+
+class SameInstantLoopError(RuntimeError):
+    """Resource decisions at one instant did not converge (zero-duration cycle in the model)."""
 
 
 class InvariantViolation(RuntimeError):
@@ -60,6 +65,12 @@ class SimContext:
         self.pools: dict[str, "ResourcePool"] = {}
         self.watchers: dict[str, list["ResourcePool"]] = {}  # node id -> pools whose strategy watches it
         self.wip = LevelTracker(self, "wip")
+        self.node_rank: dict[str, int] = {}  # node id -> declaration index in the ISMS (technical tie-break)
+        # same-instant resolution (dispatch_timing = end_of_timestep)
+        self._dirty: set["ResourcePool"] = set()
+        self._resolver_scheduled = False
+        self._instant = -1.0
+        self._instant_decisions = 0
 
     def rng(self, *key: str) -> random.Random:
         """Independent, reproducible stream per (seed, purpose). Same stream across scenarios
@@ -89,11 +100,11 @@ class SimContext:
             self.violation(f"entity {e.id} left the system still holding {[r for r, _ in e.carriers]}")
 
     def place(self, e: "Entity", node_id: str) -> None:
-        """Entity physically moves to node_id; the carriers it holds move with it."""
+        """Entity physically moves to node_id (or to a state such as 'reserved:<transport>'); its carriers move with it."""
         old = e.location
         e.location = node_id
         for rid, units in e.carriers:
-            self.carrier_move(rid, len(units), old or AVAILABLE, node_id)
+            self.carrier_move(rid, units, old or AVAILABLE, node_id)
         if e.carriers:
             self.check_carriers()
 
@@ -103,35 +114,69 @@ class SimContext:
             locs[loc] = LevelTracker(self, f"carrier_at:{rid}:{loc}", record_series=False, owner=self)
         return locs[loc]
 
-    def carrier_move(self, rid: str, n: int, frm: str, to: str) -> None:
-        if frm == to or n == 0:
+    def carrier_move(self, rid: str, units: list["Unit"], frm: str, to: str) -> None:
+        """Move carrier units from one physical state to another. Each unit has exactly ONE state (Unit.cstate);
+        moving a unit from a state it is not in is a conservation error (double membership / lost carrier)."""
+        if frm == to or not units:
             return
-        self.carrier_level(rid, frm).change(-n)
-        self.carrier_level(rid, to).change(+n)  # callers run check_carriers() once the operation is complete
+        for u in units:
+            if u.cstate != frm:
+                self.violation(f"carrier '{u.name}' moved from '{frm}' but its state is '{u.cstate}'")
+            u.cstate = to
+        self.carrier_level(rid, frm).change(-len(units))
+        self.carrier_level(rid, to).change(+len(units))  # callers run check_carriers() once the operation is complete
 
     def check_carriers(self, rid: str | None = None) -> None:
-        """AVAILABLE + held by entities (by location) + in return transports == TOTAL, never negative,
-        cross-checked against an independent count of the pool's units."""
+        """Strong carrier invariant, checked unit by unit (identity, not only counts):
+        every carrier unit belongs to EXACTLY ONE owner - the pool (available), a pending grant (granted:<node>,
+        only within the instant of the grant), an entity (its location: node, buffer, 'reserved:<transport>',
+        on board '<transport>'), or an empty-return transport ('return:<transport>') - and its recorded state
+        (Unit.cstate) matches that owner. Detects duplication, disappearance, double membership, carriers left
+        granted beyond their instant and carriers without owner. Level trackers must agree with the states."""
         if not self.check_invariants:
             return
         self.invariant_checks += 1
         for r, pool in self.pools.items():
             if rid and r != rid or pool.spec.kind.value != "carrier":
                 continue
+            owners: dict[int, list[str]] = {u.index: [] for u in pool.units}
+            expected: dict[int, str] = {}
+            for u in pool.units:
+                if not u.busy:
+                    owners[u.index].append("pool")
+                    expected[u.index] = AVAILABLE
+                elif u.granted_at is not None:
+                    owners[u.index].append("grant")
+                    expected[u.index] = u.cstate if u.cstate.startswith("granted:") else "granted:?"
+                    if u.granted_at < self.env.now:
+                        self.violation(f"carrier '{u.name}' granted at t={u.granted_at:.3f}s never collected")
+            for e in self.live.values():
+                for x, units in e.carriers:
+                    if x != r:
+                        continue
+                    for u in units:
+                        owners[u.index].append(f"entity {e.id}")
+                        expected[u.index] = e.location or "?"
+            for n in self.nodes.values():
+                for tid, units in (n.carrier_returns(r) if hasattr(n, "carrier_returns") else []):
+                    for u in units:
+                        owners[u.index].append(f"return {tid}")
+                        expected[u.index] = f"return:{tid}"
+            for u in pool.units:
+                own = owners[u.index]
+                if len(own) != 1:
+                    self.violation(f"carrier '{u.name}' has {len(own)} owners {own} (must be exactly 1)")
+                if u.cstate != expected[u.index]:
+                    self.violation(f"carrier '{u.name}' state '{u.cstate}' != owner state '{expected[u.index]}' ({own[0]})")
             locs = self.carrier_locs.get(r, {})
-            total = pool.total
-            s = sum(t.level for t in locs.values())
-            if s != total:
-                self.violation(f"rack conservation broken for '{r}': sum over locations {s} != total {total} "
-                               f"({ {k: v.level for k, v in locs.items() if v.level} })")
-            held = sum(len(u) for e in self.live.values() for x, u in e.carriers if x == r)
-            in_transport = sum(n.carriers_in_transit(r) for n in self.nodes.values() if hasattr(n, "carriers_in_transit"))
-            idle = sum(1 for u in pool.units if not u.busy)
-            if held + in_transport + idle + pool.pending != total:
-                self.violation(f"rack conservation broken for '{r}': held {held} + in transport {in_transport} "
-                               f"+ available {idle} + granted {pool.pending} != total {total}")
-            if idle != locs.get(AVAILABLE, _Zero).level:
-                self.violation(f"'{r}': {idle} idle units but location 'available' says {locs.get(AVAILABLE, _Zero).level}")
+            by_state: dict[str, int] = {}
+            for u in pool.units:
+                by_state[u.cstate] = by_state.get(u.cstate, 0) + 1
+            levels = {k: t.level for k, t in locs.items() if t.level}
+            if levels != by_state:
+                self.violation(f"carrier level trackers {levels} != unit states {by_state} for '{r}'")
+            if sum(by_state.values()) != pool.total:
+                self.violation(f"rack conservation broken for '{r}': {sum(by_state.values())} != total {pool.total}")
 
     def check_end(self) -> None:
         if not self.check_invariants:
@@ -177,6 +222,38 @@ class SimContext:
         if self.trace and self.record.events is not None:
             self.record.events.append({"t": round(self.env.now, 6), "entity": entity.id if entity else None,
                                        "event": event, "node": node, **extra})
+
+    # ---- same-instant resolution ------------------------------------------------------------
+    def request_resolution(self, pool: "ResourcePool") -> None:
+        """A pool has something to decide at this instant (new request, released unit, watched state change)."""
+        self._dirty.add(pool)
+        if not self._resolver_scheduled:
+            self._resolver_scheduled = True
+            self.at_end_of_timestep(self._resolve)
+
+    def _resolve(self) -> None:
+        """Resolve the resource decisions of the current instant to a fixed point.
+
+        Runs at the end of the instant, i.e. after every ordinary event at time t. Takes ONE decision (assignment
+        or pre-emption) from the first pool in EVENT RESOLUTION ORDER that has one, then yields so that the
+        consequences of that decision (ordinary events at the same t, e.g. an entity that received a rack now asks
+        for its operator) are processed before the next decision; then fires again. Stops when no pool can decide.
+        Resolution order is technical, not an industrial priority: carriers first (a carrier grant only ENABLES a
+        task to request its operator/tool, so operator decisions must see every task enabled at this instant),
+        then the other pools; ties by declaration order in the ISMS.
+        """
+        self._resolver_scheduled = False
+        if self.env.now != self._instant:
+            self._instant, self._instant_decisions = self.env.now, 0
+        for pool in sorted(self._dirty, key=lambda p: p.resolution_key):
+            self._dirty.discard(pool)
+            if pool._decide_one():
+                self._instant_decisions += 1
+                if self._instant_decisions > MAX_DECISIONS_PER_INSTANT:
+                    raise SameInstantLoopError(f"t={self.env.now:.3f}s: more than {MAX_DECISIONS_PER_INSTANT} resource "
+                                               f"decisions at the same instant (zero-duration cycle?)")
+                self.request_resolution(pool)  # it may have more requests / free units; re-ordered next round
+                return
 
     def at_end_of_timestep(self, callback: Callable[[], None]) -> None:
         """Run callback after every other event scheduled at the current time.
@@ -283,6 +360,8 @@ class Unit:
     task: str | None = None  # node currently served
     preemptible: bool = False  # True only while processing a task that may be suspended
     preempt: object = None  # callable set by the holder: suspends the task and frees this unit
+    cstate: str = AVAILABLE  # carriers only: the ONE physical state of this unit (see SimContext.check_carriers)
+    granted_at: float | None = None  # carriers only: time it was granted and not yet collected
 
     @property
     def name(self) -> str:
@@ -300,6 +379,7 @@ class _Request:
     entity: int | None
     resume: bool = False  # re-request of a task suspended by pre-emption
     location: str | None = None  # where the unit is needed (defaults to the requesting node)
+    node_rank: int = 0  # declaration index of the requesting node (technical tie-break, see dispatch.tie_key)
 
 
 class ResourcePool:
@@ -309,14 +389,16 @@ class ResourcePool:
     with the configured dispatch rule; every contested decision is logged in trace mode.
     """
 
-    def __init__(self, ctx: SimContext, spec: Resource, positions: dict[str, tuple[float, float]]):
+    def __init__(self, ctx: SimContext, spec: Resource, positions: dict[str, tuple[float, float]], index: int = 0):
         self.ctx = ctx
         self.spec = spec
         self.id = spec.id
+        # EVENT RESOLUTION ORDER within an instant (technical, see SimContext._resolve): carriers, then the rest;
+        # then declaration order in the ISMS
+        self.resolution_key = (0 if spec.kind.value == "carrier" else 1, index)
         self.units = [Unit(self, i, StateTracker(ctx, ResourceState.IDLE), spec.home) for i in range(spec.quantity)]
         self.waiting: list[_Request] = []
         self._seq = 0
-        self._dispatch_pending = False
         self.positions = positions
         self.speed = spec.travel.speed.to_base() if spec.travel else None
         self.metric = spec.travel.metric if spec.travel else "euclidean"
@@ -344,7 +426,8 @@ class ResourcePool:
                 location: str | None = None) -> simpy.Event:
         self._seq += 1
         evt = self.ctx.env.event()
-        self.waiting.append(_Request(self._seq, node, qty, priority, self.ctx.now, evt, entity, resume, location or node))
+        self.waiting.append(_Request(self._seq, node, qty, priority, self.ctx.now, evt, entity, resume, location or node,
+                                     self.ctx.node_rank.get(node, len(self.ctx.node_rank))))
         self._schedule_dispatch()
         return evt
 
@@ -386,7 +469,7 @@ class ResourcePool:
     # ---- dispatching ----
     def _schedule_dispatch(self) -> None:
         if self.ctx.dispatch_timing == "immediate":
-            # decide right now, in event order (sensitivity check vs. end-of-time-step decisions)
+            # sensitivity mode: decide right now, in event order (first come, first decided)
             if not self._dispatching:
                 self._dispatching = True
                 try:
@@ -394,39 +477,47 @@ class ResourcePool:
                 finally:
                     self._dispatching = False
             return
-        if not self._dispatch_pending:
-            self._dispatch_pending = True
-            self.ctx.at_end_of_timestep(self._dispatch)
+        self.ctx.request_resolution(self)  # end_of_timestep: same-instant fixed-point resolution
 
     def _dispatch(self) -> None:
-        self._dispatch_pending = False
-        while self.waiting:
-            free = [u for u in self.units if not u.busy]
-            feasible = [r for r in self.waiting if r.qty <= len(free)]
-            if not feasible:
-                cand = self.strategy.preempt_candidate(self)
-                if cand is not None:
-                    unit, reason, state = cand
-                    unit.preemptible = False
-                    self.preemptions += int(self.ctx.counting)
-                    self._log("preempt", unit.task, None, [unit], self.waiting, reason, state)
-                    unit.preempt()  # type: ignore[operator]  # holder suspends its task and releases the unit
-                return
-            chosen, reason, state = self.strategy.choose(self, feasible)
-            # nearest free units first (walking time), then lowest index
-            free.sort(key=lambda u: (self.travel_time(u, chosen.location or chosen.node), u.index))
-            units = free[: chosen.qty]
+        """Take every decision possible now (immediate mode)."""
+        while self._decide_one():
+            pass
+
+    def _decide_one(self) -> bool:
+        """Take at most ONE decision (assignment or pre-emption). True if one was taken."""
+        if not self.waiting:
+            return False
+        free = [u for u in self.units if not u.busy]
+        feasible = [r for r in self.waiting if r.qty <= len(free)]
+        if not feasible:
+            cand = self.strategy.preempt_candidate(self)
+            if cand is None:
+                return False
+            unit, reason, state = cand
+            unit.preemptible = False
+            self.preemptions += int(self.ctx.counting)
+            self._log("preempt", unit.task, None, [unit], self.waiting, reason, state)
+            unit.preempt()  # type: ignore[operator]  # holder suspends its task and releases the unit
+            return True
+        chosen, reason, state = self.strategy.choose(self, feasible)
+        # nearest free units first (walking time), then lowest index
+        free.sort(key=lambda u: (self.travel_time(u, chosen.location or chosen.node), u.index))
+        units = free[: chosen.qty]
+        for u in units:
+            u.busy = True
+            u.task = chosen.node
+        self.in_use.change(len(units))
+        if self.spec.kind.value == "carrier":
+            self.pending += len(units)
             for u in units:
-                u.busy = True
-                u.task = chosen.node
-            self.in_use.change(len(units))
-            if self.spec.kind.value == "carrier":
-                self.pending += len(units)
-                self.ctx.carrier_move(self.id, len(units), AVAILABLE, f"granted:{chosen.node}")
-            self.waiting.remove(chosen)
-            self.tasks[chosen.node] = self.tasks.get(chosen.node, 0) + 1
-            self._log("assign", chosen.node, chosen, units, [chosen, *self.waiting], reason, state)
-            chosen.event.succeed(units)
+                u.granted_at = self.ctx.now
+            self.ctx.carrier_move(self.id, units, AVAILABLE, f"granted:{chosen.node}")
+        self.waiting.remove(chosen)
+        self.tasks[chosen.node] = self.tasks.get(chosen.node, 0) + 1
+        self._log("assign", chosen.node, chosen, units, [chosen, *self.waiting], reason, state)
+        chosen.event.succeed(units)
+        return True
 
     def _log(self, kind: str, node: str | None, chosen: "_Request | None", units: list["Unit"],
              candidates: list["_Request"], reason: str, state: dict) -> None:

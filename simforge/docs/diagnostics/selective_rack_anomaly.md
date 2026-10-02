@@ -1,7 +1,7 @@
 # Diagnóstico: selectiva — 2 bastidores = 136, 3 bastidores = 123
 
-Estado: **diagnóstico terminado, sin cambios en el motor ni en la estrategia.**
-Reproducir todo: `python scripts/diagnostics/selective_racks.py` (CSV en `docs/diagnostics/selective_rack_anomaly/`).
+Estado: diagnóstico realizado con el motor **0.2.0** (§1–§16, CSV en `selective_rack_anomaly/engine_0.2.0/`). Los dos defectos encontrados están **corregidos en el motor 0.3.0**: ver §17 (reanálisis, CSV en `engine_0.3.0/`).
+Reproducir todo: `python scripts/diagnostics/selective_racks.py` (CSV en `docs/diagnostics/selective_rack_anomaly/engine_<versión>/`).
 Tests: `tests/test_selective_rack_diagnostics.py`.
 
 Método: OBSERVAR → LOCALIZAR → EXPLICAR → DEMOSTRAR. Toda la instrumentación es de **sólo lectura** (traza de eventos y
@@ -290,3 +290,67 @@ No se ha implementado ninguna: las dos cambian resultados existentes y la semán
 `03_timeline_first30min_{2,3}racks.csv`, `04_selective_starvation_{2,3}racks.csv`, `04b_starvation_by_operator_activity.csv`,
 `05_counterfactuals.csv`, `06_cycles.csv`, `07_rack_conservation_{2,3}racks.csv`, `08_feed_wip_probe_{2,3}racks.csv`,
 `09_missed_simultaneous_requests_{2,3}racks.csv`, `model_as_generated.yaml`, `model_resolved.yaml`.
+
+
+## 17. Corrección y reanálisis con el motor 0.3.0
+
+Cambios (detalle en `docs/simulation_engine.md`: "Resolución de un instante", "Estados físicos de los carriers",
+"WIP que alimenta", "Historial de versiones del motor"):
+
+1. **Contrato del instante**: resolución a punto fijo, una decisión cada vez, con las consecuencias procesadas entre
+   decisiones; orden técnico entre pools: carriers y después el resto. Test mínimo que fallaba con 0.2.0 y pasa con 0.3.0:
+   `tests/test_engine_same_instant.py::test_cascaded_same_instant_request_competes`. Comportamiento anterior
+   documentado en `tests/data/same_instant_engine_0_2_0.json`.
+2. **Desempate explícito**: momento de la petición → unidad más antigua (sin unidad al final) → orden de declaración
+   del nodo → secuencia. Sustituye al orden interno de SimPy.
+3. **Estado físico único de carrier**, con `reserved:<transporte>` desde que el transporte toma la unidad; invariante
+   unidad a unidad (tests de duplicación, desaparición, sin propietario y concesión no recogida).
+4. **`feed_wip` cuenta unidades distintas** (misma inclusión que el contrato de 0.2.0, sin doble conteo).
+
+### Antes / después (`engine_0.3.0/10_before_after_engine_0.2.0_vs_0.3.0.csv`)
+
+Medido ejecutando el mismo script sobre el commit `0805c75` (0.2.0) y sobre 0.3.0
+(`scripts/diagnostics/engine_before_after.py`):
+
+| Modelo | 0.2.0 | 0.3.0 | Diferencia | Causa (atribución medida) |
+|---|---|---|---|---|
+| 01–04, MVP generado | 59 / 359 / 1 889,05 / 477,5 / 359 | igual | 0 | — |
+| `05_selective_soldering` | 132 | 130 | −2 | contrato del instante: 132 peticiones de montaje en cascada no competían en 0.2.0 (0 en 0.3.0) |
+| selectiva (test), 1 bastidor | 122 | 122 | 0 | — |
+| selectiva (test), 2 bastidores | 136 | **133** | −3 | contrato del instante (68 peticiones excluidas en 0.2.0) |
+| selectiva (test), 3–10 bastidores | 123 | 123 | 0 | — |
+| benchmark sintético (con reserva), 3/4/5/6–10 | 248 / 227 / 219 / 218 | 234 / 233 / 222 / 217–216 | −14 / +6 / +3 / −1…−2 | **sólo el desempate** (ver abajo) |
+| benchmark sintético (sin reserva), 3–10 | DEADLOCK | 234 / 233 / … | — | el interbloqueo de 0.2.0 dependía del orden interno de SimPy |
+
+Atribución (`11_attribution.txt`): revertir los tres mecanismos sobre 0.3.0 reproduce **exactamente** todos los
+valores de 0.2.0. `05` y la selectiva de 2 bastidores cambian sólo por el contrato del instante; el benchmark sintético
+cambia sólo por el desempate. La deduplicación de `feed_wip` no cambia ningún modelo.
+
+Censo de empates (`12_tie_census.txt`): **0 empates** en 01–05, en el MVP y en la selectiva de test (1–4 bastidores).
+En el benchmark sintético, con 3 o 4 bastidores, unas 236 decisiones del operario se resuelven por desempate; ~234 son
+`transport_to_review` (lleva un bastidor cargado) frente a `rack_return` (retorno de bastidor vacío, sin unidad).
+0.2.0 elegía siempre `rack_return` (248 de 248, por orden interno de SimPy); 0.3.0 elige `transport_to_review`
+(criterio "sin unidad al final"). **Esto es de facto una prioridad del operario: queda pendiente de decisión.**
+
+### Curva 1–10 con 0.3.0 (`engine_0.3.0/01_…`, `06_cycles.csv`)
+
+| Bastidores | Producción | Ciclo (detectado) | Andar/unidad | Inactivo/unidad | s/unidad |
+|---|---|---|---|---|---|
+| 1 | 122 | `ATI` | 16,7 s | 20 s (espera a la selectiva) | 235,0 |
+| 2 | **133** | `ATI` | 16,7 s | 0 | 215,0 |
+| 3–10 | 123 | `AIT` | 33,3 s | 0 | 231,7 |
+
+**El comportamiento no monótono sigue existiendo (133 → 123)** y ahora se explica completamente por la política:
+- No quedan peticiones excluidas del instante: 0 con 1–10 bastidores.
+- No hay empates en este modelo.
+- El balance es exacto: trabajo + andar + inactivo = horizonte.
+- Con 3 o más bastidores, la regla 1 (PROTECTED_BLOCKED) fuerza un cruce de ida y vuelta montaje↔revisión por
+  bastidor. Sin la regla 1 da 132; con FIFO, 123 plano; con el andar gratis, 144 frente a 143.
+- `immediate` da 123 con 2 bastidores. Es otra semántica documentada (el primero que llega se decide primero),
+  no un defecto.
+
+Clasificación con 0.3.0: **EXPECTED_POLICY_BEHAVIOR** (el resultado sigue el contrato de WIP_TARGET_PRIORITY) más
+**MODEL_SEMANTICS_ISSUE** (si esa política representa la intención industrial sigue siendo una decisión del
+ingeniero: §15.3). Ya no es ENGINE_BUG ni RULE_IMPLEMENTATION_BUG. La diferencia `end_of_timestep` frente a
+`immediate` (133 frente a 123) es la sensibilidad documentada entre los dos modos (EVENT_ORDER_SENSITIVITY entre
+modos, no dentro del modo por defecto).

@@ -1,0 +1,671 @@
+t,transport_state,feed_wip,buffer_de_entrada,manual_assembly(in process),transport_1(in process),shared,units_by_state,physical_units_that_could_count,same_unit_counted_twice
+120.0,blocked,1,0,1,1,1,"{""reserved:transport_1"": [1]}",1,False
+120.0,waiting_resource,1,0,1,0,0,"{""reserved:transport_1"": [1]}",1,False
+120.0,busy,1,0,1,1,1,"{""reserved:transport_1"": [1]}",1,False
+138.333333,blocked,1,0,0,1,0,"{""manual_assembly"": [2], ""transport_1"": [1]}",2,False
+138.333333,starved,1,1,0,0,0,"{""buffer_de_entrada"": [1], ""manual_assembly"": [2]}",2,False
+266.666667,blocked,1,0,1,1,1,"{""inspection"": [1], ""reserved:transport_1"": [2]}",1,False
+266.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [1], ""reserved:transport_1"": [2]}",1,False
+266.666667,busy,1,0,1,1,1,"{""inspection"": [1], ""reserved:transport_1"": [2]}",1,False
+285.0,blocked,1,0,0,1,0,"{""inspection"": [1], ""manual_assembly"": [3], ""transport_1"": [2]}",2,False
+285.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [2], ""inspection"": [1], ""manual_assembly"": [3]}",2,False
+481.666667,blocked,1,0,1,1,1,"{""inspection"": [2], ""reserved:transport_1"": [3]}",1,False
+481.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [2], ""reserved:transport_1"": [3]}",1,False
+481.666667,busy,1,0,1,1,1,"{""inspection"": [2], ""reserved:transport_1"": [3]}",1,False
+500.0,blocked,1,0,0,1,0,"{""inspection"": [2], ""manual_assembly"": [4], ""transport_1"": [3]}",2,False
+500.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [3], ""inspection"": [2], ""manual_assembly"": [4]}",2,False
+696.666667,blocked,1,0,1,1,1,"{""inspection"": [3], ""reserved:transport_1"": [4]}",1,False
+696.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [3], ""reserved:transport_1"": [4]}",1,False
+696.666667,busy,1,0,1,1,1,"{""inspection"": [3], ""reserved:transport_1"": [4]}",1,False
+715.0,blocked,1,0,0,1,0,"{""inspection"": [3], ""manual_assembly"": [5], ""transport_1"": [4]}",2,False
+715.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [4], ""inspection"": [3], ""manual_assembly"": [5]}",2,False
+911.666667,blocked,1,0,1,1,1,"{""inspection"": [4], ""reserved:transport_1"": [5]}",1,False
+911.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [4], ""reserved:transport_1"": [5]}",1,False
+911.666667,busy,1,0,1,1,1,"{""inspection"": [4], ""reserved:transport_1"": [5]}",1,False
+930.0,blocked,1,0,0,1,0,"{""inspection"": [4], ""manual_assembly"": [6], ""transport_1"": [5]}",2,False
+930.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [5], ""inspection"": [4], ""manual_assembly"": [6]}",2,False
+1126.666667,blocked,1,0,1,1,1,"{""inspection"": [5], ""reserved:transport_1"": [6]}",1,False
+1126.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [5], ""reserved:transport_1"": [6]}",1,False
+1126.666667,busy,1,0,1,1,1,"{""inspection"": [5], ""reserved:transport_1"": [6]}",1,False
+1145.0,blocked,1,0,0,1,0,"{""inspection"": [5], ""manual_assembly"": [7], ""transport_1"": [6]}",2,False
+1145.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [6], ""inspection"": [5], ""manual_assembly"": [7]}",2,False
+1341.666667,blocked,1,0,1,1,1,"{""inspection"": [6], ""reserved:transport_1"": [7]}",1,False
+1341.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [6], ""reserved:transport_1"": [7]}",1,False
+1341.666667,busy,1,0,1,1,1,"{""inspection"": [6], ""reserved:transport_1"": [7]}",1,False
+1360.0,blocked,1,0,0,1,0,"{""inspection"": [6], ""manual_assembly"": [8], ""transport_1"": [7]}",2,False
+1360.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [7], ""inspection"": [6], ""manual_assembly"": [8]}",2,False
+1556.666667,blocked,1,0,1,1,1,"{""inspection"": [7], ""reserved:transport_1"": [8]}",1,False
+1556.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [7], ""reserved:transport_1"": [8]}",1,False
+1556.666667,busy,1,0,1,1,1,"{""inspection"": [7], ""reserved:transport_1"": [8]}",1,False
+1575.0,blocked,1,0,0,1,0,"{""inspection"": [7], ""manual_assembly"": [9], ""transport_1"": [8]}",2,False
+1575.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [8], ""inspection"": [7], ""manual_assembly"": [9]}",2,False
+1771.666667,blocked,1,0,1,1,1,"{""inspection"": [8], ""reserved:transport_1"": [9]}",1,False
+1771.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [8], ""reserved:transport_1"": [9]}",1,False
+1771.666667,busy,1,0,1,1,1,"{""inspection"": [8], ""reserved:transport_1"": [9]}",1,False
+1790.0,blocked,1,0,0,1,0,"{""inspection"": [8], ""manual_assembly"": [10], ""transport_1"": [9]}",2,False
+1790.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [9], ""inspection"": [8], ""manual_assembly"": [10]}",2,False
+1986.666667,blocked,1,0,1,1,1,"{""inspection"": [9], ""reserved:transport_1"": [10]}",1,False
+1986.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [9], ""reserved:transport_1"": [10]}",1,False
+1986.666667,busy,1,0,1,1,1,"{""inspection"": [9], ""reserved:transport_1"": [10]}",1,False
+2005.0,blocked,1,0,0,1,0,"{""inspection"": [9], ""manual_assembly"": [11], ""transport_1"": [10]}",2,False
+2005.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [10], ""inspection"": [9], ""manual_assembly"": [11]}",2,False
+2201.666667,blocked,1,0,1,1,1,"{""inspection"": [10], ""reserved:transport_1"": [11]}",1,False
+2201.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [10], ""reserved:transport_1"": [11]}",1,False
+2201.666667,busy,1,0,1,1,1,"{""inspection"": [10], ""reserved:transport_1"": [11]}",1,False
+2220.0,blocked,1,0,0,1,0,"{""inspection"": [10], ""manual_assembly"": [12], ""transport_1"": [11]}",2,False
+2220.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [11], ""inspection"": [10], ""manual_assembly"": [12]}",2,False
+2416.666667,blocked,1,0,1,1,1,"{""inspection"": [11], ""reserved:transport_1"": [12]}",1,False
+2416.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [11], ""reserved:transport_1"": [12]}",1,False
+2416.666667,busy,1,0,1,1,1,"{""inspection"": [11], ""reserved:transport_1"": [12]}",1,False
+2435.0,blocked,1,0,0,1,0,"{""inspection"": [11], ""manual_assembly"": [13], ""transport_1"": [12]}",2,False
+2435.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [12], ""inspection"": [11], ""manual_assembly"": [13]}",2,False
+2631.666667,blocked,1,0,1,1,1,"{""inspection"": [12], ""reserved:transport_1"": [13]}",1,False
+2631.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [12], ""reserved:transport_1"": [13]}",1,False
+2631.666667,busy,1,0,1,1,1,"{""inspection"": [12], ""reserved:transport_1"": [13]}",1,False
+2650.0,blocked,1,0,0,1,0,"{""inspection"": [12], ""manual_assembly"": [14], ""transport_1"": [13]}",2,False
+2650.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [13], ""inspection"": [12], ""manual_assembly"": [14]}",2,False
+2846.666667,blocked,1,0,1,1,1,"{""inspection"": [13], ""reserved:transport_1"": [14]}",1,False
+2846.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [13], ""reserved:transport_1"": [14]}",1,False
+2846.666667,busy,1,0,1,1,1,"{""inspection"": [13], ""reserved:transport_1"": [14]}",1,False
+2865.0,blocked,1,0,0,1,0,"{""inspection"": [13], ""manual_assembly"": [15], ""transport_1"": [14]}",2,False
+2865.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [14], ""inspection"": [13], ""manual_assembly"": [15]}",2,False
+3061.666667,blocked,1,0,1,1,1,"{""inspection"": [14], ""reserved:transport_1"": [15]}",1,False
+3061.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [14], ""reserved:transport_1"": [15]}",1,False
+3061.666667,busy,1,0,1,1,1,"{""inspection"": [14], ""reserved:transport_1"": [15]}",1,False
+3080.0,blocked,1,0,0,1,0,"{""inspection"": [14], ""manual_assembly"": [16], ""transport_1"": [15]}",2,False
+3080.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [15], ""inspection"": [14], ""manual_assembly"": [16]}",2,False
+3276.666667,blocked,1,0,1,1,1,"{""inspection"": [15], ""reserved:transport_1"": [16]}",1,False
+3276.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [15], ""reserved:transport_1"": [16]}",1,False
+3276.666667,busy,1,0,1,1,1,"{""inspection"": [15], ""reserved:transport_1"": [16]}",1,False
+3295.0,blocked,1,0,0,1,0,"{""inspection"": [15], ""manual_assembly"": [17], ""transport_1"": [16]}",2,False
+3295.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [16], ""inspection"": [15], ""manual_assembly"": [17]}",2,False
+3491.666667,blocked,1,0,1,1,1,"{""inspection"": [16], ""reserved:transport_1"": [17]}",1,False
+3491.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [16], ""reserved:transport_1"": [17]}",1,False
+3491.666667,busy,1,0,1,1,1,"{""inspection"": [16], ""reserved:transport_1"": [17]}",1,False
+3510.0,blocked,1,0,0,1,0,"{""inspection"": [16], ""manual_assembly"": [18], ""transport_1"": [17]}",2,False
+3510.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [17], ""inspection"": [16], ""manual_assembly"": [18]}",2,False
+3706.666667,blocked,1,0,1,1,1,"{""inspection"": [17], ""reserved:transport_1"": [18]}",1,False
+3706.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [17], ""reserved:transport_1"": [18]}",1,False
+3706.666667,busy,1,0,1,1,1,"{""inspection"": [17], ""reserved:transport_1"": [18]}",1,False
+3725.0,blocked,1,0,0,1,0,"{""inspection"": [17], ""manual_assembly"": [19], ""transport_1"": [18]}",2,False
+3725.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [18], ""inspection"": [17], ""manual_assembly"": [19]}",2,False
+3921.666667,blocked,1,0,1,1,1,"{""inspection"": [18], ""reserved:transport_1"": [19]}",1,False
+3921.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [18], ""reserved:transport_1"": [19]}",1,False
+3921.666667,busy,1,0,1,1,1,"{""inspection"": [18], ""reserved:transport_1"": [19]}",1,False
+3940.0,blocked,1,0,0,1,0,"{""inspection"": [18], ""manual_assembly"": [20], ""transport_1"": [19]}",2,False
+3940.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [19], ""inspection"": [18], ""manual_assembly"": [20]}",2,False
+4136.666667,blocked,1,0,1,1,1,"{""inspection"": [19], ""reserved:transport_1"": [20]}",1,False
+4136.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [19], ""reserved:transport_1"": [20]}",1,False
+4136.666667,busy,1,0,1,1,1,"{""inspection"": [19], ""reserved:transport_1"": [20]}",1,False
+4155.0,blocked,1,0,0,1,0,"{""inspection"": [19], ""manual_assembly"": [21], ""transport_1"": [20]}",2,False
+4155.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [20], ""inspection"": [19], ""manual_assembly"": [21]}",2,False
+4351.666667,blocked,1,0,1,1,1,"{""inspection"": [20], ""reserved:transport_1"": [21]}",1,False
+4351.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [20], ""reserved:transport_1"": [21]}",1,False
+4351.666667,busy,1,0,1,1,1,"{""inspection"": [20], ""reserved:transport_1"": [21]}",1,False
+4370.0,blocked,1,0,0,1,0,"{""inspection"": [20], ""manual_assembly"": [22], ""transport_1"": [21]}",2,False
+4370.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [21], ""inspection"": [20], ""manual_assembly"": [22]}",2,False
+4566.666667,blocked,1,0,1,1,1,"{""inspection"": [21], ""reserved:transport_1"": [22]}",1,False
+4566.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [21], ""reserved:transport_1"": [22]}",1,False
+4566.666667,busy,1,0,1,1,1,"{""inspection"": [21], ""reserved:transport_1"": [22]}",1,False
+4585.0,blocked,1,0,0,1,0,"{""inspection"": [21], ""manual_assembly"": [23], ""transport_1"": [22]}",2,False
+4585.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [22], ""inspection"": [21], ""manual_assembly"": [23]}",2,False
+4781.666667,blocked,1,0,1,1,1,"{""inspection"": [22], ""reserved:transport_1"": [23]}",1,False
+4781.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [22], ""reserved:transport_1"": [23]}",1,False
+4781.666667,busy,1,0,1,1,1,"{""inspection"": [22], ""reserved:transport_1"": [23]}",1,False
+4800.0,blocked,1,0,0,1,0,"{""inspection"": [22], ""manual_assembly"": [24], ""transport_1"": [23]}",2,False
+4800.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [23], ""inspection"": [22], ""manual_assembly"": [24]}",2,False
+4996.666667,blocked,1,0,1,1,1,"{""inspection"": [23], ""reserved:transport_1"": [24]}",1,False
+4996.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [23], ""reserved:transport_1"": [24]}",1,False
+4996.666667,busy,1,0,1,1,1,"{""inspection"": [23], ""reserved:transport_1"": [24]}",1,False
+5015.0,blocked,1,0,0,1,0,"{""inspection"": [23], ""manual_assembly"": [25], ""transport_1"": [24]}",2,False
+5015.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [24], ""inspection"": [23], ""manual_assembly"": [25]}",2,False
+5211.666667,blocked,1,0,1,1,1,"{""inspection"": [24], ""reserved:transport_1"": [25]}",1,False
+5211.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [24], ""reserved:transport_1"": [25]}",1,False
+5211.666667,busy,1,0,1,1,1,"{""inspection"": [24], ""reserved:transport_1"": [25]}",1,False
+5230.0,blocked,1,0,0,1,0,"{""inspection"": [24], ""manual_assembly"": [26], ""transport_1"": [25]}",2,False
+5230.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [25], ""inspection"": [24], ""manual_assembly"": [26]}",2,False
+5426.666667,blocked,1,0,1,1,1,"{""inspection"": [25], ""reserved:transport_1"": [26]}",1,False
+5426.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [25], ""reserved:transport_1"": [26]}",1,False
+5426.666667,busy,1,0,1,1,1,"{""inspection"": [25], ""reserved:transport_1"": [26]}",1,False
+5445.0,blocked,1,0,0,1,0,"{""inspection"": [25], ""manual_assembly"": [27], ""transport_1"": [26]}",2,False
+5445.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [26], ""inspection"": [25], ""manual_assembly"": [27]}",2,False
+5641.666667,blocked,1,0,1,1,1,"{""inspection"": [26], ""reserved:transport_1"": [27]}",1,False
+5641.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [26], ""reserved:transport_1"": [27]}",1,False
+5641.666667,busy,1,0,1,1,1,"{""inspection"": [26], ""reserved:transport_1"": [27]}",1,False
+5660.0,blocked,1,0,0,1,0,"{""inspection"": [26], ""manual_assembly"": [28], ""transport_1"": [27]}",2,False
+5660.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [27], ""inspection"": [26], ""manual_assembly"": [28]}",2,False
+5856.666667,blocked,1,0,1,1,1,"{""inspection"": [27], ""reserved:transport_1"": [28]}",1,False
+5856.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [27], ""reserved:transport_1"": [28]}",1,False
+5856.666667,busy,1,0,1,1,1,"{""inspection"": [27], ""reserved:transport_1"": [28]}",1,False
+5875.0,blocked,1,0,0,1,0,"{""inspection"": [27], ""manual_assembly"": [29], ""transport_1"": [28]}",2,False
+5875.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [28], ""inspection"": [27], ""manual_assembly"": [29]}",2,False
+6071.666667,blocked,1,0,1,1,1,"{""inspection"": [28], ""reserved:transport_1"": [29]}",1,False
+6071.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [28], ""reserved:transport_1"": [29]}",1,False
+6071.666667,busy,1,0,1,1,1,"{""inspection"": [28], ""reserved:transport_1"": [29]}",1,False
+6090.0,blocked,1,0,0,1,0,"{""inspection"": [28], ""manual_assembly"": [30], ""transport_1"": [29]}",2,False
+6090.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [29], ""inspection"": [28], ""manual_assembly"": [30]}",2,False
+6286.666667,blocked,1,0,1,1,1,"{""inspection"": [29], ""reserved:transport_1"": [30]}",1,False
+6286.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [29], ""reserved:transport_1"": [30]}",1,False
+6286.666667,busy,1,0,1,1,1,"{""inspection"": [29], ""reserved:transport_1"": [30]}",1,False
+6305.0,blocked,1,0,0,1,0,"{""inspection"": [29], ""manual_assembly"": [31], ""transport_1"": [30]}",2,False
+6305.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [30], ""inspection"": [29], ""manual_assembly"": [31]}",2,False
+6501.666667,blocked,1,0,1,1,1,"{""inspection"": [30], ""reserved:transport_1"": [31]}",1,False
+6501.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [30], ""reserved:transport_1"": [31]}",1,False
+6501.666667,busy,1,0,1,1,1,"{""inspection"": [30], ""reserved:transport_1"": [31]}",1,False
+6520.0,blocked,1,0,0,1,0,"{""inspection"": [30], ""manual_assembly"": [32], ""transport_1"": [31]}",2,False
+6520.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [31], ""inspection"": [30], ""manual_assembly"": [32]}",2,False
+6716.666667,blocked,1,0,1,1,1,"{""inspection"": [31], ""reserved:transport_1"": [32]}",1,False
+6716.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [31], ""reserved:transport_1"": [32]}",1,False
+6716.666667,busy,1,0,1,1,1,"{""inspection"": [31], ""reserved:transport_1"": [32]}",1,False
+6735.0,blocked,1,0,0,1,0,"{""inspection"": [31], ""manual_assembly"": [33], ""transport_1"": [32]}",2,False
+6735.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [32], ""inspection"": [31], ""manual_assembly"": [33]}",2,False
+6931.666667,blocked,1,0,1,1,1,"{""inspection"": [32], ""reserved:transport_1"": [33]}",1,False
+6931.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [32], ""reserved:transport_1"": [33]}",1,False
+6931.666667,busy,1,0,1,1,1,"{""inspection"": [32], ""reserved:transport_1"": [33]}",1,False
+6950.0,blocked,1,0,0,1,0,"{""inspection"": [32], ""manual_assembly"": [34], ""transport_1"": [33]}",2,False
+6950.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [33], ""inspection"": [32], ""manual_assembly"": [34]}",2,False
+7146.666667,blocked,1,0,1,1,1,"{""inspection"": [33], ""reserved:transport_1"": [34]}",1,False
+7146.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [33], ""reserved:transport_1"": [34]}",1,False
+7146.666667,busy,1,0,1,1,1,"{""inspection"": [33], ""reserved:transport_1"": [34]}",1,False
+7165.0,blocked,1,0,0,1,0,"{""inspection"": [33], ""manual_assembly"": [35], ""transport_1"": [34]}",2,False
+7165.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [34], ""inspection"": [33], ""manual_assembly"": [35]}",2,False
+7361.666667,blocked,1,0,1,1,1,"{""inspection"": [34], ""reserved:transport_1"": [35]}",1,False
+7361.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [34], ""reserved:transport_1"": [35]}",1,False
+7361.666667,busy,1,0,1,1,1,"{""inspection"": [34], ""reserved:transport_1"": [35]}",1,False
+7380.0,blocked,1,0,0,1,0,"{""inspection"": [34], ""manual_assembly"": [36], ""transport_1"": [35]}",2,False
+7380.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [35], ""inspection"": [34], ""manual_assembly"": [36]}",2,False
+7576.666667,blocked,1,0,1,1,1,"{""inspection"": [35], ""reserved:transport_1"": [36]}",1,False
+7576.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [35], ""reserved:transport_1"": [36]}",1,False
+7576.666667,busy,1,0,1,1,1,"{""inspection"": [35], ""reserved:transport_1"": [36]}",1,False
+7595.0,blocked,1,0,0,1,0,"{""inspection"": [35], ""manual_assembly"": [37], ""transport_1"": [36]}",2,False
+7595.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [36], ""inspection"": [35], ""manual_assembly"": [37]}",2,False
+7791.666667,blocked,1,0,1,1,1,"{""inspection"": [36], ""reserved:transport_1"": [37]}",1,False
+7791.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [36], ""reserved:transport_1"": [37]}",1,False
+7791.666667,busy,1,0,1,1,1,"{""inspection"": [36], ""reserved:transport_1"": [37]}",1,False
+7810.0,blocked,1,0,0,1,0,"{""inspection"": [36], ""manual_assembly"": [38], ""transport_1"": [37]}",2,False
+7810.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [37], ""inspection"": [36], ""manual_assembly"": [38]}",2,False
+8006.666667,blocked,1,0,1,1,1,"{""inspection"": [37], ""reserved:transport_1"": [38]}",1,False
+8006.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [37], ""reserved:transport_1"": [38]}",1,False
+8006.666667,busy,1,0,1,1,1,"{""inspection"": [37], ""reserved:transport_1"": [38]}",1,False
+8025.0,blocked,1,0,0,1,0,"{""inspection"": [37], ""manual_assembly"": [39], ""transport_1"": [38]}",2,False
+8025.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [38], ""inspection"": [37], ""manual_assembly"": [39]}",2,False
+8221.666667,blocked,1,0,1,1,1,"{""inspection"": [38], ""reserved:transport_1"": [39]}",1,False
+8221.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [38], ""reserved:transport_1"": [39]}",1,False
+8221.666667,busy,1,0,1,1,1,"{""inspection"": [38], ""reserved:transport_1"": [39]}",1,False
+8240.0,blocked,1,0,0,1,0,"{""inspection"": [38], ""manual_assembly"": [40], ""transport_1"": [39]}",2,False
+8240.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [39], ""inspection"": [38], ""manual_assembly"": [40]}",2,False
+8436.666667,blocked,1,0,1,1,1,"{""inspection"": [39], ""reserved:transport_1"": [40]}",1,False
+8436.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [39], ""reserved:transport_1"": [40]}",1,False
+8436.666667,busy,1,0,1,1,1,"{""inspection"": [39], ""reserved:transport_1"": [40]}",1,False
+8455.0,blocked,1,0,0,1,0,"{""inspection"": [39], ""manual_assembly"": [41], ""transport_1"": [40]}",2,False
+8455.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [40], ""inspection"": [39], ""manual_assembly"": [41]}",2,False
+8651.666667,blocked,1,0,1,1,1,"{""inspection"": [40], ""reserved:transport_1"": [41]}",1,False
+8651.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [40], ""reserved:transport_1"": [41]}",1,False
+8651.666667,busy,1,0,1,1,1,"{""inspection"": [40], ""reserved:transport_1"": [41]}",1,False
+8670.0,blocked,1,0,0,1,0,"{""inspection"": [40], ""manual_assembly"": [42], ""transport_1"": [41]}",2,False
+8670.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [41], ""inspection"": [40], ""manual_assembly"": [42]}",2,False
+8866.666667,blocked,1,0,1,1,1,"{""inspection"": [41], ""reserved:transport_1"": [42]}",1,False
+8866.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [41], ""reserved:transport_1"": [42]}",1,False
+8866.666667,busy,1,0,1,1,1,"{""inspection"": [41], ""reserved:transport_1"": [42]}",1,False
+8885.0,blocked,1,0,0,1,0,"{""inspection"": [41], ""manual_assembly"": [43], ""transport_1"": [42]}",2,False
+8885.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [42], ""inspection"": [41], ""manual_assembly"": [43]}",2,False
+9081.666667,blocked,1,0,1,1,1,"{""inspection"": [42], ""reserved:transport_1"": [43]}",1,False
+9081.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [42], ""reserved:transport_1"": [43]}",1,False
+9081.666667,busy,1,0,1,1,1,"{""inspection"": [42], ""reserved:transport_1"": [43]}",1,False
+9100.0,blocked,1,0,0,1,0,"{""inspection"": [42], ""manual_assembly"": [44], ""transport_1"": [43]}",2,False
+9100.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [43], ""inspection"": [42], ""manual_assembly"": [44]}",2,False
+9296.666667,blocked,1,0,1,1,1,"{""inspection"": [43], ""reserved:transport_1"": [44]}",1,False
+9296.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [43], ""reserved:transport_1"": [44]}",1,False
+9296.666667,busy,1,0,1,1,1,"{""inspection"": [43], ""reserved:transport_1"": [44]}",1,False
+9315.0,blocked,1,0,0,1,0,"{""inspection"": [43], ""manual_assembly"": [45], ""transport_1"": [44]}",2,False
+9315.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [44], ""inspection"": [43], ""manual_assembly"": [45]}",2,False
+9511.666667,blocked,1,0,1,1,1,"{""inspection"": [44], ""reserved:transport_1"": [45]}",1,False
+9511.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [44], ""reserved:transport_1"": [45]}",1,False
+9511.666667,busy,1,0,1,1,1,"{""inspection"": [44], ""reserved:transport_1"": [45]}",1,False
+9530.0,blocked,1,0,0,1,0,"{""inspection"": [44], ""manual_assembly"": [46], ""transport_1"": [45]}",2,False
+9530.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [45], ""inspection"": [44], ""manual_assembly"": [46]}",2,False
+9726.666667,blocked,1,0,1,1,1,"{""inspection"": [45], ""reserved:transport_1"": [46]}",1,False
+9726.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [45], ""reserved:transport_1"": [46]}",1,False
+9726.666667,busy,1,0,1,1,1,"{""inspection"": [45], ""reserved:transport_1"": [46]}",1,False
+9745.0,blocked,1,0,0,1,0,"{""inspection"": [45], ""manual_assembly"": [47], ""transport_1"": [46]}",2,False
+9745.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [46], ""inspection"": [45], ""manual_assembly"": [47]}",2,False
+9941.666667,blocked,1,0,1,1,1,"{""inspection"": [46], ""reserved:transport_1"": [47]}",1,False
+9941.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [46], ""reserved:transport_1"": [47]}",1,False
+9941.666667,busy,1,0,1,1,1,"{""inspection"": [46], ""reserved:transport_1"": [47]}",1,False
+9960.0,blocked,1,0,0,1,0,"{""inspection"": [46], ""manual_assembly"": [48], ""transport_1"": [47]}",2,False
+9960.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [47], ""inspection"": [46], ""manual_assembly"": [48]}",2,False
+10156.666667,blocked,1,0,1,1,1,"{""inspection"": [47], ""reserved:transport_1"": [48]}",1,False
+10156.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [47], ""reserved:transport_1"": [48]}",1,False
+10156.666667,busy,1,0,1,1,1,"{""inspection"": [47], ""reserved:transport_1"": [48]}",1,False
+10175.0,blocked,1,0,0,1,0,"{""inspection"": [47], ""manual_assembly"": [49], ""transport_1"": [48]}",2,False
+10175.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [48], ""inspection"": [47], ""manual_assembly"": [49]}",2,False
+10371.666667,blocked,1,0,1,1,1,"{""inspection"": [48], ""reserved:transport_1"": [49]}",1,False
+10371.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [48], ""reserved:transport_1"": [49]}",1,False
+10371.666667,busy,1,0,1,1,1,"{""inspection"": [48], ""reserved:transport_1"": [49]}",1,False
+10390.0,blocked,1,0,0,1,0,"{""inspection"": [48], ""manual_assembly"": [50], ""transport_1"": [49]}",2,False
+10390.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [49], ""inspection"": [48], ""manual_assembly"": [50]}",2,False
+10586.666667,blocked,1,0,1,1,1,"{""inspection"": [49], ""reserved:transport_1"": [50]}",1,False
+10586.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [49], ""reserved:transport_1"": [50]}",1,False
+10586.666667,busy,1,0,1,1,1,"{""inspection"": [49], ""reserved:transport_1"": [50]}",1,False
+10605.0,blocked,1,0,0,1,0,"{""inspection"": [49], ""manual_assembly"": [51], ""transport_1"": [50]}",2,False
+10605.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [50], ""inspection"": [49], ""manual_assembly"": [51]}",2,False
+10801.666667,blocked,1,0,1,1,1,"{""inspection"": [50], ""reserved:transport_1"": [51]}",1,False
+10801.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [50], ""reserved:transport_1"": [51]}",1,False
+10801.666667,busy,1,0,1,1,1,"{""inspection"": [50], ""reserved:transport_1"": [51]}",1,False
+10820.0,blocked,1,0,0,1,0,"{""inspection"": [50], ""manual_assembly"": [52], ""transport_1"": [51]}",2,False
+10820.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [51], ""inspection"": [50], ""manual_assembly"": [52]}",2,False
+11016.666667,blocked,1,0,1,1,1,"{""inspection"": [51], ""reserved:transport_1"": [52]}",1,False
+11016.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [51], ""reserved:transport_1"": [52]}",1,False
+11016.666667,busy,1,0,1,1,1,"{""inspection"": [51], ""reserved:transport_1"": [52]}",1,False
+11035.0,blocked,1,0,0,1,0,"{""inspection"": [51], ""manual_assembly"": [53], ""transport_1"": [52]}",2,False
+11035.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [52], ""inspection"": [51], ""manual_assembly"": [53]}",2,False
+11231.666667,blocked,1,0,1,1,1,"{""inspection"": [52], ""reserved:transport_1"": [53]}",1,False
+11231.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [52], ""reserved:transport_1"": [53]}",1,False
+11231.666667,busy,1,0,1,1,1,"{""inspection"": [52], ""reserved:transport_1"": [53]}",1,False
+11250.0,blocked,1,0,0,1,0,"{""inspection"": [52], ""manual_assembly"": [54], ""transport_1"": [53]}",2,False
+11250.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [53], ""inspection"": [52], ""manual_assembly"": [54]}",2,False
+11446.666667,blocked,1,0,1,1,1,"{""inspection"": [53], ""reserved:transport_1"": [54]}",1,False
+11446.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [53], ""reserved:transport_1"": [54]}",1,False
+11446.666667,busy,1,0,1,1,1,"{""inspection"": [53], ""reserved:transport_1"": [54]}",1,False
+11465.0,blocked,1,0,0,1,0,"{""inspection"": [53], ""manual_assembly"": [55], ""transport_1"": [54]}",2,False
+11465.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [54], ""inspection"": [53], ""manual_assembly"": [55]}",2,False
+11661.666667,blocked,1,0,1,1,1,"{""inspection"": [54], ""reserved:transport_1"": [55]}",1,False
+11661.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [54], ""reserved:transport_1"": [55]}",1,False
+11661.666667,busy,1,0,1,1,1,"{""inspection"": [54], ""reserved:transport_1"": [55]}",1,False
+11680.0,blocked,1,0,0,1,0,"{""inspection"": [54], ""manual_assembly"": [56], ""transport_1"": [55]}",2,False
+11680.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [55], ""inspection"": [54], ""manual_assembly"": [56]}",2,False
+11876.666667,blocked,1,0,1,1,1,"{""inspection"": [55], ""reserved:transport_1"": [56]}",1,False
+11876.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [55], ""reserved:transport_1"": [56]}",1,False
+11876.666667,busy,1,0,1,1,1,"{""inspection"": [55], ""reserved:transport_1"": [56]}",1,False
+11895.0,blocked,1,0,0,1,0,"{""inspection"": [55], ""manual_assembly"": [57], ""transport_1"": [56]}",2,False
+11895.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [56], ""inspection"": [55], ""manual_assembly"": [57]}",2,False
+12091.666667,blocked,1,0,1,1,1,"{""inspection"": [56], ""reserved:transport_1"": [57]}",1,False
+12091.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [56], ""reserved:transport_1"": [57]}",1,False
+12091.666667,busy,1,0,1,1,1,"{""inspection"": [56], ""reserved:transport_1"": [57]}",1,False
+12110.0,blocked,1,0,0,1,0,"{""inspection"": [56], ""manual_assembly"": [58], ""transport_1"": [57]}",2,False
+12110.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [57], ""inspection"": [56], ""manual_assembly"": [58]}",2,False
+12306.666667,blocked,1,0,1,1,1,"{""inspection"": [57], ""reserved:transport_1"": [58]}",1,False
+12306.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [57], ""reserved:transport_1"": [58]}",1,False
+12306.666667,busy,1,0,1,1,1,"{""inspection"": [57], ""reserved:transport_1"": [58]}",1,False
+12325.0,blocked,1,0,0,1,0,"{""inspection"": [57], ""manual_assembly"": [59], ""transport_1"": [58]}",2,False
+12325.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [58], ""inspection"": [57], ""manual_assembly"": [59]}",2,False
+12521.666667,blocked,1,0,1,1,1,"{""inspection"": [58], ""reserved:transport_1"": [59]}",1,False
+12521.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [58], ""reserved:transport_1"": [59]}",1,False
+12521.666667,busy,1,0,1,1,1,"{""inspection"": [58], ""reserved:transport_1"": [59]}",1,False
+12540.0,blocked,1,0,0,1,0,"{""inspection"": [58], ""manual_assembly"": [60], ""transport_1"": [59]}",2,False
+12540.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [59], ""inspection"": [58], ""manual_assembly"": [60]}",2,False
+12736.666667,blocked,1,0,1,1,1,"{""inspection"": [59], ""reserved:transport_1"": [60]}",1,False
+12736.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [59], ""reserved:transport_1"": [60]}",1,False
+12736.666667,busy,1,0,1,1,1,"{""inspection"": [59], ""reserved:transport_1"": [60]}",1,False
+12755.0,blocked,1,0,0,1,0,"{""inspection"": [59], ""manual_assembly"": [61], ""transport_1"": [60]}",2,False
+12755.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [60], ""inspection"": [59], ""manual_assembly"": [61]}",2,False
+12951.666667,blocked,1,0,1,1,1,"{""inspection"": [60], ""reserved:transport_1"": [61]}",1,False
+12951.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [60], ""reserved:transport_1"": [61]}",1,False
+12951.666667,busy,1,0,1,1,1,"{""inspection"": [60], ""reserved:transport_1"": [61]}",1,False
+12970.0,blocked,1,0,0,1,0,"{""inspection"": [60], ""manual_assembly"": [62], ""transport_1"": [61]}",2,False
+12970.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [61], ""inspection"": [60], ""manual_assembly"": [62]}",2,False
+13166.666667,blocked,1,0,1,1,1,"{""inspection"": [61], ""reserved:transport_1"": [62]}",1,False
+13166.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [61], ""reserved:transport_1"": [62]}",1,False
+13166.666667,busy,1,0,1,1,1,"{""inspection"": [61], ""reserved:transport_1"": [62]}",1,False
+13185.0,blocked,1,0,0,1,0,"{""inspection"": [61], ""manual_assembly"": [63], ""transport_1"": [62]}",2,False
+13185.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [62], ""inspection"": [61], ""manual_assembly"": [63]}",2,False
+13381.666667,blocked,1,0,1,1,1,"{""inspection"": [62], ""reserved:transport_1"": [63]}",1,False
+13381.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [62], ""reserved:transport_1"": [63]}",1,False
+13381.666667,busy,1,0,1,1,1,"{""inspection"": [62], ""reserved:transport_1"": [63]}",1,False
+13400.0,blocked,1,0,0,1,0,"{""inspection"": [62], ""manual_assembly"": [64], ""transport_1"": [63]}",2,False
+13400.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [63], ""inspection"": [62], ""manual_assembly"": [64]}",2,False
+13596.666667,blocked,1,0,1,1,1,"{""inspection"": [63], ""reserved:transport_1"": [64]}",1,False
+13596.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [63], ""reserved:transport_1"": [64]}",1,False
+13596.666667,busy,1,0,1,1,1,"{""inspection"": [63], ""reserved:transport_1"": [64]}",1,False
+13615.0,blocked,1,0,0,1,0,"{""inspection"": [63], ""manual_assembly"": [65], ""transport_1"": [64]}",2,False
+13615.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [64], ""inspection"": [63], ""manual_assembly"": [65]}",2,False
+13811.666667,blocked,1,0,1,1,1,"{""inspection"": [64], ""reserved:transport_1"": [65]}",1,False
+13811.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [64], ""reserved:transport_1"": [65]}",1,False
+13811.666667,busy,1,0,1,1,1,"{""inspection"": [64], ""reserved:transport_1"": [65]}",1,False
+13830.0,blocked,1,0,0,1,0,"{""inspection"": [64], ""manual_assembly"": [66], ""transport_1"": [65]}",2,False
+13830.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [65], ""inspection"": [64], ""manual_assembly"": [66]}",2,False
+14026.666667,blocked,1,0,1,1,1,"{""inspection"": [65], ""reserved:transport_1"": [66]}",1,False
+14026.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [65], ""reserved:transport_1"": [66]}",1,False
+14026.666667,busy,1,0,1,1,1,"{""inspection"": [65], ""reserved:transport_1"": [66]}",1,False
+14045.0,blocked,1,0,0,1,0,"{""inspection"": [65], ""manual_assembly"": [67], ""transport_1"": [66]}",2,False
+14045.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [66], ""inspection"": [65], ""manual_assembly"": [67]}",2,False
+14241.666667,blocked,1,0,1,1,1,"{""inspection"": [66], ""reserved:transport_1"": [67]}",1,False
+14241.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [66], ""reserved:transport_1"": [67]}",1,False
+14241.666667,busy,1,0,1,1,1,"{""inspection"": [66], ""reserved:transport_1"": [67]}",1,False
+14260.0,blocked,1,0,0,1,0,"{""inspection"": [66], ""manual_assembly"": [68], ""transport_1"": [67]}",2,False
+14260.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [67], ""inspection"": [66], ""manual_assembly"": [68]}",2,False
+14456.666667,blocked,1,0,1,1,1,"{""inspection"": [67], ""reserved:transport_1"": [68]}",1,False
+14456.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [67], ""reserved:transport_1"": [68]}",1,False
+14456.666667,busy,1,0,1,1,1,"{""inspection"": [67], ""reserved:transport_1"": [68]}",1,False
+14475.0,blocked,1,0,0,1,0,"{""inspection"": [67], ""manual_assembly"": [69], ""transport_1"": [68]}",2,False
+14475.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [68], ""inspection"": [67], ""manual_assembly"": [69]}",2,False
+14671.666667,blocked,1,0,1,1,1,"{""inspection"": [68], ""reserved:transport_1"": [69]}",1,False
+14671.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [68], ""reserved:transport_1"": [69]}",1,False
+14671.666667,busy,1,0,1,1,1,"{""inspection"": [68], ""reserved:transport_1"": [69]}",1,False
+14690.0,blocked,1,0,0,1,0,"{""inspection"": [68], ""manual_assembly"": [70], ""transport_1"": [69]}",2,False
+14690.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [69], ""inspection"": [68], ""manual_assembly"": [70]}",2,False
+14886.666667,blocked,1,0,1,1,1,"{""inspection"": [69], ""reserved:transport_1"": [70]}",1,False
+14886.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [69], ""reserved:transport_1"": [70]}",1,False
+14886.666667,busy,1,0,1,1,1,"{""inspection"": [69], ""reserved:transport_1"": [70]}",1,False
+14905.0,blocked,1,0,0,1,0,"{""inspection"": [69], ""manual_assembly"": [71], ""transport_1"": [70]}",2,False
+14905.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [70], ""inspection"": [69], ""manual_assembly"": [71]}",2,False
+15101.666667,blocked,1,0,1,1,1,"{""inspection"": [70], ""reserved:transport_1"": [71]}",1,False
+15101.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [70], ""reserved:transport_1"": [71]}",1,False
+15101.666667,busy,1,0,1,1,1,"{""inspection"": [70], ""reserved:transport_1"": [71]}",1,False
+15120.0,blocked,1,0,0,1,0,"{""inspection"": [70], ""manual_assembly"": [72], ""transport_1"": [71]}",2,False
+15120.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [71], ""inspection"": [70], ""manual_assembly"": [72]}",2,False
+15316.666667,blocked,1,0,1,1,1,"{""inspection"": [71], ""reserved:transport_1"": [72]}",1,False
+15316.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [71], ""reserved:transport_1"": [72]}",1,False
+15316.666667,busy,1,0,1,1,1,"{""inspection"": [71], ""reserved:transport_1"": [72]}",1,False
+15335.0,blocked,1,0,0,1,0,"{""inspection"": [71], ""manual_assembly"": [73], ""transport_1"": [72]}",2,False
+15335.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [72], ""inspection"": [71], ""manual_assembly"": [73]}",2,False
+15531.666667,blocked,1,0,1,1,1,"{""inspection"": [72], ""reserved:transport_1"": [73]}",1,False
+15531.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [72], ""reserved:transport_1"": [73]}",1,False
+15531.666667,busy,1,0,1,1,1,"{""inspection"": [72], ""reserved:transport_1"": [73]}",1,False
+15550.0,blocked,1,0,0,1,0,"{""inspection"": [72], ""manual_assembly"": [74], ""transport_1"": [73]}",2,False
+15550.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [73], ""inspection"": [72], ""manual_assembly"": [74]}",2,False
+15746.666667,blocked,1,0,1,1,1,"{""inspection"": [73], ""reserved:transport_1"": [74]}",1,False
+15746.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [73], ""reserved:transport_1"": [74]}",1,False
+15746.666667,busy,1,0,1,1,1,"{""inspection"": [73], ""reserved:transport_1"": [74]}",1,False
+15765.0,blocked,1,0,0,1,0,"{""inspection"": [73], ""manual_assembly"": [75], ""transport_1"": [74]}",2,False
+15765.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [74], ""inspection"": [73], ""manual_assembly"": [75]}",2,False
+15961.666667,blocked,1,0,1,1,1,"{""inspection"": [74], ""reserved:transport_1"": [75]}",1,False
+15961.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [74], ""reserved:transport_1"": [75]}",1,False
+15961.666667,busy,1,0,1,1,1,"{""inspection"": [74], ""reserved:transport_1"": [75]}",1,False
+15980.0,blocked,1,0,0,1,0,"{""inspection"": [74], ""manual_assembly"": [76], ""transport_1"": [75]}",2,False
+15980.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [75], ""inspection"": [74], ""manual_assembly"": [76]}",2,False
+16176.666667,blocked,1,0,1,1,1,"{""inspection"": [75], ""reserved:transport_1"": [76]}",1,False
+16176.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [75], ""reserved:transport_1"": [76]}",1,False
+16176.666667,busy,1,0,1,1,1,"{""inspection"": [75], ""reserved:transport_1"": [76]}",1,False
+16195.0,blocked,1,0,0,1,0,"{""inspection"": [75], ""manual_assembly"": [77], ""transport_1"": [76]}",2,False
+16195.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [76], ""inspection"": [75], ""manual_assembly"": [77]}",2,False
+16391.666667,blocked,1,0,1,1,1,"{""inspection"": [76], ""reserved:transport_1"": [77]}",1,False
+16391.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [76], ""reserved:transport_1"": [77]}",1,False
+16391.666667,busy,1,0,1,1,1,"{""inspection"": [76], ""reserved:transport_1"": [77]}",1,False
+16410.0,blocked,1,0,0,1,0,"{""inspection"": [76], ""manual_assembly"": [78], ""transport_1"": [77]}",2,False
+16410.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [77], ""inspection"": [76], ""manual_assembly"": [78]}",2,False
+16606.666667,blocked,1,0,1,1,1,"{""inspection"": [77], ""reserved:transport_1"": [78]}",1,False
+16606.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [77], ""reserved:transport_1"": [78]}",1,False
+16606.666667,busy,1,0,1,1,1,"{""inspection"": [77], ""reserved:transport_1"": [78]}",1,False
+16625.0,blocked,1,0,0,1,0,"{""inspection"": [77], ""manual_assembly"": [79], ""transport_1"": [78]}",2,False
+16625.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [78], ""inspection"": [77], ""manual_assembly"": [79]}",2,False
+16821.666667,blocked,1,0,1,1,1,"{""inspection"": [78], ""reserved:transport_1"": [79]}",1,False
+16821.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [78], ""reserved:transport_1"": [79]}",1,False
+16821.666667,busy,1,0,1,1,1,"{""inspection"": [78], ""reserved:transport_1"": [79]}",1,False
+16840.0,blocked,1,0,0,1,0,"{""inspection"": [78], ""manual_assembly"": [80], ""transport_1"": [79]}",2,False
+16840.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [79], ""inspection"": [78], ""manual_assembly"": [80]}",2,False
+17036.666667,blocked,1,0,1,1,1,"{""inspection"": [79], ""reserved:transport_1"": [80]}",1,False
+17036.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [79], ""reserved:transport_1"": [80]}",1,False
+17036.666667,busy,1,0,1,1,1,"{""inspection"": [79], ""reserved:transport_1"": [80]}",1,False
+17055.0,blocked,1,0,0,1,0,"{""inspection"": [79], ""manual_assembly"": [81], ""transport_1"": [80]}",2,False
+17055.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [80], ""inspection"": [79], ""manual_assembly"": [81]}",2,False
+17251.666667,blocked,1,0,1,1,1,"{""inspection"": [80], ""reserved:transport_1"": [81]}",1,False
+17251.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [80], ""reserved:transport_1"": [81]}",1,False
+17251.666667,busy,1,0,1,1,1,"{""inspection"": [80], ""reserved:transport_1"": [81]}",1,False
+17270.0,blocked,1,0,0,1,0,"{""inspection"": [80], ""manual_assembly"": [82], ""transport_1"": [81]}",2,False
+17270.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [81], ""inspection"": [80], ""manual_assembly"": [82]}",2,False
+17466.666667,blocked,1,0,1,1,1,"{""inspection"": [81], ""reserved:transport_1"": [82]}",1,False
+17466.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [81], ""reserved:transport_1"": [82]}",1,False
+17466.666667,busy,1,0,1,1,1,"{""inspection"": [81], ""reserved:transport_1"": [82]}",1,False
+17485.0,blocked,1,0,0,1,0,"{""inspection"": [81], ""manual_assembly"": [83], ""transport_1"": [82]}",2,False
+17485.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [82], ""inspection"": [81], ""manual_assembly"": [83]}",2,False
+17681.666667,blocked,1,0,1,1,1,"{""inspection"": [82], ""reserved:transport_1"": [83]}",1,False
+17681.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [82], ""reserved:transport_1"": [83]}",1,False
+17681.666667,busy,1,0,1,1,1,"{""inspection"": [82], ""reserved:transport_1"": [83]}",1,False
+17700.0,blocked,1,0,0,1,0,"{""inspection"": [82], ""manual_assembly"": [84], ""transport_1"": [83]}",2,False
+17700.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [83], ""inspection"": [82], ""manual_assembly"": [84]}",2,False
+17896.666667,blocked,1,0,1,1,1,"{""inspection"": [83], ""reserved:transport_1"": [84]}",1,False
+17896.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [83], ""reserved:transport_1"": [84]}",1,False
+17896.666667,busy,1,0,1,1,1,"{""inspection"": [83], ""reserved:transport_1"": [84]}",1,False
+17915.0,blocked,1,0,0,1,0,"{""inspection"": [83], ""manual_assembly"": [85], ""transport_1"": [84]}",2,False
+17915.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [84], ""inspection"": [83], ""manual_assembly"": [85]}",2,False
+18111.666667,blocked,1,0,1,1,1,"{""inspection"": [84], ""reserved:transport_1"": [85]}",1,False
+18111.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [84], ""reserved:transport_1"": [85]}",1,False
+18111.666667,busy,1,0,1,1,1,"{""inspection"": [84], ""reserved:transport_1"": [85]}",1,False
+18130.0,blocked,1,0,0,1,0,"{""inspection"": [84], ""manual_assembly"": [86], ""transport_1"": [85]}",2,False
+18130.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [85], ""inspection"": [84], ""manual_assembly"": [86]}",2,False
+18326.666667,blocked,1,0,1,1,1,"{""inspection"": [85], ""reserved:transport_1"": [86]}",1,False
+18326.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [85], ""reserved:transport_1"": [86]}",1,False
+18326.666667,busy,1,0,1,1,1,"{""inspection"": [85], ""reserved:transport_1"": [86]}",1,False
+18345.0,blocked,1,0,0,1,0,"{""inspection"": [85], ""manual_assembly"": [87], ""transport_1"": [86]}",2,False
+18345.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [86], ""inspection"": [85], ""manual_assembly"": [87]}",2,False
+18541.666667,blocked,1,0,1,1,1,"{""inspection"": [86], ""reserved:transport_1"": [87]}",1,False
+18541.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [86], ""reserved:transport_1"": [87]}",1,False
+18541.666667,busy,1,0,1,1,1,"{""inspection"": [86], ""reserved:transport_1"": [87]}",1,False
+18560.0,blocked,1,0,0,1,0,"{""inspection"": [86], ""manual_assembly"": [88], ""transport_1"": [87]}",2,False
+18560.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [87], ""inspection"": [86], ""manual_assembly"": [88]}",2,False
+18756.666667,blocked,1,0,1,1,1,"{""inspection"": [87], ""reserved:transport_1"": [88]}",1,False
+18756.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [87], ""reserved:transport_1"": [88]}",1,False
+18756.666667,busy,1,0,1,1,1,"{""inspection"": [87], ""reserved:transport_1"": [88]}",1,False
+18775.0,blocked,1,0,0,1,0,"{""inspection"": [87], ""manual_assembly"": [89], ""transport_1"": [88]}",2,False
+18775.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [88], ""inspection"": [87], ""manual_assembly"": [89]}",2,False
+18971.666667,blocked,1,0,1,1,1,"{""inspection"": [88], ""reserved:transport_1"": [89]}",1,False
+18971.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [88], ""reserved:transport_1"": [89]}",1,False
+18971.666667,busy,1,0,1,1,1,"{""inspection"": [88], ""reserved:transport_1"": [89]}",1,False
+18990.0,blocked,1,0,0,1,0,"{""inspection"": [88], ""manual_assembly"": [90], ""transport_1"": [89]}",2,False
+18990.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [89], ""inspection"": [88], ""manual_assembly"": [90]}",2,False
+19186.666667,blocked,1,0,1,1,1,"{""inspection"": [89], ""reserved:transport_1"": [90]}",1,False
+19186.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [89], ""reserved:transport_1"": [90]}",1,False
+19186.666667,busy,1,0,1,1,1,"{""inspection"": [89], ""reserved:transport_1"": [90]}",1,False
+19205.0,blocked,1,0,0,1,0,"{""inspection"": [89], ""manual_assembly"": [91], ""transport_1"": [90]}",2,False
+19205.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [90], ""inspection"": [89], ""manual_assembly"": [91]}",2,False
+19401.666667,blocked,1,0,1,1,1,"{""inspection"": [90], ""reserved:transport_1"": [91]}",1,False
+19401.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [90], ""reserved:transport_1"": [91]}",1,False
+19401.666667,busy,1,0,1,1,1,"{""inspection"": [90], ""reserved:transport_1"": [91]}",1,False
+19420.0,blocked,1,0,0,1,0,"{""inspection"": [90], ""manual_assembly"": [92], ""transport_1"": [91]}",2,False
+19420.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [91], ""inspection"": [90], ""manual_assembly"": [92]}",2,False
+19616.666667,blocked,1,0,1,1,1,"{""inspection"": [91], ""reserved:transport_1"": [92]}",1,False
+19616.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [91], ""reserved:transport_1"": [92]}",1,False
+19616.666667,busy,1,0,1,1,1,"{""inspection"": [91], ""reserved:transport_1"": [92]}",1,False
+19635.0,blocked,1,0,0,1,0,"{""inspection"": [91], ""manual_assembly"": [93], ""transport_1"": [92]}",2,False
+19635.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [92], ""inspection"": [91], ""manual_assembly"": [93]}",2,False
+19831.666667,blocked,1,0,1,1,1,"{""inspection"": [92], ""reserved:transport_1"": [93]}",1,False
+19831.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [92], ""reserved:transport_1"": [93]}",1,False
+19831.666667,busy,1,0,1,1,1,"{""inspection"": [92], ""reserved:transport_1"": [93]}",1,False
+19850.0,blocked,1,0,0,1,0,"{""inspection"": [92], ""manual_assembly"": [94], ""transport_1"": [93]}",2,False
+19850.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [93], ""inspection"": [92], ""manual_assembly"": [94]}",2,False
+20046.666667,blocked,1,0,1,1,1,"{""inspection"": [93], ""reserved:transport_1"": [94]}",1,False
+20046.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [93], ""reserved:transport_1"": [94]}",1,False
+20046.666667,busy,1,0,1,1,1,"{""inspection"": [93], ""reserved:transport_1"": [94]}",1,False
+20065.0,blocked,1,0,0,1,0,"{""inspection"": [93], ""manual_assembly"": [95], ""transport_1"": [94]}",2,False
+20065.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [94], ""inspection"": [93], ""manual_assembly"": [95]}",2,False
+20261.666667,blocked,1,0,1,1,1,"{""inspection"": [94], ""reserved:transport_1"": [95]}",1,False
+20261.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [94], ""reserved:transport_1"": [95]}",1,False
+20261.666667,busy,1,0,1,1,1,"{""inspection"": [94], ""reserved:transport_1"": [95]}",1,False
+20280.0,blocked,1,0,0,1,0,"{""inspection"": [94], ""manual_assembly"": [96], ""transport_1"": [95]}",2,False
+20280.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [95], ""inspection"": [94], ""manual_assembly"": [96]}",2,False
+20476.666667,blocked,1,0,1,1,1,"{""inspection"": [95], ""reserved:transport_1"": [96]}",1,False
+20476.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [95], ""reserved:transport_1"": [96]}",1,False
+20476.666667,busy,1,0,1,1,1,"{""inspection"": [95], ""reserved:transport_1"": [96]}",1,False
+20495.0,blocked,1,0,0,1,0,"{""inspection"": [95], ""manual_assembly"": [97], ""transport_1"": [96]}",2,False
+20495.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [96], ""inspection"": [95], ""manual_assembly"": [97]}",2,False
+20691.666667,blocked,1,0,1,1,1,"{""inspection"": [96], ""reserved:transport_1"": [97]}",1,False
+20691.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [96], ""reserved:transport_1"": [97]}",1,False
+20691.666667,busy,1,0,1,1,1,"{""inspection"": [96], ""reserved:transport_1"": [97]}",1,False
+20710.0,blocked,1,0,0,1,0,"{""inspection"": [96], ""manual_assembly"": [98], ""transport_1"": [97]}",2,False
+20710.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [97], ""inspection"": [96], ""manual_assembly"": [98]}",2,False
+20906.666667,blocked,1,0,1,1,1,"{""inspection"": [97], ""reserved:transport_1"": [98]}",1,False
+20906.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [97], ""reserved:transport_1"": [98]}",1,False
+20906.666667,busy,1,0,1,1,1,"{""inspection"": [97], ""reserved:transport_1"": [98]}",1,False
+20925.0,blocked,1,0,0,1,0,"{""inspection"": [97], ""manual_assembly"": [99], ""transport_1"": [98]}",2,False
+20925.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [98], ""inspection"": [97], ""manual_assembly"": [99]}",2,False
+21121.666667,blocked,1,0,1,1,1,"{""inspection"": [98], ""reserved:transport_1"": [99]}",1,False
+21121.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [98], ""reserved:transport_1"": [99]}",1,False
+21121.666667,busy,1,0,1,1,1,"{""inspection"": [98], ""reserved:transport_1"": [99]}",1,False
+21140.0,blocked,1,0,0,1,0,"{""inspection"": [98], ""manual_assembly"": [100], ""transport_1"": [99]}",2,False
+21140.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [99], ""inspection"": [98], ""manual_assembly"": [100]}",2,False
+21336.666667,blocked,1,0,1,1,1,"{""inspection"": [99], ""reserved:transport_1"": [100]}",1,False
+21336.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [99], ""reserved:transport_1"": [100]}",1,False
+21336.666667,busy,1,0,1,1,1,"{""inspection"": [99], ""reserved:transport_1"": [100]}",1,False
+21355.0,blocked,1,0,0,1,0,"{""inspection"": [99], ""manual_assembly"": [101], ""transport_1"": [100]}",2,False
+21355.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [100], ""inspection"": [99], ""manual_assembly"": [101]}",2,False
+21551.666667,blocked,1,0,1,1,1,"{""inspection"": [100], ""reserved:transport_1"": [101]}",1,False
+21551.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [100], ""reserved:transport_1"": [101]}",1,False
+21551.666667,busy,1,0,1,1,1,"{""inspection"": [100], ""reserved:transport_1"": [101]}",1,False
+21570.0,blocked,1,0,0,1,0,"{""inspection"": [100], ""manual_assembly"": [102], ""transport_1"": [101]}",2,False
+21570.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [101], ""inspection"": [100], ""manual_assembly"": [102]}",2,False
+21766.666667,blocked,1,0,1,1,1,"{""inspection"": [101], ""reserved:transport_1"": [102]}",1,False
+21766.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [101], ""reserved:transport_1"": [102]}",1,False
+21766.666667,busy,1,0,1,1,1,"{""inspection"": [101], ""reserved:transport_1"": [102]}",1,False
+21785.0,blocked,1,0,0,1,0,"{""inspection"": [101], ""manual_assembly"": [103], ""transport_1"": [102]}",2,False
+21785.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [102], ""inspection"": [101], ""manual_assembly"": [103]}",2,False
+21981.666667,blocked,1,0,1,1,1,"{""inspection"": [102], ""reserved:transport_1"": [103]}",1,False
+21981.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [102], ""reserved:transport_1"": [103]}",1,False
+21981.666667,busy,1,0,1,1,1,"{""inspection"": [102], ""reserved:transport_1"": [103]}",1,False
+22000.0,blocked,1,0,0,1,0,"{""inspection"": [102], ""manual_assembly"": [104], ""transport_1"": [103]}",2,False
+22000.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [103], ""inspection"": [102], ""manual_assembly"": [104]}",2,False
+22196.666667,blocked,1,0,1,1,1,"{""inspection"": [103], ""reserved:transport_1"": [104]}",1,False
+22196.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [103], ""reserved:transport_1"": [104]}",1,False
+22196.666667,busy,1,0,1,1,1,"{""inspection"": [103], ""reserved:transport_1"": [104]}",1,False
+22215.0,blocked,1,0,0,1,0,"{""inspection"": [103], ""manual_assembly"": [105], ""transport_1"": [104]}",2,False
+22215.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [104], ""inspection"": [103], ""manual_assembly"": [105]}",2,False
+22411.666667,blocked,1,0,1,1,1,"{""inspection"": [104], ""reserved:transport_1"": [105]}",1,False
+22411.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [104], ""reserved:transport_1"": [105]}",1,False
+22411.666667,busy,1,0,1,1,1,"{""inspection"": [104], ""reserved:transport_1"": [105]}",1,False
+22430.0,blocked,1,0,0,1,0,"{""inspection"": [104], ""manual_assembly"": [106], ""transport_1"": [105]}",2,False
+22430.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [105], ""inspection"": [104], ""manual_assembly"": [106]}",2,False
+22626.666667,blocked,1,0,1,1,1,"{""inspection"": [105], ""reserved:transport_1"": [106]}",1,False
+22626.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [105], ""reserved:transport_1"": [106]}",1,False
+22626.666667,busy,1,0,1,1,1,"{""inspection"": [105], ""reserved:transport_1"": [106]}",1,False
+22645.0,blocked,1,0,0,1,0,"{""inspection"": [105], ""manual_assembly"": [107], ""transport_1"": [106]}",2,False
+22645.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [106], ""inspection"": [105], ""manual_assembly"": [107]}",2,False
+22841.666667,blocked,1,0,1,1,1,"{""inspection"": [106], ""reserved:transport_1"": [107]}",1,False
+22841.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [106], ""reserved:transport_1"": [107]}",1,False
+22841.666667,busy,1,0,1,1,1,"{""inspection"": [106], ""reserved:transport_1"": [107]}",1,False
+22860.0,blocked,1,0,0,1,0,"{""inspection"": [106], ""manual_assembly"": [108], ""transport_1"": [107]}",2,False
+22860.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [107], ""inspection"": [106], ""manual_assembly"": [108]}",2,False
+23056.666667,blocked,1,0,1,1,1,"{""inspection"": [107], ""reserved:transport_1"": [108]}",1,False
+23056.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [107], ""reserved:transport_1"": [108]}",1,False
+23056.666667,busy,1,0,1,1,1,"{""inspection"": [107], ""reserved:transport_1"": [108]}",1,False
+23075.0,blocked,1,0,0,1,0,"{""inspection"": [107], ""manual_assembly"": [109], ""transport_1"": [108]}",2,False
+23075.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [108], ""inspection"": [107], ""manual_assembly"": [109]}",2,False
+23271.666667,blocked,1,0,1,1,1,"{""inspection"": [108], ""reserved:transport_1"": [109]}",1,False
+23271.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [108], ""reserved:transport_1"": [109]}",1,False
+23271.666667,busy,1,0,1,1,1,"{""inspection"": [108], ""reserved:transport_1"": [109]}",1,False
+23290.0,blocked,1,0,0,1,0,"{""inspection"": [108], ""manual_assembly"": [110], ""transport_1"": [109]}",2,False
+23290.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [109], ""inspection"": [108], ""manual_assembly"": [110]}",2,False
+23486.666667,blocked,1,0,1,1,1,"{""inspection"": [109], ""reserved:transport_1"": [110]}",1,False
+23486.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [109], ""reserved:transport_1"": [110]}",1,False
+23486.666667,busy,1,0,1,1,1,"{""inspection"": [109], ""reserved:transport_1"": [110]}",1,False
+23505.0,blocked,1,0,0,1,0,"{""inspection"": [109], ""manual_assembly"": [111], ""transport_1"": [110]}",2,False
+23505.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [110], ""inspection"": [109], ""manual_assembly"": [111]}",2,False
+23701.666667,blocked,1,0,1,1,1,"{""inspection"": [110], ""reserved:transport_1"": [111]}",1,False
+23701.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [110], ""reserved:transport_1"": [111]}",1,False
+23701.666667,busy,1,0,1,1,1,"{""inspection"": [110], ""reserved:transport_1"": [111]}",1,False
+23720.0,blocked,1,0,0,1,0,"{""inspection"": [110], ""manual_assembly"": [112], ""transport_1"": [111]}",2,False
+23720.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [111], ""inspection"": [110], ""manual_assembly"": [112]}",2,False
+23916.666667,blocked,1,0,1,1,1,"{""inspection"": [111], ""reserved:transport_1"": [112]}",1,False
+23916.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [111], ""reserved:transport_1"": [112]}",1,False
+23916.666667,busy,1,0,1,1,1,"{""inspection"": [111], ""reserved:transport_1"": [112]}",1,False
+23935.0,blocked,1,0,0,1,0,"{""inspection"": [111], ""manual_assembly"": [113], ""transport_1"": [112]}",2,False
+23935.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [112], ""inspection"": [111], ""manual_assembly"": [113]}",2,False
+24131.666667,blocked,1,0,1,1,1,"{""inspection"": [112], ""reserved:transport_1"": [113]}",1,False
+24131.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [112], ""reserved:transport_1"": [113]}",1,False
+24131.666667,busy,1,0,1,1,1,"{""inspection"": [112], ""reserved:transport_1"": [113]}",1,False
+24150.0,blocked,1,0,0,1,0,"{""inspection"": [112], ""manual_assembly"": [114], ""transport_1"": [113]}",2,False
+24150.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [113], ""inspection"": [112], ""manual_assembly"": [114]}",2,False
+24346.666667,blocked,1,0,1,1,1,"{""inspection"": [113], ""reserved:transport_1"": [114]}",1,False
+24346.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [113], ""reserved:transport_1"": [114]}",1,False
+24346.666667,busy,1,0,1,1,1,"{""inspection"": [113], ""reserved:transport_1"": [114]}",1,False
+24365.0,blocked,1,0,0,1,0,"{""inspection"": [113], ""manual_assembly"": [115], ""transport_1"": [114]}",2,False
+24365.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [114], ""inspection"": [113], ""manual_assembly"": [115]}",2,False
+24561.666667,blocked,1,0,1,1,1,"{""inspection"": [114], ""reserved:transport_1"": [115]}",1,False
+24561.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [114], ""reserved:transport_1"": [115]}",1,False
+24561.666667,busy,1,0,1,1,1,"{""inspection"": [114], ""reserved:transport_1"": [115]}",1,False
+24580.0,blocked,1,0,0,1,0,"{""inspection"": [114], ""manual_assembly"": [116], ""transport_1"": [115]}",2,False
+24580.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [115], ""inspection"": [114], ""manual_assembly"": [116]}",2,False
+24776.666667,blocked,1,0,1,1,1,"{""inspection"": [115], ""reserved:transport_1"": [116]}",1,False
+24776.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [115], ""reserved:transport_1"": [116]}",1,False
+24776.666667,busy,1,0,1,1,1,"{""inspection"": [115], ""reserved:transport_1"": [116]}",1,False
+24795.0,blocked,1,0,0,1,0,"{""inspection"": [115], ""manual_assembly"": [117], ""transport_1"": [116]}",2,False
+24795.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [116], ""inspection"": [115], ""manual_assembly"": [117]}",2,False
+24991.666667,blocked,1,0,1,1,1,"{""inspection"": [116], ""reserved:transport_1"": [117]}",1,False
+24991.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [116], ""reserved:transport_1"": [117]}",1,False
+24991.666667,busy,1,0,1,1,1,"{""inspection"": [116], ""reserved:transport_1"": [117]}",1,False
+25010.0,blocked,1,0,0,1,0,"{""inspection"": [116], ""manual_assembly"": [118], ""transport_1"": [117]}",2,False
+25010.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [117], ""inspection"": [116], ""manual_assembly"": [118]}",2,False
+25206.666667,blocked,1,0,1,1,1,"{""inspection"": [117], ""reserved:transport_1"": [118]}",1,False
+25206.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [117], ""reserved:transport_1"": [118]}",1,False
+25206.666667,busy,1,0,1,1,1,"{""inspection"": [117], ""reserved:transport_1"": [118]}",1,False
+25225.0,blocked,1,0,0,1,0,"{""inspection"": [117], ""manual_assembly"": [119], ""transport_1"": [118]}",2,False
+25225.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [118], ""inspection"": [117], ""manual_assembly"": [119]}",2,False
+25421.666667,blocked,1,0,1,1,1,"{""inspection"": [118], ""reserved:transport_1"": [119]}",1,False
+25421.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [118], ""reserved:transport_1"": [119]}",1,False
+25421.666667,busy,1,0,1,1,1,"{""inspection"": [118], ""reserved:transport_1"": [119]}",1,False
+25440.0,blocked,1,0,0,1,0,"{""inspection"": [118], ""manual_assembly"": [120], ""transport_1"": [119]}",2,False
+25440.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [119], ""inspection"": [118], ""manual_assembly"": [120]}",2,False
+25636.666667,blocked,1,0,1,1,1,"{""inspection"": [119], ""reserved:transport_1"": [120]}",1,False
+25636.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [119], ""reserved:transport_1"": [120]}",1,False
+25636.666667,busy,1,0,1,1,1,"{""inspection"": [119], ""reserved:transport_1"": [120]}",1,False
+25655.0,blocked,1,0,0,1,0,"{""inspection"": [119], ""manual_assembly"": [121], ""transport_1"": [120]}",2,False
+25655.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [120], ""inspection"": [119], ""manual_assembly"": [121]}",2,False
+25851.666667,blocked,1,0,1,1,1,"{""inspection"": [120], ""reserved:transport_1"": [121]}",1,False
+25851.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [120], ""reserved:transport_1"": [121]}",1,False
+25851.666667,busy,1,0,1,1,1,"{""inspection"": [120], ""reserved:transport_1"": [121]}",1,False
+25870.0,blocked,1,0,0,1,0,"{""inspection"": [120], ""manual_assembly"": [122], ""transport_1"": [121]}",2,False
+25870.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [121], ""inspection"": [120], ""manual_assembly"": [122]}",2,False
+26066.666667,blocked,1,0,1,1,1,"{""inspection"": [121], ""reserved:transport_1"": [122]}",1,False
+26066.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [121], ""reserved:transport_1"": [122]}",1,False
+26066.666667,busy,1,0,1,1,1,"{""inspection"": [121], ""reserved:transport_1"": [122]}",1,False
+26085.0,blocked,1,0,0,1,0,"{""inspection"": [121], ""manual_assembly"": [123], ""transport_1"": [122]}",2,False
+26085.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [122], ""inspection"": [121], ""manual_assembly"": [123]}",2,False
+26281.666667,blocked,1,0,1,1,1,"{""inspection"": [122], ""reserved:transport_1"": [123]}",1,False
+26281.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [122], ""reserved:transport_1"": [123]}",1,False
+26281.666667,busy,1,0,1,1,1,"{""inspection"": [122], ""reserved:transport_1"": [123]}",1,False
+26300.0,blocked,1,0,0,1,0,"{""inspection"": [122], ""manual_assembly"": [124], ""transport_1"": [123]}",2,False
+26300.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [123], ""inspection"": [122], ""manual_assembly"": [124]}",2,False
+26496.666667,blocked,1,0,1,1,1,"{""inspection"": [123], ""reserved:transport_1"": [124]}",1,False
+26496.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [123], ""reserved:transport_1"": [124]}",1,False
+26496.666667,busy,1,0,1,1,1,"{""inspection"": [123], ""reserved:transport_1"": [124]}",1,False
+26515.0,blocked,1,0,0,1,0,"{""inspection"": [123], ""manual_assembly"": [125], ""transport_1"": [124]}",2,False
+26515.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [124], ""inspection"": [123], ""manual_assembly"": [125]}",2,False
+26711.666667,blocked,1,0,1,1,1,"{""inspection"": [124], ""reserved:transport_1"": [125]}",1,False
+26711.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [124], ""reserved:transport_1"": [125]}",1,False
+26711.666667,busy,1,0,1,1,1,"{""inspection"": [124], ""reserved:transport_1"": [125]}",1,False
+26730.0,blocked,1,0,0,1,0,"{""inspection"": [124], ""manual_assembly"": [126], ""transport_1"": [125]}",2,False
+26730.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [125], ""inspection"": [124], ""manual_assembly"": [126]}",2,False
+26926.666667,blocked,1,0,1,1,1,"{""inspection"": [125], ""reserved:transport_1"": [126]}",1,False
+26926.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [125], ""reserved:transport_1"": [126]}",1,False
+26926.666667,busy,1,0,1,1,1,"{""inspection"": [125], ""reserved:transport_1"": [126]}",1,False
+26945.0,blocked,1,0,0,1,0,"{""inspection"": [125], ""manual_assembly"": [127], ""transport_1"": [126]}",2,False
+26945.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [126], ""inspection"": [125], ""manual_assembly"": [127]}",2,False
+27141.666667,blocked,1,0,1,1,1,"{""inspection"": [126], ""reserved:transport_1"": [127]}",1,False
+27141.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [126], ""reserved:transport_1"": [127]}",1,False
+27141.666667,busy,1,0,1,1,1,"{""inspection"": [126], ""reserved:transport_1"": [127]}",1,False
+27160.0,blocked,1,0,0,1,0,"{""inspection"": [126], ""manual_assembly"": [128], ""transport_1"": [127]}",2,False
+27160.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [127], ""inspection"": [126], ""manual_assembly"": [128]}",2,False
+27356.666667,blocked,1,0,1,1,1,"{""inspection"": [127], ""reserved:transport_1"": [128]}",1,False
+27356.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [127], ""reserved:transport_1"": [128]}",1,False
+27356.666667,busy,1,0,1,1,1,"{""inspection"": [127], ""reserved:transport_1"": [128]}",1,False
+27375.0,blocked,1,0,0,1,0,"{""inspection"": [127], ""manual_assembly"": [129], ""transport_1"": [128]}",2,False
+27375.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [128], ""inspection"": [127], ""manual_assembly"": [129]}",2,False
+27571.666667,blocked,1,0,1,1,1,"{""inspection"": [128], ""reserved:transport_1"": [129]}",1,False
+27571.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [128], ""reserved:transport_1"": [129]}",1,False
+27571.666667,busy,1,0,1,1,1,"{""inspection"": [128], ""reserved:transport_1"": [129]}",1,False
+27590.0,blocked,1,0,0,1,0,"{""inspection"": [128], ""manual_assembly"": [130], ""transport_1"": [129]}",2,False
+27590.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [129], ""inspection"": [128], ""manual_assembly"": [130]}",2,False
+27786.666667,blocked,1,0,1,1,1,"{""inspection"": [129], ""reserved:transport_1"": [130]}",1,False
+27786.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [129], ""reserved:transport_1"": [130]}",1,False
+27786.666667,busy,1,0,1,1,1,"{""inspection"": [129], ""reserved:transport_1"": [130]}",1,False
+27805.0,blocked,1,0,0,1,0,"{""inspection"": [129], ""manual_assembly"": [131], ""transport_1"": [130]}",2,False
+27805.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [130], ""inspection"": [129], ""manual_assembly"": [131]}",2,False
+28001.666667,blocked,1,0,1,1,1,"{""inspection"": [130], ""reserved:transport_1"": [131]}",1,False
+28001.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [130], ""reserved:transport_1"": [131]}",1,False
+28001.666667,busy,1,0,1,1,1,"{""inspection"": [130], ""reserved:transport_1"": [131]}",1,False
+28020.0,blocked,1,0,0,1,0,"{""inspection"": [130], ""manual_assembly"": [132], ""transport_1"": [131]}",2,False
+28020.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [131], ""inspection"": [130], ""manual_assembly"": [132]}",2,False
+28216.666667,blocked,1,0,1,1,1,"{""inspection"": [131], ""reserved:transport_1"": [132]}",1,False
+28216.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [131], ""reserved:transport_1"": [132]}",1,False
+28216.666667,busy,1,0,1,1,1,"{""inspection"": [131], ""reserved:transport_1"": [132]}",1,False
+28235.0,blocked,1,0,0,1,0,"{""inspection"": [131], ""manual_assembly"": [133], ""transport_1"": [132]}",2,False
+28235.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [132], ""inspection"": [131], ""manual_assembly"": [133]}",2,False
+28431.666667,blocked,1,0,1,1,1,"{""inspection"": [132], ""reserved:transport_1"": [133]}",1,False
+28431.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [132], ""reserved:transport_1"": [133]}",1,False
+28431.666667,busy,1,0,1,1,1,"{""inspection"": [132], ""reserved:transport_1"": [133]}",1,False
+28450.0,blocked,1,0,0,1,0,"{""inspection"": [132], ""manual_assembly"": [134], ""transport_1"": [133]}",2,False
+28450.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [133], ""inspection"": [132], ""manual_assembly"": [134]}",2,False
+28646.666667,blocked,1,0,1,1,1,"{""inspection"": [133], ""reserved:transport_1"": [134]}",1,False
+28646.666667,waiting_resource,1,0,1,0,0,"{""inspection"": [133], ""reserved:transport_1"": [134]}",1,False
+28646.666667,busy,1,0,1,1,1,"{""inspection"": [133], ""reserved:transport_1"": [134]}",1,False
+28665.0,blocked,1,0,0,1,0,"{""inspection"": [133], ""manual_assembly"": [135], ""transport_1"": [134]}",2,False
+28665.0,starved,1,1,0,0,0,"{""buffer_de_entrada"": [134], ""inspection"": [133], ""manual_assembly"": [135]}",2,False
