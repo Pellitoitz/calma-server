@@ -53,10 +53,12 @@ def verify_model(model: ISMSModel, registry: ComponentRegistry):
     Returns (report, compiled). With an extension block the compiled model is a CalendarCompiledModel (availability
     and/or production runtime); the approval state is re-evaluated on the FULL model (the core view has another hash)."""
     from .availability import availability_issues
+    from .maintenance import maintenance_issues
     from .production import production_issues, verification_view
     spec = getattr(model, "availability", None)
     prod = getattr(model, "production", None)
-    if spec is None and prod is None:
+    maint = getattr(model, "maintenance", None)
+    if spec is None and prod is None and maint is None:
         rep, compiled = verify(model, registry)
         rep.issues.extend(semantic_issues(model, registry))
         return rep, compiled
@@ -71,11 +73,20 @@ def verify_model(model: ISMSModel, registry: ComponentRegistry):
     if model.approval.approved and not model.is_approved:
         rep.issues.append(Issue(Level.WARNING, "APPROVAL_STALE",
                                 "El modelo cambió después de la aprobación del ingeniero: la aprobación ya no es válida."))
-    prod_issues = production_issues(model, registry, compiled)
+    prod_issues = production_issues(model, registry, compiled) + maintenance_issues(model, registry, compiled)
     ext_issues = availability_issues(model, registry) + prod_issues
-    if prod is not None and model.simulation.replications < 5 and not any(i.code == "FEW_REPLICATIONS" for i in rep.issues):
-        durs = [d for t in prod.processing.values() for d in t.values()] + [d for s in prod.setups.values() for d in s.durations()]
-        if any(not d.is_deterministic for d in durs) or any(g.mode == "PROBABILISTIC_MIX" for g in prod.generation.values()):
+    if (prod is not None or maint is not None) and model.simulation.replications < 5 \
+            and not any(i.code == "FEW_REPLICATIONS" for i in rep.issues):
+        durs = []
+        if prod is not None:
+            durs += [d for t in prod.processing.values() for d in t.values()] + [d for s in prod.setups.values() for d in s.durations()]
+        if maint is not None:
+            for nm in maint.nodes.values():
+                if nm.failure is not None:
+                    durs += [nm.failure.time_to_failure, nm.failure.repair_time]
+                durs += [t.duration for t in nm.preventive]
+        mixes = prod is not None and any(g.mode == "PROBABILISTIC_MIX" for g in prod.generation.values())
+        if any(not d.is_deterministic for d in durs) or mixes:
             ext_issues.append(Issue(Level.WARNING, "FEW_REPLICATIONS",
                                     f"Modelo estocástico con {model.simulation.replications} replicación(es): los resultados "
                                     "no son concluyentes.", "simulation.replications", "Usa ≥ 10 replicaciones (30 recomendado)."))
@@ -102,6 +113,9 @@ def verify_model(model: ISMSModel, registry: ComponentRegistry):
     if prod is not None:
         from ..engine.production_compile import compile_production
         out.production = compile_production(model, prod, out)
+    if maint is not None:
+        from ..engine.maintenance_compile import compile_maintenance
+        out.maintenance = compile_maintenance(model, maint)
     return rep, out
 
 

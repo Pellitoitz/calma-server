@@ -79,6 +79,21 @@ METRIC_INFO: dict[str, tuple[str, str, str]] = {
     "total_setup_time_h": ("Setup time (all nodes)", "h", "Sum of node setup time"),
     "setup_time_inside_planned_h": ("Setup time inside planned time", "h", "Calendars: setup while the node is planned"),
     "setup_time_outside_planned_h": ("Setup time outside planned time", "h", "Calendars: setup outside the node's planned time"),
+    # maintenance & reliability (engine >= 0.8.0); only nodes with a `maintenance` block (machine condition time)
+    "node.*.failure_count": ("Failures", "count", "Failures occurring in [warm-up, horizon]"),
+    "node.*.corrective_downtime_h": ("Corrective downtime", "h", "From failure to repair end: waiting for the repair resource + active repair"),
+    "node.*.waiting_for_repair_resource_h": ("Waiting for repair resource", "h", "DOWN, repair resource not yet granted"),
+    "node.*.active_repair_time_h": ("Active repair time", "h", "Repair in progress (resource granted)"),
+    "node.*.preventive_maintenance_count": ("PM executed", "count", "PM completed in [warm-up, horizon]"),
+    "node.*.preventive_maintenance_time_h": ("PM time", "h", "PM in progress"),
+    "node.*.waiting_for_pm_h": ("Waiting for PM", "h", "Machine reserved for a due PM (no activity in progress), PM not started: resource / calendar / end of instant"),
+    "node.*.uptime_h": ("Uptime", "h", "Machine condition up (neither failed nor in / reserved for PM), any calendar state"),
+    "node.*.downtime_h": ("Downtime (maintenance)", "h", "corrective downtime + PM time + waiting for PM"),
+    "node.*.failure_exposure_h": ("Failure-clock exposure", "h", "Time that aged the machine in the window (ELAPSED: all but DOWN and active PM; OPERATING: declared states)"),
+    "node.*.observed_mtbf_exposure_h": ("Observed MTBF (exposure)", "h", "failure_exposure_h / failure_count (NaN without failures)"),
+    "node.*.observed_mean_active_repair_s": ("Observed mean active repair", "s", "Mean repair duration of repairs completed in the window (resource wait excluded)"),
+    "node.*.observed_mean_corrective_downtime_s": ("Observed mean corrective downtime", "s", "Mean failure -> repair end of repairs completed in the window (wait included)"),
+    "node.*.reliability_availability": ("Reliability availability", "", "(planned_available - corrective downtime inside planned) / planned_available; without calendars planned = measured window"),
 }
 
 OEE_DEFINITION = (
@@ -186,6 +201,8 @@ def compute_run_kpis(rec: RunRecord, cm: CompiledModel) -> dict[str, float]:
     prod = getattr(cm, "production", None)
     if prod is not None:
         _production_kpis(k, rec, cm, prod, T)
+    if getattr(cm, "maintenance", None) is not None:
+        _maintenance_kpis(k, rec, T)
     # invariant: fractions of time can never exceed 100 %
     for key, v in k.items():
         if key.split(".")[-1] in _FRACTIONS and v == v and not -1e-9 <= v <= 1 + 1e-9:
@@ -264,7 +281,44 @@ def _production_kpis(k: dict[str, float], rec: RunRecord, cm: CompiledModel, pro
             k["setup_time_outside_planned_h"] = outside / 3600
 
 
-_FRACTIONS = {"utilization_processing", "utilization_setup", "utilization", "blocked", "starved", "waiting_resource", "down", "working", "walking", "transporting", "idle", "yield",
+def _maintenance_kpis(k: dict[str, float], rec: RunRecord, T: float) -> None:
+    """Maintenance metrics with explicit definitions (METRIC_INFO). No OEE is derived from them."""
+    for nid, cond in rec.node_condition_time.items():
+        b = f"node.{nid}"
+        h = lambda s: cond.get(s, 0.0) / 3600  # noqa: E731
+        wait, rep = h(NodeState.DOWN_WAITING_REPAIR), h(NodeState.REPAIR)
+        fails = rec.node_failures.get(nid, 0)
+        rows = [r for r in rec.maintenance if r["node"] == nid]
+        repairs = [r for r in rows if r["type"] == "failure" and "t_repair_end" in r and r["t_repair_end"] > rec.warmup_s]
+        pms = [r for r in rows if r["type"] == "pm" and "end" in r and r["counted"]]
+        k[f"{b}.failure_count"] = fails
+        k[f"{b}.corrective_downtime_h"] = wait + rep
+        k[f"{b}.waiting_for_repair_resource_h"] = wait
+        k[f"{b}.active_repair_time_h"] = rep
+        k[f"{b}.preventive_maintenance_count"] = len(pms)
+        k[f"{b}.preventive_maintenance_time_h"] = h(NodeState.PM)
+        k[f"{b}.waiting_for_pm_h"] = h(NodeState.PM_WAITING)
+        k[f"{b}.uptime_h"] = h("up")
+        k[f"{b}.downtime_h"] = wait + rep + h(NodeState.PM) + h(NodeState.PM_WAITING)
+        if nid in rec.failure_exposure_s:
+            exp = rec.failure_exposure_s[nid] / 3600
+            k[f"{b}.failure_exposure_h"] = exp
+            k[f"{b}.observed_mtbf_exposure_h"] = exp / fails if fails else float("nan")
+            k[f"{b}.observed_mean_active_repair_s"] = (sum(r["t_repair_end"] - r["t_repair_start"] for r in repairs) / len(repairs)
+                                                      if repairs else float("nan"))
+            k[f"{b}.observed_mean_corrective_downtime_s"] = (sum(r["t_repair_end"] - r["t_fail"] for r in repairs) / len(repairs)
+                                                            if repairs else float("nan"))
+            av = (rec.availability or {}).get("nodes", {}).get(nid)
+            if av is not None:
+                st = rec.node_state_time.get(nid, {})
+                inside = st.get(NodeState.DOWN_WAITING_REPAIR, 0.0) + st.get(NodeState.REPAIR, 0.0)
+                planned = av["planned_available_s"]
+            else:
+                inside, planned = (wait + rep) * 3600, T
+            k[f"{b}.reliability_availability"] = (planned - inside) / planned if planned else float("nan")
+
+
+_FRACTIONS = {"reliability_availability", "utilization_processing", "utilization_setup", "utilization", "blocked", "starved", "waiting_resource", "down", "working", "walking", "transporting", "idle", "yield",
               "planned_utilization", "planned_availability_ratio"}
 
 

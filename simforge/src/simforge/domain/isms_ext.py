@@ -2,7 +2,7 @@
 
 `SimModel` = ISMSModel + optional extension blocks: `availability` (calendars, shifts, breaks, exceptions,
 operation policies; engine >= 0.6.0) and `production` (product mix, product-specific processing/routing, setups;
-engine >= 0.7.0). A model without extension blocks serialises exactly as an ISMS 0.1 model, so
+engine >= 0.7.0) and `maintenance` (failure clocks, corrective repair, preventive maintenance; engine >= 0.8.0). A model without extension blocks serialises exactly as an ISMS 0.1 model, so
 its content_hash (and every approval bound to it) is unchanged.
 
 The frozen verifier/compiler only understands the core: `core()` returns that view; extension blocks are validated by
@@ -15,14 +15,16 @@ from pydantic import model_serializer
 
 from .calendar import AvailabilitySpec
 from .isms import ISMSModel
+from .maintenance import MaintenanceSpec
 from .production import ProductionSpec
 
-EXTENSION_KEYS = ("availability", "production")
+EXTENSION_KEYS = ("availability", "production", "maintenance")
 
 
 class SimModel(ISMSModel):
     availability: AvailabilitySpec | None = None
     production: ProductionSpec | None = None
+    maintenance: MaintenanceSpec | None = None
 
     @property
     def has_extensions(self) -> bool:

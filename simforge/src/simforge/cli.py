@@ -45,6 +45,9 @@ app.add_typer(calendar_app, name="calendar")
 from .cli_products import products_app  # noqa: E402
 
 app.add_typer(products_app, name="products")
+from .cli_maintenance import maintenance_app  # noqa: E402
+
+app.add_typer(maintenance_app, name="maintenance")
 
 
 def _registry() -> ComponentRegistry:

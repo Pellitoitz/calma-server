@@ -77,6 +77,13 @@ Varios productos (mix probabilístico o secuencia explícita), tiempos y rutas p
 integrados con calendarios y averías. SimForge representa la secuencia; no la optimiza. `simforge products ...` o
 pestaña **Products**. Detalle: [`docs/products_and_setups.md`](docs/products_and_setups.md).
 
+## Mantenimiento y fiabilidad (motor 0.8.0)
+
+Averías con reloj ELAPSED u OPERATING (exposición declarada), reparación correctiva con técnico, mantenimiento
+preventivo por calendario o por uso (AFTER_CURRENT_ACTIVITY), efecto RESET / NO_RESET sobre la edad, integración con
+calendarios y setups, métricas de downtime y fiabilidad con denominadores explícitos. Las averías legacy no cambian.
+`simforge maintenance ...` o pestaña **Maintenance**. Detalle: [`docs/maintenance_and_reliability.md`](docs/maintenance_and_reliability.md).
+
 ## Datos medidos (CSV/XLSX → distribución → parámetro)
 
 Importar un estudio de tiempos (CSV o XLSX, sin ejecutar nada del archivo) → validación fila a fila (nada se borra ni

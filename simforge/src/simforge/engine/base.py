@@ -28,7 +28,12 @@ class NodeState:
     # setups / changeovers (engine >= 0.7.0); only on nodes with setups (never in legacy KPIs: not part of ALL)
     SETUP = "setup"
     SETUP_OUTSIDE = "setup_outside_planned"  # setup running outside the node's planned time
-    PLANNED = (*ALL, SETUP)
+    # maintenance (engine >= 0.8.0): machine condition of nodes with a `maintenance` block (not part of ALL)
+    DOWN_WAITING_REPAIR = "down_waiting_repair_resource"
+    REPAIR = "repair"
+    PM_WAITING = "pm_waiting"
+    PM = "preventive_maintenance"
+    PLANNED = (*ALL, SETUP, DOWN_WAITING_REPAIR, REPAIR, PM_WAITING, PM)
     UNPLANNED = (PAUSED, BUSY_OUTSIDE, BREAK, OFF_SHIFT, SETUP_OUTSIDE)
 
 
@@ -87,6 +92,10 @@ class RunRecord:
     node_setups: dict[str, int] = field(default_factory=dict)  # setups completed (post-warmup)
     setups: list[dict[str, Any]] = field(default_factory=list)  # one audit row per setup (whole run)
     wip_end_by_product: dict[str, int] = field(default_factory=dict)
+    # maintenance (engine >= 0.8.0); empty for models without a `maintenance` block
+    node_condition_time: dict[str, dict[str, float]] = field(default_factory=dict)  # up / down_* / repair / pm_*
+    failure_exposure_s: dict[str, float] = field(default_factory=dict)  # failure-clock exposure in the window
+    maintenance: list[dict[str, Any]] = field(default_factory=list)  # one audit row per failure / PM
     completion_times: list[float] = field(default_factory=list)
     # debug
     events: list[dict[str, Any]] | None = None

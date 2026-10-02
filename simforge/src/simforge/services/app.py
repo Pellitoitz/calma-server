@@ -169,6 +169,11 @@ class SimForgeApp:
             model = as_sim_model(model).model_copy(update={"production": prev.production})
             project.log("system", "production_carried_over",
                         result=f"products/setups of v{project.meta.current_version} kept in the rebuilt model (references re-verified)")
+        if prev is not None and getattr(prev, "maintenance", None) is not None:
+            from ..domain.isms_ext import as_sim_model
+            model = as_sim_model(model).model_copy(update={"maintenance": prev.maintenance})
+            project.log("system", "maintenance_carried_over",
+                        result=f"maintenance of v{project.meta.current_version} kept in the rebuilt model (references re-verified)")
         outcome.model = model
         gen_ms = (time.perf_counter() - t0) * 1000
         report, _ = verify(model, self.registry)

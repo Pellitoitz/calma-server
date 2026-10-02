@@ -74,6 +74,7 @@ class SimContext:
         self._instant_decisions = 0
         self.calendar = None  # CalendarClock when the model has an `availability` block (engine >= 0.6.0)
         self.production = None  # ProductionRuntime when the model has a `production` block (engine >= 0.7.0)
+        self.maintenance = None  # MaintenanceRuntime when the model has a `maintenance` block (engine >= 0.8.0)
         self.product_totals: dict[str, dict[str, int]] = {}  # product -> created/completed/scrapped (whole run)
         self.product_wip: dict[str, "LevelTracker"] = {}
 
@@ -82,10 +83,10 @@ class SimContext:
         place in the queue and is re-evaluated when the node becomes available). Always True without calendars."""
         if self.calendar is None:
             return True
-        if node_id.endswith(SETUP_TASK):  # setup task of a node (engine >= 0.7.0): gated by its setup calendars
-            gating = self.production.setup_gating.get(node_id[: -len(SETUP_TASK)]) if self.production else None
-        else:
-            gating = self.calendar.rt.gating.get(node_id)
+        if "#" in node_id:  # '<node>#setup' (>= 0.7.0), '<node>#pm', '<node>#repair' (>= 0.8.0): the node decides
+            base, task = node_id.split("#", 1)
+            return self.nodes[base].task_can_work(task)
+        gating = self.calendar.rt.gating.get(node_id)
         return not gating or self.calendar.ok(gating)
 
     # ---- products (engine >= 0.7.0); never called for models without a `production` block ----
@@ -482,7 +483,7 @@ class ResourcePool:
                 location: str | None = None) -> simpy.Event:
         self._seq += 1
         evt = self.ctx.env.event()
-        base = node[: -len(SETUP_TASK)] if node.endswith(SETUP_TASK) else node  # a setup task ranks as its node
+        base = node.split("#", 1)[0]  # a setup / pm / repair task ranks as its node
         self.waiting.append(_Request(self._seq, node, qty, priority, self.ctx.now, evt, entity, resume, location or node,
                                      self.ctx.node_rank.get(base, len(self.ctx.node_rank))))
         self._schedule_dispatch()

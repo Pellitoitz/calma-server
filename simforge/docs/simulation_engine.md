@@ -79,6 +79,12 @@ de setup cambia solo al completar), con las mismas políticas de calendario y la
 proceso. Contratos de cierre (DISPATCH FIRST / SETUP SECOND, persistencia del estado, HOLD_ACQUIRED_RESOURCES,
 transiciones requeridas) en §17 de ese documento. Detalle completo: `docs/products_and_setups.md`.
 
+## Mantenimiento y fiabilidad (motor ≥ 0.8.0)
+
+Bloque `maintenance`: relojes de fallo ELAPSED / OPERATING (edad = exposición acumulada ≠ muestra), reparación
+correctiva con recursos, PM por calendario o por uso con AFTER_CURRENT_ACTIVITY, RESET / NO_RESET. Las averías legacy
+(`params.failures`) conservan su contrato. Detalle: `docs/maintenance_and_reliability.md`.
+
 ## Cambios de semántica en el motor 0.2.0 (fase benchmark)
 
 - **Recogida física en transportes**: la unidad conserva su plaza aguas arriba hasta que se carga (`loading_area` para zonas de espera explícitas).
@@ -163,6 +169,7 @@ sigue BLOCKED) e IN_TRANSPORT cuentan si su nodo es *feeder*; en buffer cuenta s
 
 | Versión | Cambio | Modelos afectados (medido) |
 |---|---|---|
+| 0.8.0 | Bloque de extensión `maintenance`: reloj de fallo ELAPSED_TIME / OPERATING_TIME con exposición explícita (PROCESSING / SETUP), edad acumulada separada de la muestra, reparación correctiva con espera de recurso y reparación activa separadas, PM CALENDAR_BASED / USAGE_BASED con AFTER_CURRENT_ACTIVITY (ninguna actividad nueva con PM pendiente o máquina DOWN), RESET / NO_RESET; estado ortogonal (condición de máquina); streams `failure_ttf`, `repair`, `pm:<id>`; métricas de fiabilidad. Ver `docs/maintenance_and_reliability.md` | Ninguno: sin bloque `maintenance` no se crea ningún stream, proceso ni evento nuevo; averías legacy intactas; 01–05 y todos los tests de 0.6/0.7 idénticos (medido) |
 | 0.7.0 | Productos (`entities` como ProductType) y bloque de extensión `production`: PROBABILISTIC_MIX (stream `product_mix` por fuente, productos en orden de id) / EXPLICIT_SEQUENCE; tiempos por producto (mismo sistema de distribuciones y `work_units`); rutas por producto; setups (`setup`, `setup_outside_planned`) CONSTANT / TARGET / SEQUENCE_DEPENDENT con `setup_key`, `initial_state` explícito, recursos propios, política de calendario propia y REUSE_ORIGINAL_SAMPLE; bucle de operación temporizada compartido por proceso y setup; métricas por producto y de setup; conservación por producto. Ver `docs/products_and_setups.md` | Ninguno: sin bloque `production` no se crea ningún stream ni evento nuevo; 01–05 y todos los tests de 0.6 idénticos (medido) |
 | 0.6.0 | Calendarios, turnos, descansos y excepciones (bloque de extensión `availability`, fuera del núcleo ISMS congelado); políticas FINISH_CURRENT / PAUSE_RESUME / STOP_RESTART y regla de inicio; transiciones de calendario con prioridad URGENT al principio del instante; contabilidad planificado/no planificado comprobada como invariante. Cierre técnico: vía única de interrupción (corrige un fallo con calendario/avería durante la re-solicitud tras una pre-emption), peticiones de nodos no disponibles no se conceden, contratos PAUSE_RESUME / REUSE_ORIGINAL_SAMPLE / FAILURE_CLOCK = ELAPSED_TIME. Ver `docs/calendars_and_shifts.md` | Ninguno: sin bloque `availability` no se crea reloj de calendario ni eventos nuevos; 01–05, MVP 359 y golden idénticos (medido) |
 | 0.5.0 | Agregación explícita de `work_units` (`work_units_aggregation`: `sum_iid` X1+…+Xk, `scale_sample` k·X, `single_sample` X); no declarada = k·X histórico con aviso `WORK_UNITS_AGGREGATION_UNDECLARED` (fuera del verificador congelado, en `validation/semantics.py`); KPIs/diagnóstico usan el factor de la política; truncamiento con `bound_type` obligatorio (PHYSICAL_BOUND / MODELLING_BOUND), `method` (DECLARED / FIT_THEN_TRUNCATE) y procedencia | Ninguno: 01–05, MVP 359, golden y el modelo e2e dan resultados idénticos a 0.4.0 (medido) y los hashes no cambian. El ejemplo de datos e2e cambia porque ahora decide `sum_iid` (127.2 ± 1.0) en vez del k·X reconocido (124.6 ± 1.4) |

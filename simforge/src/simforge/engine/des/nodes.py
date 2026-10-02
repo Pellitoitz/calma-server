@@ -18,6 +18,7 @@ from ...domain.behaviors import BufferParams, ServerParams, SourceParams, Transp
 from ...validation.verifier import CompiledNode
 from ..base import NodeState
 from ..production_compile import SetupTransitionMissing
+from .maintenance import MaintenanceController
 from .runtime import AVAILABLE, SETUP_TASK, Entity, LevelTracker, ResourcePool, SimContext, StateTracker, Unit
 
 Proc = Generator[simpy.Event, object, object]
@@ -292,7 +293,12 @@ class IndustrialServer(IndustrialNode):
             self.setup_uses = self.setup.resources
             ctx.record.node_setups[self.id] = 0
         if self.p.failures:
-            ctx.env.process(self._breakdowns())
+            ctx.env.process(self._breakdowns())  # legacy failures: historical contract, untouched
+        self.seg: dict[int, tuple[float, float]] = {}  # slot -> (start, remaining) of the running work segment
+        # maintenance (engine >= 0.8.0): failure clock, repair, PM; legacy nodes: None
+        mrt = ctx.maintenance
+        nm = mrt.nodes.get(self.id) if mrt is not None else None
+        self.maint = MaintenanceController(self, nm, mrt.pm_gating.get(self.id, {})) if nm is not None else None
         if self.gating:
             self._refresh()  # initial calendar state at t=0
 
@@ -303,7 +309,10 @@ class IndustrialServer(IndustrialNode):
     def _eff(self, state: str) -> str:
         """Tracked state. Without calendars: logical state or DOWN (legacy). Outside planned time: paused /
         busy (FINISH_CURRENT overrun) / break / off_shift, so planned and unplanned time are never mixed."""
+        cond = self.maint.condition if self.maint is not None else None
         if self.gating and not self.ctx.calendar.ok(self.gating):
+            if cond is not None and cond != "up":
+                return self.ctx.calendar.off_label(self.gating)  # outside planned time the calendar label prevails
             if state == NodeState.BUSY:
                 return NodeState.BUSY_OUTSIDE
             if state == NodeState.SETUP:
@@ -311,6 +320,8 @@ class IndustrialServer(IndustrialNode):
             if state in (NodeState.PAUSED, _SETUP_PAUSED):
                 return NodeState.PAUSED
             return self.ctx.calendar.off_label(self.gating)
+        if cond is not None and cond != "up":
+            return cond  # maintenance condition of the machine (down_waiting_repair_resource, repair, pm_waiting, pm)
         if state == _SETUP_PAUSED:  # setup paused by ITS calendar inside the node's planned time: waits for a resource
             return NodeState.DOWN if self.down else NodeState.WAITING_RESOURCE
         return NodeState.DOWN if self.down else state
@@ -364,6 +375,11 @@ class IndustrialServer(IndustrialNode):
         if self.setup is not None and (not self.setup_gating or cal.ok(self.setup_gating)):
             for use in self.setup_uses:
                 self.ctx.pools[use.resource]._schedule_dispatch()
+        if self.maint is not None:
+            self.maint.notify()
+            for t in self.maint.nm.preventive:
+                for use in t.resources:
+                    self.ctx.pools[use.resource]._schedule_dispatch()
         self._refresh()
         self.ctx.changed(self.id)
 
@@ -464,10 +480,17 @@ class IndustrialServer(IndustrialNode):
         # 1b) setup / changeover (engine >= 0.7.0): its own resources, before the processing resources
         if self.setup is not None:
             yield from self._do_setup(e, slot)
-        # 2) operators / tools
-        held = yield from self._acquire(e, slot)
-        if self.gating:
-            held = yield from self._ready_to_start(e, slot, held)
+        # 2) operators / tools (maintenance >= 0.8.0: no new activity starts while DOWN or with a PM pending)
+        while True:
+            if self.maint is not None:
+                yield from self.maint.gate()
+            held = yield from self._acquire(e, slot)
+            if self.gating:
+                held = yield from self._ready_to_start(e, slot, held)
+            if self.maint is not None and self.maint.blocks():
+                release_units(ctx, held)
+                continue
+            break
         self.record_wait(e)
         # 3) process: suspended during failures; pre-emptible by the resource's dispatch strategy;
         #    calendars: FINISH_CURRENT continues, PAUSE_RESUME keeps the remaining work, STOP_RESTART loses it
@@ -523,6 +546,10 @@ class IndustrialServer(IndustrialNode):
         remaining = full
         proc = ctx.env.active_process
         st = {"setup_state": self.setup_state} if names is _SETUP_EVENTS else {}  # setups: state is audited in the trace
+        kind = "SETUP" if names is _SETUP_EVENTS else "PROCESSING"
+        maint = self.maint
+        if maint is not None:
+            maint.activity(True)
         while remaining > 1e-12:
             if self.down:
                 yield self.up_event
@@ -544,7 +571,10 @@ class IndustrialServer(IndustrialNode):
             for u in held:
                 u.preemptible = True
                 u.preempt = lambda s=slot: self._interrupt(s, "preempt")
+            self.seg[slot] = (start, remaining)
             try:
+                if maint is not None:
+                    maint.exposure(kind, True)
                 yield ctx.env.timeout(remaining)
                 remaining = 0.0
             except simpy.Interrupt as intr:
@@ -563,10 +593,28 @@ class IndustrialServer(IndustrialNode):
                     ctx.log(names["resume"], e, self.id)
             finally:
                 self.processing.pop(slot, None)
+                self.seg.pop(slot, None)
                 for u in held:
                     u.preemptible = False
                     u.preempt = None
+                if maint is not None:
+                    maint.exposure(kind, False)
+        if maint is not None:
+            maint.activity(False)
         return held
+
+    def seg_remaining(self, slot: int) -> float:
+        start, rem = self.seg.get(slot, (self.ctx.now, 0.0))
+        return rem - (self.ctx.now - start)
+
+    def task_can_work(self, task: str) -> bool:
+        """Calendars: may a resource be granted now to this node's '<node>#<task>' (setup / pm / repair)?"""
+        cal = self.ctx.calendar
+        if task == "setup":
+            return not self.setup_gating or cal.ok(self.setup_gating)
+        if task == "pm":
+            return self.maint.task_can_work()
+        return True  # repair: not gated by the machine calendar (only by the availability of its resources)
 
     def _do_setup(self, e: Entity, slot: int) -> Proc:
         """Changeover before processing `e` (engine >= 0.7.0). Required iff the node's CURRENT setup state differs from
@@ -583,9 +631,16 @@ class IndustrialServer(IndustrialNode):
             raise SetupTransitionMissing(f"t={ctx.now:.3f}s: '{self.id}' needs setup {frm}->{key} for entity {e.id} "
                                          f"({e.etype}) but the model does not define it (never defaulted)")
         task = self.id + SETUP_TASK
-        held = yield from self._acquire(e, slot, uses=self.setup_uses, task=task)
-        if self.setup_gating:
-            held = yield from self._ready_to_start(e, slot, held, self.setup_gating, self.setup_uses, task, full_window=False)
+        while True:
+            if self.maint is not None:
+                yield from self.maint.gate()
+            held = yield from self._acquire(e, slot, uses=self.setup_uses, task=task)
+            if self.setup_gating:
+                held = yield from self._ready_to_start(e, slot, held, self.setup_gating, self.setup_uses, task, full_window=False)
+            if self.maint is not None and self.maint.blocks():
+                release_units(ctx, held)
+                continue
+            break
         sample = dur.sample_seconds(self.rng_setup)
         row = {"node": self.id, "slot": slot, "entity": e.id, "product": e.etype, "from": frm, "to": key,
                "start": ctx.now, "sampled_s": sample, "resources": [u.name for u in held], "interruptions": []}
@@ -632,6 +687,8 @@ class IndustrialServer(IndustrialNode):
                 tot[k] = tot.get(k, 0.0) + v
         self.ctx.record.node_state_time[self.id] = tot
         self.ctx.record.node_slots[self.id] = self.p.capacity
+        if self.maint is not None:
+            self.maint.finalize()
 
 
 def acquire_units(ctx: SimContext, pool: ResourcePool, node_id: str, qty: int, priority: int, e: Entity | None,

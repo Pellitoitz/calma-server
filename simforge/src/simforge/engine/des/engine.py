@@ -56,6 +56,7 @@ class DesEngine:
         positions = {n.id: (n.position.x, n.position.y) for n in model.model.nodes if n.position}
         ctx.node_rank = {n.id: i for i, n in enumerate(model.model.nodes)}
         ctx.production = getattr(model, "production", None)  # products/setups (engine >= 0.7.0); None = legacy
+        ctx.maintenance = getattr(model, "maintenance", None)  # failure clocks / repair / PM (engine >= 0.8.0)
         rt = getattr(model, "availability", None)
         if rt is not None:  # calendars (engine >= 0.6.0); models without them never create a clock (legacy events)
             ctx.calendar = CalendarClock(ctx, rt)

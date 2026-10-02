@@ -9,7 +9,7 @@ from pathlib import Path
 import streamlit as st
 
 from simforge.services.app import SimForgeApp
-from simforge.ui import calendar_view, data_view, products_view, views
+from simforge.ui import calendar_view, data_view, maintenance_view, products_view, views
 
 st.set_page_config(page_title="SimForge", page_icon="🏭", layout="wide")
 
@@ -81,8 +81,8 @@ if not slug:
 
 project = app.open_project(slug)
 st.header(project.name)
-tabs = st.tabs(["Assistant", "Model", "Data", "Calendars", "Products", "Run & results", "Experiments", "Library", "Report",
-                "Project"])
+tabs = st.tabs(["Assistant", "Model", "Data", "Calendars", "Products", "Maintenance", "Run & results", "Experiments",
+                "Library", "Report", "Project"])
 with tabs[0]:
     views.assistant_tab(app, project)
 with tabs[1]:
@@ -94,12 +94,14 @@ with tabs[3]:
 with tabs[4]:
     products_view.products_tab(app, project)
 with tabs[5]:
-    views.run_tab(app, project)
+    maintenance_view.maintenance_tab(app, project)
 with tabs[6]:
-    views.experiments_tab(app, project)
+    views.run_tab(app, project)
 with tabs[7]:
-    views.library_tab(app)
+    views.experiments_tab(app, project)
 with tabs[8]:
-    views.report_tab(app, project)
+    views.library_tab(app)
 with tabs[9]:
+    views.report_tab(app, project)
+with tabs[10]:
     views.project_tab(app, project)

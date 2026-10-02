@@ -360,7 +360,7 @@ def test_cli_end_to_end(tmp_path, monkeypatch):
     assert r.exit_code == 1 and "derivados de datos" in r.output
     ok("project", "approve", "e2e", "--by", "ana")
     out = ok("project", "run", "e2e", "--reps", "2")
-    assert "engine 0.7.0" in out and "seeds [12345, 12346]" in out
+    assert "engine 0.8.0" in out and "seeds [12345, 12346]" in out
     assert '"fit_id": "' + fit_id in ok("data", "trace", "e2e", TARGET)
     assert "APPLIED" in ok("data", "inspect", "e2e", "montaje@v1")
     assert "montaje@v1" in ok("data", "list", "e2e")
