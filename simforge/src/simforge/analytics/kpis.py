@@ -93,7 +93,13 @@ METRIC_INFO: dict[str, tuple[str, str, str]] = {
     "node.*.observed_mtbf_exposure_h": ("Observed MTBF (exposure)", "h", "failure_exposure_h / failure_count (NaN without failures)"),
     "node.*.observed_mean_active_repair_s": ("Observed mean active repair", "s", "Mean repair duration of repairs completed in the window (resource wait excluded)"),
     "node.*.observed_mean_corrective_downtime_s": ("Observed mean corrective downtime", "s", "Mean failure -> repair end of repairs completed in the window (wait included)"),
-    "node.*.reliability_availability": ("Reliability availability", "", "(planned_available - corrective downtime inside planned) / planned_available; without calendars planned = measured window"),
+    "node.*.corrective_reliability_availability": ("Availability vs corrective losses", "", "(planned_available - corrective downtime inside planned) / planned_available; without calendars planned = measured window. PM NOT included"),
+    "node.*.reliability_availability": ("Availability vs corrective losses (alias)", "", "Alias of corrective_reliability_availability (same value, kept for compatibility)"),
+    "node.*.corrective_downtime_inside_planned_h": ("Corrective downtime inside planned", "h", "Corrective downtime while the node is planned available (calendars); = corrective_downtime_h without calendars"),
+    "node.*.preventive_maintenance_time_inside_planned_h": ("PM time inside planned", "h", "Active PM while the node is planned available; = preventive_maintenance_time_h without calendars"),
+    "node.*.pm_due_occurrences": ("PM due occurrences", "count", "Due occurrences of the PM jobs completed in the window (merged occurrences included)"),
+    "node.*.mean_pm_delay_s": ("Mean PM delay", "s", "Mean (PM start - first due) of PM completed in the window; a delay, not a judgement"),
+    "node.*.max_pm_delay_s": ("Max PM delay", "s", "Max (PM start - first due) of PM completed in the window"),
 }
 
 OEE_DEFINITION = (
@@ -308,17 +314,26 @@ def _maintenance_kpis(k: dict[str, float], rec: RunRecord, T: float) -> None:
                                                       if repairs else float("nan"))
             k[f"{b}.observed_mean_corrective_downtime_s"] = (sum(r["t_repair_end"] - r["t_fail"] for r in repairs) / len(repairs)
                                                             if repairs else float("nan"))
-            av = (rec.availability or {}).get("nodes", {}).get(nid)
-            if av is not None:
-                st = rec.node_state_time.get(nid, {})
-                inside = st.get(NodeState.DOWN_WAITING_REPAIR, 0.0) + st.get(NodeState.REPAIR, 0.0)
-                planned = av["planned_available_s"]
-            else:
-                inside, planned = (wait + rep) * 3600, T
-            k[f"{b}.reliability_availability"] = (planned - inside) / planned if planned else float("nan")
+        av = (rec.availability or {}).get("nodes", {}).get(nid)
+        if av is not None:  # slot accounting: maintenance conditions are named only inside planned time (no double count)
+            st = rec.node_state_time.get(nid, {})
+            inside = st.get(NodeState.DOWN_WAITING_REPAIR, 0.0) + st.get(NodeState.REPAIR, 0.0)
+            pm_inside = st.get(NodeState.PM, 0.0)
+            planned = av["planned_available_s"]
+        else:
+            inside, pm_inside, planned = (wait + rep) * 3600, cond.get(NodeState.PM, 0.0), T
+        k[f"{b}.corrective_downtime_inside_planned_h"] = inside / 3600
+        k[f"{b}.preventive_maintenance_time_inside_planned_h"] = pm_inside / 3600
+        if nid in rec.failure_exposure_s:
+            k[f"{b}.corrective_reliability_availability"] = (planned - inside) / planned if planned else float("nan")
+            k[f"{b}.reliability_availability"] = k[f"{b}.corrective_reliability_availability"]
+        k[f"{b}.pm_due_occurrences"] = sum(r["due_occurrences"] for r in pms)
+        delays = [r["delay_s"] for r in pms]
+        k[f"{b}.mean_pm_delay_s"] = sum(delays) / len(delays) if delays else float("nan")
+        k[f"{b}.max_pm_delay_s"] = max(delays) if delays else float("nan")
 
 
-_FRACTIONS = {"reliability_availability", "utilization_processing", "utilization_setup", "utilization", "blocked", "starved", "waiting_resource", "down", "working", "walking", "transporting", "idle", "yield",
+_FRACTIONS = {"corrective_reliability_availability", "reliability_availability", "utilization_processing", "utilization_setup", "utilization", "blocked", "starved", "waiting_resource", "down", "working", "walking", "transporting", "idle", "yield",
               "planned_utilization", "planned_availability_ratio"}
 
 

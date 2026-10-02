@@ -42,7 +42,19 @@ def maintenance_issues(model: ISMSModel, registry: ComponentRegistry, compiled=N
         return held
     can_fail = {n.id for n in model.nodes if isinstance(n.params, dict) and n.params.get("failures")}
     can_fail |= {nid for nid, nm in spec.nodes.items() if nm.failure is not None}
-    held_by_failing = set().union(*(held_while_down(n) for n in can_fail if n in nodes)) if can_fail else set()
+    # wait-for graph between resources: a failure-prone node M holds h (processing/setup of an interrupted activity)
+    # while DOWN, until its repair resource r is free -> edge h -> r. A cycle (incl. h == r) = possible circular wait.
+    # Quantities are ignored (conservative); PM resources are never held while a machine is DOWN (not in the graph).
+    import networkx as nx
+    waits = nx.DiGraph()
+    for nid in can_fail:
+        if nid not in nodes or nid not in spec.nodes or spec.nodes[nid].failure is None:
+            continue
+        for h in held_while_down(nid):
+            for u in spec.nodes[nid].failure.repair_resources:
+                waits.add_edge(h, u.resource)
+    cyclic = {r for comp in nx.strongly_connected_components(waits) for r in comp
+              if len(comp) > 1 or waits.has_edge(r, r)}
 
     def check_resources(uses, path, what, repair: bool):
         if len(uses) > 1:
@@ -60,11 +72,11 @@ def maintenance_issues(model: ISMSModel, registry: ComponentRegistry, compiled=N
             if r.dispatch.value == "wip_target":
                 add(Level.ERROR, "MAINTENANCE_RESOURCE_WIP_TARGET_UNSUPPORTED",
                     f"'{r.id}' usa WIP_TARGET: la clasificación de tareas de mantenimiento no está definida en 0.8.", path)
-            if repair and u.resource in held_by_failing:
+            if repair and u.resource in cyclic:
                 add(Level.ERROR, "MAINTENANCE_RESOURCE_DEADLOCK_RISK",
-                    f"'{u.resource}' repara '{what}' y también lo retiene una máquina averiable mientras está DOWN "
-                    "(recurso de proceso/setup): posible bloqueo circular.", path,
-                    "Usa un recurso de reparación distinto de los recursos de proceso/setup de máquinas averiables.")
+                    f"'{u.resource}' repara {what} y forma un ciclo de espera: una máquina averiable lo retiene (como "
+                    "recurso de proceso/setup) mientras espera su propia reparación.", path,
+                    "Usa un recurso de reparación que no cierre el ciclo (sin robo de recurso ni pre-emption en 0.8).")
 
     for nid, nm in spec.nodes.items():
         path = f"maintenance.nodes.{nid}"

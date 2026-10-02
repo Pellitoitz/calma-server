@@ -99,6 +99,7 @@ class MaintenanceController:
         self.activities = 0  # activities in progress (started, not finished; paused/interrupted ones included)
         self.pending: list = []  # due PM tasks, in due order
         self.pm_active = None
+        self.pm_requesting = False  # a PM resource request is waiting in a pool
         self.pm_gating = pm_gating
         self.failing = False
         self.condition = UP
@@ -226,10 +227,15 @@ class MaintenanceController:
     def _due(self, t) -> None:
         ctx = self.ctx
         if any(p.id == t.id for p in self.pending) or (self.pm_active is not None and self.pm_active.id == t.id):
-            ctx.log("pm_due_merged", None, self.node.id, pm=t.id, **self._state_info())
+            # one PM job per plan: a new occurrence of a plan already pending/running is merged, but kept for audit
+            row = next(r for r in reversed(self.rows) if r["type"] == "pm" and r["pm"] == t.id and "end" not in r)
+            row["due_occurrences"] += 1
+            row["due_times"].append(ctx.now)
+            ctx.log("pm_due_merged", None, self.node.id, pm=t.id, due_occurrences=row["due_occurrences"], **self._state_info())
             return
         self.pending.append(t)
-        self.rows.append({"type": "pm", "node": self.node.id, "pm": t.id, "trigger": t.trigger, "due": ctx.now})
+        self.rows.append({"type": "pm", "node": self.node.id, "pm": t.id, "trigger": t.trigger, "due": ctx.now,
+                          "due_occurrences": 1, "due_times": [ctx.now], "wait_causes": []})
         ctx.log("pm_due", None, self.node.id, pm=t.id, trigger=t.trigger, activity_in_progress=self.activities > 0,
                 **self._state_info())
         self._notify()
@@ -256,6 +262,7 @@ class MaintenanceController:
             ctx.record.node_failures[node.id] += 1
         ctx.log("failure", None, node.id, clock=f.clock, ttf_s=round(self.ttf, 6), age_s=round(age, 6),
                 interrupted=interrupted, **self._state_info())
+        self._note_pending()
         for slot in sorted(node.processing):
             node._interrupt(slot, "failure")
         held = []
@@ -282,6 +289,7 @@ class MaintenanceController:
         self._set_condition()
         node._refresh()
         ctx.log("up", None, node.id, **self._state_info())
+        self._note_pending()
         evt, node.up_event = node.up_event, ctx.env.event()
         evt.succeed()
         self._refresh_integrators()
@@ -298,6 +306,32 @@ class MaintenanceController:
         g = self.pm_gating.get(t.id, [])
         return not self.node.down and self.activities == 0 and (not g or cal is None or cal.ok(g))
 
+    def _causes(self, t) -> list[str]:
+        """Why a pending PM cannot start now (all that apply, none invented)."""
+        cal = self.ctx.calendar
+        g = self.pm_gating.get(t.id, [])
+        c = []
+        if self.activities > 0:
+            c.append("CURRENT_ACTIVITY")
+        if self.node.down:
+            c.append("MACHINE_DOWN")
+        if g and cal is not None and not cal.ok(g):
+            c.append("CALENDAR_UNAVAILABLE")
+        if self.pm_requesting:
+            c.append("WAITING_RESOURCE")
+        return c
+
+    def _note_pending(self) -> None:
+        """A pending (not running) PM: record the current causes after a condition change (failure / repair end)."""
+        if self.pending and self.pm_active is None:
+            self._note_wait(self.pending[0], self._causes(self.pending[0]))
+
+    def _note_wait(self, t, causes: list[str]) -> None:
+        row = next(r for r in reversed(self.rows) if r["type"] == "pm" and r["pm"] == t.id and "end" not in r)
+        if not row["wait_causes"] or row["wait_causes"][-1][1] != causes:
+            row["wait_causes"].append([self.ctx.now, causes])
+            self.ctx.log("pm_waiting", None, self.node.id, pm=t.id, causes=causes, **self._state_info())
+
     def _pm_executor(self):
         node, ctx = self.node, self.ctx
         while True:
@@ -305,6 +339,7 @@ class MaintenanceController:
                 yield self.wait_change()
             t = self.pending[0]
             if not self._can_start(t):
+                self._note_wait(t, self._causes(t))
                 yield self.wait_change()
                 continue
             yield self._end_of_instant()  # failures / calendar / activity ends of this instant first
@@ -314,15 +349,19 @@ class MaintenanceController:
             held = []
             for use in t.resources:
                 from .nodes import acquire_units
+                self.pm_requesting = True
+                self._note_wait(t, ["WAITING_RESOURCE"])
                 ctx.log("pm_resource_request", None, node.id, pm=t.id, resource=use.resource)
                 held.extend((yield from acquire_units(ctx, ctx.pools[use.resource], node.id + PM_TASK, use.quantity,
                                                       node.cn.node.priority, None, walk_to=node.id)))
+                self.pm_requesting = False
             if not self._can_start(t):  # failed (ELAPSED) or calendar closed while waiting: never PM on a DOWN machine
                 _release(ctx, held)
                 ctx.log("pm_resource_returned", None, node.id, pm=t.id, **self._state_info())
                 continue
             row = next(r for r in reversed(self.rows) if r["type"] == "pm" and r["pm"] == t.id and "start" not in r)
             row["start"] = ctx.now
+            row["delay_s"] = ctx.now - row["due"]  # PM_START - first due of this job (delay only; no judgement)
             if self.failure is not None:
                 self.failure.sync()
                 row["age_before_s"] = self.failure.value

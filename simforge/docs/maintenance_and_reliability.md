@@ -135,10 +135,17 @@ turno o idle **no**).
 ## 7. Recursos y bloqueos
 
 Reutiliza los pools existentes (`<nodo>#repair`, `<nodo>#pm`). Para no introducir esperas circulares, en 0.8:
-como mucho **un** recurso por tarea de mantenimiento (`MAINTENANCE_MULTI_RESOURCE_UNSUPPORTED`); un recurso de
-reparación no puede ser recurso de proceso/setup de una máquina averiable (lo retendría estando DOWN:
-`MAINTENANCE_RESOURCE_DEADLOCK_RISK`); sin carriers ni recursos WIP_TARGET. Nodos con mantenimiento: capacity 1
-(`MAINTENANCE_MULTI_SLOT_UNSUPPORTED`).
+como mucho **un** recurso por tarea de mantenimiento (`MAINTENANCE_MULTI_RESOURCE_UNSUPPORTED`); sin carriers ni
+recursos WIP_TARGET; nodos con mantenimiento: capacity 1 (`MAINTENANCE_MULTI_SLOT_UNSUPPORTED`).
+
+**Regla anti-bloqueo (ciclos reales).** Grafo de espera entre recursos: una máquina averiable M retiene `h` (recurso
+de proceso/setup de una actividad interrumpida) mientras espera su recurso de reparación `r` → arista `h → r`. Un
+**ciclo** (incluido `h = r`: el técnico del setup que también repara esa máquina) es un posible bloqueo circular →
+`MAINTENANCE_RESOURCE_DEADLOCK_RISK`. Casos seguros permitidos: técnico haciendo PM en A mientras B espera para
+reparar (espera, no bloqueo: los recursos de PM nunca se retienen con la máquina DOWN y el PM termina); técnico
+recurso productivo de A y reparador de B si no se cierra un ciclo. Limitación conservadora: las cantidades no se
+tienen en cuenta (un ciclo con varias unidades también se rechaza). No hay robo de recurso, pre-emption ni
+release-and-reacquire.
 
 ## 8. Métricas (definiciones exactas, sin redefinir las antiguas)
 
@@ -153,7 +160,11 @@ reparación no puede ser recurso de proceso/setup de una máquina averiable (lo 
 | `observed_mtbf_exposure_h` | `failure_exposure_h / failure_count` (NaN sin averías) |
 | `observed_mean_active_repair_s` | media de duración de reparación (sin espera) de reparaciones terminadas en la ventana |
 | `observed_mean_corrective_downtime_s` | media avería → fin de reparación (con espera) |
-| `reliability_availability` | `(planned_available − correctivo dentro de planificado) / planned_available`; sin calendarios, planned = ventana medida |
+| `corrective_reliability_availability` | `(planned_available − correctivo dentro de planificado) / planned_available`; sin calendarios, planned = ventana medida. **Solo pérdidas correctivas: el PM NO entra** |
+| `reliability_availability` | alias del anterior (mismo valor; nombre de la primera versión de 0.8, se mantiene por compatibilidad) |
+| `corrective_downtime_inside_planned_h` / `preventive_maintenance_time_inside_planned_h` | parte dentro del tiempo planificado del nodo (sin calendarios = total) |
+| `pm_due_occurrences` | vencimientos de los PM completados (incluidos los fusionados) |
+| `mean_pm_delay_s` / `max_pm_delay_s` | `PM_START − primer vencimiento del trabajo`; un retraso, no un incumplimiento |
 
 No se genera OEE: siguen faltando los contratos de Performance y Quality con calendarios/mezcla.
 
@@ -184,3 +195,62 @@ para reparación y PM; exposición a estados distintos de PROCESSING / SETUP; OE
 
 Estado: **CODE_COMPLETE + SYNTHETICALLY_VALIDATED**. Sin datos reales: no REAL_DATA_VALIDATED. Una validación real
 contrastaría timestamps y número de averías, downtime, espera de técnico, reparación activa, plan y ejecución de PM.
+
+## 12. Cierre técnico 0.8.0: contratos exactos
+
+**ELAPSED_TIME** (no es "todo wall-clock"): la edad avanza mientras la máquina **no** está DOWN (esperando reparación
+o en reparación activa) ni en PM activo. Sí avanza en: processing, setup, idle/starved, blocked, espera de recursos
+productivos, fuera de turno, descanso, PM pendiente, espera para empezar un PM y espera de su recurso. Por eso una
+máquina reservada para un PM puede fallar antes de que el PM empiece (test). Comportamiento legacy sin cambios.
+
+**OPERATING_TIME**: solo los estados declarados (PROCESSING / SETUP). Nada más.
+
+**CALENDAR_BASED = plan fijo**: los vencimientos son `first_due + k·every` aunque una ejecución se retrase (lunes →
+ejecutado el miércoles → siguiente vencimiento el lunes siguiente, no miércoles + 7 días).
+
+**USAGE_BASED**: el contador se pone a 0 **solo al completar** el PM (no al vencer, quedar pendiente, conseguir el
+recurso ni empezar). Una máquina reservada no produce, así que no acumula uso.
+
+**Vencimientos con un PM pendiente**: un trabajo por plan; los vencimientos adicionales del mismo plan se fusionan
+(también si el PM está en curso) y quedan auditados: `due_occurrences`, `due_times`, eventos `pm_due_merged`.
+
+**Retraso y causas**: `delay_s = PM_START − primer vencimiento`. `wait_causes` registra, cada vez que cambian, las
+causas presentes (todas las que coinciden, ninguna inventada): `CURRENT_ACTIVITY`, `MACHINE_DOWN`,
+`CALENDAR_UNAVAILABLE`, `WAITING_RESOURCE`; evento `pm_waiting`.
+
+**Avería con PM pendiente**: la avería no borra el PM; tras la reparación (y la actividad interrumpida, si la había)
+el PM va antes de cualquier trabajo nuevo. Si el recurso de PM se concede con la máquina DOWN (también en el mismo
+instante de la avería: las averías se procesan antes que las concesiones de final de instante) se devuelve sin PM y
+el PM espera la reparación; sin fugas ni dobles adquisiciones.
+
+**Técnico en PM y otra máquina falla**: no hay pre-emption de mantenimiento; la reparación espera a que termine el PM
+y el pool aplica su regla (FIFO / prioridad estática). No existe "correctivo siempre gana".
+
+**Invariante DOWN**: con la condición DOWN/REPAIR no empieza ninguna actividad nueva (proceso, setup, entidad que ya
+esperaba, petición concedida durante la avería: el recurso se devuelve al instante). Tras UP, la actividad
+interrumpida continúa primero.
+
+**Reparada ≠ productiva** (02:00 reparada, 06:00 turno: `up` + fuera de turno sin producción). **PM y calendario**: el
+PM solo empieza con el calendario del nodo (y de su recurso) disponible; nunca aprovecha descansos ni fuera de turno.
+**PM/reparación cruzando el fin de turno** (de la máquina o del técnico): FINISH_CURRENT, terminan. Si el recurso no
+se había concedido antes del fin de su disponibilidad, se espera a la siguiente.
+
+**Reset**: correctivo solo RESET (NO_RESET exigiría reparación mínima / edad virtual / reparación imperfecta, fuera
+de alcance: no se simula con trucos). PM: RESET = edad 0 + nueva muestra; NO_RESET = edad y muestra intactas y
+**ningún número aleatorio consumido** (test de la secuencia de muestras).
+
+**Sin doble conteo**: la partición del slot (planificado + descanso + fuera de turno = ventana × slots) nombra la
+condición de mantenimiento solo dentro del tiempo planificado; la condición de máquina es otra partición (up + down +
+repair + pm_waiting + pm = ventana). El correctivo fuera de turno no infla `corrective_downtime_inside_planned_h`; el
+PM que termina fuera de turno se mide entero en `preventive_maintenance_time_h` y su parte planificada en `…_inside_planned_h`.
+
+**Horizonte**: todas las métricas se cierran exactamente en el horizonte (también la exposición del reloj, aunque el
+último evento sea anterior); nada se completa artificialmente después (filas abiertas sin fin).
+
+**Mismo instante**: PM_DUE + avería, concesión de PM + avería, fin de reparación + inicio de turno, fin de PM + fin de
+turno, avería + fin de setup, avería + fin de proceso, PM_DUE + fin de proceso, PM_DUE + fin de turno — deterministas
+(misma traza y KPIs en ejecuciones repetidas), con el mecanismo de instante existente.
+
+**El mantenimiento no cambia `setup_state`** (B → avería → reparación → PM → B) ni crea, destruye, duplica o reencamina
+entidades (conservación por producto comprobada).
+
