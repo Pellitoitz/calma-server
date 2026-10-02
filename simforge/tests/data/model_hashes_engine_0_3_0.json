@@ -1,0 +1,22 @@
+{
+ "01_simple_line.yaml": {
+  "content_hash": "fd83f6617d815d7a",
+  "dump_sha": "237970663149dd98"
+ },
+ "02_shared_operator.yaml": {
+  "content_hash": "115c4b2bade7f0b5",
+  "dump_sha": "84028872bb2e592f"
+ },
+ "03_machine_breakdowns.yaml": {
+  "content_hash": "fa1f58d5c2d18831",
+  "dump_sha": "bc4c8243db45ab52"
+ },
+ "04_rework_routing.yaml": {
+  "content_hash": "49632762ec2d1514",
+  "dump_sha": "4a85fdcbba86156d"
+ },
+ "05_selective_soldering.yaml": {
+  "content_hash": "6115e56095b49d88",
+  "dump_sha": "9ba4c865055f436d"
+ }
+}

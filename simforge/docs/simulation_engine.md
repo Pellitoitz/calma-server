@@ -129,11 +129,12 @@ sigue BLOCKED) e IN_TRANSPORT cuentan si su nodo es *feeder*; en buffer cuenta s
 
 | Versión | Cambio | Modelos afectados (medido) |
 |---|---|---|
+| 0.4.0 | Distribuciones `gamma` y `weibull`; truncamiento **explícito** (`truncation: {lower, upper, reason}`, muestreo por rechazo, media truncada); una muestra negativa sin truncamiento declarado es un error (`NegativeSampleError`), ya no se re-muestrea en silencio; `normal` con P(t<0) > 1e-9 exige truncamiento declarado; `Provenance.data` (enlace a dataset/ajuste) | Ninguno de 01–05, MVP 359, golden ni selectiva (hash de contenido y resultados idénticos, test `test_engine_0_4_0_*`). Modelos externos con `normal` de masa negativa no despreciable dejan de validar: hay que declarar el truncamiento |
 | 0.3.0 | Resolución de un instante a punto fijo + desempate explícito; estado único de carrier con `reserved:<transporte>`; `feed_wip` sin doble conteo | `05_selective_soldering` 132 → 130 (contrato del instante); selectiva de test 2 bastidores 136 → 133 (contrato); benchmark sintético 3–10 bastidores (desempate; sin reserva ya no hay interbloqueo). Sin cambio: 01–04, MVP 359, golden. Detalle: `docs/diagnostics/selective_rack_anomaly.md` §17 |
 | 0.2.0 | Recogida física en transportes, estados de operario, invariantes | — |
 
 Los resultados guardan `engine_version` y la caché la incluye en la clave: los resultados de 0.2.0 siguen
-identificados como tales y nunca se sirven como resultados de 0.3.0.
+identificados como tales y nunca se sirven como resultados de una versión posterior.
 
 ## KPIs (analytics/kpis.py)
 

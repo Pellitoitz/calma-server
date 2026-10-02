@@ -23,6 +23,7 @@ class Dimension(str, Enum):
 # unit -> (dimension, factor to SI base unit)
 _UNITS: dict[str, tuple[Dimension, float]] = {
     # time -> seconds
+    "ms": (Dimension.TIME, 0.001),
     "s": (Dimension.TIME, 1.0),
     "second": (Dimension.TIME, 1.0),
     "seconds": (Dimension.TIME, 1.0),
@@ -38,6 +39,7 @@ _UNITS: dict[str, tuple[Dimension, float]] = {
     "m": (Dimension.LENGTH, 1.0),
     "cm": (Dimension.LENGTH, 0.01),
     "mm": (Dimension.LENGTH, 0.001),
+    "km": (Dimension.LENGTH, 1000.0),
     # speed -> m/s
     "m/s": (Dimension.SPEED, 1.0),
     "m/min": (Dimension.SPEED, 1 / 60.0),

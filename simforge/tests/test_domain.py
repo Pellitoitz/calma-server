@@ -44,8 +44,12 @@ def test_invalid_distributions_rejected(bad):
 
 
 def test_no_negative_samples():
+    # engine >= 0.4.0: a normal with non-negligible negative mass needs an EXPLICIT truncation (no silent resampling)
+    with pytest.raises(ValidationError, match="explicit truncation"):
+        Normal(mean=1, std=5)
     rng = random.Random(1)
-    for d in [Normal(mean=1, std=5), LogNormal(mean=5, std=10), Exponential(mean=3), Uniform(low=0, high=1)]:
+    trunc = {"lower": 0, "reason": "durations are non-negative"}
+    for d in [Normal(mean=1, std=5, truncation=trunc), LogNormal(mean=5, std=10), Exponential(mean=3), Uniform(low=0, high=1)]:
         assert min(d.sample_seconds(rng) for _ in range(5000)) >= 0
 
 
