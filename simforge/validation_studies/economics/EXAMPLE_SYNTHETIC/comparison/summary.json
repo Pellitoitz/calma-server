@@ -1,0 +1,23 @@
+{
+  "case_id": "ECON-DEMO-001",
+  "status": "SYNTHETIC_DEMO_NOT_A_VALIDATION",
+  "statement": "SYNTHETIC DEMO: no capability is REAL_DATA_VALIDATED (format demonstration only). Not validated by this study: [LABOR_PAID_TIME, LABOR_PLANNED_TIME, LABOR_BUSY_TIME, MACHINE_TIME_COST, ENERGY_COST, ENERGY_CONSUMPTION_FROM_DECLARED_POWER, MATERIAL_COST, SCRAP_COST, REPAIR_LABOR_COST, PM_LABOR_COST, PER_FAILURE_COST, PER_PM_COST, DOWNTIME_DECLARED_COST, REVENUE, COST_PER_PRODUCED_UNIT, COST_PER_GOOD_UNIT, ANNUALIZATION, CAPEX, SCENARIO_DELTA, EVALUATED_SAVINGS, SIMPLE_PAYBACK, ANNUAL_RETURN_ON_INCREMENTAL_CAPEX, REPLICATION_ECONOMIC_UNCERTAINTY]. Costs not represented in the data: overhead, tooling wear.",
+  "config_errors": [],
+  "regression": {
+    "ok": true,
+    "expected": {
+      "01_simple_line.yaml": 59,
+      "02_shared_operator.yaml": 359,
+      "03_machine_breakdowns.yaml": 1889.05,
+      "04_rework_routing.yaml": 477.5,
+      "05_selective_soldering.yaml": 130
+    },
+    "got": {
+      "01_simple_line.yaml": 59.0,
+      "02_shared_operator.yaml": 359.0,
+      "03_machine_breakdowns.yaml": 1889.05,
+      "04_rework_routing.yaml": 477.5,
+      "05_selective_soldering.yaml": 130.0
+    }
+  }
+}

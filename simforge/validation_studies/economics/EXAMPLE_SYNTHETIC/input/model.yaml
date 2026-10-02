@@ -1,0 +1,12 @@
+# SYNTHETIC DEMO physical model: one manual assembly station with one operator, 40 h observed week (5 x 8 h).
+meta: {name: Assembly_Cell_1 (synthetic demo)}
+simulation: {horizon: {value: 40, unit: h}}
+resources:
+  - {id: op, quantity: 1}
+nodes:
+  - {id: src, component: source, params: {arrival: interarrival, interarrival: {dist: constant, value: 6, unit: min}}}
+  - {id: m, component: manual_assembly, params: {process_time: {dist: constant, value: 4.875, unit: min}, resources: [{resource: op}]}}
+  - {id: out, component: sink}
+edges:
+  - {source: src, target: m}
+  - {source: m, target: out}

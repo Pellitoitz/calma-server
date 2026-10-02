@@ -1,0 +1,16 @@
+capability,evidence,evidence_notes,level,limits,reason,reference,reference_calc,reference_id,result,scenario,simforge,target,tolerance
+LABOR_PAID_TIME,,,A,,|1136 - 1136| <= 1.14e-06,,1136.0,R1,PASS,baseline,1136.0,op,
+LABOR_PAID_TIME,SYNTHETIC,"[""synthetic reference""]",B,"[""input I1 is SYNTHETIC""]",|1136 - 1136| = 0 vs tolerance 0.405,1136.0,1136.0,R1,PASS,baseline,,op,0.405
+LABOR_PAID_TIME,,,C,,simulated physical drivers not VALIDATED_MODEL_OUTPUT (end-to-end limited),1136.0,,R1,INCOMPLETE,baseline,1136.0,op,0.405
+MACHINE_TIME_COST,,,A,,|390 - 390| <= 3.91e-07,,390.0,R2,PASS,baseline,390.0,m,
+MACHINE_TIME_COST,SYNTHETIC,"[""synthetic reference""]",B,"[""input I2 is SYNTHETIC""]",|390 - 390| = 0 vs tolerance 0.53,390.0,390.0,R2,PASS,baseline,,m,0.5300004
+MACHINE_TIME_COST,,,C,,simulated physical drivers not VALIDATED_MODEL_OUTPUT (end-to-end limited),390.0,,R2,INCOMPLETE,baseline,389.0249999999999,m,0.5300004
+COST_PER_GOOD_UNIT,,,A,,|3.815 - 3.815| <= 4.82e-09,,3.815,R3,PASS,baseline,3.815,run,
+COST_PER_GOOD_UNIT,SYNTHETIC,"[""synthetic reference""]",B,"[""input I1 is SYNTHETIC"", ""input I2 is SYNTHETIC""]",|3.815 - 3.815| = 0 vs tolerance 0.0028125,3.815,3.815,R3,PASS,baseline,,run,0.0028125010000000002
+COST_PER_GOOD_UNIT,,,C,,simulated physical drivers not VALIDATED_MODEL_OUTPUT (end-to-end limited),3.815,,R3,INCOMPLETE,baseline,3.822117794486216,run,0.0028125010000000002
+EVALUATED_SAVINGS,,,A,,|362 - 362| <= 3.63e-07,,362.0,R4,PASS,baseline,362.0,comparison,
+EVALUATED_SAVINGS,SYNTHETIC,"[""synthetic reference""]",B,"[""input I1 is SYNTHETIC"", ""input I2 is SYNTHETIC"", ""input I4 is SYNTHETIC"", ""input I5 is SYNTHETIC"", ""physical driver node.m.processing_h is RECONSTRUCTED (OBSERVED)""]",|362 - 362| = 0 vs tolerance 0.6,362.0,362.0,R4,PASS,baseline,,comparison,0.6
+EVALUATED_SAVINGS,,,C,,simulated physical drivers not VALIDATED_MODEL_OUTPUT (end-to-end limited),362.0,,R4,INCOMPLETE,baseline,284.0,comparison,0.6
+SIMPLE_PAYBACK,,,A,,|1.501321163 - 1.501321163| <= 2.5e-09,,1.5013211626231084,R5,PASS,baseline,1.5013211626231084,comparison,
+SIMPLE_PAYBACK,SYNTHETIC,"[""synthetic reference""]",B,"[""input I1 is SYNTHETIC"", ""input I2 is SYNTHETIC"", ""input I4 is SYNTHETIC"", ""input I5 is SYNTHETIC"", ""input I3 is SYNTHETIC"", ""input I6 is SYNTHETIC"", ""physical driver node.m.processing_h is RECONSTRUCTED (OBSERVED)""]",|1.50132 - 1.5| = 0.00132116 vs tolerance 0.005,1.5,1.5013211626231084,R5,PASS,baseline,,comparison,0.005
+SIMPLE_PAYBACK,,,C,,simulated physical drivers not VALIDATED_MODEL_OUTPUT (end-to-end limited),1.5,,R5,INCOMPLETE,baseline,1.9136558481322707,comparison,0.005

@@ -1,0 +1,6 @@
+reference_id,scenario,capability,target,value,currency,source_id,economic_concept,method,included_components,period_start,period_end,reference_precision,absolute_tolerance,relative_tolerance,tolerance_basis,tolerance_reason,notes
+R1,baseline,LABOR_PAID_TIME,op,1136.00,EUR,S4,PAYROLL_COST,,,2026-10-05,2026-10-09,0.01,,,,,payroll total for the cell (tolerance derived from resolutions)
+R2,baseline,MACHINE_TIME_COST,m,390.00,EUR,S5,,,ownership;maintenance,2026-10-05,2026-10-09,0.01,,,,,
+R3,baseline,COST_PER_GOOD_UNIT,run,3.815,EUR,S5,,,,2026-10-05,2026-10-09,0.001,,,,,
+R4,baseline,EVALUATED_SAVINGS,comparison,362.00,EUR,S8,,,,2026-10-05,2026-10-09,0.01,0.6,,SOURCE_PRECISION,rates 0.01 EUR/h x up to 40 h per line + minute resolution of processing hours,
+R5,baseline,SIMPLE_PAYBACK,comparison,1.50,,S8,,SIMPLE_PAYBACK,,2026-10-05,2026-10-09,0.01,0.005,,ROUNDING,controlling reports payback rounded to 0.01 years,demo value: 25000 / (362 x 46)

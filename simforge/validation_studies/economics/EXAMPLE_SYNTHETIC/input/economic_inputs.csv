@@ -1,0 +1,7 @@
+economic_input_id,scenario,category,resource_or_node,product,kind,resource,paid_time,declared_paid_hours_per_unit,state,value,currency,unit,basis,effective_date,source_id,provenance,precision,included_components,economic_concept,notes
+I1,baseline,labor,op,,,,CALENDAR_WINDOW,,,28.40,EUR,EUR/h,PER_PAID_HOUR,2026-01-01,S1,provided_by_client,0.01,wage;social_charges,PAYROLL_COST,operator paid for the full shift window
+I2,baseline,machine,m,,,,,,,12.00,EUR,EUR/h,PER_PROCESSING_HOUR,2026-01-01,S2,provided_by_client,0.01,ownership;maintenance,,
+I3,baseline,capex,none,,,,,,,0,EUR,EUR,FIXED,2026-10-01,S7,provided_by_client,0.01,,,explicit 0: no investment in the current state
+I4,alternative,labor,op,,,,DECLARED,30,,28.40,EUR,EUR/h,PER_PAID_HOUR,2026-01-01,S1,provided_by_client,0.01,wage;social_charges,PAYROLL_COST,operator shared with another cell: 30 paid h/week declared
+I5,alternative,machine,m,,,,,,,12.00,EUR,EUR/h,PER_PROCESSING_HOUR,2026-01-01,S2,provided_by_client,0.01,ownership;maintenance,,
+I6,alternative,capex,equipment,,,,,,,25000,EUR,EUR,FIXED,2026-09-20,S7,provided_by_client,0.01,,,quote

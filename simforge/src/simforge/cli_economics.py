@@ -139,3 +139,21 @@ def compare(baseline: str, alternative: str, seed: Optional[int] = typer.Option(
     r = c.annual_return_on_incremental_capex
     typer.echo("  annual return on incremental CAPEX: " + (f"{r['value']:.3f}" if r["status"] == "AVAILABLE" else r["status"]))
     typer.echo(f"  {c.note}")
+
+
+@economics_app.command("validate-real")
+def validate_real(case_dir: Path):
+    """Real-data economic validation of one case (protocol: docs/validation/economic_real_data_validation.md).
+    Thin wrapper of scripts/validation/economic_validation.py (a validation tool, not engine logic)."""
+    import importlib.util
+    script = Path(__file__).resolve().parents[2] / "scripts" / "validation" / "economic_validation.py"
+    if not script.exists():
+        typer.secho("Validator not found (source checkout needed): run python scripts/validation/economic_validation.py <CASE>",
+                    fg="red")
+        raise typer.Exit(2)
+    spec = importlib.util.spec_from_file_location("economic_validation", script)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    code = mod.main([str(case_dir)])
+    typer.echo(f"Report: {case_dir / 'VALIDATION_REPORT.md'} · matrix: {case_dir / 'comparison' / 'capabilities.csv'}")
+    raise typer.Exit(code)

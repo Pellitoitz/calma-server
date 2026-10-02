@@ -11,7 +11,8 @@ DES (motor) → resultados físicos (per_replication) → supuestos económicos 
 SimForge **no recomienda, no ordena alternativas, no elige "la mejor" y no optimiza**. Muestra hechos (costes,
 deltas, ahorros, payback, cobertura) con su fórmula, su base física y su procedencia. No hay IA en esta capa.
 
-Estado: `CODE_COMPLETE` + `SYNTHETICALLY_VALIDATED`. Validación con datos económicos reales: `NOT_TESTED`.
+Estado: `CODE_COMPLETE` + `SYNTHETICALLY_VALIDATED`. Validación con datos económicos reales: `NOT_EXECUTED`; protocolo
+`READY_FOR_REAL_ECONOMIC_VALIDATION`: [`docs/validation/economic_real_data_validation.md`](validation/economic_real_data_validation.md).
 
 ## 1. Arquitectura y aislamiento
 

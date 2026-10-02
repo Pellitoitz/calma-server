@@ -1,0 +1,24 @@
+capability,reasons,status
+LABOR_PAID_TIME,"[""synthetic evidence: cannot be REAL_DATA_VALIDATED""]",INCOMPLETE
+LABOR_PLANNED_TIME,"[""not exercised by this case""]",NOT_OBSERVED
+LABOR_BUSY_TIME,"[""not exercised by this case""]",NOT_OBSERVED
+MACHINE_TIME_COST,"[""synthetic evidence: cannot be REAL_DATA_VALIDATED""]",INCOMPLETE
+ENERGY_COST,"[""not exercised by this case""]",NOT_OBSERVED
+ENERGY_CONSUMPTION_FROM_DECLARED_POWER,"[""not exercised by this case""]",NOT_OBSERVED
+MATERIAL_COST,"[""not exercised by this case""]",NOT_OBSERVED
+SCRAP_COST,"[""not exercised by this case""]",NOT_OBSERVED
+REPAIR_LABOR_COST,"[""not exercised by this case""]",NOT_OBSERVED
+PM_LABOR_COST,"[""not exercised by this case""]",NOT_OBSERVED
+PER_FAILURE_COST,"[""not exercised by this case""]",NOT_OBSERVED
+PER_PM_COST,"[""not exercised by this case""]",NOT_OBSERVED
+DOWNTIME_DECLARED_COST,"[""not exercised by this case""]",NOT_OBSERVED
+REVENUE,"[""not exercised by this case""]",NOT_OBSERVED
+COST_PER_PRODUCED_UNIT,"[""not exercised by this case""]",NOT_OBSERVED
+COST_PER_GOOD_UNIT,"[""synthetic evidence: cannot be REAL_DATA_VALIDATED""]",INCOMPLETE
+ANNUALIZATION,"[""requested / exercised but no reference result""]",INCOMPLETE
+CAPEX,"[""requested / exercised but no reference result""]",INCOMPLETE
+SCENARIO_DELTA,"[""not exercised by this case""]",NOT_OBSERVED
+EVALUATED_SAVINGS,"[""synthetic evidence: cannot be REAL_DATA_VALIDATED""]",INCOMPLETE
+SIMPLE_PAYBACK,"[""synthetic evidence: cannot be REAL_DATA_VALIDATED""]",INCOMPLETE
+ANNUAL_RETURN_ON_INCREMENTAL_CAPEX,"[""not exercised by this case""]",NOT_OBSERVED
+REPLICATION_ECONOMIC_UNCERTAINTY,"[""not exercised by this case""]",NOT_OBSERVED

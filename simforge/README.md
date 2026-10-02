@@ -93,6 +93,8 @@ explícita, CAPEX separado, comparación de escenarios con deltas/ahorros/paybac
 parte del hash físico: cambiar un precio nunca re-simula ni invalida la aprobación física. SimForge no recomienda ni
 optimiza. `simforge economics ...` o pestaña **Economics**. Detalle:
 [`docs/economics_and_decision_support.md`](docs/economics_and_decision_support.md).
+Validación con datos reales: protocolo listo ([`docs/validation/economic_real_data_validation.md`](docs/validation/economic_real_data_validation.md)),
+sin ejecutar (no hay datos reales todavía).
 
 ## Datos medidos (CSV/XLSX → distribución → parámetro)
 

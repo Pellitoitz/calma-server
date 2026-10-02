@@ -1,0 +1,27 @@
+# Copy TEMPLATE/ to <CASE_ID>/ and fill every field. Anonymise (Company_A, Line_2, Operator_1). See FILES.md.
+case_id:                       # e.g. ECON-PILOT-001
+case_name:
+data_nature: REAL              # REAL | SYNTHETIC_DEMO
+company_anonymized:            # e.g. Company_A (never the real name if not needed)
+process_anonymized:            # e.g. Assembly_Cell_1
+period_start:                  # YYYY-MM-DD
+period_end:
+currency:                      # ONE currency (no FX in 0.9)
+economic_question: >
+  (the economic question this case answers, in one sentence)
+economic_scope: []             # capabilities to validate, e.g. [LABOR_PAID_TIME, MACHINE_TIME_COST, COST_PER_GOOD_UNIT]
+physical:                      # single scenario. For baseline vs alternative use `scenarios: {baseline: {...}, alternative: {...}}`
+  model: model.yaml            # SimForge physical model of the case (structure: resources, nodes)
+  window_h:                    # observed period hours = SimForge measured window (horizon - warm-up)
+  # simulated_run: {replications: 5, base_seed: 12345, drivers_validation: NOT_VALIDATED}  # optional level C
+# annualization: {runs_per_year: , source_id: }  # only with a real source (PRODUCTION_CALENDAR / OPERATING_PLAN / ...)
+not_applicable: {}             # {CAPABILITY: reason} only when it truly does not apply to this process
+unrepresented_costs:           # MANDATORY. "Is there any cost or economic condition needed to interpret this result
+  answer:                      #  that is NOT represented in the data?"  "YES" | "NO" | "UNKNOWN"
+  concepts: []                 # YES: list them. UNKNOWN: no end-to-end representativeness claim is possible.
+out_of_scope: []               # e.g. [overhead, depreciation, spare parts, external service]
+semantic_gaps: []              # [{case: , current_0_9_semantics: , why_not_represented: , impact: , possible_evolution: }]
+known_limitations: []
+engineer: {role: }
+validation_date:
+signoff: {role: , date: , reviewed: false, scope_accepted: false}

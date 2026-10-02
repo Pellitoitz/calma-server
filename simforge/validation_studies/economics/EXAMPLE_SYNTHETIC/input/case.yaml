@@ -1,0 +1,34 @@
+# SYNTHETIC DEMO — invented numbers that exercise the protocol and the report format. It is NOT a validation:
+# data_nature SYNTHETIC_DEMO and SYNTHETIC sources can never produce REAL_DATA_VALIDATED.
+case_id: ECON-DEMO-001
+case_name: Labor + machine cost of an assembly cell, current vs. semi-automated (demo)
+data_nature: SYNTHETIC_DEMO            # REAL | SYNTHETIC_DEMO
+company_anonymized: Company_X
+process_anonymized: Assembly_Cell_1
+period_start: 2026-10-05
+period_end: 2026-10-09
+currency: EUR
+economic_question: >
+  Does SimForge Economics reproduce the documented labor and machine cost of one week of Assembly_Cell_1, its cost
+  per good unit, and the simple payback of the semi-automation proposal?
+economic_scope: [LABOR_PAID_TIME, MACHINE_TIME_COST, COST_PER_GOOD_UNIT, ANNUALIZATION, CAPEX, EVALUATED_SAVINGS, SIMPLE_PAYBACK]
+scenarios:
+  baseline:
+    model: model.yaml
+    window_h: 40                       # observed period hours = SimForge horizon - warm-up
+    simulated_run: {replications: 3, base_seed: 12345, drivers_validation: NOT_VALIDATED}
+  alternative:
+    model: model.yaml
+    window_h: 40
+    simulated_run: {replications: 3, base_seed: 12345, drivers_validation: NOT_VALIDATED}
+annualization: {runs_per_year: 46, source_id: S6}   # weeks/year from the approved operating plan (never 220 days x 2 shifts)
+not_applicable: {}
+unrepresented_costs:                    # MANDATORY: any cost/condition needed to interpret the result that is NOT in the data?
+  answer: YES                           # YES | NO | UNKNOWN
+  concepts: [overhead, tooling wear]
+out_of_scope: [overhead, depreciation, financing, taxes]
+semantic_gaps: []
+known_limitations: [single observed week]
+engineer: {role: process engineer}
+validation_date: 2026-10-20
+signoff: {role: process engineer, date: 2026-10-20, reviewed: true, scope_accepted: true}

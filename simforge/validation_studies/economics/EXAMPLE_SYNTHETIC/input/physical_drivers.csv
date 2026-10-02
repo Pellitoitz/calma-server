@@ -1,0 +1,8 @@
+driver_id,scenario,kpi,value,unit,resolution,classification,event_status,source_id,notes
+D1,baseline,units_completed,400,units,0,MEASURED,OBSERVED,S3,
+D2,baseline,units_scrapped,8,units,0,MEASURED,OBSERVED,S3,
+D3,baseline,node.m.processing_h,32.5,h,0.0166667,MEASURED,OBSERVED,S3,minute resolution
+D4,alternative,units_completed,400,units,0,RECONSTRUCTED,OBSERVED,S3,pilot week of the proposal
+D5,alternative,units_scrapped,8,units,0,RECONSTRUCTED,OBSERVED,S3,
+D6,alternative,node.m.processing_h,26,h,0.0166667,RECONSTRUCTED,OBSERVED,S3,
+D7,baseline,node.m.failure_count,0,failures,0,MEASURED,NO_EVENT,S3,maintenance log exists and shows no failure

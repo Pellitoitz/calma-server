@@ -1,0 +1,9 @@
+source_id,source_type,source_reference,source_date,extraction_date,confirmed_by_role,represents,evidence_class,notes
+S1,HR,SRC-HR-RATES-2026,2026-01-01,2026-10-15,HR controller,hourly paid rate of assembly operators (wage + social charges),SYNTHETIC,demo
+S2,MACHINE_COST_RECORD,SRC-CTRL-MACHRATE-2026,2026-01-01,2026-10-15,controller,machine hourly rate per processing hour (ownership + maintenance),SYNTHETIC,demo
+S3,PRODUCTION_RECORD,SRC-MES-WEEK41,2026-10-09,2026-10-15,production supervisor,good and scrapped units and processing hours of week 41,SYNTHETIC,demo
+S4,PAYROLL,SRC-PAYROLL-WEEK41,2026-10-12,2026-10-15,HR controller,paid labor cost of the cell for week 41,SYNTHETIC,demo
+S5,ACCOUNTING,SRC-CTRL-COSTREPORT-W41,2026-10-14,2026-10-15,controller,machine cost and cost per good unit of week 41,SYNTHETIC,demo
+S6,OPERATING_PLAN,SRC-OPPLAN-2027,2026-09-30,2026-10-15,plant manager,approved operating weeks per year,SYNTHETIC,demo
+S7,QUOTE,SRC-QUOTE-AUTOMATION-01,2026-09-20,2026-10-15,purchasing,semi-automation equipment quote,SYNTHETIC,demo
+S8,ACCOUNTING,SRC-CTRL-INVESTMENT-CASE,2026-10-01,2026-10-15,controller,simple payback of the proposal (controlling calculation),SYNTHETIC,demo
