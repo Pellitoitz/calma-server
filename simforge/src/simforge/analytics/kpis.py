@@ -63,6 +63,22 @@ METRIC_INFO: dict[str, tuple[str, str, str]] = {
     "node.*.busy_outside_planned_h": ("Busy outside planned time", "h", "FINISH_CURRENT overrun"),
     "node.*.blocked_planned_h": ("Blocked (planned)", "h", "Blocked inside planned time"),
     "node.*.starved_planned_h": ("Starved (planned)", "h", "Starved inside planned time"),
+    # products and setups (engine >= 0.7.0); only for models with a `production` block
+    "product.*.created": ("Created", "units", "Units of this product created (whole run)"),
+    "product.*.completed": ("Completed", "units", "Units of this product reaching a Sink in [warm-up, horizon]"),
+    "product.*.throughput_per_hour": ("Throughput", "units/h", "completed / measured hours"),
+    "product.*.avg_wip": ("Average WIP", "units", "Time-weighted units of this product in the system"),
+    "product.*.wip_end": ("WIP at end", "units", "Units of this product in the system at the horizon"),
+    "product.*.avg_lead_time_s": ("Average lead time", "s", "Mean (sink time - creation time) of completed units"),
+    "node.*.processing_time_h": ("Processing time", "h", "Time processing (busy + busy outside planned), summed over slots"),
+    "node.*.utilization_processing": ("Utilization (processing)", "", "busy / (slots x measured time); same definition as node.*.utilization"),
+    "node.*.setup_count": ("Setups", "count", "Setups completed in [warm-up, horizon]"),
+    "node.*.setup_time_h": ("Setup time", "h", "Time in setup (inside + outside planned time); pauses not included"),
+    "node.*.utilization_setup": ("Utilization (setup)", "", "setup time / (slots x measured time)"),
+    "total_setup_count": ("Setups (all nodes)", "count", "Setups completed in [warm-up, horizon]"),
+    "total_setup_time_h": ("Setup time (all nodes)", "h", "Sum of node setup time"),
+    "setup_time_inside_planned_h": ("Setup time inside planned time", "h", "Calendars: setup while the node is planned"),
+    "setup_time_outside_planned_h": ("Setup time outside planned time", "h", "Calendars: setup outside the node's planned time"),
 }
 
 OEE_DEFINITION = (
@@ -167,6 +183,9 @@ def compute_run_kpis(rec: RunRecord, cm: CompiledModel) -> dict[str, float]:
                 k[f"resource.{rid}.avg_at.{name[len(prefix):]}"] = avg
     if rec.availability:
         _calendar_kpis(k, rec)
+    prod = getattr(cm, "production", None)
+    if prod is not None:
+        _production_kpis(k, rec, cm, prod, T)
     # invariant: fractions of time can never exceed 100 %
     for key, v in k.items():
         if key.split(".")[-1] in _FRACTIONS and v == v and not -1e-9 <= v <= 1 + 1e-9:
@@ -211,7 +230,41 @@ def _calendar_kpis(k: dict[str, float], rec: RunRecord) -> None:
         k[f"{base}.planned_production_time_h"] = planned / 3600
 
 
-_FRACTIONS = {"utilization", "blocked", "starved", "waiting_resource", "down", "working", "walking", "transporting", "idle", "yield",
+def _production_kpis(k: dict[str, float], rec: RunRecord, cm: CompiledModel, prod, T: float) -> None:
+    """Per product and setup metrics (engine >= 0.7.0). Legacy metrics keep their definitions untouched."""
+    for p in sorted(prod.setup_key):
+        done = [(c, d) for eid, c, d in rec.completions if rec.entity_product.get(eid) == p]
+        lts = [d - c for c, d in done]
+        k[f"product.{p}.created"] = rec.created_by_product.get(p, 0)
+        k[f"product.{p}.completed"] = len(done)
+        k[f"product.{p}.throughput_per_hour"] = len(done) / (T / 3600) if T > 0 else 0.0
+        k[f"product.{p}.avg_wip"] = rec.level_avg.get(f"wip:{p}", 0.0)
+        k[f"product.{p}.wip_end"] = rec.wip_end_by_product.get(p, 0)
+        k[f"product.{p}.avg_lead_time_s"] = sum(lts) / len(lts) if lts else float("nan")
+    inside = outside = 0.0
+    count = 0
+    for nid, cn in cm.nodes.items():
+        if cn.behavior.value != "server" or nid not in rec.node_state_time:
+            continue
+        st = rec.node_state_time[nid]
+        denom = rec.node_slots[nid] * T
+        k[f"node.{nid}.processing_time_h"] = (st.get(NodeState.BUSY, 0.0) + st.get(NodeState.BUSY_OUTSIDE, 0.0)) / 3600
+        k[f"node.{nid}.utilization_processing"] = st.get(NodeState.BUSY, 0.0) / denom if denom else 0.0
+        if nid in prod.setups:
+            s_in, s_out = st.get(NodeState.SETUP, 0.0), st.get(NodeState.SETUP_OUTSIDE, 0.0)
+            k[f"node.{nid}.setup_count"] = rec.node_setups.get(nid, 0)
+            k[f"node.{nid}.setup_time_h"] = (s_in + s_out) / 3600
+            k[f"node.{nid}.utilization_setup"] = (s_in + s_out) / denom if denom else 0.0
+            inside, outside, count = inside + s_in, outside + s_out, count + rec.node_setups.get(nid, 0)
+    if prod.setups:
+        k["total_setup_count"] = count
+        k["total_setup_time_h"] = (inside + outside) / 3600
+        if rec.availability:
+            k["setup_time_inside_planned_h"] = inside / 3600
+            k["setup_time_outside_planned_h"] = outside / 3600
+
+
+_FRACTIONS = {"utilization_processing", "utilization_setup", "utilization", "blocked", "starved", "waiting_resource", "down", "working", "walking", "transporting", "idle", "yield",
               "planned_utilization", "planned_availability_ratio"}
 
 

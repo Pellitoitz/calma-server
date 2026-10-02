@@ -17,9 +17,17 @@ from collections import Counter
 from ...domain.behaviors import BufferParams, ServerParams, SourceParams, TransportParams
 from ...validation.verifier import CompiledNode
 from ..base import NodeState
-from .runtime import AVAILABLE, Entity, LevelTracker, ResourcePool, SimContext, StateTracker, Unit
+from ..production_compile import SetupTransitionMissing
+from .runtime import AVAILABLE, SETUP_TASK, Entity, LevelTracker, ResourcePool, SimContext, StateTracker, Unit
 
 Proc = Generator[simpy.Event, object, object]
+
+# trace event names of the shared timed-operation loop (processing names are the historical ones)
+_PROCESS_EVENTS = {"restart": "restart_lost_work", "pause": "paused_by_calendar", "resume": "resume_process",
+                   "preempted": "preempted", "paused_state": NodeState.PAUSED}
+_SETUP_PAUSED = "setup_paused"  # logical slot state: setup paused by its calendar (tracked as PAUSED or WAITING_RESOURCE)
+_SETUP_EVENTS = {"restart": "setup_restart_lost_work", "pause": "setup_paused_by_calendar", "resume": "setup_resume",
+                 "preempted": "setup_preempted", "paused_state": _SETUP_PAUSED}
 
 
 class IndustrialNode:
@@ -35,7 +43,15 @@ class IndustrialNode:
     def enter(self, entity: Entity, on_accept=None) -> Proc:  # pragma: no cover - abstract
         raise NotImplementedError
 
-    def next_node(self) -> "IndustrialNode":
+    def next_node(self, entity: Entity | None = None) -> "IndustrialNode":
+        if entity is not None and entity.route is not None:  # product route (engine >= 0.7.0): no random draw
+            r = entity.route
+            try:
+                i = r.index(self.id, entity.route_pos)
+            except ValueError:
+                self.ctx.violation(f"entity {entity.id} ({entity.etype}) at '{self.id}', which is not on its route {list(r)}")
+            entity.route_pos = i + 1
+            return self.ctx.nodes[r[i + 1]]
         succ = self.cn.successors
         if len(succ) == 1:
             return self.ctx.nodes[succ[0][0]]
@@ -83,6 +99,13 @@ class IndustrialSource(IndustrialNode):
         self.p: SourceParams = cn.params  # type: ignore[assignment]
         self.rng = ctx.rng(self.id, "arrivals")
         self.etype = self.p.entity_type or "unit"
+        # product generation (engine >= 0.7.0). Legacy sources create no product stream: no extra random numbers
+        self.gen = ctx.production.generation(self.id) if ctx.production is not None else None
+        if self.gen is not None:
+            self.seq_i = 0
+            if self.gen.mode == "PROBABILISTIC_MIX":  # fixed order (sorted ids): the same hash gives the same sequence
+                self.rng_product = ctx.rng(self.id, "product_mix")
+                self.mix = sorted((p, w) for p, w in self.gen.mix.items() if w > 0)
         # own calendar (engine >= 0.6.0): arrivals only in available time (the interarrival clock pauses outside it)
         self.gating = ctx.calendar.rt.gating.get(self.id, []) if ctx.calendar else []
         ctx.env.process(self._run())
@@ -92,19 +115,47 @@ class IndustrialSource(IndustrialNode):
         self.ctx.admit(e, self.id)
         self.ctx.record.created += 1
         self.ctx.wip.change(+1)
-        self.ctx.log("created", e, self.id)
+        if self.ctx.production is not None:
+            self.ctx.product_in(e)
+            self.ctx.log("created", e, self.id, product=e.etype)
+        else:
+            self.ctx.log("created", e, self.id)
 
     def _push(self, e: Entity) -> Proc:
-        yield from self.next_node().enter(e)
+        yield from self.next_node(e).enter(e)
+
+    def _new(self) -> Entity | None:
+        """Next entity. Products: PROBABILISTIC_MIX draws from this source's own 'product_mix' stream;
+        EXPLICIT_SEQUENCE takes the next element (None when a non-repeating sequence is exhausted)."""
+        if self.gen is None:
+            return self.ctx.new_entity(self.etype)
+        if self.gen.mode == "EXPLICIT_SEQUENCE":
+            seq = self.gen.sequence
+            if self.seq_i >= len(seq) and not self.gen.repeat:
+                return None
+            product = seq[self.seq_i % len(seq)]
+            self.seq_i += 1
+        else:
+            r, acc, product = self.rng_product.random(), 0.0, self.mix[-1][0]
+            for p, w in self.mix:
+                acc += w
+                if r < acc:
+                    product = p
+                    break
+        e = self.ctx.new_entity(product)
+        e.route = self.ctx.production.routes.get(product)
+        return e
 
     def _run(self) -> Proc:
         n = 0
         while self.p.max_entities is None or n < self.p.max_entities:
             n += 1
-            e = self.ctx.new_entity(self.etype)
+            e = self._new()
+            if e is None:
+                return  # explicit sequence finished (repeat: false)
             if self.p.arrival == "infinite":
                 # unlimited supply: the unit exists in the system once the first node accepts it
-                target = self.next_node()
+                target = self.next_node(e)
                 if self.gating:
                     # place first, then wait for the source's own availability: never admitted outside it
                     res = yield from target.reserve()
@@ -130,6 +181,8 @@ class IndustrialSink(IndustrialNode):
         release_all_carriers(self.ctx, entity)
         self.ctx.retire(entity, "completed")
         self.ctx.wip.change(-1)
+        if self.ctx.production is not None:
+            self.ctx.product_out(entity, "completed")
         if self.ctx.counting:
             self.ctx.record.completions.append((entity.id, entity.created, self.ctx.now))
         self.ctx.log("completed", entity, self.id)
@@ -179,7 +232,7 @@ class IndustrialBuffer(IndustrialNode):
             entity, req = self.items.pop(0 if self.p.discipline == "fifo" else -1)
             self._forwarding = entity
             # the unit keeps its buffer space until the downstream node accepts it
-            yield from self.next_node().enter(entity)
+            yield from self.next_node(entity).enter(entity)
             self._forwarding = None
             self.record_wait(entity)
             self.level.change(-1)
@@ -226,6 +279,18 @@ class IndustrialServer(IndustrialNode):
         ctx.record.node_rejects[self.id] = 0
         ctx.record.node_failures[self.id] = 0
         ctx.record.node_preemptions[self.id] = 0
+        # products and setups (engine >= 0.7.0); legacy nodes: no table, no setup, no extra random stream
+        prod = ctx.production
+        self.prod_times = prod.processing.get(self.id) if prod is not None else None
+        self.setup = prod.setups.get(self.id) if prod is not None else None
+        self.phase: dict[int, str] = {}  # slot -> "setup" | "process" (what an interruption applies to)
+        if self.setup is not None:
+            self.setup_state = self.setup.initial_state  # changes ONLY when a setup completes
+            self.rng_setup = ctx.rng(self.id, "setup")
+            self.setup_gating: list[str] = prod.setup_gating.get(self.id, [])
+            self.setup_policy = self.setup.at_unavailability
+            self.setup_uses = self.setup.resources
+            ctx.record.node_setups[self.id] = 0
         if self.p.failures:
             ctx.env.process(self._breakdowns())
         if self.gating:
@@ -241,9 +306,13 @@ class IndustrialServer(IndustrialNode):
         if self.gating and not self.ctx.calendar.ok(self.gating):
             if state == NodeState.BUSY:
                 return NodeState.BUSY_OUTSIDE
-            if state == NodeState.PAUSED:
+            if state == NodeState.SETUP:
+                return NodeState.SETUP_OUTSIDE
+            if state in (NodeState.PAUSED, _SETUP_PAUSED):
                 return NodeState.PAUSED
             return self.ctx.calendar.off_label(self.gating)
+        if state == _SETUP_PAUSED:  # setup paused by ITS calendar inside the node's planned time: waits for a resource
+            return NodeState.DOWN if self.down else NodeState.WAITING_RESOURCE
         return NodeState.DOWN if self.down else state
 
     def _set(self, slot: int, state: str) -> None:
@@ -281,38 +350,48 @@ class IndustrialServer(IndustrialNode):
 
     def on_calendar_change(self) -> None:
         """Calendar transition of one of the gating calendars (called by the CalendarClock, URGENT)."""
-        if not self._cal_ok() and self.policy in ("PAUSE_RESUME", "STOP_RESTART"):
-            for slot in sorted(self.processing):
+        cal = self.ctx.calendar
+        for slot in sorted(self.processing):
+            if self.phase.get(slot) == "setup":
+                gating, policy = self.setup_gating, self.setup_policy
+            else:
+                gating, policy = self.gating, self.policy
+            if gating and not cal.ok(gating) and policy in ("PAUSE_RESUME", "STOP_RESTART"):
                 self._interrupt(slot, "calendar")
-        elif self._cal_ok():
+        if self._cal_ok():
             for use in self.p.resources:  # requests left pending while this node was unavailable compete again
+                self.ctx.pools[use.resource]._schedule_dispatch()
+        if self.setup is not None and (not self.setup_gating or cal.ok(self.setup_gating)):
+            for use in self.setup_uses:
                 self.ctx.pools[use.resource]._schedule_dispatch()
         self._refresh()
         self.ctx.changed(self.id)
 
-    def _release_for_calendar(self, e: Entity, slot: int, held: list[Unit], state: str) -> Proc:
+    def _release_for_calendar(self, e: Entity, slot: int, held: list[Unit], state: str, gating: list[str] | None = None) -> Proc:
         """Free operators/tools (not carriers, not the slot) until every gating calendar is available again AND the
         machine is not down: resources are re-requested only when the operation can really continue (a machine still
         under repair when the shift starts does not pull its operator back until it is repaired)."""
         release_units(self.ctx, held)
         self._set(slot, state)
         while True:
-            yield from self.ctx.calendar.wait_until_ok(self.gating)
+            yield from self.ctx.calendar.wait_until_ok(self.gating if gating is None else gating)
             if not self.down:
                 return []
             yield self.up_event
 
-    def _ready_to_start(self, e: Entity, slot: int, held: list[Unit]) -> Proc:
+    def _ready_to_start(self, e: Entity, slot: int, held: list[Unit], gating: list[str] | None = None,
+                        uses=None, task: str | None = None, full_window: bool = True) -> Proc:
         """Before STARTING an operation: every gating calendar available, and (REQUIRE_FULL_WINDOW, deterministic times
-        only) the whole operation fits before the common availability ends. Returns the held units."""
+        only, processing only) the whole operation fits before the common availability ends. Returns the held units."""
         cal = self.ctx.calendar
+        gating = self.gating if gating is None else gating
         while True:
-            if not self._cal_ok():
-                held = yield from self._release_for_calendar(e, slot, held, NodeState.WAITING_RESOURCE)
-                held = yield from self._acquire(e, slot)
+            if not cal.ok(gating):
+                held = yield from self._release_for_calendar(e, slot, held, NodeState.WAITING_RESOURCE, gating)
+                held = yield from self._acquire(e, slot, uses=uses, task=task)
                 continue
-            if self.start_rule == "REQUIRE_FULL_WINDOW":
-                need = self.p.process_time.mean_seconds() * self.p.entity_time_factor()  # type: ignore[union-attr]
+            if full_window and self.start_rule == "REQUIRE_FULL_WINDOW":
+                need = self._pt(e).mean_seconds() * self.p.entity_time_factor()  # type: ignore[union-attr]
                 end = cal.window_end(self.gating, self.ctx.now)
                 if self.ctx.now + need > end + 1e-9:
                     self.ctx.log("start_deferred", e, self.id, needs_s=round(need, 3), window_left_s=round(end - self.ctx.now, 3))
@@ -324,6 +403,15 @@ class IndustrialServer(IndustrialNode):
                     held = yield from self._acquire(e, slot)
                     continue
             return held
+
+    def _pt(self, e: Entity):
+        """Processing time distribution for this entity: the product's own (engine >= 0.7.0) or the node's."""
+        if self.prod_times is None:
+            return self.p.process_time
+        pt = self.prod_times.get(e.etype)
+        if pt is None:  # the verifier makes this impossible; never fall back to another product's time
+            raise RuntimeError(f"'{self.id}': no processing time for product '{e.etype}'")
+        return pt
 
     # ---- flow ----
     def reserve(self) -> Proc:
@@ -345,14 +433,18 @@ class IndustrialServer(IndustrialNode):
         self.ctx.log("enter", entity, self.id, slot=slot)
         self.ctx.env.process(self._work(entity, req, slot))
 
-    def _acquire(self, e: Entity, slot: int, resume: bool = False) -> Proc:
-        """Operators/tools held during processing (walking to this node if they have travel)."""
+    def _acquire(self, e: Entity, slot: int, resume: bool = False, uses=None, task: str | None = None) -> Proc:
+        """Operators/tools held during processing (walking to this node if they have travel). Setups (engine >= 0.7.0)
+        pass their own `uses` and the task id '<node>#setup' (units walk to this node)."""
         ctx, held = self.ctx, []
-        for use in self.p.resources:
+        for use in (self.p.resources if uses is None else uses):
             self._set(slot, NodeState.WAITING_RESOURCE)
-            ctx.log("wait_resource", e, self.id, resource=use.resource, resume=resume)
-            held.extend((yield from acquire_units(ctx, ctx.pools[use.resource], self.id, use.quantity,
-                                                  self.cn.node.priority, e, resume)))
+            if task is None:
+                ctx.log("wait_resource", e, self.id, resource=use.resource, resume=resume)
+            else:
+                ctx.log("wait_resource", e, self.id, resource=use.resource, resume=resume, task=task)
+            held.extend((yield from acquire_units(ctx, ctx.pools[use.resource], task or self.id, use.quantity,
+                                                  self.cn.node.priority, e, resume, walk_to=self.id if task else None)))
         return held
 
     def _work(self, e: Entity, req, slot: int) -> Proc:
@@ -369,6 +461,9 @@ class IndustrialServer(IndustrialNode):
             ctx.carrier_move(use.resource, units, f"granted:{self.id}", e.location or self.id)
             ctx.check_carriers(use.resource)
             ctx.log("carrier_seized", e, self.id, resource=use.resource, available=sum(1 for u in pool.units if not u.busy))
+        # 1b) setup / changeover (engine >= 0.7.0): its own resources, before the processing resources
+        if self.setup is not None:
+            yield from self._do_setup(e, slot)
         # 2) operators / tools
         held = yield from self._acquire(e, slot)
         if self.gating:
@@ -376,52 +471,12 @@ class IndustrialServer(IndustrialNode):
         self.record_wait(e)
         # 3) process: suspended during failures; pre-emptible by the resource's dispatch strategy;
         #    calendars: FINISH_CURRENT continues, PAUSE_RESUME keeps the remaining work, STOP_RESTART loses it
+        self.phase[slot] = "process"
         self._set(slot, NodeState.BUSY)
         ctx.log("start_process", e, self.id)
-        remaining = self.p.sample_entity_seconds(self.rng_time)  # work_units aggregation (behaviors.py)
-        full = remaining
-        proc = ctx.env.active_process
-        while remaining > 1e-12:
-            if self.down:
-                yield self.up_event
-                continue
-            if self.gating and self.policy in ("PAUSE_RESUME", "STOP_RESTART") and not self._cal_ok():
-                if self.policy == "STOP_RESTART":
-                    ctx.log("restart_lost_work", e, self.id, lost_s=round(full - remaining, 3))
-                    remaining = full
-                ctx.log("paused_by_calendar", e, self.id, remaining_s=round(remaining, 3), policy=self.policy)
-                held = yield from self._release_for_calendar(e, slot, held, NodeState.PAUSED)
-                held = yield from self._acquire(e, slot, resume=True)
-                if self.policy == "STOP_RESTART":
-                    held = yield from self._ready_to_start(e, slot, held)  # a restart is a new start
-                self._set(slot, NodeState.BUSY)
-                ctx.log("resume_process", e, self.id, remaining_s=round(remaining, 3))
-                continue
-            start = ctx.now
-            self.processing[slot] = proc  # type: ignore[assignment]
-            for u in held:
-                u.preemptible = True
-                u.preempt = lambda s=slot: self._interrupt(s, "preempt")
-            try:
-                yield ctx.env.timeout(remaining)
-                remaining = 0.0
-            except simpy.Interrupt as intr:
-                remaining -= ctx.now - start
-                if intr.cause == "calendar" and remaining <= 1e-9:
-                    remaining = 0.0  # finished exactly when availability ended: complete, never paused/restarted
-                if intr.cause == "preempt":
-                    if ctx.counting:
-                        ctx.record.node_preemptions[self.id] += 1
-                    ctx.log("preempted", e, self.id, remaining_s=round(remaining, 3))
-                    release_units(ctx, held)
-                    held = yield from self._acquire(e, slot, resume=True)
-                    self._set(slot, NodeState.BUSY)
-                    ctx.log("resume_process", e, self.id)
-            finally:
-                self.processing.pop(slot, None)
-                for u in held:
-                    u.preemptible = False
-                    u.preempt = None
+        remaining = self.p.sample_entity_seconds(self.rng_time, None if self.prod_times is None else self._pt(e))
+        held = yield from self._timed(e, slot, held, remaining, self.policy, self.gating, None, None, NodeState.BUSY,
+                                      _PROCESS_EVENTS)
         ctx.log("end_process", e, self.id)
         if ctx.counting:
             ctx.record.node_processed[self.id] += 1
@@ -438,6 +493,8 @@ class IndustrialServer(IndustrialNode):
                 release_all_carriers(ctx, e)
                 ctx.retire(e, "scrapped")
                 ctx.wip.change(-1)
+                if ctx.production is not None:
+                    ctx.product_out(e, "scrapped")
                 if ctx.counting:
                     ctx.record.scrapped.append((e.id, self.id, ctx.now))
                 ctx.log("scrapped", e, self.id)
@@ -445,7 +502,7 @@ class IndustrialServer(IndustrialNode):
                 target = ctx.nodes[self.p.on_reject]
                 ctx.log("rejected", e, self.id, to=self.p.on_reject)
         else:
-            target = self.next_node()
+            target = self.next_node(e)
         # 6) move downstream (blocked while downstream is full)
         if target is not None:
             self._set(slot, NodeState.BLOCKED)
@@ -456,6 +513,95 @@ class IndustrialServer(IndustrialNode):
         self.slot_entity[slot] = None
         self._set(slot, NodeState.STARVED)
         self.slots.release(req)
+
+    def _timed(self, e: Entity, slot: int, held: list[Unit], full: float, policy, gating: list[str], uses, task,
+               busy: str, names: dict, interruptions: list | None = None) -> Proc:
+        """Run `full` seconds of work (processing or setup) in this slot. The single implementation of: suspension
+        while DOWN (failure clock unchanged: remaining work kept), calendar policy (PAUSE_RESUME keeps the remaining,
+        STOP_RESTART repeats the SAME sample), pre-emption by the dispatch strategy. Returns the held units."""
+        ctx = self.ctx
+        remaining = full
+        proc = ctx.env.active_process
+        while remaining > 1e-12:
+            if self.down:
+                yield self.up_event
+                continue
+            if gating and policy in ("PAUSE_RESUME", "STOP_RESTART") and not ctx.calendar.ok(gating):
+                if policy == "STOP_RESTART":
+                    ctx.log(names["restart"], e, self.id, lost_s=round(full - remaining, 3))
+                    remaining = full  # REUSE_ORIGINAL_SAMPLE: no new random number
+                ctx.log(names["pause"], e, self.id, remaining_s=round(remaining, 3), policy=policy)
+                held = yield from self._release_for_calendar(e, slot, held, names["paused_state"], gating)
+                held = yield from self._acquire(e, slot, resume=True, uses=uses, task=task)
+                if policy == "STOP_RESTART":
+                    held = yield from self._ready_to_start(e, slot, held, gating, uses, task, full_window=task is None)
+                self._set(slot, busy)
+                ctx.log(names["resume"], e, self.id, remaining_s=round(remaining, 3))
+                continue
+            start = ctx.now
+            self.processing[slot] = proc  # type: ignore[assignment]
+            for u in held:
+                u.preemptible = True
+                u.preempt = lambda s=slot: self._interrupt(s, "preempt")
+            try:
+                yield ctx.env.timeout(remaining)
+                remaining = 0.0
+            except simpy.Interrupt as intr:
+                remaining -= ctx.now - start
+                if intr.cause == "calendar" and remaining <= 1e-9:
+                    remaining = 0.0  # finished exactly when availability ended: complete, never paused/restarted
+                if interruptions is not None:
+                    interruptions.append({"t": ctx.now, "cause": intr.cause, "remaining_s": round(remaining, 6)})
+                if intr.cause == "preempt":
+                    if ctx.counting:
+                        ctx.record.node_preemptions[self.id] += 1
+                    ctx.log(names["preempted"], e, self.id, remaining_s=round(remaining, 3))
+                    release_units(ctx, held)
+                    held = yield from self._acquire(e, slot, resume=True, uses=uses, task=task)
+                    self._set(slot, busy)
+                    ctx.log(names["resume"], e, self.id)
+            finally:
+                self.processing.pop(slot, None)
+                for u in held:
+                    u.preemptible = False
+                    u.preempt = None
+        return held
+
+    def _do_setup(self, e: Entity, slot: int) -> Proc:
+        """Changeover before processing `e` (engine >= 0.7.0). Required iff the node's CURRENT setup state differs from
+        the entity's setup key; the state changes only when the setup COMPLETES. An undefined change stops the run."""
+        ctx = self.ctx
+        key = ctx.production.setup_key.get(e.etype)
+        frm = self.setup_state
+        if key is None or key == frm:
+            if key is None:
+                raise SetupTransitionMissing(f"t={ctx.now:.3f}s: product '{e.etype}' has no setup_key at '{self.id}'")
+            return
+        dur = self.setup.duration(frm, key)
+        if dur is None:
+            raise SetupTransitionMissing(f"t={ctx.now:.3f}s: '{self.id}' needs setup {frm}->{key} for entity {e.id} "
+                                         f"({e.etype}) but the model does not define it (never defaulted)")
+        task = self.id + SETUP_TASK
+        held = yield from self._acquire(e, slot, uses=self.setup_uses, task=task)
+        if self.setup_gating:
+            held = yield from self._ready_to_start(e, slot, held, self.setup_gating, self.setup_uses, task, full_window=False)
+        sample = dur.sample_seconds(self.rng_setup)
+        row = {"node": self.id, "slot": slot, "entity": e.id, "product": e.etype, "from": frm, "to": key,
+               "start": ctx.now, "sampled_s": sample, "resources": [u.name for u in held], "interruptions": []}
+        self.phase[slot] = "setup"
+        self._set(slot, NodeState.SETUP)
+        ctx.log("setup_start", e, self.id, frm=frm, to=key, duration_s=round(sample, 6), resources=row["resources"])
+        held = yield from self._timed(e, slot, held, sample, self.setup_policy, self.setup_gating, self.setup_uses, task,
+                                      NodeState.SETUP, _SETUP_EVENTS, row["interruptions"])
+        self.setup_state = key  # only now: an interrupted/paused setup never counts as done
+        row["end"] = ctx.now
+        row["elapsed_s"] = ctx.now - row["start"]
+        row["counted"] = ctx.counting
+        ctx.record.setups.append(row)
+        if ctx.counting:
+            ctx.record.node_setups[self.id] += 1
+        ctx.log("setup_end", e, self.id, frm=frm, to=key)
+        release_units(ctx, held)
 
     def _breakdowns(self) -> Proc:
         f = self.p.failures
@@ -658,7 +804,7 @@ class IndustrialTransport(IndustrialNode):
             targets: dict[int, tuple] = {}
             for q in load:
                 if q[0] == "unit":
-                    target = self.next_node()
+                    target = self.next_node(q[1])
                     token = None
                     if p.reserve_destination:
                         self._set(v, NodeState.BLOCKED)  # waiting for room at the destination (resource not held)

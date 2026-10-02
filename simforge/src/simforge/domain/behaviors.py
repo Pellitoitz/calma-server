@@ -100,9 +100,10 @@ class ServerParams(BaseModel):
         """Effective aggregation (legacy k*X when undeclared)."""
         return self.work_units_aggregation or LEGACY_AGGREGATION
 
-    def sample_entity_seconds(self, rng) -> float:
-        """Processing time of one entity. All samples come from the node's own stream `rng` (reproducible)."""
-        pt = self.process_time
+    def sample_entity_seconds(self, rng, process_time=None) -> float:
+        """Processing time of one entity. All samples come from the node's own stream `rng` (reproducible).
+        `process_time` = product-specific time (engine >= 0.7.0); None = the node's own process_time."""
+        pt = self.process_time if process_time is None else process_time
         agg = self.aggregation
         if agg == "single_sample":
             return pt.sample_seconds(rng)  # type: ignore[union-attr]

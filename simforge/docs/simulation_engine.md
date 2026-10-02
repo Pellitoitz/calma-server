@@ -72,6 +72,12 @@ Disponibilidad planificada de operarios, herramientas, máquinas y fuentes: turn
 excepciones con fecha, políticas de fin de disponibilidad y precedencia de eventos simultáneos. Detalle completo:
 `docs/calendars_and_shifts.md`.
 
+## Productos y setups (motor ≥ 0.7.0)
+
+Mix probabilístico / secuencia explícita, tiempos y rutas por producto, setups como estado propio del slot (el estado
+de setup cambia solo al completar), con las mismas políticas de calendario y la misma vía de interrupción que el
+proceso. Detalle completo: `docs/products_and_setups.md`.
+
 ## Cambios de semántica en el motor 0.2.0 (fase benchmark)
 
 - **Recogida física en transportes**: la unidad conserva su plaza aguas arriba hasta que se carga (`loading_area` para zonas de espera explícitas).
@@ -156,6 +162,7 @@ sigue BLOCKED) e IN_TRANSPORT cuentan si su nodo es *feeder*; en buffer cuenta s
 
 | Versión | Cambio | Modelos afectados (medido) |
 |---|---|---|
+| 0.7.0 | Productos (`entities` como ProductType) y bloque de extensión `production`: PROBABILISTIC_MIX (stream `product_mix` por fuente, productos en orden de id) / EXPLICIT_SEQUENCE; tiempos por producto (mismo sistema de distribuciones y `work_units`); rutas por producto; setups (`setup`, `setup_outside_planned`) CONSTANT / TARGET / SEQUENCE_DEPENDENT con `setup_key`, `initial_state` explícito, recursos propios, política de calendario propia y REUSE_ORIGINAL_SAMPLE; bucle de operación temporizada compartido por proceso y setup; métricas por producto y de setup; conservación por producto. Ver `docs/products_and_setups.md` | Ninguno: sin bloque `production` no se crea ningún stream ni evento nuevo; 01–05 y todos los tests de 0.6 idénticos (medido) |
 | 0.6.0 | Calendarios, turnos, descansos y excepciones (bloque de extensión `availability`, fuera del núcleo ISMS congelado); políticas FINISH_CURRENT / PAUSE_RESUME / STOP_RESTART y regla de inicio; transiciones de calendario con prioridad URGENT al principio del instante; contabilidad planificado/no planificado comprobada como invariante. Cierre técnico: vía única de interrupción (corrige un fallo con calendario/avería durante la re-solicitud tras una pre-emption), peticiones de nodos no disponibles no se conceden, contratos PAUSE_RESUME / REUSE_ORIGINAL_SAMPLE / FAILURE_CLOCK = ELAPSED_TIME. Ver `docs/calendars_and_shifts.md` | Ninguno: sin bloque `availability` no se crea reloj de calendario ni eventos nuevos; 01–05, MVP 359 y golden idénticos (medido) |
 | 0.5.0 | Agregación explícita de `work_units` (`work_units_aggregation`: `sum_iid` X1+…+Xk, `scale_sample` k·X, `single_sample` X); no declarada = k·X histórico con aviso `WORK_UNITS_AGGREGATION_UNDECLARED` (fuera del verificador congelado, en `validation/semantics.py`); KPIs/diagnóstico usan el factor de la política; truncamiento con `bound_type` obligatorio (PHYSICAL_BOUND / MODELLING_BOUND), `method` (DECLARED / FIT_THEN_TRUNCATE) y procedencia | Ninguno: 01–05, MVP 359, golden y el modelo e2e dan resultados idénticos a 0.4.0 (medido) y los hashes no cambian. El ejemplo de datos e2e cambia porque ahora decide `sum_iid` (127.2 ± 1.0) en vez del k·X reconocido (124.6 ± 1.4) |
 | 0.4.0 | Distribuciones `gamma` y `weibull`; truncamiento **explícito** (`truncation: {lower, upper, reason}`, muestreo por rechazo, media truncada); una muestra negativa sin truncamiento declarado es un error (`NegativeSampleError`), ya no se re-muestrea en silencio; `normal` con P(t<0) > 1e-9 exige truncamiento declarado; `Provenance.data` (enlace a dataset/ajuste) | Ninguno de 01–05, MVP 359, golden ni selectiva (hash de contenido y resultados idénticos, test `test_engine_0_4_0_*`). Modelos externos con `normal` de masa negativa no despreciable dejan de validar: hay que declarar el truncamiento |

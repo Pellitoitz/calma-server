@@ -100,9 +100,10 @@ class CalendarClock:
                 cid = self.rt.resource_calendar.get(pool.id)
                 if cid in changed:
                     pool.set_calendar_label(self.labels[cid])
+            setup_gating = ctx.production.setup_gating if ctx.production is not None else {}
             for nid in ctx.node_rank:  # declaration order
                 node = ctx.nodes.get(nid)
-                if node is not None and changed & set(self.rt.gating.get(nid, [])):
+                if node is not None and changed & (set(self.rt.gating.get(nid, [])) | set(setup_gating.get(nid, []))):
                     node.on_calendar_change()
             evt, self.change_event = self.change_event, ctx.env.event()
             evt.succeed()

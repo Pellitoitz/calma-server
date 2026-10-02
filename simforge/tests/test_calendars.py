@@ -377,7 +377,7 @@ def test_calendar_persists_and_historical_run_is_reproducible(tmp_path):
     m = line([cal(breaks=(("10:00", "10:15"),))])
     v1 = sf.save_model(p, m, "with break")
     r1 = sf.run_simulation(p)
-    assert r1.engine_version == "0.6.0" and r1.availability_hash
+    assert r1.engine_version == "0.7.0" and r1.availability_hash
     sf.save_model(p, set_value(p.current_model(), "availability.calendars.0.breaks.0.end", "11:00"), "longer break")
     assert run_simulation(p.current_model(), REG).kpis.mean("units_completed") != r1.kpis.mean("units_completed")
     old = p.load_version(v1)

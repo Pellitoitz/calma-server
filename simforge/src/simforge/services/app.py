@@ -163,6 +163,12 @@ class SimForgeApp:
             model = as_sim_model(model).model_copy(update={"availability": prev.availability})
             project.log("system", "availability_carried_over",
                         result=f"calendars of v{project.meta.current_version} kept in the rebuilt model (references re-verified)")
+        if prev is not None and getattr(prev, "production", None) is not None:
+            # nor about products/setups (engine >= 0.7.0): kept, and re-verified against the rebuilt structure
+            from ..domain.isms_ext import as_sim_model
+            model = as_sim_model(model).model_copy(update={"production": prev.production})
+            project.log("system", "production_carried_over",
+                        result=f"products/setups of v{project.meta.current_version} kept in the rebuilt model (references re-verified)")
         outcome.model = model
         gen_ms = (time.perf_counter() - t0) * 1000
         report, _ = verify(model, self.registry)

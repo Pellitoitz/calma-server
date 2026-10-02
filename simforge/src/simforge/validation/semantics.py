@@ -48,32 +48,61 @@ def semantic_issues(model: ISMSModel, registry: ComponentRegistry) -> list[Issue
 
 
 def verify_model(model: ISMSModel, registry: ComponentRegistry):
-    """verify() on the ISMS core + semantic warnings + extension blocks (calendars).
+    """verify() on the ISMS core + semantic warnings + extension blocks (calendars, production).
 
-    Returns (report, compiled). With an `availability` block the compiled model is a CalendarCompiledModel; the
-    approval state is re-evaluated on the FULL model (the core view has another hash)."""
+    Returns (report, compiled). With an extension block the compiled model is a CalendarCompiledModel (availability
+    and/or production runtime); the approval state is re-evaluated on the FULL model (the core view has another hash)."""
     from .availability import availability_issues
+    from .production import production_issues, verification_view
     spec = getattr(model, "availability", None)
-    core = model.core() if spec is not None else model  # type: ignore[attr-defined]
-    rep, compiled = verify(core, registry)
-    rep.issues.extend(semantic_issues(model, registry))
-    if spec is None:
+    prod = getattr(model, "production", None)
+    if spec is None and prod is None:
+        rep, compiled = verify(model, registry)
+        rep.issues.extend(semantic_issues(model, registry))
         return rep, compiled
+    core = model.core()  # type: ignore[attr-defined]
+    timed, routed = set(), set()
+    if prod is not None:
+        core, timed, routed = verification_view(core, prod)
+    rep, compiled = verify(core, registry)
+    rep.confirmed_values -= len(timed)  # neutral placeholders are not values of the model
+    rep.issues.extend(semantic_issues(model, registry))
     rep.issues = [i for i in rep.issues if i.code != "APPROVAL_STALE"]
     if model.approval.approved and not model.is_approved:
         rep.issues.append(Issue(Level.WARNING, "APPROVAL_STALE",
                                 "El modelo cambió después de la aprobación del ingeniero: la aprobación ya no es válida."))
-    cal_issues = availability_issues(model, registry)
-    rep.issues.extend(cal_issues)
+    prod_issues = production_issues(model, registry, compiled)
+    ext_issues = availability_issues(model, registry) + prod_issues
+    if prod is not None and model.simulation.replications < 5 and not any(i.code == "FEW_REPLICATIONS" for i in rep.issues):
+        durs = [d for t in prod.processing.values() for d in t.values()] + [d for s in prod.setups.values() for d in s.durations()]
+        if any(not d.is_deterministic for d in durs) or any(g.mode == "PROBABILISTIC_MIX" for g in prod.generation.values()):
+            ext_issues.append(Issue(Level.WARNING, "FEW_REPLICATIONS",
+                                    f"Modelo estocástico con {model.simulation.replications} replicación(es): los resultados "
+                                    "no son concluyentes.", "simulation.replications", "Usa ≥ 10 replicaciones (30 recomendado)."))
+    rep.issues.extend(ext_issues)
     if rep.readiness in (Readiness.EXECUTABLE, Readiness.ENGINEER_APPROVED):
-        if any(i.level is Level.ERROR for i in cal_issues):
+        if any(i.level is Level.ERROR and i.code == "MISSING" for i in prod_issues):
+            rep.readiness = Readiness.INCOMPLETE
+        elif any(i.level is Level.ERROR for i in ext_issues):
             rep.readiness = Readiness.CONFIGURED
         else:
             rep.readiness = Readiness.ENGINEER_APPROVED if model.is_approved else Readiness.EXECUTABLE
     if compiled is None or rep.errors:
         return rep, None
-    from ..engine.calendar_compile import compile_availability
-    return rep, compile_availability(compiled, model, registry)
+    for nid in timed:  # placeholders out: the engine must take product times, never this value
+        compiled.nodes[nid].params.process_time = None
+    for nid in routed:
+        compiled.nodes[nid].successors = []
+    from ..engine.calendar_compile import CalendarCompiledModel, compile_availability
+    if spec is not None:
+        out = compile_availability(compiled, model, registry)
+    else:
+        out = CalendarCompiledModel(model=compiled.model, nodes=compiled.nodes, horizon_s=compiled.horizon_s,
+                                    warmup_s=compiled.warmup_s, component_versions=compiled.component_versions)
+    if prod is not None:
+        from ..engine.production_compile import compile_production
+        out.production = compile_production(model, prod, out)
+    return rep, out
 
 
 __all__ = ["semantic_issues", "verify_model", "VerificationReport"]

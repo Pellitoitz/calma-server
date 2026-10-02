@@ -21,6 +21,7 @@ from ..base import ResourceState, RunRecord, TimeSeries
 LOW_PRIORITY = 2  # SimPy: 0 urgent, 1 normal. 2 = "end of current time step"
 MAX_SERIES_POINTS = 50_000
 AVAILABLE = "available"  # location of carriers idle in their pool
+SETUP_TASK = "#setup"  # resource task id of a node's setup: '<node>#setup' (engine >= 0.7.0)
 MAX_DECISIONS_PER_INSTANT = 100_000  # guard: a same-instant resolution that never reaches a fixed point is an error
 
 
@@ -72,14 +73,34 @@ class SimContext:
         self._instant = -1.0
         self._instant_decisions = 0
         self.calendar = None  # CalendarClock when the model has an `availability` block (engine >= 0.6.0)
+        self.production = None  # ProductionRuntime when the model has a `production` block (engine >= 0.7.0)
+        self.product_totals: dict[str, dict[str, int]] = {}  # product -> created/completed/scrapped (whole run)
+        self.product_wip: dict[str, "LevelTracker"] = {}
 
     def node_can_work(self, node_id: str) -> bool:
         """Calendars: a request from a node whose own/gating calendars are unavailable is not granted (it keeps its
         place in the queue and is re-evaluated when the node becomes available). Always True without calendars."""
         if self.calendar is None:
             return True
-        gating = self.calendar.rt.gating.get(node_id)
+        if node_id.endswith(SETUP_TASK):  # setup task of a node (engine >= 0.7.0): gated by its setup calendars
+            gating = self.production.setup_gating.get(node_id[: -len(SETUP_TASK)]) if self.production else None
+        else:
+            gating = self.calendar.rt.gating.get(node_id)
         return not gating or self.calendar.ok(gating)
+
+    # ---- products (engine >= 0.7.0); never called for models without a `production` block ----
+    def product_in(self, e: "Entity") -> None:
+        t = self.product_totals.setdefault(e.etype, {"created": 0, "completed": 0, "scrapped": 0})
+        t["created"] += 1
+        if e.etype not in self.product_wip:
+            self.product_wip[e.etype] = LevelTracker(self, f"wip:{e.etype}", record_series=False)
+        self.product_wip[e.etype].change(+1)
+        self.record.created_by_product[e.etype] = self.record.created_by_product.get(e.etype, 0) + 1
+        self.record.entity_product[e.id] = e.etype
+
+    def product_out(self, e: "Entity", how: str) -> None:
+        self.product_totals[e.etype][how] += 1
+        self.product_wip[e.etype].change(-1)
 
     def rng(self, *key: str) -> random.Random:
         """Independent, reproducible stream per (seed, purpose). Same stream across scenarios
@@ -196,6 +217,17 @@ class SimContext:
                            f"scrapped {t['scrapped']} + in system {len(self.live)}")
         if self.wip.level != len(self.live):
             self.violation(f"WIP counter {self.wip.level} != entities in system {len(self.live)}")
+        if self.production is not None:  # conservation per product, and products add up to the totals
+            for p, c in self.product_totals.items():
+                live = sum(1 for e in self.live.values() if e.etype == p)
+                if c["created"] != c["completed"] + c["scrapped"] + live:
+                    self.violation(f"product conservation '{p}': created {c['created']} != completed {c['completed']} + "
+                                   f"scrapped {c['scrapped']} + in system {live}")
+                if self.product_wip[p].level != live:
+                    self.violation(f"WIP counter of '{p}' {self.product_wip[p].level} != {live} in system")
+            for k in ("created", "completed", "scrapped"):
+                if sum(c[k] for c in self.product_totals.values()) != t[k]:
+                    self.violation(f"sum over products of '{k}' != total {t[k]}")
         self.check_carriers()
 
     def snapshot(self) -> dict[str, Any]:
@@ -282,6 +314,8 @@ class Entity:
     carriers: list[tuple[str, list["Unit"]]] = field(default_factory=list)
     node_entered: float = 0.0
     location: str | None = None
+    route: tuple[str, ...] | None = None  # product route (engine >= 0.7.0); None = legacy edge routing
+    route_pos: int = 0  # index of the entity's current node in `route`
 
 
 class StateTracker:
@@ -448,8 +482,9 @@ class ResourcePool:
                 location: str | None = None) -> simpy.Event:
         self._seq += 1
         evt = self.ctx.env.event()
+        base = node[: -len(SETUP_TASK)] if node.endswith(SETUP_TASK) else node  # a setup task ranks as its node
         self.waiting.append(_Request(self._seq, node, qty, priority, self.ctx.now, evt, entity, resume, location or node,
-                                     self.ctx.node_rank.get(node, len(self.ctx.node_rank))))
+                                     self.ctx.node_rank.get(base, len(self.ctx.node_rank))))
         self._schedule_dispatch()
         return evt
 

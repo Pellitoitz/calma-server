@@ -70,6 +70,13 @@ Turnos (incluidos nocturnos), descansos, fines de semana, festivos y horas extra
 máquina o fuente; qué pasa con una operación al acabar el turno (FINISH_CURRENT / PAUSE_RESUME / STOP_RESTART, decisión
 del ingeniero). `simforge calendar ...` o pestaña **Calendars**. Detalle: [`docs/calendars_and_shifts.md`](docs/calendars_and_shifts.md).
 
+## Mix de productos y setups (motor 0.7.0)
+
+Varios productos (mix probabilístico o secuencia explícita), tiempos y rutas por producto, setups / changeovers
+(constante, por destino o matriz origen→destino asimétrica; familias con `setup_key`; estado inicial explícito),
+integrados con calendarios y averías. SimForge representa la secuencia; no la optimiza. `simforge products ...` o
+pestaña **Products**. Detalle: [`docs/products_and_setups.md`](docs/products_and_setups.md).
+
 ## Datos medidos (CSV/XLSX → distribución → parámetro)
 
 Importar un estudio de tiempos (CSV o XLSX, sin ejecutar nada del archivo) → validación fila a fila (nada se borra ni

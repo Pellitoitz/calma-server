@@ -1,7 +1,8 @@
 """ISMS extensions on top of the FROZEN ISMS 0.1 core (domain/isms.py is part of the LLM benchmark V1 contract).
 
-`SimModel` = ISMSModel + optional extension blocks. Today: `availability` (calendars, shifts, breaks, exceptions,
-operation policies; engine >= 0.6.0). A model without extension blocks serialises exactly as an ISMS 0.1 model, so
+`SimModel` = ISMSModel + optional extension blocks: `availability` (calendars, shifts, breaks, exceptions,
+operation policies; engine >= 0.6.0) and `production` (product mix, product-specific processing/routing, setups;
+engine >= 0.7.0). A model without extension blocks serialises exactly as an ISMS 0.1 model, so
 its content_hash (and every approval bound to it) is unchanged.
 
 The frozen verifier/compiler only understands the core: `core()` returns that view; extension blocks are validated by
@@ -14,12 +15,18 @@ from pydantic import model_serializer
 
 from .calendar import AvailabilitySpec
 from .isms import ISMSModel
+from .production import ProductionSpec
 
-EXTENSION_KEYS = ("availability",)
+EXTENSION_KEYS = ("availability", "production")
 
 
 class SimModel(ISMSModel):
     availability: AvailabilitySpec | None = None
+    production: ProductionSpec | None = None
+
+    @property
+    def has_extensions(self) -> bool:
+        return any(getattr(self, k) is not None for k in EXTENSION_KEYS)
 
     @model_serializer(mode="wrap")
     def _omit_empty_extensions(self, handler):

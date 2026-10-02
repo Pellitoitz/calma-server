@@ -25,8 +25,11 @@ class NodeState:
     BUSY_OUTSIDE = "busy_outside_planned"  # FINISH_CURRENT: operation started in planned time, finishing after it
     BREAK = "break"
     OFF_SHIFT = "off_shift"
-    PLANNED = ALL
-    UNPLANNED = (PAUSED, BUSY_OUTSIDE, BREAK, OFF_SHIFT)
+    # setups / changeovers (engine >= 0.7.0); only on nodes with setups (never in legacy KPIs: not part of ALL)
+    SETUP = "setup"
+    SETUP_OUTSIDE = "setup_outside_planned"  # setup running outside the node's planned time
+    PLANNED = (*ALL, SETUP)
+    UNPLANNED = (PAUSED, BUSY_OUTSIDE, BREAK, OFF_SHIFT, SETUP_OUTSIDE)
 
 
 class ResourceState:
@@ -78,6 +81,12 @@ class RunRecord:
     node_preemptions: dict[str, int] = field(default_factory=dict)  # tasks suspended by pre-emption
     invariant_checks: int = 0
     availability: dict[str, Any] | None = None  # calendars: planned/break/off-shift time per resource/node (engine >= 0.6.0)
+    # products and setups (engine >= 0.7.0); empty for models without a `production` block
+    created_by_product: dict[str, int] = field(default_factory=dict)  # whole run
+    entity_product: dict[int, str] = field(default_factory=dict)  # entity id -> product
+    node_setups: dict[str, int] = field(default_factory=dict)  # setups completed (post-warmup)
+    setups: list[dict[str, Any]] = field(default_factory=list)  # one audit row per setup (whole run)
+    wip_end_by_product: dict[str, int] = field(default_factory=dict)
     completion_times: list[float] = field(default_factory=list)
     # debug
     events: list[dict[str, Any]] | None = None

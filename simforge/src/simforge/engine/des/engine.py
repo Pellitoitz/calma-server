@@ -55,6 +55,7 @@ class DesEngine:
         ctx.model = model.model
         positions = {n.id: (n.position.x, n.position.y) for n in model.model.nodes if n.position}
         ctx.node_rank = {n.id: i for i, n in enumerate(model.model.nodes)}
+        ctx.production = getattr(model, "production", None)  # products/setups (engine >= 0.7.0); None = legacy
         rt = getattr(model, "availability", None)
         if rt is not None:  # calendars (engine >= 0.6.0); models without them never create a clock (legacy events)
             ctx.calendar = CalendarClock(ctx, rt)
@@ -91,8 +92,13 @@ class DesEngine:
         if rt is not None:
             _availability_record(ctx, model, record)
         ctx.wip.finalize()
+        for tracker in ctx.product_wip.values():
+            tracker.finalize()
         ctx.check_end()
         record.wip_end = ctx.wip.level
+        if ctx.production is not None:
+            for p in ctx.product_totals:
+                record.wip_end_by_product[p] = sum(1 for e in ctx.live.values() if e.etype == p)
         record.invariant_checks = ctx.invariant_checks
         record.completion_times = [d for _, _, d in record.completions]
         for locs in ctx.carrier_locs.values():

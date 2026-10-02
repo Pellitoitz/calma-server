@@ -25,7 +25,10 @@ class AvailabilityRuntime:
 
 @dataclass
 class CalendarCompiledModel(CompiledModel):
+    """Compiled model + extension runtimes (calendars: engine >= 0.6.0; production: engine >= 0.7.0)."""
+
     availability: AvailabilityRuntime | None = None
+    production: object | None = None  # engine.production_compile.ProductionRuntime
 
 
 def compile_availability(cm: CompiledModel, model, registry: ComponentRegistry) -> CalendarCompiledModel:
