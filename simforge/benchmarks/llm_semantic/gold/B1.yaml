@@ -1,0 +1,148 @@
+id: B1
+gold_source: explicit spec
+gold_status: VALID
+roles:
+- role: assembly
+  accept:
+  - manual_assembly
+  - manual_process
+  keywords:
+  - montaje
+  - monta
+  - assembl
+  - ensambl
+  - carga
+  - coloca
+- role: buffer
+  accept:
+  - buffer
+  keywords:
+  - buffer
+  - cola
+  - pulmon
+  - estanteria
+  - queue
+  - almacen
+- role: selective
+  accept:
+  - selective_soldering
+  keywords:
+  - selectiva
+  - selective
+- role: review
+  accept:
+  - inspection
+  - cleaning
+  keywords:
+  - revis
+  - inspecc
+  - limpi
+  - review
+requirements:
+- kind: flow
+  description: topology in flow order
+  id: B1-R01
+- kind: component
+  role: assembly
+  description: assembly -> accepted library component
+  id: B1-R02
+- kind: component
+  role: buffer
+  description: buffer -> accepted library component
+  id: B1-R03
+- kind: component
+  role: selective
+  description: selective -> accepted library component
+  id: B1-R04
+- kind: component
+  role: review
+  description: review -> accepted library component
+  id: B1-R05
+- kind: value
+  role: assembly
+  field: process_time
+  expect: 30
+  description: assembly 30 s PER_CIRCUIT
+  per: per_item
+  items: 4
+  id: B1-R06
+- kind: basis
+  role: assembly
+  expect: per_item
+  description: assembly time basis = per circuit
+  id: B1-R07
+- kind: value
+  target: items_per_entity
+  expect: 4
+  description: 4 circuits per rack
+  id: B1-R08
+- kind: value
+  role: buffer
+  field: capacity
+  expect: 3
+  description: buffer 3 racks
+  id: B1-R09
+- kind: value
+  role: selective
+  field: process_time
+  expect: 20
+  description: selective 20 s PER_RACK
+  per: per_entity
+  items: 4
+  id: B1-R10
+- kind: basis
+  role: selective
+  expect: per_entity
+  description: selective time basis = per rack
+  id: B1-R11
+- kind: value
+  role: review
+  field: process_time
+  expect: 15
+  description: review 15 s PER_CIRCUIT
+  per: per_item
+  items: 4
+  id: B1-R12
+- kind: basis
+  role: review
+  expect: per_item
+  description: review time basis = per circuit
+  id: B1-R13
+- kind: value
+  target: carrier_quantity
+  expect: 3
+  description: 3 racks
+  id: B1-R14
+- kind: carrier
+  seize: assembly
+  release: review
+  return: immediate
+  description: rack taken at assembly, freed after review, immediately available
+  id: B1-R15
+- kind: shared_resource
+  roles:
+  - assembly
+  - review
+  description: same operator assembles and reviews
+  id: B1-R16
+- kind: no_resource
+  role: selective
+  description: selective is automatic
+  id: B1-R17
+- kind: strategy
+  operator_of: assembly
+  rule: unspecified
+  severity: MAJOR
+  description: no priority stated -> none invented
+  id: B1-R18
+- kind: value
+  target: horizon
+  expect: 28800
+  description: horizon 8 h
+  severity: MAJOR
+  id: B1-R19
+- kind: supply
+  expect: infinite
+  description: unlimited supply
+  severity: MAJOR
+  id: B1-R20

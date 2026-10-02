@@ -1,0 +1,8 @@
+id: P1
+family: PERTURBATION
+title: A1 perturbed
+purpose: Order, synonyms, '1 minuto', 'cinco'.
+text: 'Se simulan 8 h. Al inicio de la línea siempre hay material. El montaje, manual, lo hace un operario y dura 1 minuto
+  por pieza; después las piezas esperan en un pulmón con sitio para cinco. Una máquina automática las procesa: 45 s cada una.
+  Por último, ese mismo operario inspecciona cada pieza en 20 s.'
+perturbation_of: A1

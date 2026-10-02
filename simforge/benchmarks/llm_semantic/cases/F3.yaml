@@ -1,0 +1,7 @@
+id: F3
+family: F_REALISTIC
+title: Two different resources
+purpose: Assembler (2 tasks) + test technician.
+text: Un montador ensambla cada equipo en 90 s. Los equipos montados esperan en un buffer de 4. Un técnico de pruebas hace
+  el test funcional de cada equipo en 120 s. Después el mismo montador embala el equipo en 40 s. Hay un montador y un técnico.
+  Suministro continuo. 8 horas de simulación.

@@ -1,0 +1,7 @@
+id: B2
+family: B_UNITS_BASIS
+title: Per panel vs per board, min and ms
+purpose: 2 min/panel, 15 s/board, 4 min/panel, 1500 ms/board, 6 boards/panel.
+text: Fabricamos paneles de 6 placas. La serigrafía imprime un panel en 2 minutos. La pick and place coloca los componentes
+  a razón de 15 segundos por placa. El horno de reflow tarda 4 min por panel. La AOI inspecciona cada placa en 1500 ms. Entre
+  cada máquina y la siguiente hay un buffer de 2 paneles. Todas son máquinas automáticas. Material ilimitado; simular 8 h.

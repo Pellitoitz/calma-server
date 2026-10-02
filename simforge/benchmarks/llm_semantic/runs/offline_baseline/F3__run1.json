@@ -1,0 +1,693 @@
+{
+ "case": "F3",
+ "family": "F_REALISTIC",
+ "schema_valid": true,
+ "compiles": true,
+ "verifier_status": "EXECUTABLE",
+ "error": null,
+ "semantically_correct": false,
+ "wall_s": 0.005,
+ "interpreter": "offline-rules",
+ "draft": {
+  "model_name": "Manual assembly → Test station → Machine",
+  "horizon_value": null,
+  "horizon_unit": "h",
+  "supply": "unknown",
+  "interarrival": null,
+  "resources": [],
+  "steps": [
+   {
+    "id": "manual_assembly",
+    "name": "Manual assembly",
+    "component": "manual_assembly",
+    "time": {
+     "dist": "constant",
+     "value": 90.0,
+     "low": null,
+     "mode": null,
+     "high": null,
+     "mean": null,
+     "std": null,
+     "unit": "s"
+    },
+    "capacity": null,
+    "resources": [],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   },
+   {
+    "id": "buffer_1",
+    "name": "Buffer 1",
+    "component": "buffer",
+    "time": null,
+    "capacity": 4,
+    "resources": [],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   },
+   {
+    "id": "test_station",
+    "name": "Test station",
+    "component": "test_station",
+    "time": {
+     "dist": "constant",
+     "value": 120.0,
+     "low": null,
+     "mode": null,
+     "high": null,
+     "mean": null,
+     "std": null,
+     "unit": "s"
+    },
+    "capacity": null,
+    "resources": [],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   },
+   {
+    "id": "machine",
+    "name": "Machine",
+    "component": "machine",
+    "time": {
+     "dist": "constant",
+     "value": 40.0,
+     "low": null,
+     "mode": null,
+     "high": null,
+     "mean": null,
+     "std": null,
+     "unit": "s"
+    },
+    "capacity": null,
+    "resources": [],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   }
+  ],
+  "policies": [],
+  "carrier_loops": [],
+  "experiments": [],
+  "missing_information": [],
+  "assumptions": [],
+  "confidence_notes": [
+   "Interpretado por el intérprete OFFLINE (reglas deterministas ES/EN)."
+  ],
+  "items": null,
+  "custom_rules": [],
+  "unparsed": [
+   "Hay un montador y un técnico"
+  ],
+  "layout_known": false
+ },
+ "model": {
+  "isms_version": "0.1",
+  "meta": {
+   "name": "Manual assembly → Test station → Machine",
+   "description": "Un montador ensambla cada equipo en 90 s. Los equipos montados esperan en un buffer de 4. Un técnico de pruebas hace el test funcional de cada equipo en 120 s. Después el mismo montador embala el equipo en 40 s. Hay un montador y un técnico. Suministro continuo. 8 horas de simulación.",
+   "tags": [],
+   "domain": null,
+   "origin": "ai_generated",
+   "generated_by": {
+    "interpreter": "offline-rules",
+    "prompt_version": "offline_rules_v2",
+    "compiler": "compiler_v2",
+    "prototype_mode": false,
+    "at": "2026-10-02T06:00:13+00:00"
+   }
+  },
+  "simulation": {
+   "horizon": {
+    "value": 8.0,
+    "unit": "h",
+    "provenance": {
+     "status": "assumed",
+     "source": null,
+     "note": "default 8 h",
+     "timestamp": null
+    }
+   },
+   "warmup": {
+    "value": 0.0,
+    "unit": "s",
+    "provenance": null
+   },
+   "kind": "terminating",
+   "replications": 1,
+   "base_seed": 12345,
+   "trace": false,
+   "dispatch_timing": "end_of_timestep",
+   "check_invariants": true
+  },
+  "entities": [
+   {
+    "id": "unit",
+    "name": "Unit",
+    "description": ""
+   }
+  ],
+  "parameters": [
+   {
+    "id": "manual_assembly_time",
+    "value": 90.0,
+    "unit": "s",
+    "description": "Tiempo de 'Manual assembly'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "buffer_1_capacity",
+    "value": 4.0,
+    "unit": "units",
+    "description": "Capacidad de 'Buffer 1'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "test_station_time",
+    "value": 120.0,
+    "unit": "s",
+    "description": "Tiempo de 'Test station'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "machine_time",
+    "value": 40.0,
+    "unit": "s",
+    "description": "Tiempo de 'Machine'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   }
+  ],
+  "resources": [],
+  "nodes": [
+   {
+    "id": "source",
+    "name": "Source",
+    "component": "source",
+    "component_version": null,
+    "params": {
+     "arrival": "infinite"
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "manual_assembly",
+    "name": "Manual assembly",
+    "component": "manual_assembly",
+    "component_version": "1.0.0",
+    "params": {
+     "process_time": {
+      "dist": "constant",
+      "unit": "s",
+      "value": "$manual_assembly_time"
+     }
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "buffer_1",
+    "name": "Buffer 1",
+    "component": "buffer",
+    "component_version": "1.0.0",
+    "params": {
+     "capacity": "$buffer_1_capacity"
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "test_station",
+    "name": "Test station",
+    "component": "test_station",
+    "component_version": "1.0.0",
+    "params": {
+     "process_time": {
+      "dist": "constant",
+      "unit": "s",
+      "value": "$test_station_time"
+     }
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "machine",
+    "name": "Machine",
+    "component": "machine",
+    "component_version": "1.0.0",
+    "params": {
+     "process_time": {
+      "dist": "constant",
+      "unit": "s",
+      "value": "$machine_time"
+     }
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "sink",
+    "name": "Sink",
+    "component": "sink",
+    "component_version": null,
+    "params": {},
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   }
+  ],
+  "edges": [
+   {
+    "source": "source",
+    "target": "manual_assembly",
+    "probability": null
+   },
+   {
+    "source": "manual_assembly",
+    "target": "buffer_1",
+    "probability": null
+   },
+   {
+    "source": "buffer_1",
+    "target": "test_station",
+    "probability": null
+   },
+   {
+    "source": "test_station",
+    "target": "machine",
+    "probability": null
+   },
+   {
+    "source": "machine",
+    "target": "sink",
+    "probability": null
+   }
+  ],
+  "assumptions": [
+   {
+    "id": "a1",
+    "text": "Suministro infinito (la primera estación nunca espera material): no se indicó la llegada.",
+    "path": "nodes.source.params.arrival",
+    "origin": "ai",
+    "accepted": false
+   },
+   {
+    "id": "a2",
+    "text": "Horizonte de simulación de 8 h (no se indicó).",
+    "path": "simulation.horizon",
+    "origin": "ai",
+    "accepted": false
+   }
+  ],
+  "missing": [
+   {
+    "question": "No he usado esta frase: «Hay un montador y un técnico». Si describe algo del proceso, reformúlala o añádelo a mano.",
+    "path": null,
+    "required": false
+   }
+  ],
+  "approval": {
+   "approved": false,
+   "by": null,
+   "at": null,
+   "model_hash": null,
+   "note": ""
+  },
+  "experiments": [],
+  "custom_rule_candidates": []
+ },
+ "questions": [
+  "No he usado esta frase: «Hay un montador y un técnico». Si describe algo del proceso, reformúlala o añádelo a mano."
+ ],
+ "assumptions": [
+  "Suministro infinito (la primera estación nunca espera material): no se indicó la llegada.",
+  "Horizonte de simulación de 8 h (no se indicó)."
+ ],
+ "custom_rules": [],
+ "unparsed": [
+  "Hay un montador y un técnico"
+ ],
+ "confidence_notes_dropped_by_compiler": [
+  "Interpretado por el intérprete OFFLINE (reglas deterministas ES/EN)."
+ ],
+ "evaluation": {
+  "case": "F3",
+  "results": [
+   {
+    "case": "F3",
+    "req": "F3-R01",
+    "kind": "flow",
+    "metric": "TOPOLOGY",
+    "description": "topology in flow order",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "steps in order (wrong components counted separately: ['packaging'])",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F3",
+    "req": "F3-R02",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "assembly -> accepted library component",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "manual_assembly = manual_assembly",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F3",
+    "req": "F3-R03",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "buffer -> accepted library component",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "buffer_1 = buffer",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F3",
+    "req": "F3-R04",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "test -> accepted library component",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "test_station = test_station",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F3",
+    "req": "F3-R05",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "packaging -> accepted library component",
+    "status": "WRONG",
+    "error_type": "COMPONENT_MATCH_ERROR",
+    "severity": "CRITICAL",
+    "detail": "step present as 'machine' (machine); expected one of ['packaging']",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F3",
+    "req": "F3-R06",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "assembly 90 s",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "manual_assembly: 90.0 s x 1 = 90.0 s per entity",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F3",
+    "req": "F3-R07",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "buffer 4",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "buffer_1: 4.0",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F3",
+    "req": "F3-R08",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "test 120 s",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "test_station: 120.0 s x 1 = 120.0 s per entity",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F3",
+    "req": "F3-R09",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "packing 40 s",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "machine: 40.0 s x 1 = 40.0 s per entity",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F3",
+    "req": "F3-R10",
+    "kind": "shared_resource",
+    "metric": "RESOURCE_ASSIGNMENT",
+    "description": "assembler does assembly+packing; technician (another resource) does the test",
+    "status": "WRONG",
+    "error_type": "RESOURCE_ASSIGNMENT_ERROR",
+    "severity": "CRITICAL",
+    "detail": "roles ['assembly', 'packaging'] -> operators [None, None]",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F3",
+    "req": "F3-R11",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "one technician",
+    "status": "OMITTED",
+    "error_type": "SILENT_OMISSION",
+    "severity": "CRITICAL",
+    "detail": "NO_OPERATOR (test_station)",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F3",
+    "req": "F3-R12",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "one assembler",
+    "status": "OMITTED",
+    "error_type": "PARAMETER_VALUE_ERROR",
+    "severity": "MAJOR",
+    "detail": "NO_OPERATOR; flagged «Hay un montador y un técnico»",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F3",
+    "req": "F3-R13",
+    "kind": "strategy",
+    "metric": "STRATEGY",
+    "description": "no rule invented",
+    "status": "WRONG",
+    "error_type": "STRATEGY_ERROR",
+    "severity": "MAJOR",
+    "detail": "no operator found",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F3",
+    "req": "F3-R14",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "horizon 8 h",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "simulation.horizon: 28800.0",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F3",
+    "req": "F3-R15",
+    "kind": "supply",
+    "metric": "PARAMETER_VALUE",
+    "description": "unlimited supply",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "infinite",
+    "evaluated": true,
+    "unit_sensitive": false
+   }
+  ],
+  "grounding": [
+   {
+    "parameter": "manual_assembly_time",
+    "value": 90.0,
+    "unit": "s",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "buffer_1_capacity",
+    "value": 4.0,
+    "unit": "units",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "test_station_time",
+    "value": 120.0,
+    "unit": "s",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "machine_time",
+    "value": 40.0,
+    "unit": "s",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   }
+  ],
+  "role_map": {
+   "assembly": "manual_assembly",
+   "buffer": "buffer_1",
+   "test": "test_station",
+   "packaging": "machine",
+   "packaging(loose)": true
+  },
+  "semantically_correct": false
+ },
+ "llm_calls": [],
+ "repeat": 1,
+ "signature": {
+  "topology": [
+   "source",
+   "manual_assembly",
+   "buffer",
+   "test_station",
+   "machine",
+   "sink"
+  ],
+  "components": {
+   "assembly": "manual_assembly",
+   "buffer": "buffer",
+   "test": "test_station",
+   "packaging": "machine"
+  },
+  "loose_roles": [
+   "packaging"
+  ],
+  "requirements": {
+   "F3-R01": "CORRECT",
+   "F3-R02": "CORRECT",
+   "F3-R03": "CORRECT",
+   "F3-R04": "CORRECT",
+   "F3-R05": "WRONG",
+   "F3-R06": "CORRECT",
+   "F3-R07": "CORRECT",
+   "F3-R08": "CORRECT",
+   "F3-R09": "CORRECT",
+   "F3-R10": "WRONG",
+   "F3-R11": "OMITTED",
+   "F3-R12": "OMITTED",
+   "F3-R13": "WRONG",
+   "F3-R14": "CORRECT",
+   "F3-R15": "CORRECT"
+  },
+  "missing": [],
+  "assumption_paths": [
+   "nodes.source.params.arrival",
+   "simulation.horizon"
+  ],
+  "custom_rules": 0
+ }
+}

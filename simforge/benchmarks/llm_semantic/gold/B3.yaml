@@ -1,0 +1,173 @@
+id: B3
+gold_source: explicit spec
+gold_status: VALID
+roles:
+- role: assembly
+  accept:
+  - manual_assembly
+  - manual_process
+  keywords:
+  - montaje
+  - monta
+  - assembl
+  - ensambl
+  - carga
+  - coloca
+- role: transport
+  accept:
+  - rack_transport
+  - transport
+  keywords:
+  - transport
+  - lleva
+  - traslad
+  - distancia
+  - carro
+- role: buffer
+  accept:
+  - buffer
+  keywords:
+  - buffer
+  - cola
+  - pulmon
+  - estanteria
+  - queue
+  - almacen
+- role: selective
+  accept:
+  - selective_soldering
+  keywords:
+  - selectiva
+  - selective
+- role: review
+  accept:
+  - inspection
+  - cleaning
+  keywords:
+  - revis
+  - inspecc
+  - limpi
+  - review
+requirements:
+- kind: flow
+  description: topology in flow order
+  id: B3-R01
+- kind: component
+  role: assembly
+  description: assembly -> accepted library component
+  id: B3-R02
+- kind: component
+  role: transport
+  description: transport -> accepted library component
+  id: B3-R03
+- kind: component
+  role: buffer
+  description: buffer -> accepted library component
+  id: B3-R04
+- kind: component
+  role: selective
+  description: selective -> accepted library component
+  id: B3-R05
+- kind: component
+  role: review
+  description: review -> accepted library component
+  id: B3-R06
+- kind: value
+  role: assembly
+  field: process_time
+  expect: 120
+  description: assembly 2 min per rack
+  raw: 2
+  unit_sensitive: true
+  per: per_entity
+  id: B3-R07
+- kind: value
+  role: transport
+  field: load_time
+  expect: 5
+  description: load 5 s
+  id: B3-R08
+- kind: value
+  role: transport
+  field: unload_time
+  expect: 3
+  description: unload 3 s
+  id: B3-R09
+- kind: value
+  target: distance
+  between:
+  - assembly
+  - buffer
+  expect: 12.5
+  raw: 1250
+  unit_sensitive: true
+  description: assembly->buffer 1250 cm = 12.5 m
+  id: B3-R10
+- kind: value
+  target: distance
+  between:
+  - buffer
+  - review
+  expect: 3.5
+  raw: 3500
+  unit_sensitive: true
+  description: buffer->review 3500 mm = 3.5 m
+  id: B3-R11
+- kind: value
+  target: walking_speed
+  expect: 0.9
+  description: walking speed 0.9 m/s
+  id: B3-R12
+- kind: value
+  role: buffer
+  field: capacity
+  expect: 4
+  description: buffer 4 racks
+  id: B3-R13
+- kind: value
+  role: selective
+  field: process_time
+  expect: 40
+  description: selective 40 s per rack
+  id: B3-R14
+- kind: value
+  role: review
+  field: process_time
+  expect: 45
+  description: review 45 s per rack
+  id: B3-R15
+- kind: value
+  target: carrier_quantity
+  expect: 2
+  description: 2 racks
+  id: B3-R16
+- kind: carrier
+  seize: assembly
+  release: review
+  return: immediate
+  description: rack loop
+  id: B3-R17
+- kind: shared_resource
+  roles:
+  - assembly
+  - transport
+  - review
+  description: 'one operator: assembly, transport, review'
+  id: B3-R18
+- kind: strategy
+  operator_of: assembly
+  rule: unspecified
+  severity: MAJOR
+  description: no rule invented
+  id: B3-R19
+- kind: value
+  target: horizon
+  expect: 28800
+  description: horizon 8 h
+  severity: MAJOR
+  id: B3-R20
+- kind: supply
+  expect: infinite
+  description: unlimited supply
+  severity: MAJOR
+  id: B3-R21

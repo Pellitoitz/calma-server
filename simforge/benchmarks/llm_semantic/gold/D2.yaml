@@ -1,0 +1,101 @@
+id: D2
+gold_source: explicit spec (MVP + contradiction)
+gold_status: VALID
+roles:
+- role: assembly
+  accept:
+  - manual_assembly
+  - manual_process
+  keywords:
+  - montaje
+  - monta
+  - assembl
+  - ensambl
+  - carga
+  - coloca
+- role: buffer
+  accept:
+  - buffer
+  keywords:
+  - buffer
+  - cola
+  - pulmon
+  - estanteria
+  - queue
+  - almacen
+- role: machine
+  accept:
+  - machine
+  keywords:
+  - maquina
+  - machine
+- role: inspection
+  accept:
+  - inspection
+  keywords:
+  - inspecc
+  - inspect
+  - revis
+requirements:
+- kind: flow
+  description: topology in flow order
+  id: D2-R01
+- kind: component
+  role: assembly
+  description: assembly -> accepted library component
+  id: D2-R02
+- kind: component
+  role: buffer
+  description: buffer -> accepted library component
+  id: D2-R03
+- kind: component
+  role: machine
+  description: machine -> accepted library component
+  id: D2-R04
+- kind: component
+  role: inspection
+  description: inspection -> accepted library component
+  id: D2-R05
+- kind: conflict
+  role: assembly
+  field: process_time
+  values:
+  - 60
+  - 75
+  description: 60 s vs 75 s -> ASK
+  id: D2-R06
+- kind: value
+  role: buffer
+  field: capacity
+  expect: 5
+  description: buffer 5
+  id: D2-R07
+- kind: value
+  role: machine
+  field: process_time
+  expect: 45
+  description: machine 45 s
+  id: D2-R08
+- kind: value
+  role: inspection
+  field: process_time
+  expect: 20
+  description: inspection 20 s
+  id: D2-R09
+- kind: shared_resource
+  roles:
+  - assembly
+  - inspection
+  description: same operator
+  id: D2-R10
+- kind: value
+  target: horizon
+  expect: 28800
+  description: horizon 8 h
+  severity: MAJOR
+  id: D2-R11
+- kind: supply
+  expect: infinite
+  description: unlimited supply
+  severity: MAJOR
+  id: D2-R12

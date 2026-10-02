@@ -1,0 +1,7 @@
+id: D3
+family: D_CONTRADICTION
+title: One vs two operators
+purpose: Operator count 1 vs 2.
+text: Fuente infinita. Un único operario hace el montaje (60 s por pieza) y la inspección (20 s por pieza). Entre el montaje
+  y la máquina hay un buffer de 5 piezas; la máquina tarda 45 s por pieza. En esta línea trabajan dos operarios. Simular 8
+  horas.

@@ -1,0 +1,7 @@
+id: C2
+family: C_MISSING_AMBIGUITY
+title: Transport without distance
+purpose: Operator carries racks; no distance, speed, load/unload.
+text: Hay 3 bastidores. El operario monta cada bastidor en 120 s y luego lo lleva él mismo hasta la selectiva. Antes de la
+  selectiva hay un buffer donde caben 3 bastidores. La selectiva tarda 20 s por bastidor. Después el mismo operario revisa
+  el bastidor en 60 s y el bastidor vuelve libre al montaje en ese momento. Material ilimitado; simular 8 horas.

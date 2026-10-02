@@ -1,0 +1,758 @@
+{
+ "case": "A1",
+ "family": "A_PARAPHRASE",
+ "schema_valid": true,
+ "compiles": true,
+ "verifier_status": "EXECUTABLE",
+ "error": null,
+ "semantically_correct": false,
+ "wall_s": 0.014,
+ "interpreter": "offline-rules",
+ "draft": {
+  "model_name": "Machine → Machine 2 → Machine 3",
+  "horizon_value": null,
+  "horizon_unit": "h",
+  "supply": "infinite",
+  "interarrival": null,
+  "resources": [
+   {
+    "id": "operator_1",
+    "name": "Operario",
+    "kind": "operator",
+    "quantity": 1,
+    "walking_speed_m_s": null
+   }
+  ],
+  "steps": [
+   {
+    "id": "machine",
+    "name": "Machine",
+    "component": "machine",
+    "time": {
+     "dist": "constant",
+     "value": 60.0,
+     "low": null,
+     "mode": null,
+     "high": null,
+     "mean": null,
+     "std": null,
+     "unit": "s"
+    },
+    "capacity": null,
+    "resources": [
+     "operator_1"
+    ],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   },
+   {
+    "id": "buffer_1",
+    "name": "Buffer 1",
+    "component": "buffer",
+    "time": null,
+    "capacity": 5,
+    "resources": [],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   },
+   {
+    "id": "machine_2",
+    "name": "Machine 2",
+    "component": "machine",
+    "time": {
+     "dist": "constant",
+     "value": 45.0,
+     "low": null,
+     "mode": null,
+     "high": null,
+     "mean": null,
+     "std": null,
+     "unit": "s"
+    },
+    "capacity": null,
+    "resources": [],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   },
+   {
+    "id": "machine_3",
+    "name": "Machine 3",
+    "component": "machine",
+    "time": {
+     "dist": "constant",
+     "value": 20.0,
+     "low": null,
+     "mode": null,
+     "high": null,
+     "mean": null,
+     "std": null,
+     "unit": "s"
+    },
+    "capacity": null,
+    "resources": [
+     "operator_1"
+    ],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   }
+  ],
+  "policies": [],
+  "carrier_loops": [],
+  "experiments": [],
+  "missing_information": [],
+  "assumptions": [],
+  "confidence_notes": [
+   "Interpretado por el intérprete OFFLINE (reglas deterministas ES/EN)."
+  ],
+  "items": null,
+  "custom_rules": [],
+  "unparsed": [],
+  "layout_known": false
+ },
+ "model": {
+  "isms_version": "0.1",
+  "meta": {
+   "name": "Machine → Machine 2 → Machine 3",
+   "description": "Línea con suministro ilimitado de piezas. Estación 1: montaje manual, tiempo de ciclo 60 s/pieza, realizado por un operario. A continuación, buffer intermedio de capacidad 5 unidades. Estación 2: máquina automática con tiempo de ciclo 45 s/pieza. Estación 3: inspección final de 20 s/pieza, realizada por el mismo operario de la estación 1. Horizonte de simulación: 8 horas.",
+   "tags": [],
+   "domain": null,
+   "origin": "ai_generated",
+   "generated_by": {
+    "interpreter": "offline-rules",
+    "prompt_version": "offline_rules_v2",
+    "compiler": "compiler_v2",
+    "prototype_mode": false,
+    "at": "2026-10-02T06:00:13+00:00"
+   }
+  },
+  "simulation": {
+   "horizon": {
+    "value": 8.0,
+    "unit": "h",
+    "provenance": {
+     "status": "assumed",
+     "source": null,
+     "note": "default 8 h",
+     "timestamp": null
+    }
+   },
+   "warmup": {
+    "value": 0.0,
+    "unit": "s",
+    "provenance": null
+   },
+   "kind": "terminating",
+   "replications": 1,
+   "base_seed": 12345,
+   "trace": false,
+   "dispatch_timing": "end_of_timestep",
+   "check_invariants": true
+  },
+  "entities": [
+   {
+    "id": "unit",
+    "name": "Unit",
+    "description": ""
+   }
+  ],
+  "parameters": [
+   {
+    "id": "machine_time",
+    "value": 60.0,
+    "unit": "s",
+    "description": "Tiempo de 'Machine'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "buffer_1_capacity",
+    "value": 5.0,
+    "unit": "units",
+    "description": "Capacidad de 'Buffer 1'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "machine_2_time",
+    "value": 45.0,
+    "unit": "s",
+    "description": "Tiempo de 'Machine 2'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "machine_3_time",
+    "value": 20.0,
+    "unit": "s",
+    "description": "Tiempo de 'Machine 3'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "operator_1_count",
+    "value": 1.0,
+    "unit": "units",
+    "description": "Número de Operario",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   }
+  ],
+  "resources": [
+   {
+    "id": "operator_1",
+    "name": "Operario",
+    "kind": "operator",
+    "quantity": "$operator_1_count",
+    "dispatch": "fifo",
+    "wip_target": null,
+    "travel": null,
+    "home": null,
+    "cost_per_hour": null,
+    "provenance": null
+   }
+  ],
+  "nodes": [
+   {
+    "id": "source",
+    "name": "Source",
+    "component": "source",
+    "component_version": null,
+    "params": {
+     "arrival": "infinite"
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "machine",
+    "name": "Machine",
+    "component": "machine",
+    "component_version": "1.0.0",
+    "params": {
+     "process_time": {
+      "dist": "constant",
+      "unit": "s",
+      "value": "$machine_time"
+     },
+     "resources": [
+      {
+       "resource": "operator_1"
+      }
+     ]
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "buffer_1",
+    "name": "Buffer 1",
+    "component": "buffer",
+    "component_version": "1.0.0",
+    "params": {
+     "capacity": "$buffer_1_capacity"
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "machine_2",
+    "name": "Machine 2",
+    "component": "machine",
+    "component_version": "1.0.0",
+    "params": {
+     "process_time": {
+      "dist": "constant",
+      "unit": "s",
+      "value": "$machine_2_time"
+     }
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "machine_3",
+    "name": "Machine 3",
+    "component": "machine",
+    "component_version": "1.0.0",
+    "params": {
+     "process_time": {
+      "dist": "constant",
+      "unit": "s",
+      "value": "$machine_3_time"
+     },
+     "resources": [
+      {
+       "resource": "operator_1"
+      }
+     ]
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "sink",
+    "name": "Sink",
+    "component": "sink",
+    "component_version": null,
+    "params": {},
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   }
+  ],
+  "edges": [
+   {
+    "source": "source",
+    "target": "machine",
+    "probability": null
+   },
+   {
+    "source": "machine",
+    "target": "buffer_1",
+    "probability": null
+   },
+   {
+    "source": "buffer_1",
+    "target": "machine_2",
+    "probability": null
+   },
+   {
+    "source": "machine_2",
+    "target": "machine_3",
+    "probability": null
+   },
+   {
+    "source": "machine_3",
+    "target": "sink",
+    "probability": null
+   }
+  ],
+  "assumptions": [
+   {
+    "id": "a1",
+    "text": "Los desplazamientos del operario entre puestos no se modelan (no se indicaron distancias).",
+    "path": "resources",
+    "origin": "ai",
+    "accepted": false
+   },
+   {
+    "id": "a2",
+    "text": "'Operario' es compartido por Machine, Machine 3: se asume FIFO (atiende la petición más antigua).",
+    "path": "resources.operator_1.dispatch",
+    "origin": "ai",
+    "accepted": false
+   },
+   {
+    "id": "a3",
+    "text": "Horizonte de simulación de 8 h (no se indicó).",
+    "path": "simulation.horizon",
+    "origin": "ai",
+    "accepted": false
+   }
+  ],
+  "missing": [
+   {
+    "question": "'Operario' hace Machine, Machine 3. Cuando varias tareas le requieren a la vez, ¿cuál tiene prioridad? (p.ej. mantener alimentada la máquina / vaciar primero la inspección / FIFO)",
+    "path": "resources.operator_1.dispatch",
+    "required": false
+   }
+  ],
+  "approval": {
+   "approved": false,
+   "by": null,
+   "at": null,
+   "model_hash": null,
+   "note": ""
+  },
+  "experiments": [],
+  "custom_rule_candidates": []
+ },
+ "questions": [
+  "'Operario' hace Machine, Machine 3. Cuando varias tareas le requieren a la vez, ¿cuál tiene prioridad? (p.ej. mantener alimentada la máquina / vaciar primero la inspección / FIFO)"
+ ],
+ "assumptions": [
+  "Los desplazamientos del operario entre puestos no se modelan (no se indicaron distancias).",
+  "'Operario' es compartido por Machine, Machine 3: se asume FIFO (atiende la petición más antigua).",
+  "Horizonte de simulación de 8 h (no se indicó)."
+ ],
+ "custom_rules": [],
+ "unparsed": [],
+ "confidence_notes_dropped_by_compiler": [
+  "Interpretado por el intérprete OFFLINE (reglas deterministas ES/EN)."
+ ],
+ "evaluation": {
+  "case": "A1",
+  "results": [
+   {
+    "case": "A1",
+    "req": "A1-R01",
+    "kind": "flow",
+    "metric": "TOPOLOGY",
+    "description": "topology in flow order",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "steps in order (wrong components counted separately: ['assembly', 'inspection'])",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "A1",
+    "req": "A1-R02",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "assembly -> accepted library component",
+    "status": "WRONG",
+    "error_type": "COMPONENT_MATCH_ERROR",
+    "severity": "CRITICAL",
+    "detail": "step present as 'machine' (machine); expected one of ['manual_assembly', 'manual_process']",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "A1",
+    "req": "A1-R03",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "buffer -> accepted library component",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "buffer_1 = buffer",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "A1",
+    "req": "A1-R04",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "machine -> accepted library component",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "machine_2 = machine",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "A1",
+    "req": "A1-R05",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "inspection -> accepted library component",
+    "status": "WRONG",
+    "error_type": "COMPONENT_MATCH_ERROR",
+    "severity": "CRITICAL",
+    "detail": "step present as 'machine' (machine_3); expected one of ['inspection']",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "A1",
+    "req": "A1-R06",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "assembly 60 s/piece",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "machine: 60.0 s x 1 = 60.0 s per entity",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "A1",
+    "req": "A1-R07",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "buffer capacity 5",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "buffer_1: 5.0",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "A1",
+    "req": "A1-R08",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "machine 45 s/piece",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "machine_2: 45.0 s x 1 = 45.0 s per entity",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "A1",
+    "req": "A1-R09",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "inspection 20 s/piece",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "machine_3: 20.0 s x 1 = 20.0 s per entity",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "A1",
+    "req": "A1-R10",
+    "kind": "shared_resource",
+    "metric": "RESOURCE_ASSIGNMENT",
+    "description": "same operator assembles and inspects",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "['operator_1', 'operator_1']",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "A1",
+    "req": "A1-R11",
+    "kind": "no_resource",
+    "metric": "RESOURCE_ASSIGNMENT",
+    "description": "machine is automatic (no operator)",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "A1",
+    "req": "A1-R12",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "one operator",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "machine: 1.0",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "A1",
+    "req": "A1-R13",
+    "kind": "strategy",
+    "metric": "STRATEGY",
+    "description": "operator priority NOT stated: no invented rule (FIFO only as visible assumption or question)",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "fifo + «'Operario' hace Machine, Machine 3. Cuando varias tareas le requieren a la vez, ¿cuál tiene priorida»",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "A1",
+    "req": "A1-R14",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "horizon 8 h",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "simulation.horizon: 28800.0",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "A1",
+    "req": "A1-R15",
+    "kind": "supply",
+    "metric": "PARAMETER_VALUE",
+    "description": "unlimited supply",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "infinite",
+    "evaluated": true,
+    "unit_sensitive": false
+   }
+  ],
+  "grounding": [
+   {
+    "parameter": "machine_time",
+    "value": 60.0,
+    "unit": "s",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "buffer_1_capacity",
+    "value": 5.0,
+    "unit": "units",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "machine_2_time",
+    "value": 45.0,
+    "unit": "s",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "machine_3_time",
+    "value": 20.0,
+    "unit": "s",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "operator_1_count",
+    "value": 1.0,
+    "unit": "units",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   }
+  ],
+  "role_map": {
+   "assembly": "machine",
+   "buffer": "buffer_1",
+   "machine": "machine_2",
+   "inspection": "machine_3",
+   "assembly(loose)": true,
+   "inspection(loose)": true
+  },
+  "semantically_correct": false
+ },
+ "llm_calls": [],
+ "repeat": 1,
+ "signature": {
+  "topology": [
+   "source",
+   "machine",
+   "buffer",
+   "machine",
+   "machine",
+   "sink"
+  ],
+  "components": {
+   "assembly": "machine",
+   "buffer": "buffer",
+   "machine": "machine",
+   "inspection": "machine"
+  },
+  "loose_roles": [
+   "assembly",
+   "inspection"
+  ],
+  "requirements": {
+   "A1-R01": "CORRECT",
+   "A1-R02": "WRONG",
+   "A1-R03": "CORRECT",
+   "A1-R04": "CORRECT",
+   "A1-R05": "WRONG",
+   "A1-R06": "CORRECT",
+   "A1-R07": "CORRECT",
+   "A1-R08": "CORRECT",
+   "A1-R09": "CORRECT",
+   "A1-R10": "CORRECT",
+   "A1-R11": "CORRECT",
+   "A1-R12": "CORRECT",
+   "A1-R13": "CORRECT",
+   "A1-R14": "CORRECT",
+   "A1-R15": "CORRECT"
+  },
+  "missing": [],
+  "assumption_paths": [
+   "resources",
+   "resources.operator_1.dispatch",
+   "simulation.horizon"
+  ],
+  "custom_rules": 0
+ }
+}

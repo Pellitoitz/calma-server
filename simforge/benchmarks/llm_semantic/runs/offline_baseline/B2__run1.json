@@ -1,0 +1,921 @@
+{
+ "case": "B2",
+ "family": "B_UNITS_BASIS",
+ "schema_valid": true,
+ "compiles": true,
+ "verifier_status": "INCOMPLETE",
+ "error": null,
+ "semantically_correct": false,
+ "wall_s": 0.007,
+ "interpreter": "offline-rules",
+ "draft": {
+  "model_name": "Screen printer → Pick and place → Reflow oven → Inspection",
+  "horizon_value": 8.0,
+  "horizon_unit": "h",
+  "supply": "unknown",
+  "interarrival": null,
+  "resources": [],
+  "steps": [
+   {
+    "id": "screen_printer",
+    "name": "Screen printer",
+    "component": "screen_printer",
+    "time": {
+     "dist": "constant",
+     "value": 2.0,
+     "low": null,
+     "mode": null,
+     "high": null,
+     "mean": null,
+     "std": null,
+     "unit": "min"
+    },
+    "capacity": null,
+    "resources": [],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   },
+   {
+    "id": "pick_and_place",
+    "name": "Pick and place",
+    "component": "pick_and_place",
+    "time": {
+     "dist": "constant",
+     "value": 15.0,
+     "low": null,
+     "mode": null,
+     "high": null,
+     "mean": null,
+     "std": null,
+     "unit": "s"
+    },
+    "capacity": null,
+    "resources": [],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   },
+   {
+    "id": "reflow",
+    "name": "Reflow oven",
+    "component": "reflow",
+    "time": {
+     "dist": "constant",
+     "value": 4.0,
+     "low": null,
+     "mode": null,
+     "high": null,
+     "mean": null,
+     "std": null,
+     "unit": "min"
+    },
+    "capacity": null,
+    "resources": [],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   },
+   {
+    "id": "inspection",
+    "name": "Inspection",
+    "component": "inspection",
+    "time": null,
+    "capacity": null,
+    "resources": [],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   },
+   {
+    "id": "buffer_1",
+    "name": "Buffer 1",
+    "component": "buffer",
+    "time": null,
+    "capacity": 2,
+    "resources": [],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   }
+  ],
+  "policies": [],
+  "carrier_loops": [],
+  "experiments": [],
+  "missing_information": [],
+  "assumptions": [],
+  "confidence_notes": [
+   "Interpretado por el intérprete OFFLINE (reglas deterministas ES/EN)."
+  ],
+  "items": null,
+  "custom_rules": [],
+  "unparsed": [
+   "Fabricamos paneles de 6 placas",
+   "Todas son máquinas automáticas",
+   "Material ilimitado"
+  ],
+  "layout_known": false
+ },
+ "model": {
+  "isms_version": "0.1",
+  "meta": {
+   "name": "Screen printer → Pick and place → Reflow oven → Inspection",
+   "description": "Fabricamos paneles de 6 placas. La serigrafía imprime un panel en 2 minutos. La pick and place coloca los componentes a razón de 15 segundos por placa. El horno de reflow tarda 4 min por panel. La AOI inspecciona cada placa en 1500 ms. Entre cada máquina y la siguiente hay un buffer de 2 paneles. Todas son máquinas automáticas. Material ilimitado; simular 8 h.",
+   "tags": [],
+   "domain": null,
+   "origin": "ai_generated",
+   "generated_by": {
+    "interpreter": "offline-rules",
+    "prompt_version": "offline_rules_v2",
+    "compiler": "compiler_v2",
+    "prototype_mode": false,
+    "at": "2026-10-02T06:00:13+00:00"
+   }
+  },
+  "simulation": {
+   "horizon": {
+    "value": 8.0,
+    "unit": "h",
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": null
+    }
+   },
+   "warmup": {
+    "value": 0.0,
+    "unit": "s",
+    "provenance": null
+   },
+   "kind": "terminating",
+   "replications": 1,
+   "base_seed": 12345,
+   "trace": false,
+   "dispatch_timing": "end_of_timestep",
+   "check_invariants": true
+  },
+  "entities": [
+   {
+    "id": "unit",
+    "name": "Unit",
+    "description": ""
+   }
+  ],
+  "parameters": [
+   {
+    "id": "screen_printer_time",
+    "value": 2.0,
+    "unit": "min",
+    "description": "Tiempo de 'Screen printer'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "pick_and_place_time",
+    "value": 15.0,
+    "unit": "s",
+    "description": "Tiempo de 'Pick and place'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "reflow_time",
+    "value": 4.0,
+    "unit": "min",
+    "description": "Tiempo de 'Reflow oven'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "inspection_time",
+    "value": null,
+    "unit": "s",
+    "description": "Tiempo de proceso de 'Inspection'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": null
+   },
+   {
+    "id": "buffer_1_capacity",
+    "value": 2.0,
+    "unit": "units",
+    "description": "Capacidad de 'Buffer 1'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   }
+  ],
+  "resources": [],
+  "nodes": [
+   {
+    "id": "source",
+    "name": "Source",
+    "component": "source",
+    "component_version": null,
+    "params": {
+     "arrival": "infinite"
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "screen_printer",
+    "name": "Screen printer",
+    "component": "screen_printer",
+    "component_version": "1.0.0",
+    "params": {
+     "process_time": {
+      "dist": "constant",
+      "unit": "min",
+      "value": "$screen_printer_time"
+     }
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "pick_and_place",
+    "name": "Pick and place",
+    "component": "pick_and_place",
+    "component_version": "1.0.0",
+    "params": {
+     "process_time": {
+      "dist": "constant",
+      "unit": "s",
+      "value": "$pick_and_place_time"
+     }
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "reflow",
+    "name": "Reflow oven",
+    "component": "reflow",
+    "component_version": "1.0.0",
+    "params": {
+     "process_time": {
+      "dist": "constant",
+      "unit": "min",
+      "value": "$reflow_time"
+     }
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "inspection",
+    "name": "Inspection",
+    "component": "inspection",
+    "component_version": "1.0.0",
+    "params": {
+     "process_time": {
+      "dist": "constant",
+      "unit": "s",
+      "value": "$inspection_time"
+     }
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "buffer_1",
+    "name": "Buffer 1",
+    "component": "buffer",
+    "component_version": "1.0.0",
+    "params": {
+     "capacity": "$buffer_1_capacity"
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "sink",
+    "name": "Sink",
+    "component": "sink",
+    "component_version": null,
+    "params": {},
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   }
+  ],
+  "edges": [
+   {
+    "source": "source",
+    "target": "screen_printer",
+    "probability": null
+   },
+   {
+    "source": "screen_printer",
+    "target": "pick_and_place",
+    "probability": null
+   },
+   {
+    "source": "pick_and_place",
+    "target": "reflow",
+    "probability": null
+   },
+   {
+    "source": "reflow",
+    "target": "inspection",
+    "probability": null
+   },
+   {
+    "source": "inspection",
+    "target": "buffer_1",
+    "probability": null
+   },
+   {
+    "source": "buffer_1",
+    "target": "sink",
+    "probability": null
+   }
+  ],
+  "assumptions": [
+   {
+    "id": "a1",
+    "text": "Suministro infinito (la primera estación nunca espera material): no se indicó la llegada.",
+    "path": "nodes.source.params.arrival",
+    "origin": "ai",
+    "accepted": false
+   }
+  ],
+  "missing": [
+   {
+    "question": "No he usado esta frase: «Fabricamos paneles de 6 placas». Si describe algo del proceso, reformúlala o añádelo a mano.",
+    "path": null,
+    "required": false
+   },
+   {
+    "question": "No he usado esta frase: «Todas son máquinas automáticas». Si describe algo del proceso, reformúlala o añádelo a mano.",
+    "path": null,
+    "required": false
+   },
+   {
+    "question": "No he usado esta frase: «Material ilimitado». Si describe algo del proceso, reformúlala o añádelo a mano.",
+    "path": null,
+    "required": false
+   }
+  ],
+  "approval": {
+   "approved": false,
+   "by": null,
+   "at": null,
+   "model_hash": null,
+   "note": ""
+  },
+  "experiments": [],
+  "custom_rule_candidates": []
+ },
+ "questions": [
+  "Tiempo de proceso de 'Inspection' (s)",
+  "No he usado esta frase: «Fabricamos paneles de 6 placas». Si describe algo del proceso, reformúlala o añádelo a mano.",
+  "No he usado esta frase: «Todas son máquinas automáticas». Si describe algo del proceso, reformúlala o añádelo a mano.",
+  "No he usado esta frase: «Material ilimitado». Si describe algo del proceso, reformúlala o añádelo a mano."
+ ],
+ "assumptions": [
+  "Suministro infinito (la primera estación nunca espera material): no se indicó la llegada."
+ ],
+ "custom_rules": [],
+ "unparsed": [
+  "Fabricamos paneles de 6 placas",
+  "Todas son máquinas automáticas",
+  "Material ilimitado"
+ ],
+ "confidence_notes_dropped_by_compiler": [
+  "Interpretado por el intérprete OFFLINE (reglas deterministas ES/EN)."
+ ],
+ "evaluation": {
+  "case": "B2",
+  "results": [
+   {
+    "case": "B2",
+    "req": "B2-R01",
+    "kind": "flow",
+    "metric": "TOPOLOGY",
+    "description": "topology in flow order",
+    "status": "WRONG",
+    "error_type": "TOPOLOGY_ERROR",
+    "severity": "CRITICAL",
+    "detail": "missing roles ['buffer_2', 'buffer_3'] (flagged: []); order WRONG; extra nodes []",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B2",
+    "req": "B2-R02",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "printer -> accepted library component",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "screen_printer = screen_printer",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B2",
+    "req": "B2-R03",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "buffer_1 -> accepted library component",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "buffer_1 = buffer",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B2",
+    "req": "B2-R04",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "pnp -> accepted library component",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "pick_and_place = pick_and_place",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B2",
+    "req": "B2-R05",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "buffer_2 -> accepted library component",
+    "status": "OMITTED",
+    "error_type": "SILENT_OMISSION",
+    "severity": "CRITICAL",
+    "detail": "step not in the model and not flagged",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B2",
+    "req": "B2-R06",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "reflow -> accepted library component",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "reflow = reflow",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B2",
+    "req": "B2-R07",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "buffer_3 -> accepted library component",
+    "status": "OMITTED",
+    "error_type": "SILENT_OMISSION",
+    "severity": "CRITICAL",
+    "detail": "step not in the model and not flagged",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B2",
+    "req": "B2-R08",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "aoi -> accepted library component",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "inspection = inspection",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B2",
+    "req": "B2-R09",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "printer 2 min PER_PANEL",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "screen_printer: 120.0 s x 1 = 120.0 s per entity",
+    "evaluated": true,
+    "unit_sensitive": true
+   },
+   {
+    "case": "B2",
+    "req": "B2-R10",
+    "kind": "basis",
+    "metric": "SEMANTIC_BASIS",
+    "description": "printer per panel",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "per_entity (work_units=1)",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B2",
+    "req": "B2-R11",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "pick&place 15 s PER_BOARD",
+    "status": "WRONG",
+    "error_type": "SEMANTIC_BASIS_ERROR",
+    "severity": "CRITICAL",
+    "detail": "15.0 s x 1 = 15.0 s per entity; expected 90.0 (15.0 per_item, x6)",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B2",
+    "req": "B2-R12",
+    "kind": "basis",
+    "metric": "SEMANTIC_BASIS",
+    "description": "pick&place per board",
+    "status": "WRONG",
+    "error_type": "SEMANTIC_BASIS_ERROR",
+    "severity": "CRITICAL",
+    "detail": "expected per_item, model per_entity (work_units=1); time per entity CHANGED",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B2",
+    "req": "B2-R13",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "reflow 4 min PER_PANEL",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "reflow: 240.0 s x 1 = 240.0 s per entity",
+    "evaluated": true,
+    "unit_sensitive": true
+   },
+   {
+    "case": "B2",
+    "req": "B2-R14",
+    "kind": "basis",
+    "metric": "SEMANTIC_BASIS",
+    "description": "reflow per panel",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "per_entity (work_units=1)",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B2",
+    "req": "B2-R15",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "AOI 1500 ms PER_BOARD",
+    "status": "WRONG",
+    "error_type": "FALSE_MISSING",
+    "severity": "MINOR",
+    "detail": "inspection_time has no value although the text gives it",
+    "evaluated": true,
+    "unit_sensitive": true
+   },
+   {
+    "case": "B2",
+    "req": "B2-R16",
+    "kind": "basis",
+    "metric": "SEMANTIC_BASIS",
+    "description": "AOI per board",
+    "status": "WRONG",
+    "error_type": "SEMANTIC_BASIS_ERROR",
+    "severity": "CRITICAL",
+    "detail": "expected per_item, model per_entity (work_units=1); time per entity CHANGED",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B2",
+    "req": "B2-R17",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "6 boards per panel",
+    "status": "OMITTED",
+    "error_type": "SILENT_OMISSION",
+    "severity": "CRITICAL",
+    "detail": "NO_PARAM (-)",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B2",
+    "req": "B2-R18",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "buffer 1 = 2 panels",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "buffer_1: 2.0",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B2",
+    "req": "B2-R19",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "buffer 2 = 2 panels",
+    "status": "OMITTED",
+    "error_type": "SILENT_OMISSION",
+    "severity": "CRITICAL",
+    "detail": "NO_NODE (role 'buffer_2' not found in the model)",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B2",
+    "req": "B2-R20",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "buffer 3 = 2 panels",
+    "status": "OMITTED",
+    "error_type": "SILENT_OMISSION",
+    "severity": "CRITICAL",
+    "detail": "NO_NODE (role 'buffer_3' not found in the model)",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B2",
+    "req": "B2-R21",
+    "kind": "no_resource",
+    "metric": "RESOURCE_ASSIGNMENT",
+    "description": "printer automatic",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B2",
+    "req": "B2-R22",
+    "kind": "no_resource",
+    "metric": "RESOURCE_ASSIGNMENT",
+    "description": "pnp automatic",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B2",
+    "req": "B2-R23",
+    "kind": "no_resource",
+    "metric": "RESOURCE_ASSIGNMENT",
+    "description": "reflow automatic",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B2",
+    "req": "B2-R24",
+    "kind": "no_resource",
+    "metric": "RESOURCE_ASSIGNMENT",
+    "description": "aoi automatic",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B2",
+    "req": "B2-R25",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "horizon 8 h",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "simulation.horizon: 28800.0",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B2",
+    "req": "B2-R26",
+    "kind": "supply",
+    "metric": "PARAMETER_VALUE",
+    "description": "unlimited supply",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "infinite",
+    "evaluated": true,
+    "unit_sensitive": false
+   }
+  ],
+  "grounding": [
+   {
+    "parameter": "screen_printer_time",
+    "value": 2.0,
+    "unit": "min",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "pick_and_place_time",
+    "value": 15.0,
+    "unit": "s",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "reflow_time",
+    "value": 4.0,
+    "unit": "min",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "inspection_time",
+    "value": null,
+    "unit": "s",
+    "status": "MISSING",
+    "grounded": null,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "buffer_1_capacity",
+    "value": 2.0,
+    "unit": "units",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   }
+  ],
+  "role_map": {
+   "printer": "screen_printer",
+   "buffer_1": "buffer_1",
+   "pnp": "pick_and_place",
+   "buffer_2": null,
+   "reflow": "reflow",
+   "buffer_3": null,
+   "aoi": "inspection"
+  },
+  "semantically_correct": false
+ },
+ "llm_calls": [],
+ "repeat": 1,
+ "signature": {
+  "topology": [
+   "source",
+   "screen_printer",
+   "pick_and_place",
+   "reflow",
+   "inspection",
+   "buffer",
+   "sink"
+  ],
+  "components": {
+   "printer": "screen_printer",
+   "buffer_1": "buffer",
+   "pnp": "pick_and_place",
+   "buffer_2": null,
+   "reflow": "reflow",
+   "buffer_3": null,
+   "aoi": "inspection"
+  },
+  "loose_roles": [],
+  "requirements": {
+   "B2-R01": "WRONG",
+   "B2-R02": "CORRECT",
+   "B2-R03": "CORRECT",
+   "B2-R04": "CORRECT",
+   "B2-R05": "OMITTED",
+   "B2-R06": "CORRECT",
+   "B2-R07": "OMITTED",
+   "B2-R08": "CORRECT",
+   "B2-R09": "CORRECT",
+   "B2-R10": "CORRECT",
+   "B2-R11": "WRONG",
+   "B2-R12": "WRONG",
+   "B2-R13": "CORRECT",
+   "B2-R14": "CORRECT",
+   "B2-R15": "WRONG",
+   "B2-R16": "WRONG",
+   "B2-R17": "OMITTED",
+   "B2-R18": "CORRECT",
+   "B2-R19": "OMITTED",
+   "B2-R20": "OMITTED",
+   "B2-R21": "CORRECT",
+   "B2-R22": "CORRECT",
+   "B2-R23": "CORRECT",
+   "B2-R24": "CORRECT",
+   "B2-R25": "CORRECT",
+   "B2-R26": "CORRECT"
+  },
+  "missing": [
+   [
+    "aoi",
+    "process_time"
+   ]
+  ],
+  "assumption_paths": [
+   "nodes.source.params.arrival"
+  ],
+  "custom_rules": 0
+ }
+}

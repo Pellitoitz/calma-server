@@ -1,0 +1,149 @@
+id: F2
+gold_source: examples/04_rework_routing.yaml (manual)
+gold_status: VALID
+roles:
+- role: queue
+  accept:
+  - buffer
+  keywords:
+  - buffer
+  - cola
+  - pulmon
+  - estanteria
+  - queue
+  - almacen
+- role: aoi
+  accept:
+  - aoi
+  - inspection
+  keywords:
+  - aoi
+  - optica
+- role: rework
+  accept:
+  - rework
+  keywords:
+  - repar
+  - rework
+  - retrabajo
+- role: queue_a
+  accept:
+  - buffer
+  keywords:
+  - buffer
+  - cola
+  - pulmon
+  - estanteria
+  - queue
+  - almacen
+- role: test_a
+  accept:
+  - test_station
+  - functional_test
+  keywords:
+  - test
+  - prueba
+  - banco
+- role: queue_b
+  accept:
+  - buffer
+  keywords:
+  - buffer
+  - cola
+  - pulmon
+  - estanteria
+  - queue
+  - almacen
+- role: test_b
+  accept:
+  - test_station
+  - functional_test
+  keywords:
+  - test
+  - prueba
+  - banco
+requirements:
+- kind: supply
+  expect: interarrival
+  description: random arrivals
+  id: F2-R01
+- kind: distribution
+  field: interarrival
+  expect:
+    dist: exponential
+    mean: 60
+  description: exp(60 s)
+  id: F2-R02
+- kind: component
+  role: aoi
+  description: aoi -> accepted library component
+  id: F2-R03
+- kind: value
+  role: aoi
+  field: process_time
+  expect: 30
+  description: AOI 30 s
+  id: F2-R04
+- kind: value
+  role: aoi
+  field: yield_rate
+  expect: 0.9
+  description: 90 % good
+  id: F2-R05
+- kind: unsupported
+  keywords:
+  - repar
+  - vuelven
+  - cola
+  - fallan
+  min_hits: 2
+  approximation_check: false
+  description: 'rework loop back to the AOI queue: modelled correctly or flagged as not representable'
+  id: F2-R06
+- kind: routing
+  from: aoi
+  to:
+    queue_a: 0.6
+    queue_b: 0.4
+  keywords:
+  - 60 %
+  - 40 %
+  - linea a
+  - linea b
+  - linea de test
+  description: '60/40 split: modelled or flagged, never linearised silently'
+  id: F2-R07
+- kind: distribution
+  role: test_a
+  field: process_time
+  expect:
+    dist: uniform
+    low: 60
+    high: 90
+  description: test A U(60,90)
+  id: F2-R08
+- kind: distribution
+  role: test_b
+  field: process_time
+  expect:
+    dist: uniform
+    low: 80
+    high: 110
+  description: test B U(80,110)
+  id: F2-R09
+- kind: distribution
+  role: rework
+  field: process_time
+  expect:
+    dist: triangular
+    low: 60
+    mode: 90
+    high: 180
+  description: rework TRI(60,90,180)
+  id: F2-R10
+- kind: value
+  target: horizon
+  expect: 28800
+  description: horizon 8 h
+  severity: MAJOR
+  id: F2-R11

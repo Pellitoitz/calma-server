@@ -1,0 +1,6 @@
+id: C4
+family: C_MISSING_AMBIGUITY
+title: Missing time and capacity
+purpose: Inspection time and buffer capacity absent.
+text: Fuente infinita. Un operario monta cada pieza en 50 segundos. Después del montaje hay un buffer. Una máquina procesa
+  cada pieza en 40 segundos. Después pasa por inspección, que también hace el mismo operario. Simular 8 horas.

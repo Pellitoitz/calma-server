@@ -1,0 +1,72 @@
+{
+ "frozen_at": "2026-10-02T05:56:00+00:00",
+ "commit": "cae03a9ebdf9162a0f24b7fce2a36cc8499ec851",
+ "process_parser_version": "process_parser_v1",
+ "compiler_version": "compiler_v2",
+ "isms_version": "0.1",
+ "engine_version": "0.3.0",
+ "library_version": {
+  "components": {
+   "aoi": "1.0.0",
+   "buffer": "1.0.0",
+   "cleaning": "1.0.0",
+   "coating": "1.0.0",
+   "functional_test": "1.0.0",
+   "ict": "1.0.0",
+   "inspection": "1.0.0",
+   "machine": "1.0.0",
+   "manual_assembly": "1.0.0",
+   "manual_insertion": "1.0.0",
+   "manual_process": "1.0.0",
+   "packaging": "1.0.0",
+   "pick_and_place": "1.0.0",
+   "rack_transport": "1.0.0",
+   "reflow": "1.0.0",
+   "rework": "1.0.0",
+   "router": "1.0.0",
+   "screen_printer": "1.0.0",
+   "selective_soldering": "1.0.0",
+   "sink": "1.0.0",
+   "source": "1.0.0",
+   "spi": "1.0.0",
+   "test_station": "1.0.0",
+   "transport": "1.0.0",
+   "transport_delay": "1.0.0",
+   "wave_soldering": "1.0.0"
+  },
+  "content_hash": "113651d59b39991a"
+ },
+ "rules_library_version": {
+  "rules": {
+   "shared_operator": "1.0.0",
+   "carrier": "1.0.0",
+   "fifo": "1.0.0",
+   "static_priority": "1.0.0",
+   "wip_target_priority": "1.0.0"
+  },
+  "content_hash": "c1fa3e27bf29429b"
+ },
+ "anthropic_sdk_version": "1.9.0",
+ "python": "3.11.15",
+ "default_claude_model": "claude-opus-5-5",
+ "files": {
+  "src/simforge/ai/prompts/process_parser_v1.txt": "d6435004512b3a436f4dfeb5a91a107c0b778b678ac94e9ed93171d59937a0a2",
+  "src/simforge/ai/prompts/__init__.py": "bd126ce0c81ccab4c2bb751dc5a90e3e33bf19e45e68258d0880b4172054d72f",
+  "src/simforge/ai/compiler.py": "a475abfb26f241686174ad394698ce0746818a33d18dca5b33bd2aa743ce11bd",
+  "src/simforge/ai/schemas.py": "319c984fa5b6b342b4a93a50fb5183aeef3823058ee785ab41ebf8798a5dd0b6",
+  "src/simforge/ai/interpreter.py": "35852f8a2d840cf5176406723c1b6d9f03b2e686b8fd069ae03a351babe94dfc",
+  "src/simforge/ai/context.py": "501d4377ad6ebeb4ce2bbadb9dc2f1f1519a7fa18c0b561e3104d5a8bdac06d5",
+  "src/simforge/ai/provider.py": "d7b5fb6333264f8fa1cc1b59316f58453e1f11f81d553e79bff3c4c0ccf04e25",
+  "src/simforge/ai/rule_based.py": "c253e48cf68251084888f651e3c5df339e9abfcc1864cb20ed54e077a9d0269c",
+  "src/simforge/library/registry.py": "b5ee1ce51ab7a5ce9c9f0aa2d7f176bac031016ec016f3f1de74b41407ccb167",
+  "src/simforge/validation/verifier.py": "4d451bd7b7b94d93b9fb44108054113c6efd441aa3be18edafab15594de805ba",
+  "src/simforge/domain/isms.py": "50c689e7f0d74f117e543f0c49755b46126b34c531adb3fffccd1c0d28c04f20",
+  "src/simforge/domain/expressions.py": "b0ff4082b32312998ea7a9b316f75c65108578c8a64a57427a749af67a860379",
+  "src/simforge/library/components/core.yaml": "cf3cf15757ce051e0d29db812994b0d6a10ee6746ef5e03b2f17264fa9990b57",
+  "src/simforge/library/components/electronics.yaml": "f001556b340d1af83f1d719db6d9972ead44943dc50ecfc21fbbd461453675a0",
+  "src/simforge/library/components/logistics.yaml": "4084f0987b61de16275e645c93a1166e7a4762eefd7b6c63c87ca52c56c9a3e1",
+  "src/simforge/library/components/manufacturing.yaml": "66661a76c96f9b13ff9b8a88bdeb435bcb7ee55d1e896f2533fd98e0d20291ac",
+  "src/simforge/library/rules/defaults.yaml": "44e9cf798b54c8b0e43f1cb96bc7f3efe10d7f1a8d32d808e71cd7b2ff7ac9d9",
+  "src/simforge/library/rules/rules.yaml": "941a11d3f3e65c7fee755cbff487a26cf2d0f676cdd139f033ad96b2dbbc69f1"
+ }
+}

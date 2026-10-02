@@ -1,0 +1,8 @@
+id: C3
+family: C_MISSING_AMBIGUITY
+title: WIP target without value
+purpose: Strategy stated, target not.
+text: Hay 3 bastidores. Un operario monta cada bastidor en 2 minutos. Los bastidores esperan en un buffer de 3 antes de la
+  selectiva, que tarda 40 s por bastidor. Luego el mismo operario revisa cada bastidor en 50 s y el bastidor vuelve libre
+  al montaje. Quiero que el operario mantenga alimentada la selectiva con una estrategia de WIP objetivo. Material ilimitado;
+  simular 8 horas.

@@ -1,0 +1,206 @@
+id: F1
+gold_source: 'selective model validated by hand (docs/diagnostics/selective_rack_anomaly.md: 1-rack cycle 235 s)'
+gold_status: VALID
+roles:
+- role: assembly
+  accept:
+  - manual_assembly
+  - manual_process
+  keywords:
+  - montaje
+  - monta
+  - assembl
+  - ensambl
+  - carga
+  - coloca
+- role: transport
+  accept:
+  - rack_transport
+  - transport
+  keywords:
+  - transport
+  - lleva
+  - traslad
+  - distancia
+  - carro
+- role: buffer
+  accept:
+  - buffer
+  keywords:
+  - buffer
+  - cola
+  - pulmon
+  - estanteria
+  - queue
+  - almacen
+- role: selective
+  accept:
+  - selective_soldering
+  keywords:
+  - selectiva
+  - selective
+- role: review
+  accept:
+  - inspection
+  - cleaning
+  keywords:
+  - revis
+  - inspecc
+  - limpi
+  - review
+requirements:
+- kind: flow
+  description: topology in flow order
+  id: F1-R01
+- kind: component
+  role: assembly
+  description: assembly -> accepted library component
+  id: F1-R02
+- kind: component
+  role: transport
+  description: transport -> accepted library component
+  id: F1-R03
+- kind: component
+  role: buffer
+  description: buffer -> accepted library component
+  id: F1-R04
+- kind: component
+  role: selective
+  description: selective -> accepted library component
+  id: F1-R05
+- kind: component
+  role: review
+  description: review -> accepted library component
+  id: F1-R06
+- kind: value
+  role: assembly
+  field: process_time
+  expect: 30
+  description: load 30 s PER_BOARD
+  per: per_item
+  items: 4
+  id: F1-R07
+- kind: basis
+  role: assembly
+  expect: per_item
+  description: assembly per board
+  id: F1-R08
+- kind: value
+  target: items_per_entity
+  expect: 4
+  description: 4 boards per rack
+  id: F1-R09
+- kind: value
+  role: transport
+  field: load_time
+  expect: 5
+  description: load 5 s
+  id: F1-R10
+- kind: value
+  role: transport
+  field: unload_time
+  expect: 5
+  description: unload 5 s
+  id: F1-R11
+- kind: value
+  target: distance
+  between:
+  - assembly
+  - buffer
+  expect: 10
+  description: 10 m
+  id: F1-R12
+- kind: value
+  target: distance
+  between:
+  - buffer
+  - review
+  expect: 5
+  description: 5 m
+  id: F1-R13
+- kind: value
+  target: walking_speed
+  expect: 1.2
+  description: 1.2 m/s
+  id: F1-R14
+- kind: value
+  role: buffer
+  field: capacity
+  expect: 3
+  description: 3 racks in front of the selective
+  id: F1-R15
+- kind: value
+  role: selective
+  field: process_time
+  expect: 20
+  description: selective 20 s PER_RACK
+  per: per_entity
+  items: 4
+  id: F1-R16
+- kind: basis
+  role: selective
+  expect: per_entity
+  description: selective per rack
+  id: F1-R17
+- kind: value
+  role: review
+  field: process_time
+  expect: 15
+  description: review+cleaning 15 s PER_BOARD
+  per: per_item
+  items: 4
+  id: F1-R18
+- kind: basis
+  role: review
+  expect: per_item
+  description: review per board
+  id: F1-R19
+- kind: value
+  target: carrier_quantity
+  expect: 3
+  description: 3 racks
+  id: F1-R20
+- kind: carrier
+  seize: assembly
+  release: review
+  return: immediate
+  description: rack loop, immediate return
+  id: F1-R21
+- kind: shared_resource
+  roles:
+  - assembly
+  - transport
+  - review
+  description: one operator does everything
+  id: F1-R22
+- kind: strategy
+  operator_of: assembly
+  rule: wip_target
+  protected: selective
+  description: keep the selective fed with a WIP target
+  id: F1-R23
+- kind: value
+  target: wip_target
+  expect: 2
+  description: target 2 racks ready
+  id: F1-R24
+- kind: strategy
+  operator_of: assembly
+  rule: wip_target
+  feeders:
+  - assembly
+  - transport
+  gold_status: GOLD_REQUIRES_ENGINEER_REVIEW
+  description: feeding tasks = assembly + transport
+  id: F1-R25
+- kind: value
+  target: horizon
+  expect: 28800
+  description: horizon 8 h
+  severity: MAJOR
+  id: F1-R26
+- kind: supply
+  expect: infinite
+  description: unlimited supply
+  severity: MAJOR
+  id: F1-R27

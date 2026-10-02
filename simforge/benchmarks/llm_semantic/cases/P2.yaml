@@ -1,0 +1,9 @@
+id: P2
+family: PERTURBATION
+title: B1 perturbed
+purpose: Order, synonyms, '0,5 min por circuito'.
+text: Simular 8 horas, con circuitos de sobra. Hay 3 bastidores de 4 circuitos cada uno. El operario coloca los circuitos
+  en el bastidor a 0,5 min por circuito; el bastidor ya montado espera en un buffer con sitio para 3 bastidores. La selectiva
+  suelda cada bastidor completo en 20 s. Luego ese mismo operario revisa los circuitos, 15 s por circuito, y en cuanto acaba
+  el bastidor vuelve libre al montaje.
+perturbation_of: B1

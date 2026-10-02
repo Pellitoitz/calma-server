@@ -1,0 +1,148 @@
+id: D4
+gold_source: explicit spec
+gold_status: VALID
+roles:
+- role: assembly
+  accept:
+  - manual_assembly
+  - manual_process
+  keywords:
+  - montaje
+  - monta
+  - assembl
+  - ensambl
+  - carga
+  - coloca
+- role: transport
+  accept:
+  - rack_transport
+  - transport
+  keywords:
+  - transport
+  - lleva
+  - traslad
+  - distancia
+  - carro
+- role: buffer
+  accept:
+  - buffer
+  keywords:
+  - buffer
+  - cola
+  - pulmon
+  - estanteria
+  - queue
+  - almacen
+- role: selective
+  accept:
+  - selective_soldering
+  keywords:
+  - selectiva
+  - selective
+- role: review
+  accept:
+  - inspection
+  - cleaning
+  keywords:
+  - revis
+  - inspecc
+  - limpi
+  - review
+requirements:
+- kind: flow
+  description: topology in flow order
+  id: D4-R01
+- kind: component
+  role: assembly
+  description: assembly -> accepted library component
+  id: D4-R02
+- kind: component
+  role: transport
+  description: transport -> accepted library component
+  id: D4-R03
+- kind: component
+  role: buffer
+  description: buffer -> accepted library component
+  id: D4-R04
+- kind: component
+  role: selective
+  description: selective -> accepted library component
+  id: D4-R05
+- kind: component
+  role: review
+  description: review -> accepted library component
+  id: D4-R06
+- kind: conflict
+  target: distance
+  between:
+  - assembly
+  - buffer
+  values:
+  - 8
+  - 12
+  description: 8 m vs 12 m -> ASK
+  id: D4-R07
+- kind: value
+  role: assembly
+  field: process_time
+  expect: 100
+  description: assembly 100 s
+  id: D4-R08
+- kind: value
+  role: transport
+  field: load_time
+  expect: 4
+  description: load 4 s
+  id: D4-R09
+- kind: value
+  role: transport
+  field: unload_time
+  expect: 4
+  description: unload 4 s
+  id: D4-R10
+- kind: value
+  target: walking_speed
+  expect: 1
+  description: 1 m/s
+  id: D4-R11
+- kind: value
+  role: buffer
+  field: capacity
+  expect: 3
+  description: buffer 3
+  id: D4-R12
+- kind: value
+  role: selective
+  field: process_time
+  expect: 30
+  description: selective 30 s
+  id: D4-R13
+- kind: value
+  role: review
+  field: process_time
+  expect: 50
+  description: review 50 s
+  id: D4-R14
+- kind: value
+  target: carrier_quantity
+  expect: 2
+  description: 2 racks
+  id: D4-R15
+- kind: shared_resource
+  roles:
+  - assembly
+  - transport
+  - review
+  description: same operator
+  id: D4-R16
+- kind: value
+  target: horizon
+  expect: 28800
+  description: horizon 8 h
+  severity: MAJOR
+  id: D4-R17
+- kind: supply
+  expect: infinite
+  description: unlimited supply
+  severity: MAJOR
+  id: D4-R18

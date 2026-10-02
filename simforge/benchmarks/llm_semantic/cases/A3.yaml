@@ -1,0 +1,7 @@
+id: A3
+family: A_PARAPHRASE
+title: Reordered information
+purpose: Same process, sentences in reverse/mixed order.
+text: Simula 8 horas. La inspección final dura 20 s por pieza y la hace el mismo operario que monta. Antes de la inspección
+  hay una máquina de 45 s por pieza, alimentada desde un buffer de 5 piezas. Ese buffer lo llena el montaje manual, que tarda
+  60 s por pieza y lo hace un operario. Al principio de la línea nunca falta material.

@@ -1,0 +1,165 @@
+{
+ "REAL_LLM_TEST": "BLOCKED_NO_API_KEY",
+ "freeze": {
+  "frozen_at": "2026-10-02T05:56:00+00:00",
+  "commit": "cae03a9ebdf9162a0f24b7fce2a36cc8499ec851",
+  "process_parser_version": "process_parser_v1",
+  "compiler_version": "compiler_v2",
+  "isms_version": "0.1",
+  "engine_version": "0.3.0",
+  "library_version": {
+   "components": {
+    "aoi": "1.0.0",
+    "buffer": "1.0.0",
+    "cleaning": "1.0.0",
+    "coating": "1.0.0",
+    "functional_test": "1.0.0",
+    "ict": "1.0.0",
+    "inspection": "1.0.0",
+    "machine": "1.0.0",
+    "manual_assembly": "1.0.0",
+    "manual_insertion": "1.0.0",
+    "manual_process": "1.0.0",
+    "packaging": "1.0.0",
+    "pick_and_place": "1.0.0",
+    "rack_transport": "1.0.0",
+    "reflow": "1.0.0",
+    "rework": "1.0.0",
+    "router": "1.0.0",
+    "screen_printer": "1.0.0",
+    "selective_soldering": "1.0.0",
+    "sink": "1.0.0",
+    "source": "1.0.0",
+    "spi": "1.0.0",
+    "test_station": "1.0.0",
+    "transport": "1.0.0",
+    "transport_delay": "1.0.0",
+    "wave_soldering": "1.0.0"
+   },
+   "content_hash": "113651d59b39991a"
+  },
+  "rules_library_version": {
+   "rules": {
+    "shared_operator": "1.0.0",
+    "carrier": "1.0.0",
+    "fifo": "1.0.0",
+    "static_priority": "1.0.0",
+    "wip_target_priority": "1.0.0"
+   },
+   "content_hash": "c1fa3e27bf29429b"
+  },
+  "anthropic_sdk_version": "1.9.0",
+  "python": "3.11.15",
+  "default_claude_model": "claude-opus-5-5"
+ },
+ "claude": [],
+ "non_claude_runs": [
+  {
+   "label": "offline_baseline",
+   "provider": "offline",
+   "model": "offline-rules",
+   "metrics": {
+    "SEMANTIC_REQUIREMENT_ACCURACY": {
+     "value": 0.6946,
+     "num": 257,
+     "den": 370
+    },
+    "SCHEMA_VALID_RATE": {
+     "value": 1.0,
+     "num": 24,
+     "den": 24
+    },
+    "COMPILE_RATE": {
+     "value": 1.0,
+     "num": 24,
+     "den": 24
+    },
+    "EXECUTABLE_RATE": {
+     "value": 0.3333,
+     "num": 8,
+     "den": 24
+    },
+    "SEMANTICALLY_CORRECT_RUNS": {
+     "value": 0.1667,
+     "num": 4,
+     "den": 24
+    },
+    "INVENTED_DATA_RATE": {
+     "value": 0.0,
+     "num": 0,
+     "den": 113
+    },
+    "SILENT_OMISSION_RATE": {
+     "value": 0.0919,
+     "num": 34,
+     "den": 370
+    },
+    "MISSING_DETECTION_RECALL": {
+     "value": 1.0,
+     "num": 7,
+     "den": 7
+    },
+    "AMBIGUITY_DETECTION_RATE": {
+     "value": 0.0,
+     "num": 0,
+     "den": 1
+    },
+    "CONFLICT_DETECTION_RATE": {
+     "value": 0.0,
+     "num": 0,
+     "den": 4
+    },
+    "UNSUPPORTED_RULE_DETECTION_RATE": {
+     "value": 0.6667,
+     "num": 4,
+     "den": 6
+    },
+    "COMPONENT_MATCH_ACCURACY": {
+     "value": 0.8469,
+     "num": 83,
+     "den": 98
+    },
+    "TOPOLOGY_ACCURACY": {
+     "value": 0.4091,
+     "num": 9,
+     "den": 22
+    },
+    "PARAMETER_VALUE_ACCURACY": {
+     "value": 0.6879,
+     "num": 119,
+     "den": 173
+    },
+    "UNIT_ACCURACY": {
+     "value": 0.4,
+     "num": 4,
+     "den": 10
+    },
+    "SEMANTIC_BASIS_ACCURACY": {
+     "value": 0.3571,
+     "num": 5,
+     "den": 14
+    },
+    "RESOURCE_ASSIGNMENT_ACCURACY": {
+     "value": 0.75,
+     "num": 21,
+     "den": 28
+    },
+    "STRATEGY_ACCURACY": {
+     "value": 0.6364,
+     "num": 7,
+     "den": 11
+    },
+    "CARRIER_SEMANTICS_ACCURACY": {
+     "value": 0.2,
+     "num": 1,
+     "den": 5
+    },
+    "ROUTING_ACCURACY": {
+     "value": 1.0,
+     "num": 1,
+     "den": 1
+    }
+   }
+  }
+ ]
+}

@@ -1,0 +1,7 @@
+id: D2
+family: D_CONTRADICTION
+title: Two assembly times
+purpose: Assembly 60 s and later 75 s.
+text: Fuente infinita. Un operario monta cada pieza en 60 segundos. Las piezas esperan en un buffer de 5. Una máquina las
+  procesa en 45 segundos. Después el mismo operario inspecciona cada pieza en 20 segundos. Por cierto, el montaje de cada
+  pieza lleva 75 segundos. Simular 8 horas.

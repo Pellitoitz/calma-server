@@ -1,0 +1,7 @@
+id: D1
+family: D_CONTRADICTION
+title: Buffer 5 vs 3
+purpose: Two incompatible capacities for the same buffer.
+text: 'Hay 4 bastidores. Un operario monta cada bastidor en 120 s. El buffer de entrada de la selectiva tiene capacidad para
+  5 bastidores. La selectiva tarda 30 s por bastidor. Después el mismo operario revisa el bastidor en 60 s y el bastidor vuelve
+  libre al montaje. Ojo: antes de la selectiva solo caben 3 bastidores. Material ilimitado; simular 8 horas.'

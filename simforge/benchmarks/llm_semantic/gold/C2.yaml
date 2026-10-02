@@ -1,0 +1,169 @@
+id: C2
+gold_source: explicit spec
+gold_status: VALID
+roles:
+- role: assembly
+  accept:
+  - manual_assembly
+  - manual_process
+  keywords:
+  - montaje
+  - monta
+  - assembl
+  - ensambl
+  - carga
+  - coloca
+- role: transport
+  accept:
+  - rack_transport
+  - transport
+  keywords:
+  - transport
+  - lleva
+  - traslad
+  - distancia
+  - carro
+- role: buffer
+  accept:
+  - buffer
+  keywords:
+  - buffer
+  - cola
+  - pulmon
+  - estanteria
+  - queue
+  - almacen
+- role: selective
+  accept:
+  - selective_soldering
+  keywords:
+  - selectiva
+  - selective
+- role: review
+  accept:
+  - inspection
+  - cleaning
+  keywords:
+  - revis
+  - inspecc
+  - limpi
+  - review
+requirements:
+- kind: flow
+  description: topology in flow order
+  id: C2-R01
+- kind: component
+  role: assembly
+  description: assembly -> accepted library component
+  id: C2-R02
+- kind: component
+  role: transport
+  description: transport -> accepted library component
+  id: C2-R03
+- kind: component
+  role: buffer
+  description: buffer -> accepted library component
+  id: C2-R04
+- kind: component
+  role: selective
+  description: selective -> accepted library component
+  id: C2-R05
+- kind: component
+  role: review
+  description: review -> accepted library component
+  id: C2-R06
+- kind: missing
+  target: distance
+  between:
+  - assembly
+  - buffer
+  keywords:
+  - distancia
+  - metros
+  - distance
+  description: distance assembly->selective not given -> MISSING
+  id: C2-R07
+- kind: missing
+  target: walking_speed
+  keywords:
+  - velocidad
+  - speed
+  description: walking speed not given -> MISSING
+  id: C2-R08
+- kind: missing
+  role: transport
+  field: load_time
+  keywords:
+  - carga
+  description: load time not given -> MISSING
+  id: C2-R09
+- kind: missing
+  role: transport
+  field: unload_time
+  keywords:
+  - descarga
+  description: unload time not given -> MISSING
+  id: C2-R10
+- kind: missing
+  target: distance
+  between:
+  - buffer
+  - review
+  keywords:
+  - distancia
+  gold_status: GOLD_REQUIRES_ENGINEER_REVIEW
+  description: 'walking distance to review: needed only if walking is modelled (engineer decides)'
+  id: C2-R11
+- kind: value
+  role: assembly
+  field: process_time
+  expect: 120
+  description: assembly 120 s per rack
+  id: C2-R12
+- kind: value
+  role: buffer
+  field: capacity
+  expect: 3
+  description: buffer 3
+  id: C2-R13
+- kind: value
+  role: selective
+  field: process_time
+  expect: 20
+  description: selective 20 s per rack
+  id: C2-R14
+- kind: value
+  role: review
+  field: process_time
+  expect: 60
+  description: review 60 s per rack
+  id: C2-R15
+- kind: value
+  target: carrier_quantity
+  expect: 3
+  description: 3 racks
+  id: C2-R16
+- kind: carrier
+  seize: assembly
+  release: review
+  return: immediate
+  description: rack loop
+  id: C2-R17
+- kind: shared_resource
+  roles:
+  - assembly
+  - transport
+  - review
+  description: same operator
+  id: C2-R18
+- kind: value
+  target: horizon
+  expect: 28800
+  description: horizon 8 h
+  severity: MAJOR
+  id: C2-R19
+- kind: supply
+  expect: infinite
+  description: unlimited supply
+  severity: MAJOR
+  id: C2-R20

@@ -1,0 +1,90 @@
+id: F4
+gold_source: explicit spec (deterministic variant of examples/03)
+gold_status: VALID
+roles:
+- role: press
+  accept:
+  - machine
+  keywords:
+  - prensa
+  - press
+  - estampa
+- role: buffer
+  accept:
+  - buffer
+  keywords:
+  - buffer
+  - cola
+  - pulmon
+  - estanteria
+  - queue
+  - almacen
+- role: test
+  accept:
+  - test_station
+  - functional_test
+  keywords:
+  - test
+  - prueba
+  - banco
+requirements:
+- kind: flow
+  description: topology in flow order
+  id: F4-R01
+- kind: component
+  role: press
+  description: press -> accepted library component
+  id: F4-R02
+- kind: component
+  role: buffer
+  description: buffer -> accepted library component
+  id: F4-R03
+- kind: component
+  role: test
+  description: test -> accepted library component
+  id: F4-R04
+- kind: value
+  role: press
+  field: process_time
+  expect: 55
+  description: press 55 s
+  id: F4-R05
+- kind: value
+  role: buffer
+  field: capacity
+  expect: 10
+  description: buffer 10
+  id: F4-R06
+- kind: value
+  role: test
+  field: process_time
+  expect: 50
+  description: test 50 s
+  id: F4-R07
+- kind: value
+  role: test
+  field: yield_rate
+  expect: 0.97
+  description: 3 % scrap
+  id: F4-R08
+- kind: unsupported
+  keywords:
+  - aver
+  - 2 horas
+  - 10 minutos
+  - repar
+  min_hits: 2
+  approximation_check: false
+  description: 'breakdowns MTBF 2 h / MTTR 10 min: modelled or flagged, never dropped'
+  id: F4-R09
+- kind: value
+  target: horizon
+  expect: 144000
+  description: 40 h
+  severity: MAJOR
+  id: F4-R10
+- kind: supply
+  expect: infinite
+  description: unlimited supply
+  severity: MAJOR
+  id: F4-R11

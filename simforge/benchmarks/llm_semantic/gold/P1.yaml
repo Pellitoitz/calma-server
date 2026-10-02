@@ -1,0 +1,118 @@
+id: P1
+gold_source: 'examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py).
+  Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one.'
+gold_status: VALID
+roles:
+- role: assembly
+  accept:
+  - manual_assembly
+  - manual_process
+  keywords:
+  - montaje
+  - monta
+  - assembl
+  - ensambl
+  - carga
+  - coloca
+- role: buffer
+  accept:
+  - buffer
+  keywords:
+  - buffer
+  - cola
+  - pulmon
+  - estanteria
+  - queue
+  - almacen
+- role: machine
+  accept:
+  - machine
+  keywords:
+  - maquina
+  - machine
+- role: inspection
+  accept:
+  - inspection
+  keywords:
+  - inspecc
+  - inspect
+  - revis
+requirements:
+- kind: flow
+  description: topology in flow order
+  id: P1-R01
+- kind: component
+  role: assembly
+  description: assembly -> accepted library component
+  id: P1-R02
+- kind: component
+  role: buffer
+  description: buffer -> accepted library component
+  id: P1-R03
+- kind: component
+  role: machine
+  description: machine -> accepted library component
+  id: P1-R04
+- kind: component
+  role: inspection
+  description: inspection -> accepted library component
+  id: P1-R05
+- kind: value
+  role: assembly
+  field: process_time
+  expect: 60
+  description: assembly 60 s/piece
+  raw: 1
+  unit_sensitive: true
+  id: P1-R06
+- kind: value
+  role: buffer
+  field: capacity
+  expect: 5
+  description: buffer capacity 5
+  id: P1-R07
+- kind: value
+  role: machine
+  field: process_time
+  expect: 45
+  description: machine 45 s/piece
+  id: P1-R08
+- kind: value
+  role: inspection
+  field: process_time
+  expect: 20
+  description: inspection 20 s/piece
+  id: P1-R09
+- kind: shared_resource
+  roles:
+  - assembly
+  - inspection
+  description: same operator assembles and inspects
+  id: P1-R10
+- kind: no_resource
+  role: machine
+  description: machine is automatic (no operator)
+  id: P1-R11
+- kind: value
+  role: assembly
+  field: operator_quantity
+  expect: 1
+  description: one operator
+  id: P1-R12
+- kind: strategy
+  operator_of: assembly
+  rule: unspecified
+  severity: MAJOR
+  description: 'operator priority NOT stated: no invented rule (FIFO only as visible assumption or question)'
+  id: P1-R13
+- kind: value
+  target: horizon
+  expect: 28800
+  description: horizon 8 h
+  severity: MAJOR
+  id: P1-R14
+- kind: supply
+  expect: infinite
+  description: unlimited supply
+  severity: MAJOR
+  id: P1-R15

@@ -1,0 +1,1460 @@
+{
+ "case": "B3",
+ "family": "B_UNITS_BASIS",
+ "schema_valid": true,
+ "compiles": true,
+ "verifier_status": "INCOMPLETE",
+ "error": null,
+ "semantically_correct": false,
+ "wall_s": 0.007,
+ "interpreter": "offline-rules",
+ "draft": {
+  "model_name": "Transporte 1 → Transporte 2 → Selective soldering → Inspection",
+  "horizon_value": 8.0,
+  "horizon_unit": "h",
+  "supply": "unknown",
+  "interarrival": null,
+  "resources": [
+   {
+    "id": "racks",
+    "name": "bastidores",
+    "kind": "carrier",
+    "quantity": 2,
+    "walking_speed_m_s": null
+   },
+   {
+    "id": "operator_1",
+    "name": "Operario",
+    "kind": "operator",
+    "quantity": 1,
+    "walking_speed_m_s": null
+   }
+  ],
+  "steps": [
+   {
+    "id": "transport_1",
+    "name": "Transporte 1",
+    "component": "rack_transport",
+    "time": null,
+    "capacity": null,
+    "resources": [
+     "operator_1"
+    ],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   },
+   {
+    "id": "transport_2",
+    "name": "Transporte 2",
+    "component": "rack_transport",
+    "time": null,
+    "capacity": null,
+    "resources": [],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": 3.0,
+    "unload_time_s": 3.0,
+    "units_per_trip": null
+   },
+   {
+    "id": "buffer_1",
+    "name": "Buffer 1",
+    "component": "buffer",
+    "time": null,
+    "capacity": 4,
+    "resources": [],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   },
+   {
+    "id": "selective_soldering",
+    "name": "Selective soldering",
+    "component": "selective_soldering",
+    "time": {
+     "dist": "constant",
+     "value": 40.0,
+     "low": null,
+     "mode": null,
+     "high": null,
+     "mean": null,
+     "std": null,
+     "unit": "s"
+    },
+    "capacity": null,
+    "resources": [],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   },
+   {
+    "id": "inspection",
+    "name": "Inspection",
+    "component": "inspection",
+    "time": {
+     "dist": "constant",
+     "value": 45.0,
+     "low": null,
+     "mode": null,
+     "high": null,
+     "mean": null,
+     "std": null,
+     "unit": "s"
+    },
+    "capacity": null,
+    "resources": [
+     "operator_1"
+    ],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   },
+   {
+    "id": "buffer_2",
+    "name": "Buffer 2",
+    "component": "buffer",
+    "time": null,
+    "capacity": null,
+    "resources": [],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   },
+   {
+    "id": "manual_assembly",
+    "name": "Manual assembly",
+    "component": "manual_assembly",
+    "time": null,
+    "capacity": null,
+    "resources": [],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   }
+  ],
+  "policies": [],
+  "carrier_loops": [
+   {
+    "resource": "racks",
+    "seize_at": "selective_soldering",
+    "release_at": "manual_assembly",
+    "return_mode": "immediate"
+   }
+  ],
+  "experiments": [],
+  "missing_information": [
+   {
+    "question": "¿Quién realiza 'Transporte 2'? (el operario u otro recurso)",
+    "required": false
+   }
+  ],
+  "assumptions": [
+   "Cada unidad toma un rack en 'Selective soldering' y lo libera al terminar 'Manual assembly'."
+  ],
+  "confidence_notes": [
+   "Interpretado por el intérprete OFFLINE (reglas deterministas ES/EN)."
+  ],
+  "items": null,
+  "custom_rules": [],
+  "unparsed": [
+   "Material ilimitado"
+  ],
+  "layout_known": false
+ },
+ "model": {
+  "isms_version": "0.1",
+  "meta": {
+   "name": "Transporte 1 → Transporte 2 → Selective soldering → Inspection",
+   "description": "Un operario monta cada bastidor en 2 min y lo lleva andando hasta el buffer de la selectiva, que está a 1250 cm del puesto de montaje. Cargar el bastidor en el carro le lleva 5 s y descargarlo 3 s. El operario camina a 0,9 m/s. En el buffer de la selectiva caben 4 bastidores. La selectiva tarda 40 s por bastidor. Después el mismo operario revisa el bastidor en 45 s; la mesa de revisión está a 3500 mm del buffer. Hay 2 bastidores en circulación y vuelven al montaje en cuanto termina la revisión. ",
+   "tags": [],
+   "domain": null,
+   "origin": "ai_generated",
+   "generated_by": {
+    "interpreter": "offline-rules",
+    "prompt_version": "offline_rules_v2",
+    "compiler": "compiler_v2",
+    "prototype_mode": false,
+    "at": "2026-10-02T06:00:13+00:00"
+   }
+  },
+  "simulation": {
+   "horizon": {
+    "value": 8.0,
+    "unit": "h",
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": null
+    }
+   },
+   "warmup": {
+    "value": 0.0,
+    "unit": "s",
+    "provenance": null
+   },
+   "kind": "terminating",
+   "replications": 1,
+   "base_seed": 12345,
+   "trace": false,
+   "dispatch_timing": "end_of_timestep",
+   "check_invariants": true
+  },
+  "entities": [
+   {
+    "id": "unit",
+    "name": "Unit",
+    "description": ""
+   }
+  ],
+  "parameters": [
+   {
+    "id": "transport_1_load_time",
+    "value": null,
+    "unit": "s",
+    "description": "Tiempo de carga en 'Transporte 1'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": null
+   },
+   {
+    "id": "transport_1_unload_time",
+    "value": null,
+    "unit": "s",
+    "description": "Tiempo de descarga en 'Transporte 1'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": null
+   },
+   {
+    "id": "transport_2_load_time",
+    "value": 3.0,
+    "unit": "s",
+    "description": "Tiempo de carga en 'Transporte 2'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "transport_2_unload_time",
+    "value": 3.0,
+    "unit": "s",
+    "description": "Tiempo de descarga en 'Transporte 2'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "buffer_1_capacity",
+    "value": 4.0,
+    "unit": "units",
+    "description": "Capacidad de 'Buffer 1'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "selective_soldering_time",
+    "value": 40.0,
+    "unit": "s",
+    "description": "Tiempo de 'Selective soldering'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "inspection_time",
+    "value": 45.0,
+    "unit": "s",
+    "description": "Tiempo de 'Inspection'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "buffer_2_capacity",
+    "value": null,
+    "unit": "units",
+    "description": "Capacidad de 'Buffer 2'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": null
+   },
+   {
+    "id": "manual_assembly_time",
+    "value": null,
+    "unit": "s",
+    "description": "Tiempo de proceso de 'Manual assembly'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": null
+   },
+   {
+    "id": "racks_count",
+    "value": 2.0,
+    "unit": "units",
+    "description": "Número de bastidores",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "operator_1_count",
+    "value": 1.0,
+    "unit": "units",
+    "description": "Número de Operario",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "dist_source_transport_1",
+    "value": null,
+    "unit": "m",
+    "description": "Distancia Source ↔ Transporte 1",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": null
+   },
+   {
+    "id": "dist_transport_1_transport_2",
+    "value": null,
+    "unit": "m",
+    "description": "Distancia Transporte 1 ↔ Transporte 2",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": null
+   },
+   {
+    "id": "dist_transport_2_buffer_1",
+    "value": null,
+    "unit": "m",
+    "description": "Distancia Transporte 2 ↔ Buffer 1",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": null
+   },
+   {
+    "id": "dist_buffer_1_inspection",
+    "value": null,
+    "unit": "m",
+    "description": "Distancia Buffer 1 ↔ Inspection",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": null
+   },
+   {
+    "id": "operator_walking_speed",
+    "value": null,
+    "unit": "m/s",
+    "description": "Velocidad del operario andando",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": null
+   }
+  ],
+  "resources": [
+   {
+    "id": "racks",
+    "name": "bastidores",
+    "kind": "carrier",
+    "quantity": "$racks_count",
+    "dispatch": "fifo",
+    "wip_target": null,
+    "travel": null,
+    "home": null,
+    "cost_per_hour": null,
+    "provenance": null
+   },
+   {
+    "id": "operator_1",
+    "name": "Operario",
+    "kind": "operator",
+    "quantity": "$operator_1_count",
+    "dispatch": "fifo",
+    "wip_target": null,
+    "travel": {
+     "speed": {
+      "value": "$operator_walking_speed",
+      "unit": "m/s",
+      "provenance": null
+     },
+     "metric": "euclidean",
+     "distances": [
+      {
+       "a": "source",
+       "b": "transport_1",
+       "distance": {
+        "value": "$dist_source_transport_1",
+        "unit": "m",
+        "provenance": null
+       }
+      },
+      {
+       "a": "source",
+       "b": "transport_2",
+       "distance": {
+        "value": "$dist_source_transport_1 + $dist_transport_1_transport_2",
+        "unit": "m",
+        "provenance": null
+       }
+      },
+      {
+       "a": "source",
+       "b": "buffer_1",
+       "distance": {
+        "value": "$dist_source_transport_1 + $dist_transport_1_transport_2 + $dist_transport_2_buffer_1",
+        "unit": "m",
+        "provenance": null
+       }
+      },
+      {
+       "a": "source",
+       "b": "inspection",
+       "distance": {
+        "value": "$dist_source_transport_1 + $dist_transport_1_transport_2 + $dist_transport_2_buffer_1 + $dist_buffer_1_inspection",
+        "unit": "m",
+        "provenance": null
+       }
+      },
+      {
+       "a": "transport_1",
+       "b": "transport_2",
+       "distance": {
+        "value": "$dist_transport_1_transport_2",
+        "unit": "m",
+        "provenance": null
+       }
+      },
+      {
+       "a": "transport_1",
+       "b": "buffer_1",
+       "distance": {
+        "value": "$dist_transport_1_transport_2 + $dist_transport_2_buffer_1",
+        "unit": "m",
+        "provenance": null
+       }
+      },
+      {
+       "a": "transport_1",
+       "b": "inspection",
+       "distance": {
+        "value": "$dist_transport_1_transport_2 + $dist_transport_2_buffer_1 + $dist_buffer_1_inspection",
+        "unit": "m",
+        "provenance": null
+       }
+      },
+      {
+       "a": "transport_2",
+       "b": "buffer_1",
+       "distance": {
+        "value": "$dist_transport_2_buffer_1",
+        "unit": "m",
+        "provenance": null
+       }
+      },
+      {
+       "a": "transport_2",
+       "b": "inspection",
+       "distance": {
+        "value": "$dist_transport_2_buffer_1 + $dist_buffer_1_inspection",
+        "unit": "m",
+        "provenance": null
+       }
+      },
+      {
+       "a": "buffer_1",
+       "b": "inspection",
+       "distance": {
+        "value": "$dist_buffer_1_inspection",
+        "unit": "m",
+        "provenance": null
+       }
+      }
+     ],
+     "locations": {}
+    },
+    "home": "transport_1",
+    "cost_per_hour": null,
+    "provenance": null
+   }
+  ],
+  "nodes": [
+   {
+    "id": "source",
+    "name": "Source",
+    "component": "source",
+    "component_version": null,
+    "params": {
+     "arrival": "infinite"
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "transport_1",
+    "name": "Transporte 1",
+    "component": "rack_transport",
+    "component_version": "1.0.0",
+    "params": {
+     "capacity": 1,
+     "load_time": {
+      "dist": "constant",
+      "unit": "s",
+      "value": "$transport_1_load_time"
+     },
+     "unload_time": {
+      "dist": "constant",
+      "unit": "s",
+      "value": "$transport_1_unload_time"
+     },
+     "reserve_destination": true,
+     "return_empty": false,
+     "resources": [
+      {
+       "resource": "operator_1"
+      }
+     ],
+     "origin": "source",
+     "destination": "transport_2",
+     "distance": {
+      "value": "$dist_source_transport_1 + $dist_transport_1_transport_2",
+      "unit": "m"
+     },
+     "speed": {
+      "value": "$operator_walking_speed",
+      "unit": "m/s"
+     }
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "transport_2",
+    "name": "Transporte 2",
+    "component": "rack_transport",
+    "component_version": "1.0.0",
+    "params": {
+     "capacity": 1,
+     "load_time": {
+      "dist": "constant",
+      "unit": "s",
+      "value": "$transport_2_load_time"
+     },
+     "unload_time": {
+      "dist": "constant",
+      "unit": "s",
+      "value": "$transport_2_unload_time"
+     },
+     "reserve_destination": true,
+     "return_empty": false,
+     "origin": "transport_1",
+     "destination": "buffer_1",
+     "distance": {
+      "value": "$dist_transport_1_transport_2 + $dist_transport_2_buffer_1",
+      "unit": "m"
+     },
+     "speed": {
+      "value": "$operator_walking_speed",
+      "unit": "m/s"
+     }
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "buffer_1",
+    "name": "Buffer 1",
+    "component": "buffer",
+    "component_version": "1.0.0",
+    "params": {
+     "capacity": "$buffer_1_capacity"
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "selective_soldering",
+    "name": "Selective soldering",
+    "component": "selective_soldering",
+    "component_version": "1.0.0",
+    "params": {
+     "process_time": {
+      "dist": "constant",
+      "unit": "s",
+      "value": "$selective_soldering_time"
+     }
+    },
+    "priority": 0,
+    "seize": [
+     {
+      "resource": "racks",
+      "quantity": 1
+     }
+    ],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "inspection",
+    "name": "Inspection",
+    "component": "inspection",
+    "component_version": "1.0.0",
+    "params": {
+     "process_time": {
+      "dist": "constant",
+      "unit": "s",
+      "value": "$inspection_time"
+     },
+     "resources": [
+      {
+       "resource": "operator_1"
+      }
+     ]
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "buffer_2",
+    "name": "Buffer 2",
+    "component": "buffer",
+    "component_version": "1.0.0",
+    "params": {
+     "capacity": "$buffer_2_capacity"
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "manual_assembly",
+    "name": "Manual assembly",
+    "component": "manual_assembly",
+    "component_version": "1.0.0",
+    "params": {
+     "process_time": {
+      "dist": "constant",
+      "unit": "s",
+      "value": "$manual_assembly_time"
+     }
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [
+     "racks"
+    ],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "sink",
+    "name": "Sink",
+    "component": "sink",
+    "component_version": null,
+    "params": {},
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   }
+  ],
+  "edges": [
+   {
+    "source": "source",
+    "target": "transport_1",
+    "probability": null
+   },
+   {
+    "source": "transport_1",
+    "target": "transport_2",
+    "probability": null
+   },
+   {
+    "source": "transport_2",
+    "target": "buffer_1",
+    "probability": null
+   },
+   {
+    "source": "buffer_1",
+    "target": "selective_soldering",
+    "probability": null
+   },
+   {
+    "source": "selective_soldering",
+    "target": "inspection",
+    "probability": null
+   },
+   {
+    "source": "inspection",
+    "target": "buffer_2",
+    "probability": null
+   },
+   {
+    "source": "buffer_2",
+    "target": "manual_assembly",
+    "probability": null
+   },
+   {
+    "source": "manual_assembly",
+    "target": "sink",
+    "probability": null
+   }
+  ],
+  "assumptions": [
+   {
+    "id": "a1",
+    "text": "Suministro infinito (la primera estación nunca espera material): no se indicó la llegada.",
+    "path": "nodes.source.params.arrival",
+    "origin": "ai",
+    "accepted": false
+   },
+   {
+    "id": "a2",
+    "text": "'Transporte 1': 1 unidad por viaje (no se indicó).",
+    "path": "nodes.transport_1.params.capacity",
+    "origin": "ai",
+    "accepted": false
+   },
+   {
+    "id": "a3",
+    "text": "'Transporte 1': el viaje empieza sólo cuando hay sitio en el destino (evita que el operario espere cargado).",
+    "path": "nodes.transport_1.params.reserve_destination",
+    "origin": "ai",
+    "accepted": false
+   },
+   {
+    "id": "a4",
+    "text": "'Transporte 2': 1 unidad por viaje (no se indicó).",
+    "path": "nodes.transport_2.params.capacity",
+    "origin": "ai",
+    "accepted": false
+   },
+   {
+    "id": "a5",
+    "text": "'Transporte 2': el viaje empieza sólo cuando hay sitio en el destino (evita que el operario espere cargado).",
+    "path": "nodes.transport_2.params.reserve_destination",
+    "origin": "ai",
+    "accepted": false
+   },
+   {
+    "id": "a6",
+    "text": "Layout lineal en el orden del flujo: la distancia entre dos puntos no consecutivos es la suma de los tramos.",
+    "path": "resources",
+    "origin": "ai",
+    "accepted": false
+   },
+   {
+    "id": "a7",
+    "text": "'Transporte 1': velocidad cargado = velocidad andando del operario.",
+    "path": "nodes.transport_1.params.speed",
+    "origin": "ai",
+    "accepted": false
+   },
+   {
+    "id": "a8",
+    "text": "'Transporte 2': velocidad cargado = velocidad andando del operario.",
+    "path": "nodes.transport_2.params.speed",
+    "origin": "ai",
+    "accepted": false
+   },
+   {
+    "id": "a9",
+    "text": "El operario empieza en 'Transporte 1'.",
+    "path": "resources.operator_1.home",
+    "origin": "ai",
+    "accepted": false
+   },
+   {
+    "id": "a10",
+    "text": "'Operario' es compartido por Transporte 1, Inspection: se asume FIFO (atiende la petición más antigua).",
+    "path": "resources.operator_1.dispatch",
+    "origin": "ai",
+    "accepted": false
+   },
+   {
+    "id": "a11",
+    "text": "Cada unidad toma un rack en 'Selective soldering' y lo libera al terminar 'Manual assembly'.",
+    "path": null,
+    "origin": "ai",
+    "accepted": false
+   }
+  ],
+  "missing": [
+   {
+    "question": "'Operario' hace Transporte 1, Inspection. Cuando varias tareas le requieren a la vez, ¿cuál tiene prioridad? (p.ej. mantener alimentada la máquina / vaciar primero la inspección / FIFO)",
+    "path": "resources.operator_1.dispatch",
+    "required": false
+   },
+   {
+    "question": "No he usado esta frase: «Material ilimitado». Si describe algo del proceso, reformúlala o añádelo a mano.",
+    "path": null,
+    "required": false
+   },
+   {
+    "question": "¿Quién realiza 'Transporte 2'? (el operario u otro recurso)",
+    "path": null,
+    "required": false
+   }
+  ],
+  "approval": {
+   "approved": false,
+   "by": null,
+   "at": null,
+   "model_hash": null,
+   "note": ""
+  },
+  "experiments": [],
+  "custom_rule_candidates": []
+ },
+ "questions": [
+  "Tiempo de carga en 'Transporte 1' (s)",
+  "Tiempo de descarga en 'Transporte 1' (s)",
+  "Capacidad de 'Buffer 2' (units)",
+  "Tiempo de proceso de 'Manual assembly' (s)",
+  "Distancia Source ↔ Transporte 1 (m)",
+  "Distancia Transporte 1 ↔ Transporte 2 (m)",
+  "Distancia Transporte 2 ↔ Buffer 1 (m)",
+  "Distancia Buffer 1 ↔ Inspection (m)",
+  "Velocidad del operario andando (m/s)",
+  "'Operario' hace Transporte 1, Inspection. Cuando varias tareas le requieren a la vez, ¿cuál tiene prioridad? (p.ej. mantener alimentada la máquina / vaciar primero la inspección / FIFO)",
+  "No he usado esta frase: «Material ilimitado». Si describe algo del proceso, reformúlala o añádelo a mano.",
+  "¿Quién realiza 'Transporte 2'? (el operario u otro recurso)"
+ ],
+ "assumptions": [
+  "Suministro infinito (la primera estación nunca espera material): no se indicó la llegada.",
+  "'Transporte 1': 1 unidad por viaje (no se indicó).",
+  "'Transporte 1': el viaje empieza sólo cuando hay sitio en el destino (evita que el operario espere cargado).",
+  "'Transporte 2': 1 unidad por viaje (no se indicó).",
+  "'Transporte 2': el viaje empieza sólo cuando hay sitio en el destino (evita que el operario espere cargado).",
+  "Layout lineal en el orden del flujo: la distancia entre dos puntos no consecutivos es la suma de los tramos.",
+  "'Transporte 1': velocidad cargado = velocidad andando del operario.",
+  "'Transporte 2': velocidad cargado = velocidad andando del operario.",
+  "El operario empieza en 'Transporte 1'.",
+  "'Operario' es compartido por Transporte 1, Inspection: se asume FIFO (atiende la petición más antigua).",
+  "Cada unidad toma un rack en 'Selective soldering' y lo libera al terminar 'Manual assembly'."
+ ],
+ "custom_rules": [],
+ "unparsed": [
+  "Material ilimitado"
+ ],
+ "confidence_notes_dropped_by_compiler": [
+  "Interpretado por el intérprete OFFLINE (reglas deterministas ES/EN)."
+ ],
+ "evaluation": {
+  "case": "B3",
+  "results": [
+   {
+    "case": "B3",
+    "req": "B3-R01",
+    "kind": "flow",
+    "metric": "TOPOLOGY",
+    "description": "topology in flow order",
+    "status": "WRONG",
+    "error_type": "TOPOLOGY_ERROR",
+    "severity": "CRITICAL",
+    "detail": "missing roles [] (flagged: []); order WRONG; extra nodes [('transport_2', 'rack_transport'), ('buffer_2', 'buffer')]",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B3",
+    "req": "B3-R02",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "assembly -> accepted library component",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "manual_assembly = manual_assembly",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B3",
+    "req": "B3-R03",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "transport -> accepted library component",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "transport_1 = rack_transport",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B3",
+    "req": "B3-R04",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "buffer -> accepted library component",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "buffer_1 = buffer",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B3",
+    "req": "B3-R05",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "selective -> accepted library component",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "selective_soldering = selective_soldering",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B3",
+    "req": "B3-R06",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "review -> accepted library component",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "inspection = inspection",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B3",
+    "req": "B3-R07",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "assembly 2 min per rack",
+    "status": "WRONG",
+    "error_type": "FALSE_MISSING",
+    "severity": "MINOR",
+    "detail": "manual_assembly_time has no value although the text gives it; asked «Tiempo de carga en 'Transporte 1' (s)»",
+    "evaluated": true,
+    "unit_sensitive": true
+   },
+   {
+    "case": "B3",
+    "req": "B3-R08",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "load 5 s",
+    "status": "WRONG",
+    "error_type": "FALSE_MISSING",
+    "severity": "MINOR",
+    "detail": "transport_1_load_time has no value although the text gives it; asked «Tiempo de carga en 'Transporte 1' (s)»",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B3",
+    "req": "B3-R09",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "unload 3 s",
+    "status": "WRONG",
+    "error_type": "FALSE_MISSING",
+    "severity": "MINOR",
+    "detail": "transport_1_unload_time has no value although the text gives it; asked «Tiempo de carga en 'Transporte 1' (s)»",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B3",
+    "req": "B3-R10",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "assembly->buffer 1250 cm = 12.5 m",
+    "status": "OMITTED",
+    "error_type": "SILENT_OMISSION",
+    "severity": "CRITICAL",
+    "detail": "NO_DISTANCE (no distance between the two roles)",
+    "evaluated": true,
+    "unit_sensitive": true
+   },
+   {
+    "case": "B3",
+    "req": "B3-R11",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "buffer->review 3500 mm = 3.5 m",
+    "status": "WRONG",
+    "error_type": "FALSE_MISSING",
+    "severity": "MINOR",
+    "detail": "dist_buffer_1_inspection has no value although the text gives it",
+    "evaluated": true,
+    "unit_sensitive": true
+   },
+   {
+    "case": "B3",
+    "req": "B3-R12",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "walking speed 0.9 m/s",
+    "status": "WRONG",
+    "error_type": "FALSE_MISSING",
+    "severity": "MINOR",
+    "detail": "operator_walking_speed has no value although the text gives it",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B3",
+    "req": "B3-R13",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "buffer 4 racks",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "buffer_1: 4.0",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B3",
+    "req": "B3-R14",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "selective 40 s per rack",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "selective_soldering: 40.0 s x 1 = 40.0 s per entity",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B3",
+    "req": "B3-R15",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "review 45 s per rack",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "inspection: 45.0 s x 1 = 45.0 s per entity",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B3",
+    "req": "B3-R16",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "2 racks",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "carrier: 2.0",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B3",
+    "req": "B3-R17",
+    "kind": "carrier",
+    "metric": "CARRIER_SEMANTICS",
+    "description": "rack loop",
+    "status": "WRONG",
+    "error_type": "CARRIER_SEMANTICS_ERROR",
+    "severity": "CRITICAL",
+    "detail": "seize ['selective_soldering'], release ['manual_assembly'], release_via []",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B3",
+    "req": "B3-R18",
+    "kind": "shared_resource",
+    "metric": "RESOURCE_ASSIGNMENT",
+    "description": "one operator: assembly, transport, review",
+    "status": "WRONG",
+    "error_type": "RESOURCE_ASSIGNMENT_ERROR",
+    "severity": "CRITICAL",
+    "detail": "roles ['assembly', 'transport', 'review'] -> operators [None, 'operator_1', 'operator_1']",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B3",
+    "req": "B3-R19",
+    "kind": "strategy",
+    "metric": "STRATEGY",
+    "description": "no rule invented",
+    "status": "WRONG",
+    "error_type": "STRATEGY_ERROR",
+    "severity": "MAJOR",
+    "detail": "no operator found",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B3",
+    "req": "B3-R20",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "horizon 8 h",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "simulation.horizon: 28800.0",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B3",
+    "req": "B3-R21",
+    "kind": "supply",
+    "metric": "PARAMETER_VALUE",
+    "description": "unlimited supply",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "infinite",
+    "evaluated": true,
+    "unit_sensitive": false
+   }
+  ],
+  "grounding": [
+   {
+    "parameter": "transport_1_load_time",
+    "value": null,
+    "unit": "s",
+    "status": "MISSING",
+    "grounded": null,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "transport_1_unload_time",
+    "value": null,
+    "unit": "s",
+    "status": "MISSING",
+    "grounded": null,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "transport_2_load_time",
+    "value": 3.0,
+    "unit": "s",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "transport_2_unload_time",
+    "value": 3.0,
+    "unit": "s",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "buffer_1_capacity",
+    "value": 4.0,
+    "unit": "units",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "selective_soldering_time",
+    "value": 40.0,
+    "unit": "s",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "inspection_time",
+    "value": 45.0,
+    "unit": "s",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "buffer_2_capacity",
+    "value": null,
+    "unit": "units",
+    "status": "MISSING",
+    "grounded": null,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "manual_assembly_time",
+    "value": null,
+    "unit": "s",
+    "status": "MISSING",
+    "grounded": null,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "racks_count",
+    "value": 2.0,
+    "unit": "units",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "operator_1_count",
+    "value": 1.0,
+    "unit": "units",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "dist_source_transport_1",
+    "value": null,
+    "unit": "m",
+    "status": "MISSING",
+    "grounded": null,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "dist_transport_1_transport_2",
+    "value": null,
+    "unit": "m",
+    "status": "MISSING",
+    "grounded": null,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "dist_transport_2_buffer_1",
+    "value": null,
+    "unit": "m",
+    "status": "MISSING",
+    "grounded": null,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "dist_buffer_1_inspection",
+    "value": null,
+    "unit": "m",
+    "status": "MISSING",
+    "grounded": null,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "operator_walking_speed",
+    "value": null,
+    "unit": "m/s",
+    "status": "MISSING",
+    "grounded": null,
+    "verdict": "OK"
+   }
+  ],
+  "role_map": {
+   "assembly": "manual_assembly",
+   "transport": "transport_1",
+   "buffer": "buffer_1",
+   "selective": "selective_soldering",
+   "review": "inspection"
+  },
+  "semantically_correct": false
+ },
+ "llm_calls": [],
+ "repeat": 1,
+ "signature": {
+  "topology": [
+   "source",
+   "rack_transport",
+   "rack_transport",
+   "buffer",
+   "selective_soldering",
+   "inspection",
+   "buffer",
+   "manual_assembly",
+   "sink"
+  ],
+  "components": {
+   "assembly": "manual_assembly",
+   "transport": "rack_transport",
+   "buffer": "buffer",
+   "selective": "selective_soldering",
+   "review": "inspection"
+  },
+  "loose_roles": [],
+  "requirements": {
+   "B3-R01": "WRONG",
+   "B3-R02": "CORRECT",
+   "B3-R03": "CORRECT",
+   "B3-R04": "CORRECT",
+   "B3-R05": "CORRECT",
+   "B3-R06": "CORRECT",
+   "B3-R07": "WRONG",
+   "B3-R08": "WRONG",
+   "B3-R09": "WRONG",
+   "B3-R10": "OMITTED",
+   "B3-R11": "WRONG",
+   "B3-R12": "WRONG",
+   "B3-R13": "CORRECT",
+   "B3-R14": "CORRECT",
+   "B3-R15": "CORRECT",
+   "B3-R16": "CORRECT",
+   "B3-R17": "WRONG",
+   "B3-R18": "WRONG",
+   "B3-R19": "WRONG",
+   "B3-R20": "CORRECT",
+   "B3-R21": "CORRECT"
+  },
+  "missing": [
+   [
+    "assembly",
+    "process_time"
+   ],
+   [
+    "buffer",
+    "capacity"
+   ],
+   [
+    "rack_transport",
+    "distance"
+   ],
+   [
+    "rack_transport",
+    "speed"
+   ],
+   [
+    "transport",
+    "distance"
+   ],
+   [
+    "transport",
+    "load_time"
+   ],
+   [
+    "transport",
+    "speed"
+   ],
+   [
+    "transport",
+    "unload_time"
+   ]
+  ],
+  "assumption_paths": [
+   "",
+   "nodes.<transport>.params.capacity",
+   "nodes.<transport>.params.reserve_destination",
+   "nodes.<transport>.params.speed",
+   "nodes.source.params.arrival",
+   "nodes.transport_2.params.capacity",
+   "nodes.transport_2.params.reserve_destination",
+   "nodes.transport_2.params.speed",
+   "resources",
+   "resources.operator_1.dispatch",
+   "resources.operator_1.home"
+  ],
+  "custom_rules": 0
+ }
+}

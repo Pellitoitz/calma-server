@@ -1,0 +1,797 @@
+label,provider,model,case,repeat,req,kind,metric,description,status,error_type,severity,evaluated,unit_sensitive,detail
+offline_baseline,offline,offline-rules,A1,1,A1-R01,flow,TOPOLOGY,topology in flow order,CORRECT,,,True,False,"steps in order (wrong components counted separately: ['assembly', 'inspection'])"
+offline_baseline,offline,offline-rules,A1,1,A1-R02,component,COMPONENT_MATCH,assembly -> accepted library component,WRONG,COMPONENT_MATCH_ERROR,CRITICAL,True,False,"step present as 'machine' (machine); expected one of ['manual_assembly', 'manual_process']"
+offline_baseline,offline,offline-rules,A1,1,A1-R03,component,COMPONENT_MATCH,buffer -> accepted library component,CORRECT,,,True,False,buffer_1 = buffer
+offline_baseline,offline,offline-rules,A1,1,A1-R04,component,COMPONENT_MATCH,machine -> accepted library component,CORRECT,,,True,False,machine_2 = machine
+offline_baseline,offline,offline-rules,A1,1,A1-R05,component,COMPONENT_MATCH,inspection -> accepted library component,WRONG,COMPONENT_MATCH_ERROR,CRITICAL,True,False,step present as 'machine' (machine_3); expected one of ['inspection']
+offline_baseline,offline,offline-rules,A1,1,A1-R06,value,PARAMETER_VALUE,assembly 60 s/piece,CORRECT,,,True,False,machine: 60.0 s x 1 = 60.0 s per entity
+offline_baseline,offline,offline-rules,A1,1,A1-R07,value,PARAMETER_VALUE,buffer capacity 5,CORRECT,,,True,False,buffer_1: 5.0
+offline_baseline,offline,offline-rules,A1,1,A1-R08,value,PARAMETER_VALUE,machine 45 s/piece,CORRECT,,,True,False,machine_2: 45.0 s x 1 = 45.0 s per entity
+offline_baseline,offline,offline-rules,A1,1,A1-R09,value,PARAMETER_VALUE,inspection 20 s/piece,CORRECT,,,True,False,machine_3: 20.0 s x 1 = 20.0 s per entity
+offline_baseline,offline,offline-rules,A1,1,A1-R10,shared_resource,RESOURCE_ASSIGNMENT,same operator assembles and inspects,CORRECT,,,True,False,"['operator_1', 'operator_1']"
+offline_baseline,offline,offline-rules,A1,1,A1-R11,no_resource,RESOURCE_ASSIGNMENT,machine is automatic (no operator),CORRECT,,,True,False,
+offline_baseline,offline,offline-rules,A1,1,A1-R12,value,PARAMETER_VALUE,one operator,CORRECT,,,True,False,machine: 1.0
+offline_baseline,offline,offline-rules,A1,1,A1-R13,strategy,STRATEGY,operator priority NOT stated: no invented rule (FIFO only as visible assumption or question),CORRECT,,,True,False,"fifo + «'Operario' hace Machine, Machine 3. Cuando varias tareas le requieren a la vez, ¿cuál tiene priorida»"
+offline_baseline,offline,offline-rules,A1,1,A1-R14,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,A1,1,A1-R15,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,A1,2,A1-R01,flow,TOPOLOGY,topology in flow order,CORRECT,,,True,False,"steps in order (wrong components counted separately: ['assembly', 'inspection'])"
+offline_baseline,offline,offline-rules,A1,2,A1-R02,component,COMPONENT_MATCH,assembly -> accepted library component,WRONG,COMPONENT_MATCH_ERROR,CRITICAL,True,False,"step present as 'machine' (machine); expected one of ['manual_assembly', 'manual_process']"
+offline_baseline,offline,offline-rules,A1,2,A1-R03,component,COMPONENT_MATCH,buffer -> accepted library component,CORRECT,,,True,False,buffer_1 = buffer
+offline_baseline,offline,offline-rules,A1,2,A1-R04,component,COMPONENT_MATCH,machine -> accepted library component,CORRECT,,,True,False,machine_2 = machine
+offline_baseline,offline,offline-rules,A1,2,A1-R05,component,COMPONENT_MATCH,inspection -> accepted library component,WRONG,COMPONENT_MATCH_ERROR,CRITICAL,True,False,step present as 'machine' (machine_3); expected one of ['inspection']
+offline_baseline,offline,offline-rules,A1,2,A1-R06,value,PARAMETER_VALUE,assembly 60 s/piece,CORRECT,,,True,False,machine: 60.0 s x 1 = 60.0 s per entity
+offline_baseline,offline,offline-rules,A1,2,A1-R07,value,PARAMETER_VALUE,buffer capacity 5,CORRECT,,,True,False,buffer_1: 5.0
+offline_baseline,offline,offline-rules,A1,2,A1-R08,value,PARAMETER_VALUE,machine 45 s/piece,CORRECT,,,True,False,machine_2: 45.0 s x 1 = 45.0 s per entity
+offline_baseline,offline,offline-rules,A1,2,A1-R09,value,PARAMETER_VALUE,inspection 20 s/piece,CORRECT,,,True,False,machine_3: 20.0 s x 1 = 20.0 s per entity
+offline_baseline,offline,offline-rules,A1,2,A1-R10,shared_resource,RESOURCE_ASSIGNMENT,same operator assembles and inspects,CORRECT,,,True,False,"['operator_1', 'operator_1']"
+offline_baseline,offline,offline-rules,A1,2,A1-R11,no_resource,RESOURCE_ASSIGNMENT,machine is automatic (no operator),CORRECT,,,True,False,
+offline_baseline,offline,offline-rules,A1,2,A1-R12,value,PARAMETER_VALUE,one operator,CORRECT,,,True,False,machine: 1.0
+offline_baseline,offline,offline-rules,A1,2,A1-R13,strategy,STRATEGY,operator priority NOT stated: no invented rule (FIFO only as visible assumption or question),CORRECT,,,True,False,"fifo + «'Operario' hace Machine, Machine 3. Cuando varias tareas le requieren a la vez, ¿cuál tiene priorida»"
+offline_baseline,offline,offline-rules,A1,2,A1-R14,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,A1,2,A1-R15,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,A1,3,A1-R01,flow,TOPOLOGY,topology in flow order,CORRECT,,,True,False,"steps in order (wrong components counted separately: ['assembly', 'inspection'])"
+offline_baseline,offline,offline-rules,A1,3,A1-R02,component,COMPONENT_MATCH,assembly -> accepted library component,WRONG,COMPONENT_MATCH_ERROR,CRITICAL,True,False,"step present as 'machine' (machine); expected one of ['manual_assembly', 'manual_process']"
+offline_baseline,offline,offline-rules,A1,3,A1-R03,component,COMPONENT_MATCH,buffer -> accepted library component,CORRECT,,,True,False,buffer_1 = buffer
+offline_baseline,offline,offline-rules,A1,3,A1-R04,component,COMPONENT_MATCH,machine -> accepted library component,CORRECT,,,True,False,machine_2 = machine
+offline_baseline,offline,offline-rules,A1,3,A1-R05,component,COMPONENT_MATCH,inspection -> accepted library component,WRONG,COMPONENT_MATCH_ERROR,CRITICAL,True,False,step present as 'machine' (machine_3); expected one of ['inspection']
+offline_baseline,offline,offline-rules,A1,3,A1-R06,value,PARAMETER_VALUE,assembly 60 s/piece,CORRECT,,,True,False,machine: 60.0 s x 1 = 60.0 s per entity
+offline_baseline,offline,offline-rules,A1,3,A1-R07,value,PARAMETER_VALUE,buffer capacity 5,CORRECT,,,True,False,buffer_1: 5.0
+offline_baseline,offline,offline-rules,A1,3,A1-R08,value,PARAMETER_VALUE,machine 45 s/piece,CORRECT,,,True,False,machine_2: 45.0 s x 1 = 45.0 s per entity
+offline_baseline,offline,offline-rules,A1,3,A1-R09,value,PARAMETER_VALUE,inspection 20 s/piece,CORRECT,,,True,False,machine_3: 20.0 s x 1 = 20.0 s per entity
+offline_baseline,offline,offline-rules,A1,3,A1-R10,shared_resource,RESOURCE_ASSIGNMENT,same operator assembles and inspects,CORRECT,,,True,False,"['operator_1', 'operator_1']"
+offline_baseline,offline,offline-rules,A1,3,A1-R11,no_resource,RESOURCE_ASSIGNMENT,machine is automatic (no operator),CORRECT,,,True,False,
+offline_baseline,offline,offline-rules,A1,3,A1-R12,value,PARAMETER_VALUE,one operator,CORRECT,,,True,False,machine: 1.0
+offline_baseline,offline,offline-rules,A1,3,A1-R13,strategy,STRATEGY,operator priority NOT stated: no invented rule (FIFO only as visible assumption or question),CORRECT,,,True,False,"fifo + «'Operario' hace Machine, Machine 3. Cuando varias tareas le requieren a la vez, ¿cuál tiene priorida»"
+offline_baseline,offline,offline-rules,A1,3,A1-R14,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,A1,3,A1-R15,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,A1,4,A1-R01,flow,TOPOLOGY,topology in flow order,CORRECT,,,True,False,"steps in order (wrong components counted separately: ['assembly', 'inspection'])"
+offline_baseline,offline,offline-rules,A1,4,A1-R02,component,COMPONENT_MATCH,assembly -> accepted library component,WRONG,COMPONENT_MATCH_ERROR,CRITICAL,True,False,"step present as 'machine' (machine); expected one of ['manual_assembly', 'manual_process']"
+offline_baseline,offline,offline-rules,A1,4,A1-R03,component,COMPONENT_MATCH,buffer -> accepted library component,CORRECT,,,True,False,buffer_1 = buffer
+offline_baseline,offline,offline-rules,A1,4,A1-R04,component,COMPONENT_MATCH,machine -> accepted library component,CORRECT,,,True,False,machine_2 = machine
+offline_baseline,offline,offline-rules,A1,4,A1-R05,component,COMPONENT_MATCH,inspection -> accepted library component,WRONG,COMPONENT_MATCH_ERROR,CRITICAL,True,False,step present as 'machine' (machine_3); expected one of ['inspection']
+offline_baseline,offline,offline-rules,A1,4,A1-R06,value,PARAMETER_VALUE,assembly 60 s/piece,CORRECT,,,True,False,machine: 60.0 s x 1 = 60.0 s per entity
+offline_baseline,offline,offline-rules,A1,4,A1-R07,value,PARAMETER_VALUE,buffer capacity 5,CORRECT,,,True,False,buffer_1: 5.0
+offline_baseline,offline,offline-rules,A1,4,A1-R08,value,PARAMETER_VALUE,machine 45 s/piece,CORRECT,,,True,False,machine_2: 45.0 s x 1 = 45.0 s per entity
+offline_baseline,offline,offline-rules,A1,4,A1-R09,value,PARAMETER_VALUE,inspection 20 s/piece,CORRECT,,,True,False,machine_3: 20.0 s x 1 = 20.0 s per entity
+offline_baseline,offline,offline-rules,A1,4,A1-R10,shared_resource,RESOURCE_ASSIGNMENT,same operator assembles and inspects,CORRECT,,,True,False,"['operator_1', 'operator_1']"
+offline_baseline,offline,offline-rules,A1,4,A1-R11,no_resource,RESOURCE_ASSIGNMENT,machine is automatic (no operator),CORRECT,,,True,False,
+offline_baseline,offline,offline-rules,A1,4,A1-R12,value,PARAMETER_VALUE,one operator,CORRECT,,,True,False,machine: 1.0
+offline_baseline,offline,offline-rules,A1,4,A1-R13,strategy,STRATEGY,operator priority NOT stated: no invented rule (FIFO only as visible assumption or question),CORRECT,,,True,False,"fifo + «'Operario' hace Machine, Machine 3. Cuando varias tareas le requieren a la vez, ¿cuál tiene priorida»"
+offline_baseline,offline,offline-rules,A1,4,A1-R14,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,A1,4,A1-R15,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,A1,5,A1-R01,flow,TOPOLOGY,topology in flow order,CORRECT,,,True,False,"steps in order (wrong components counted separately: ['assembly', 'inspection'])"
+offline_baseline,offline,offline-rules,A1,5,A1-R02,component,COMPONENT_MATCH,assembly -> accepted library component,WRONG,COMPONENT_MATCH_ERROR,CRITICAL,True,False,"step present as 'machine' (machine); expected one of ['manual_assembly', 'manual_process']"
+offline_baseline,offline,offline-rules,A1,5,A1-R03,component,COMPONENT_MATCH,buffer -> accepted library component,CORRECT,,,True,False,buffer_1 = buffer
+offline_baseline,offline,offline-rules,A1,5,A1-R04,component,COMPONENT_MATCH,machine -> accepted library component,CORRECT,,,True,False,machine_2 = machine
+offline_baseline,offline,offline-rules,A1,5,A1-R05,component,COMPONENT_MATCH,inspection -> accepted library component,WRONG,COMPONENT_MATCH_ERROR,CRITICAL,True,False,step present as 'machine' (machine_3); expected one of ['inspection']
+offline_baseline,offline,offline-rules,A1,5,A1-R06,value,PARAMETER_VALUE,assembly 60 s/piece,CORRECT,,,True,False,machine: 60.0 s x 1 = 60.0 s per entity
+offline_baseline,offline,offline-rules,A1,5,A1-R07,value,PARAMETER_VALUE,buffer capacity 5,CORRECT,,,True,False,buffer_1: 5.0
+offline_baseline,offline,offline-rules,A1,5,A1-R08,value,PARAMETER_VALUE,machine 45 s/piece,CORRECT,,,True,False,machine_2: 45.0 s x 1 = 45.0 s per entity
+offline_baseline,offline,offline-rules,A1,5,A1-R09,value,PARAMETER_VALUE,inspection 20 s/piece,CORRECT,,,True,False,machine_3: 20.0 s x 1 = 20.0 s per entity
+offline_baseline,offline,offline-rules,A1,5,A1-R10,shared_resource,RESOURCE_ASSIGNMENT,same operator assembles and inspects,CORRECT,,,True,False,"['operator_1', 'operator_1']"
+offline_baseline,offline,offline-rules,A1,5,A1-R11,no_resource,RESOURCE_ASSIGNMENT,machine is automatic (no operator),CORRECT,,,True,False,
+offline_baseline,offline,offline-rules,A1,5,A1-R12,value,PARAMETER_VALUE,one operator,CORRECT,,,True,False,machine: 1.0
+offline_baseline,offline,offline-rules,A1,5,A1-R13,strategy,STRATEGY,operator priority NOT stated: no invented rule (FIFO only as visible assumption or question),CORRECT,,,True,False,"fifo + «'Operario' hace Machine, Machine 3. Cuando varias tareas le requieren a la vez, ¿cuál tiene priorida»"
+offline_baseline,offline,offline-rules,A1,5,A1-R14,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,A1,5,A1-R15,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,A2,1,A2-R01,flow,TOPOLOGY,topology in flow order,WRONG,TOPOLOGY_ERROR,CRITICAL,True,False,"missing roles ['buffer'] (flagged: []); order OK; extra nodes [('transport_1', 'transport')]"
+offline_baseline,offline,offline-rules,A2,1,A2-R02,component,COMPONENT_MATCH,assembly -> accepted library component,CORRECT,,,True,False,manual_assembly = manual_assembly
+offline_baseline,offline,offline-rules,A2,1,A2-R03,component,COMPONENT_MATCH,buffer -> accepted library component,WRONG,COMPONENT_MATCH_ERROR,CRITICAL,True,False,no node with ['buffer']; extra components ['transport']
+offline_baseline,offline,offline-rules,A2,1,A2-R04,component,COMPONENT_MATCH,machine -> accepted library component,CORRECT,,,True,False,machine = machine
+offline_baseline,offline,offline-rules,A2,1,A2-R05,component,COMPONENT_MATCH,inspection -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,A2,1,A2-R06,value,PARAMETER_VALUE,assembly 60 s/piece,WRONG,FALSE_MISSING,MINOR,True,True,manual_assembly_time has no value although the text gives it; asked «Tiempo de carga en 'Transporte 1' (s)»
+offline_baseline,offline,offline-rules,A2,1,A2-R07,value,PARAMETER_VALUE,buffer capacity 5,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_NODE (role 'buffer' not found in the model)
+offline_baseline,offline,offline-rules,A2,1,A2-R08,value,PARAMETER_VALUE,machine 45 s/piece,CORRECT,,,True,False,machine: 45.0 s x 1 = 45.0 s per entity
+offline_baseline,offline,offline-rules,A2,1,A2-R09,value,PARAMETER_VALUE,inspection 20 s/piece,WRONG,FALSE_MISSING,MINOR,True,False,inspection_time has no value although the text gives it; asked «Tiempo de proceso de 'Inspection' (s)»
+offline_baseline,offline,offline-rules,A2,1,A2-R10,shared_resource,RESOURCE_ASSIGNMENT,same operator assembles and inspects,WRONG,RESOURCE_ASSIGNMENT_ERROR,CRITICAL,True,False,"roles ['assembly', 'inspection'] -> operators [None, None]"
+offline_baseline,offline,offline-rules,A2,1,A2-R11,no_resource,RESOURCE_ASSIGNMENT,machine is automatic (no operator),CORRECT,,,True,False,
+offline_baseline,offline,offline-rules,A2,1,A2-R12,value,PARAMETER_VALUE,one operator,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_OPERATOR (manual_assembly)
+offline_baseline,offline,offline-rules,A2,1,A2-R13,strategy,STRATEGY,operator priority NOT stated: no invented rule (FIFO only as visible assumption or question),WRONG,STRATEGY_ERROR,MAJOR,True,False,no operator found
+offline_baseline,offline,offline-rules,A2,1,A2-R14,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,A2,1,A2-R15,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,A3,1,A3-R01,flow,TOPOLOGY,topology in flow order,WRONG,TOPOLOGY_ERROR,CRITICAL,True,False,"missing roles ['buffer', 'machine'] (flagged: []); order WRONG; extra nodes [('inspection_2', 'inspection')]"
+offline_baseline,offline,offline-rules,A3,1,A3-R02,component,COMPONENT_MATCH,assembly -> accepted library component,CORRECT,,,True,False,manual_assembly = manual_assembly
+offline_baseline,offline,offline-rules,A3,1,A3-R03,component,COMPONENT_MATCH,buffer -> accepted library component,WRONG,COMPONENT_MATCH_ERROR,CRITICAL,True,False,no node with ['buffer']; extra components ['inspection']
+offline_baseline,offline,offline-rules,A3,1,A3-R04,component,COMPONENT_MATCH,machine -> accepted library component,WRONG,COMPONENT_MATCH_ERROR,CRITICAL,True,False,no node with ['machine']; extra components ['inspection']
+offline_baseline,offline,offline-rules,A3,1,A3-R05,component,COMPONENT_MATCH,inspection -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,A3,1,A3-R06,value,PARAMETER_VALUE,assembly 60 s/piece,CORRECT,,,True,False,manual_assembly: 60.0 s x 1 = 60.0 s per entity
+offline_baseline,offline,offline-rules,A3,1,A3-R07,value,PARAMETER_VALUE,buffer capacity 5,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_NODE (role 'buffer' not found in the model)
+offline_baseline,offline,offline-rules,A3,1,A3-R08,value,PARAMETER_VALUE,machine 45 s/piece,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_NODE (role 'machine' not found in the model)
+offline_baseline,offline,offline-rules,A3,1,A3-R09,value,PARAMETER_VALUE,inspection 20 s/piece,CORRECT,,,True,False,inspection: 20.0 s x 1 = 20.0 s per entity
+offline_baseline,offline,offline-rules,A3,1,A3-R10,shared_resource,RESOURCE_ASSIGNMENT,same operator assembles and inspects,CORRECT,,,True,False,"['operator_1', 'operator_1']"
+offline_baseline,offline,offline-rules,A3,1,A3-R11,no_resource,RESOURCE_ASSIGNMENT,machine is automatic (no operator),OMITTED,SILENT_OMISSION,CRITICAL,True,False,role missing
+offline_baseline,offline,offline-rules,A3,1,A3-R12,value,PARAMETER_VALUE,one operator,CORRECT,,,True,False,manual_assembly: 1.0
+offline_baseline,offline,offline-rules,A3,1,A3-R13,strategy,STRATEGY,operator priority NOT stated: no invented rule (FIFO only as visible assumption or question),CORRECT,,,True,False,"fifo + «'Operario' hace Inspection, Manual assembly. Cuando varias tareas le requieren a la vez, ¿cuál tiene»"
+offline_baseline,offline,offline-rules,A3,1,A3-R14,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,A3,1,A3-R15,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,A4,1,A4-R01,flow,TOPOLOGY,topology in flow order,CORRECT,,,True,False,
+offline_baseline,offline,offline-rules,A4,1,A4-R02,component,COMPONENT_MATCH,assembly -> accepted library component,CORRECT,,,True,False,manual_assembly = manual_assembly
+offline_baseline,offline,offline-rules,A4,1,A4-R03,component,COMPONENT_MATCH,buffer -> accepted library component,CORRECT,,,True,False,buffer_1 = buffer
+offline_baseline,offline,offline-rules,A4,1,A4-R04,component,COMPONENT_MATCH,machine -> accepted library component,CORRECT,,,True,False,machine = machine
+offline_baseline,offline,offline-rules,A4,1,A4-R05,component,COMPONENT_MATCH,inspection -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,A4,1,A4-R06,value,PARAMETER_VALUE,assembly 60 s/piece,CORRECT,,,True,False,manual_assembly: 60.0 s x 1 = 60.0 s per entity
+offline_baseline,offline,offline-rules,A4,1,A4-R07,value,PARAMETER_VALUE,buffer capacity 5,CORRECT,,,True,False,buffer_1: 5.0
+offline_baseline,offline,offline-rules,A4,1,A4-R08,value,PARAMETER_VALUE,machine 45 s/piece,CORRECT,,,True,False,machine: 45.0 s x 1 = 45.0 s per entity
+offline_baseline,offline,offline-rules,A4,1,A4-R09,value,PARAMETER_VALUE,inspection 20 s/piece,CORRECT,,,True,False,inspection: 20.0 s x 1 = 20.0 s per entity
+offline_baseline,offline,offline-rules,A4,1,A4-R10,shared_resource,RESOURCE_ASSIGNMENT,same operator assembles and inspects,CORRECT,,,True,False,"['operator_1', 'operator_1']"
+offline_baseline,offline,offline-rules,A4,1,A4-R11,no_resource,RESOURCE_ASSIGNMENT,machine is automatic (no operator),CORRECT,,,True,False,
+offline_baseline,offline,offline-rules,A4,1,A4-R12,value,PARAMETER_VALUE,one operator,CORRECT,,,True,False,manual_assembly: 1.0
+offline_baseline,offline,offline-rules,A4,1,A4-R13,strategy,STRATEGY,operator priority NOT stated: no invented rule (FIFO only as visible assumption or question),CORRECT,,,True,False,"fifo + «'Operario' hace Manual assembly, Inspection. Cuando varias tareas le requieren a la vez, ¿cuál tiene»"
+offline_baseline,offline,offline-rules,A4,1,A4-R14,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,A4,1,A4-R15,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,B1,1,B1-R01,flow,TOPOLOGY,topology in flow order,WRONG,TOPOLOGY_ERROR,CRITICAL,True,False,"missing roles [] (flagged: []); order OK; extra nodes [('transport_1', 'rack_transport'), ('inspection_2', 'inspection')]"
+offline_baseline,offline,offline-rules,B1,1,B1-R02,component,COMPONENT_MATCH,assembly -> accepted library component,CORRECT,,,True,False,manual_assembly = manual_assembly
+offline_baseline,offline,offline-rules,B1,1,B1-R03,component,COMPONENT_MATCH,buffer -> accepted library component,CORRECT,,,True,False,buffer_1 = buffer
+offline_baseline,offline,offline-rules,B1,1,B1-R04,component,COMPONENT_MATCH,selective -> accepted library component,CORRECT,,,True,False,selective_soldering = selective_soldering
+offline_baseline,offline,offline-rules,B1,1,B1-R05,component,COMPONENT_MATCH,review -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,B1,1,B1-R06,value,PARAMETER_VALUE,assembly 30 s PER_CIRCUIT,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"30.0 s x 1 = 30.0 s per entity; expected 120.0 (30.0 per_item, x4)"
+offline_baseline,offline,offline-rules,B1,1,B1-R07,basis,SEMANTIC_BASIS,assembly time basis = per circuit,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"expected per_item, model per_entity (work_units=1); time per entity CHANGED"
+offline_baseline,offline,offline-rules,B1,1,B1-R08,value,PARAMETER_VALUE,4 circuits per rack,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_PARAM (-)
+offline_baseline,offline,offline-rules,B1,1,B1-R09,value,PARAMETER_VALUE,buffer 3 racks,CORRECT,,,True,False,buffer_1: 3.0
+offline_baseline,offline,offline-rules,B1,1,B1-R10,value,PARAMETER_VALUE,selective 20 s PER_RACK,CORRECT,,,True,False,selective_soldering: 20.0 s x 1 = 20.0 s per entity
+offline_baseline,offline,offline-rules,B1,1,B1-R11,basis,SEMANTIC_BASIS,selective time basis = per rack,CORRECT,,,True,False,per_entity (work_units=1)
+offline_baseline,offline,offline-rules,B1,1,B1-R12,value,PARAMETER_VALUE,review 15 s PER_CIRCUIT,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"15.0 s x 1 = 15.0 s per entity; expected 60.0 (15.0 per_item, x4)"
+offline_baseline,offline,offline-rules,B1,1,B1-R13,basis,SEMANTIC_BASIS,review time basis = per circuit,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"expected per_item, model per_entity (work_units=1); time per entity CHANGED"
+offline_baseline,offline,offline-rules,B1,1,B1-R14,value,PARAMETER_VALUE,3 racks,CORRECT,,,True,False,carrier: 3.0
+offline_baseline,offline,offline-rules,B1,1,B1-R15,carrier,CARRIER_SEMANTICS,"rack taken at assembly, freed after review, immediately available",WRONG,CARRIER_SEMANTICS_ERROR,CRITICAL,True,False,"seize ['manual_assembly'], release ['inspection_2'], release_via []"
+offline_baseline,offline,offline-rules,B1,1,B1-R16,shared_resource,RESOURCE_ASSIGNMENT,same operator assembles and reviews,CORRECT,,,True,False,"['operator_1', 'operator_1']"
+offline_baseline,offline,offline-rules,B1,1,B1-R17,no_resource,RESOURCE_ASSIGNMENT,selective is automatic,CORRECT,,,True,False,
+offline_baseline,offline,offline-rules,B1,1,B1-R18,strategy,STRATEGY,no priority stated -> none invented,CORRECT,,,True,False,"fifo + «'Operario' hace Manual assembly, Inspection. Cuando varias tareas le requieren a la vez, ¿cuál tiene»"
+offline_baseline,offline,offline-rules,B1,1,B1-R19,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,B1,1,B1-R20,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,B1,2,B1-R01,flow,TOPOLOGY,topology in flow order,WRONG,TOPOLOGY_ERROR,CRITICAL,True,False,"missing roles [] (flagged: []); order OK; extra nodes [('transport_1', 'rack_transport'), ('inspection_2', 'inspection')]"
+offline_baseline,offline,offline-rules,B1,2,B1-R02,component,COMPONENT_MATCH,assembly -> accepted library component,CORRECT,,,True,False,manual_assembly = manual_assembly
+offline_baseline,offline,offline-rules,B1,2,B1-R03,component,COMPONENT_MATCH,buffer -> accepted library component,CORRECT,,,True,False,buffer_1 = buffer
+offline_baseline,offline,offline-rules,B1,2,B1-R04,component,COMPONENT_MATCH,selective -> accepted library component,CORRECT,,,True,False,selective_soldering = selective_soldering
+offline_baseline,offline,offline-rules,B1,2,B1-R05,component,COMPONENT_MATCH,review -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,B1,2,B1-R06,value,PARAMETER_VALUE,assembly 30 s PER_CIRCUIT,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"30.0 s x 1 = 30.0 s per entity; expected 120.0 (30.0 per_item, x4)"
+offline_baseline,offline,offline-rules,B1,2,B1-R07,basis,SEMANTIC_BASIS,assembly time basis = per circuit,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"expected per_item, model per_entity (work_units=1); time per entity CHANGED"
+offline_baseline,offline,offline-rules,B1,2,B1-R08,value,PARAMETER_VALUE,4 circuits per rack,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_PARAM (-)
+offline_baseline,offline,offline-rules,B1,2,B1-R09,value,PARAMETER_VALUE,buffer 3 racks,CORRECT,,,True,False,buffer_1: 3.0
+offline_baseline,offline,offline-rules,B1,2,B1-R10,value,PARAMETER_VALUE,selective 20 s PER_RACK,CORRECT,,,True,False,selective_soldering: 20.0 s x 1 = 20.0 s per entity
+offline_baseline,offline,offline-rules,B1,2,B1-R11,basis,SEMANTIC_BASIS,selective time basis = per rack,CORRECT,,,True,False,per_entity (work_units=1)
+offline_baseline,offline,offline-rules,B1,2,B1-R12,value,PARAMETER_VALUE,review 15 s PER_CIRCUIT,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"15.0 s x 1 = 15.0 s per entity; expected 60.0 (15.0 per_item, x4)"
+offline_baseline,offline,offline-rules,B1,2,B1-R13,basis,SEMANTIC_BASIS,review time basis = per circuit,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"expected per_item, model per_entity (work_units=1); time per entity CHANGED"
+offline_baseline,offline,offline-rules,B1,2,B1-R14,value,PARAMETER_VALUE,3 racks,CORRECT,,,True,False,carrier: 3.0
+offline_baseline,offline,offline-rules,B1,2,B1-R15,carrier,CARRIER_SEMANTICS,"rack taken at assembly, freed after review, immediately available",WRONG,CARRIER_SEMANTICS_ERROR,CRITICAL,True,False,"seize ['manual_assembly'], release ['inspection_2'], release_via []"
+offline_baseline,offline,offline-rules,B1,2,B1-R16,shared_resource,RESOURCE_ASSIGNMENT,same operator assembles and reviews,CORRECT,,,True,False,"['operator_1', 'operator_1']"
+offline_baseline,offline,offline-rules,B1,2,B1-R17,no_resource,RESOURCE_ASSIGNMENT,selective is automatic,CORRECT,,,True,False,
+offline_baseline,offline,offline-rules,B1,2,B1-R18,strategy,STRATEGY,no priority stated -> none invented,CORRECT,,,True,False,"fifo + «'Operario' hace Manual assembly, Inspection. Cuando varias tareas le requieren a la vez, ¿cuál tiene»"
+offline_baseline,offline,offline-rules,B1,2,B1-R19,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,B1,2,B1-R20,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,B1,3,B1-R01,flow,TOPOLOGY,topology in flow order,WRONG,TOPOLOGY_ERROR,CRITICAL,True,False,"missing roles [] (flagged: []); order OK; extra nodes [('transport_1', 'rack_transport'), ('inspection_2', 'inspection')]"
+offline_baseline,offline,offline-rules,B1,3,B1-R02,component,COMPONENT_MATCH,assembly -> accepted library component,CORRECT,,,True,False,manual_assembly = manual_assembly
+offline_baseline,offline,offline-rules,B1,3,B1-R03,component,COMPONENT_MATCH,buffer -> accepted library component,CORRECT,,,True,False,buffer_1 = buffer
+offline_baseline,offline,offline-rules,B1,3,B1-R04,component,COMPONENT_MATCH,selective -> accepted library component,CORRECT,,,True,False,selective_soldering = selective_soldering
+offline_baseline,offline,offline-rules,B1,3,B1-R05,component,COMPONENT_MATCH,review -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,B1,3,B1-R06,value,PARAMETER_VALUE,assembly 30 s PER_CIRCUIT,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"30.0 s x 1 = 30.0 s per entity; expected 120.0 (30.0 per_item, x4)"
+offline_baseline,offline,offline-rules,B1,3,B1-R07,basis,SEMANTIC_BASIS,assembly time basis = per circuit,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"expected per_item, model per_entity (work_units=1); time per entity CHANGED"
+offline_baseline,offline,offline-rules,B1,3,B1-R08,value,PARAMETER_VALUE,4 circuits per rack,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_PARAM (-)
+offline_baseline,offline,offline-rules,B1,3,B1-R09,value,PARAMETER_VALUE,buffer 3 racks,CORRECT,,,True,False,buffer_1: 3.0
+offline_baseline,offline,offline-rules,B1,3,B1-R10,value,PARAMETER_VALUE,selective 20 s PER_RACK,CORRECT,,,True,False,selective_soldering: 20.0 s x 1 = 20.0 s per entity
+offline_baseline,offline,offline-rules,B1,3,B1-R11,basis,SEMANTIC_BASIS,selective time basis = per rack,CORRECT,,,True,False,per_entity (work_units=1)
+offline_baseline,offline,offline-rules,B1,3,B1-R12,value,PARAMETER_VALUE,review 15 s PER_CIRCUIT,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"15.0 s x 1 = 15.0 s per entity; expected 60.0 (15.0 per_item, x4)"
+offline_baseline,offline,offline-rules,B1,3,B1-R13,basis,SEMANTIC_BASIS,review time basis = per circuit,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"expected per_item, model per_entity (work_units=1); time per entity CHANGED"
+offline_baseline,offline,offline-rules,B1,3,B1-R14,value,PARAMETER_VALUE,3 racks,CORRECT,,,True,False,carrier: 3.0
+offline_baseline,offline,offline-rules,B1,3,B1-R15,carrier,CARRIER_SEMANTICS,"rack taken at assembly, freed after review, immediately available",WRONG,CARRIER_SEMANTICS_ERROR,CRITICAL,True,False,"seize ['manual_assembly'], release ['inspection_2'], release_via []"
+offline_baseline,offline,offline-rules,B1,3,B1-R16,shared_resource,RESOURCE_ASSIGNMENT,same operator assembles and reviews,CORRECT,,,True,False,"['operator_1', 'operator_1']"
+offline_baseline,offline,offline-rules,B1,3,B1-R17,no_resource,RESOURCE_ASSIGNMENT,selective is automatic,CORRECT,,,True,False,
+offline_baseline,offline,offline-rules,B1,3,B1-R18,strategy,STRATEGY,no priority stated -> none invented,CORRECT,,,True,False,"fifo + «'Operario' hace Manual assembly, Inspection. Cuando varias tareas le requieren a la vez, ¿cuál tiene»"
+offline_baseline,offline,offline-rules,B1,3,B1-R19,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,B1,3,B1-R20,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,B1,4,B1-R01,flow,TOPOLOGY,topology in flow order,WRONG,TOPOLOGY_ERROR,CRITICAL,True,False,"missing roles [] (flagged: []); order OK; extra nodes [('transport_1', 'rack_transport'), ('inspection_2', 'inspection')]"
+offline_baseline,offline,offline-rules,B1,4,B1-R02,component,COMPONENT_MATCH,assembly -> accepted library component,CORRECT,,,True,False,manual_assembly = manual_assembly
+offline_baseline,offline,offline-rules,B1,4,B1-R03,component,COMPONENT_MATCH,buffer -> accepted library component,CORRECT,,,True,False,buffer_1 = buffer
+offline_baseline,offline,offline-rules,B1,4,B1-R04,component,COMPONENT_MATCH,selective -> accepted library component,CORRECT,,,True,False,selective_soldering = selective_soldering
+offline_baseline,offline,offline-rules,B1,4,B1-R05,component,COMPONENT_MATCH,review -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,B1,4,B1-R06,value,PARAMETER_VALUE,assembly 30 s PER_CIRCUIT,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"30.0 s x 1 = 30.0 s per entity; expected 120.0 (30.0 per_item, x4)"
+offline_baseline,offline,offline-rules,B1,4,B1-R07,basis,SEMANTIC_BASIS,assembly time basis = per circuit,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"expected per_item, model per_entity (work_units=1); time per entity CHANGED"
+offline_baseline,offline,offline-rules,B1,4,B1-R08,value,PARAMETER_VALUE,4 circuits per rack,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_PARAM (-)
+offline_baseline,offline,offline-rules,B1,4,B1-R09,value,PARAMETER_VALUE,buffer 3 racks,CORRECT,,,True,False,buffer_1: 3.0
+offline_baseline,offline,offline-rules,B1,4,B1-R10,value,PARAMETER_VALUE,selective 20 s PER_RACK,CORRECT,,,True,False,selective_soldering: 20.0 s x 1 = 20.0 s per entity
+offline_baseline,offline,offline-rules,B1,4,B1-R11,basis,SEMANTIC_BASIS,selective time basis = per rack,CORRECT,,,True,False,per_entity (work_units=1)
+offline_baseline,offline,offline-rules,B1,4,B1-R12,value,PARAMETER_VALUE,review 15 s PER_CIRCUIT,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"15.0 s x 1 = 15.0 s per entity; expected 60.0 (15.0 per_item, x4)"
+offline_baseline,offline,offline-rules,B1,4,B1-R13,basis,SEMANTIC_BASIS,review time basis = per circuit,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"expected per_item, model per_entity (work_units=1); time per entity CHANGED"
+offline_baseline,offline,offline-rules,B1,4,B1-R14,value,PARAMETER_VALUE,3 racks,CORRECT,,,True,False,carrier: 3.0
+offline_baseline,offline,offline-rules,B1,4,B1-R15,carrier,CARRIER_SEMANTICS,"rack taken at assembly, freed after review, immediately available",WRONG,CARRIER_SEMANTICS_ERROR,CRITICAL,True,False,"seize ['manual_assembly'], release ['inspection_2'], release_via []"
+offline_baseline,offline,offline-rules,B1,4,B1-R16,shared_resource,RESOURCE_ASSIGNMENT,same operator assembles and reviews,CORRECT,,,True,False,"['operator_1', 'operator_1']"
+offline_baseline,offline,offline-rules,B1,4,B1-R17,no_resource,RESOURCE_ASSIGNMENT,selective is automatic,CORRECT,,,True,False,
+offline_baseline,offline,offline-rules,B1,4,B1-R18,strategy,STRATEGY,no priority stated -> none invented,CORRECT,,,True,False,"fifo + «'Operario' hace Manual assembly, Inspection. Cuando varias tareas le requieren a la vez, ¿cuál tiene»"
+offline_baseline,offline,offline-rules,B1,4,B1-R19,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,B1,4,B1-R20,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,B1,5,B1-R01,flow,TOPOLOGY,topology in flow order,WRONG,TOPOLOGY_ERROR,CRITICAL,True,False,"missing roles [] (flagged: []); order OK; extra nodes [('transport_1', 'rack_transport'), ('inspection_2', 'inspection')]"
+offline_baseline,offline,offline-rules,B1,5,B1-R02,component,COMPONENT_MATCH,assembly -> accepted library component,CORRECT,,,True,False,manual_assembly = manual_assembly
+offline_baseline,offline,offline-rules,B1,5,B1-R03,component,COMPONENT_MATCH,buffer -> accepted library component,CORRECT,,,True,False,buffer_1 = buffer
+offline_baseline,offline,offline-rules,B1,5,B1-R04,component,COMPONENT_MATCH,selective -> accepted library component,CORRECT,,,True,False,selective_soldering = selective_soldering
+offline_baseline,offline,offline-rules,B1,5,B1-R05,component,COMPONENT_MATCH,review -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,B1,5,B1-R06,value,PARAMETER_VALUE,assembly 30 s PER_CIRCUIT,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"30.0 s x 1 = 30.0 s per entity; expected 120.0 (30.0 per_item, x4)"
+offline_baseline,offline,offline-rules,B1,5,B1-R07,basis,SEMANTIC_BASIS,assembly time basis = per circuit,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"expected per_item, model per_entity (work_units=1); time per entity CHANGED"
+offline_baseline,offline,offline-rules,B1,5,B1-R08,value,PARAMETER_VALUE,4 circuits per rack,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_PARAM (-)
+offline_baseline,offline,offline-rules,B1,5,B1-R09,value,PARAMETER_VALUE,buffer 3 racks,CORRECT,,,True,False,buffer_1: 3.0
+offline_baseline,offline,offline-rules,B1,5,B1-R10,value,PARAMETER_VALUE,selective 20 s PER_RACK,CORRECT,,,True,False,selective_soldering: 20.0 s x 1 = 20.0 s per entity
+offline_baseline,offline,offline-rules,B1,5,B1-R11,basis,SEMANTIC_BASIS,selective time basis = per rack,CORRECT,,,True,False,per_entity (work_units=1)
+offline_baseline,offline,offline-rules,B1,5,B1-R12,value,PARAMETER_VALUE,review 15 s PER_CIRCUIT,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"15.0 s x 1 = 15.0 s per entity; expected 60.0 (15.0 per_item, x4)"
+offline_baseline,offline,offline-rules,B1,5,B1-R13,basis,SEMANTIC_BASIS,review time basis = per circuit,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"expected per_item, model per_entity (work_units=1); time per entity CHANGED"
+offline_baseline,offline,offline-rules,B1,5,B1-R14,value,PARAMETER_VALUE,3 racks,CORRECT,,,True,False,carrier: 3.0
+offline_baseline,offline,offline-rules,B1,5,B1-R15,carrier,CARRIER_SEMANTICS,"rack taken at assembly, freed after review, immediately available",WRONG,CARRIER_SEMANTICS_ERROR,CRITICAL,True,False,"seize ['manual_assembly'], release ['inspection_2'], release_via []"
+offline_baseline,offline,offline-rules,B1,5,B1-R16,shared_resource,RESOURCE_ASSIGNMENT,same operator assembles and reviews,CORRECT,,,True,False,"['operator_1', 'operator_1']"
+offline_baseline,offline,offline-rules,B1,5,B1-R17,no_resource,RESOURCE_ASSIGNMENT,selective is automatic,CORRECT,,,True,False,
+offline_baseline,offline,offline-rules,B1,5,B1-R18,strategy,STRATEGY,no priority stated -> none invented,CORRECT,,,True,False,"fifo + «'Operario' hace Manual assembly, Inspection. Cuando varias tareas le requieren a la vez, ¿cuál tiene»"
+offline_baseline,offline,offline-rules,B1,5,B1-R19,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,B1,5,B1-R20,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,B2,1,B2-R01,flow,TOPOLOGY,topology in flow order,WRONG,TOPOLOGY_ERROR,CRITICAL,True,False,"missing roles ['buffer_2', 'buffer_3'] (flagged: []); order WRONG; extra nodes []"
+offline_baseline,offline,offline-rules,B2,1,B2-R02,component,COMPONENT_MATCH,printer -> accepted library component,CORRECT,,,True,False,screen_printer = screen_printer
+offline_baseline,offline,offline-rules,B2,1,B2-R03,component,COMPONENT_MATCH,buffer_1 -> accepted library component,CORRECT,,,True,False,buffer_1 = buffer
+offline_baseline,offline,offline-rules,B2,1,B2-R04,component,COMPONENT_MATCH,pnp -> accepted library component,CORRECT,,,True,False,pick_and_place = pick_and_place
+offline_baseline,offline,offline-rules,B2,1,B2-R05,component,COMPONENT_MATCH,buffer_2 -> accepted library component,OMITTED,SILENT_OMISSION,CRITICAL,True,False,step not in the model and not flagged
+offline_baseline,offline,offline-rules,B2,1,B2-R06,component,COMPONENT_MATCH,reflow -> accepted library component,CORRECT,,,True,False,reflow = reflow
+offline_baseline,offline,offline-rules,B2,1,B2-R07,component,COMPONENT_MATCH,buffer_3 -> accepted library component,OMITTED,SILENT_OMISSION,CRITICAL,True,False,step not in the model and not flagged
+offline_baseline,offline,offline-rules,B2,1,B2-R08,component,COMPONENT_MATCH,aoi -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,B2,1,B2-R09,value,PARAMETER_VALUE,printer 2 min PER_PANEL,CORRECT,,,True,True,screen_printer: 120.0 s x 1 = 120.0 s per entity
+offline_baseline,offline,offline-rules,B2,1,B2-R10,basis,SEMANTIC_BASIS,printer per panel,CORRECT,,,True,False,per_entity (work_units=1)
+offline_baseline,offline,offline-rules,B2,1,B2-R11,value,PARAMETER_VALUE,pick&place 15 s PER_BOARD,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"15.0 s x 1 = 15.0 s per entity; expected 90.0 (15.0 per_item, x6)"
+offline_baseline,offline,offline-rules,B2,1,B2-R12,basis,SEMANTIC_BASIS,pick&place per board,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"expected per_item, model per_entity (work_units=1); time per entity CHANGED"
+offline_baseline,offline,offline-rules,B2,1,B2-R13,value,PARAMETER_VALUE,reflow 4 min PER_PANEL,CORRECT,,,True,True,reflow: 240.0 s x 1 = 240.0 s per entity
+offline_baseline,offline,offline-rules,B2,1,B2-R14,basis,SEMANTIC_BASIS,reflow per panel,CORRECT,,,True,False,per_entity (work_units=1)
+offline_baseline,offline,offline-rules,B2,1,B2-R15,value,PARAMETER_VALUE,AOI 1500 ms PER_BOARD,WRONG,FALSE_MISSING,MINOR,True,True,inspection_time has no value although the text gives it
+offline_baseline,offline,offline-rules,B2,1,B2-R16,basis,SEMANTIC_BASIS,AOI per board,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"expected per_item, model per_entity (work_units=1); time per entity CHANGED"
+offline_baseline,offline,offline-rules,B2,1,B2-R17,value,PARAMETER_VALUE,6 boards per panel,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_PARAM (-)
+offline_baseline,offline,offline-rules,B2,1,B2-R18,value,PARAMETER_VALUE,buffer 1 = 2 panels,CORRECT,,,True,False,buffer_1: 2.0
+offline_baseline,offline,offline-rules,B2,1,B2-R19,value,PARAMETER_VALUE,buffer 2 = 2 panels,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_NODE (role 'buffer_2' not found in the model)
+offline_baseline,offline,offline-rules,B2,1,B2-R20,value,PARAMETER_VALUE,buffer 3 = 2 panels,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_NODE (role 'buffer_3' not found in the model)
+offline_baseline,offline,offline-rules,B2,1,B2-R21,no_resource,RESOURCE_ASSIGNMENT,printer automatic,CORRECT,,,True,False,
+offline_baseline,offline,offline-rules,B2,1,B2-R22,no_resource,RESOURCE_ASSIGNMENT,pnp automatic,CORRECT,,,True,False,
+offline_baseline,offline,offline-rules,B2,1,B2-R23,no_resource,RESOURCE_ASSIGNMENT,reflow automatic,CORRECT,,,True,False,
+offline_baseline,offline,offline-rules,B2,1,B2-R24,no_resource,RESOURCE_ASSIGNMENT,aoi automatic,CORRECT,,,True,False,
+offline_baseline,offline,offline-rules,B2,1,B2-R25,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,B2,1,B2-R26,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,B3,1,B3-R01,flow,TOPOLOGY,topology in flow order,WRONG,TOPOLOGY_ERROR,CRITICAL,True,False,"missing roles [] (flagged: []); order WRONG; extra nodes [('transport_2', 'rack_transport'), ('buffer_2', 'buffer')]"
+offline_baseline,offline,offline-rules,B3,1,B3-R02,component,COMPONENT_MATCH,assembly -> accepted library component,CORRECT,,,True,False,manual_assembly = manual_assembly
+offline_baseline,offline,offline-rules,B3,1,B3-R03,component,COMPONENT_MATCH,transport -> accepted library component,CORRECT,,,True,False,transport_1 = rack_transport
+offline_baseline,offline,offline-rules,B3,1,B3-R04,component,COMPONENT_MATCH,buffer -> accepted library component,CORRECT,,,True,False,buffer_1 = buffer
+offline_baseline,offline,offline-rules,B3,1,B3-R05,component,COMPONENT_MATCH,selective -> accepted library component,CORRECT,,,True,False,selective_soldering = selective_soldering
+offline_baseline,offline,offline-rules,B3,1,B3-R06,component,COMPONENT_MATCH,review -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,B3,1,B3-R07,value,PARAMETER_VALUE,assembly 2 min per rack,WRONG,FALSE_MISSING,MINOR,True,True,manual_assembly_time has no value although the text gives it; asked «Tiempo de carga en 'Transporte 1' (s)»
+offline_baseline,offline,offline-rules,B3,1,B3-R08,value,PARAMETER_VALUE,load 5 s,WRONG,FALSE_MISSING,MINOR,True,False,transport_1_load_time has no value although the text gives it; asked «Tiempo de carga en 'Transporte 1' (s)»
+offline_baseline,offline,offline-rules,B3,1,B3-R09,value,PARAMETER_VALUE,unload 3 s,WRONG,FALSE_MISSING,MINOR,True,False,transport_1_unload_time has no value although the text gives it; asked «Tiempo de carga en 'Transporte 1' (s)»
+offline_baseline,offline,offline-rules,B3,1,B3-R10,value,PARAMETER_VALUE,assembly->buffer 1250 cm = 12.5 m,OMITTED,SILENT_OMISSION,CRITICAL,True,True,NO_DISTANCE (no distance between the two roles)
+offline_baseline,offline,offline-rules,B3,1,B3-R11,value,PARAMETER_VALUE,buffer->review 3500 mm = 3.5 m,WRONG,FALSE_MISSING,MINOR,True,True,dist_buffer_1_inspection has no value although the text gives it
+offline_baseline,offline,offline-rules,B3,1,B3-R12,value,PARAMETER_VALUE,walking speed 0.9 m/s,WRONG,FALSE_MISSING,MINOR,True,False,operator_walking_speed has no value although the text gives it
+offline_baseline,offline,offline-rules,B3,1,B3-R13,value,PARAMETER_VALUE,buffer 4 racks,CORRECT,,,True,False,buffer_1: 4.0
+offline_baseline,offline,offline-rules,B3,1,B3-R14,value,PARAMETER_VALUE,selective 40 s per rack,CORRECT,,,True,False,selective_soldering: 40.0 s x 1 = 40.0 s per entity
+offline_baseline,offline,offline-rules,B3,1,B3-R15,value,PARAMETER_VALUE,review 45 s per rack,CORRECT,,,True,False,inspection: 45.0 s x 1 = 45.0 s per entity
+offline_baseline,offline,offline-rules,B3,1,B3-R16,value,PARAMETER_VALUE,2 racks,CORRECT,,,True,False,carrier: 2.0
+offline_baseline,offline,offline-rules,B3,1,B3-R17,carrier,CARRIER_SEMANTICS,rack loop,WRONG,CARRIER_SEMANTICS_ERROR,CRITICAL,True,False,"seize ['selective_soldering'], release ['manual_assembly'], release_via []"
+offline_baseline,offline,offline-rules,B3,1,B3-R18,shared_resource,RESOURCE_ASSIGNMENT,"one operator: assembly, transport, review",WRONG,RESOURCE_ASSIGNMENT_ERROR,CRITICAL,True,False,"roles ['assembly', 'transport', 'review'] -> operators [None, 'operator_1', 'operator_1']"
+offline_baseline,offline,offline-rules,B3,1,B3-R19,strategy,STRATEGY,no rule invented,WRONG,STRATEGY_ERROR,MAJOR,True,False,no operator found
+offline_baseline,offline,offline-rules,B3,1,B3-R20,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,B3,1,B3-R21,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,B4,1,B4-R01,flow,TOPOLOGY,topology in flow order,CORRECT,,,True,False,steps in order (wrong components counted separately: ['packaging'])
+offline_baseline,offline,offline-rules,B4,1,B4-R02,component,COMPONENT_MATCH,test -> accepted library component,CORRECT,,,True,False,test_station = test_station
+offline_baseline,offline,offline-rules,B4,1,B4-R03,component,COMPONENT_MATCH,buffer -> accepted library component,CORRECT,,,True,False,buffer_1 = buffer
+offline_baseline,offline,offline-rules,B4,1,B4-R04,component,COMPONENT_MATCH,packaging -> accepted library component,WRONG,COMPONENT_MATCH_ERROR,CRITICAL,True,False,step present as 'wave_soldering' (wave_soldering); expected one of ['packaging']
+offline_baseline,offline,offline-rules,B4,1,B4-R05,value,PARAMETER_VALUE,test 0.75 min PER_BOX,CORRECT,,,True,True,test_station: 45.0 s x 1 = 45.0 s per entity
+offline_baseline,offline,offline-rules,B4,1,B4-R06,basis,SEMANTIC_BASIS,test per box,CORRECT,,,True,False,per_entity (work_units=1)
+offline_baseline,offline,offline-rules,B4,1,B4-R07,value,PARAMETER_VALUE,packaging 3 s PER_PIECE,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"3.0 s x 1 = 3.0 s per entity; expected 30.0 (3.0 per_item, x10)"
+offline_baseline,offline,offline-rules,B4,1,B4-R08,basis,SEMANTIC_BASIS,packaging per piece,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"expected per_item, model per_entity (work_units=1); time per entity CHANGED"
+offline_baseline,offline,offline-rules,B4,1,B4-R09,value,PARAMETER_VALUE,10 pieces per box,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_PARAM (-)
+offline_baseline,offline,offline-rules,B4,1,B4-R10,value,PARAMETER_VALUE,buffer 2 boxes,CORRECT,,,True,False,buffer_1: 2.0
+offline_baseline,offline,offline-rules,B4,1,B4-R11,no_resource,RESOURCE_ASSIGNMENT,test automatic,CORRECT,,,True,False,
+offline_baseline,offline,offline-rules,B4,1,B4-R12,value,PARAMETER_VALUE,one operator packs,CORRECT,,,True,False,wave_soldering: 1.0
+offline_baseline,offline,offline-rules,B4,1,B4-R13,value,PARAMETER_VALUE,7.5 h,WRONG,PARAMETER_VALUE_ERROR,MAJOR,True,True,simulation.horizon: 28800.0 != 27000.0
+offline_baseline,offline,offline-rules,B4,1,B4-R14,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,C1,1,C1-R01,flow,TOPOLOGY,topology in flow order,WRONG,TOPOLOGY_ERROR,CRITICAL,True,False,"missing roles [] (flagged: []); order OK; extra nodes [('transport_1', 'rack_transport'), ('inspection_2', 'inspection')]"
+offline_baseline,offline,offline-rules,C1,1,C1-R02,component,COMPONENT_MATCH,assembly -> accepted library component,CORRECT,,,True,False,manual_assembly = manual_assembly
+offline_baseline,offline,offline-rules,C1,1,C1-R03,component,COMPONENT_MATCH,buffer -> accepted library component,CORRECT,,,True,False,buffer_1 = buffer
+offline_baseline,offline,offline-rules,C1,1,C1-R04,component,COMPONENT_MATCH,selective -> accepted library component,CORRECT,,,True,False,selective_soldering = selective_soldering
+offline_baseline,offline,offline-rules,C1,1,C1-R05,component,COMPONENT_MATCH,review -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,C1,1,C1-R06,value,PARAMETER_VALUE,assembly 30 s PER_CIRCUIT,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"30.0 s x 1 = 30.0 s per entity; expected 120.0 (30.0 per_item, x4)"
+offline_baseline,offline,offline-rules,C1,1,C1-R07,basis,SEMANTIC_BASIS,assembly time basis = per circuit,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"expected per_item, model per_entity (work_units=1); time per entity CHANGED"
+offline_baseline,offline,offline-rules,C1,1,C1-R08,value,PARAMETER_VALUE,4 circuits per rack,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_PARAM (-)
+offline_baseline,offline,offline-rules,C1,1,C1-R09,value,PARAMETER_VALUE,buffer 3 racks,CORRECT,,,True,False,buffer_1: 3.0
+offline_baseline,offline,offline-rules,C1,1,C1-R10,value,PARAMETER_VALUE,review 15 s PER_CIRCUIT,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"15.0 s x 1 = 15.0 s per entity; expected 60.0 (15.0 per_item, x4)"
+offline_baseline,offline,offline-rules,C1,1,C1-R11,basis,SEMANTIC_BASIS,review time basis = per circuit,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"expected per_item, model per_entity (work_units=1); time per entity CHANGED"
+offline_baseline,offline,offline-rules,C1,1,C1-R12,value,PARAMETER_VALUE,3 racks,CORRECT,,,True,False,carrier: 3.0
+offline_baseline,offline,offline-rules,C1,1,C1-R13,carrier,CARRIER_SEMANTICS,"rack taken at assembly, freed after review, immediately available",WRONG,CARRIER_SEMANTICS_ERROR,CRITICAL,True,False,"seize ['manual_assembly'], release ['inspection_2'], release_via []"
+offline_baseline,offline,offline-rules,C1,1,C1-R14,shared_resource,RESOURCE_ASSIGNMENT,same operator assembles and reviews,CORRECT,,,True,False,"['operator_1', 'operator_1']"
+offline_baseline,offline,offline-rules,C1,1,C1-R15,no_resource,RESOURCE_ASSIGNMENT,selective is automatic,CORRECT,,,True,False,
+offline_baseline,offline,offline-rules,C1,1,C1-R16,strategy,STRATEGY,no priority stated -> none invented,CORRECT,,,True,False,"fifo + «'Operario' hace Manual assembly, Inspection. Cuando varias tareas le requieren a la vez, ¿cuál tiene»"
+offline_baseline,offline,offline-rules,C1,1,C1-R17,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,C1,1,C1-R18,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,C1,1,C1-R19,ambiguity,AMBIGUITY_DETECTION,"'la selectiva tarda 20 s' with 4 circuits/rack: per rack or per circuit? must ASK, not guess",WRONG,AMBIGUITY_NOT_DETECTED,CRITICAL,True,False,resolved silently
+offline_baseline,offline,offline-rules,C1,2,C1-R01,flow,TOPOLOGY,topology in flow order,WRONG,TOPOLOGY_ERROR,CRITICAL,True,False,"missing roles [] (flagged: []); order OK; extra nodes [('transport_1', 'rack_transport'), ('inspection_2', 'inspection')]"
+offline_baseline,offline,offline-rules,C1,2,C1-R02,component,COMPONENT_MATCH,assembly -> accepted library component,CORRECT,,,True,False,manual_assembly = manual_assembly
+offline_baseline,offline,offline-rules,C1,2,C1-R03,component,COMPONENT_MATCH,buffer -> accepted library component,CORRECT,,,True,False,buffer_1 = buffer
+offline_baseline,offline,offline-rules,C1,2,C1-R04,component,COMPONENT_MATCH,selective -> accepted library component,CORRECT,,,True,False,selective_soldering = selective_soldering
+offline_baseline,offline,offline-rules,C1,2,C1-R05,component,COMPONENT_MATCH,review -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,C1,2,C1-R06,value,PARAMETER_VALUE,assembly 30 s PER_CIRCUIT,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"30.0 s x 1 = 30.0 s per entity; expected 120.0 (30.0 per_item, x4)"
+offline_baseline,offline,offline-rules,C1,2,C1-R07,basis,SEMANTIC_BASIS,assembly time basis = per circuit,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"expected per_item, model per_entity (work_units=1); time per entity CHANGED"
+offline_baseline,offline,offline-rules,C1,2,C1-R08,value,PARAMETER_VALUE,4 circuits per rack,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_PARAM (-)
+offline_baseline,offline,offline-rules,C1,2,C1-R09,value,PARAMETER_VALUE,buffer 3 racks,CORRECT,,,True,False,buffer_1: 3.0
+offline_baseline,offline,offline-rules,C1,2,C1-R10,value,PARAMETER_VALUE,review 15 s PER_CIRCUIT,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"15.0 s x 1 = 15.0 s per entity; expected 60.0 (15.0 per_item, x4)"
+offline_baseline,offline,offline-rules,C1,2,C1-R11,basis,SEMANTIC_BASIS,review time basis = per circuit,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"expected per_item, model per_entity (work_units=1); time per entity CHANGED"
+offline_baseline,offline,offline-rules,C1,2,C1-R12,value,PARAMETER_VALUE,3 racks,CORRECT,,,True,False,carrier: 3.0
+offline_baseline,offline,offline-rules,C1,2,C1-R13,carrier,CARRIER_SEMANTICS,"rack taken at assembly, freed after review, immediately available",WRONG,CARRIER_SEMANTICS_ERROR,CRITICAL,True,False,"seize ['manual_assembly'], release ['inspection_2'], release_via []"
+offline_baseline,offline,offline-rules,C1,2,C1-R14,shared_resource,RESOURCE_ASSIGNMENT,same operator assembles and reviews,CORRECT,,,True,False,"['operator_1', 'operator_1']"
+offline_baseline,offline,offline-rules,C1,2,C1-R15,no_resource,RESOURCE_ASSIGNMENT,selective is automatic,CORRECT,,,True,False,
+offline_baseline,offline,offline-rules,C1,2,C1-R16,strategy,STRATEGY,no priority stated -> none invented,CORRECT,,,True,False,"fifo + «'Operario' hace Manual assembly, Inspection. Cuando varias tareas le requieren a la vez, ¿cuál tiene»"
+offline_baseline,offline,offline-rules,C1,2,C1-R17,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,C1,2,C1-R18,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,C1,2,C1-R19,ambiguity,AMBIGUITY_DETECTION,"'la selectiva tarda 20 s' with 4 circuits/rack: per rack or per circuit? must ASK, not guess",WRONG,AMBIGUITY_NOT_DETECTED,CRITICAL,True,False,resolved silently
+offline_baseline,offline,offline-rules,C1,3,C1-R01,flow,TOPOLOGY,topology in flow order,WRONG,TOPOLOGY_ERROR,CRITICAL,True,False,"missing roles [] (flagged: []); order OK; extra nodes [('transport_1', 'rack_transport'), ('inspection_2', 'inspection')]"
+offline_baseline,offline,offline-rules,C1,3,C1-R02,component,COMPONENT_MATCH,assembly -> accepted library component,CORRECT,,,True,False,manual_assembly = manual_assembly
+offline_baseline,offline,offline-rules,C1,3,C1-R03,component,COMPONENT_MATCH,buffer -> accepted library component,CORRECT,,,True,False,buffer_1 = buffer
+offline_baseline,offline,offline-rules,C1,3,C1-R04,component,COMPONENT_MATCH,selective -> accepted library component,CORRECT,,,True,False,selective_soldering = selective_soldering
+offline_baseline,offline,offline-rules,C1,3,C1-R05,component,COMPONENT_MATCH,review -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,C1,3,C1-R06,value,PARAMETER_VALUE,assembly 30 s PER_CIRCUIT,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"30.0 s x 1 = 30.0 s per entity; expected 120.0 (30.0 per_item, x4)"
+offline_baseline,offline,offline-rules,C1,3,C1-R07,basis,SEMANTIC_BASIS,assembly time basis = per circuit,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"expected per_item, model per_entity (work_units=1); time per entity CHANGED"
+offline_baseline,offline,offline-rules,C1,3,C1-R08,value,PARAMETER_VALUE,4 circuits per rack,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_PARAM (-)
+offline_baseline,offline,offline-rules,C1,3,C1-R09,value,PARAMETER_VALUE,buffer 3 racks,CORRECT,,,True,False,buffer_1: 3.0
+offline_baseline,offline,offline-rules,C1,3,C1-R10,value,PARAMETER_VALUE,review 15 s PER_CIRCUIT,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"15.0 s x 1 = 15.0 s per entity; expected 60.0 (15.0 per_item, x4)"
+offline_baseline,offline,offline-rules,C1,3,C1-R11,basis,SEMANTIC_BASIS,review time basis = per circuit,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"expected per_item, model per_entity (work_units=1); time per entity CHANGED"
+offline_baseline,offline,offline-rules,C1,3,C1-R12,value,PARAMETER_VALUE,3 racks,CORRECT,,,True,False,carrier: 3.0
+offline_baseline,offline,offline-rules,C1,3,C1-R13,carrier,CARRIER_SEMANTICS,"rack taken at assembly, freed after review, immediately available",WRONG,CARRIER_SEMANTICS_ERROR,CRITICAL,True,False,"seize ['manual_assembly'], release ['inspection_2'], release_via []"
+offline_baseline,offline,offline-rules,C1,3,C1-R14,shared_resource,RESOURCE_ASSIGNMENT,same operator assembles and reviews,CORRECT,,,True,False,"['operator_1', 'operator_1']"
+offline_baseline,offline,offline-rules,C1,3,C1-R15,no_resource,RESOURCE_ASSIGNMENT,selective is automatic,CORRECT,,,True,False,
+offline_baseline,offline,offline-rules,C1,3,C1-R16,strategy,STRATEGY,no priority stated -> none invented,CORRECT,,,True,False,"fifo + «'Operario' hace Manual assembly, Inspection. Cuando varias tareas le requieren a la vez, ¿cuál tiene»"
+offline_baseline,offline,offline-rules,C1,3,C1-R17,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,C1,3,C1-R18,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,C1,3,C1-R19,ambiguity,AMBIGUITY_DETECTION,"'la selectiva tarda 20 s' with 4 circuits/rack: per rack or per circuit? must ASK, not guess",WRONG,AMBIGUITY_NOT_DETECTED,CRITICAL,True,False,resolved silently
+offline_baseline,offline,offline-rules,C1,4,C1-R01,flow,TOPOLOGY,topology in flow order,WRONG,TOPOLOGY_ERROR,CRITICAL,True,False,"missing roles [] (flagged: []); order OK; extra nodes [('transport_1', 'rack_transport'), ('inspection_2', 'inspection')]"
+offline_baseline,offline,offline-rules,C1,4,C1-R02,component,COMPONENT_MATCH,assembly -> accepted library component,CORRECT,,,True,False,manual_assembly = manual_assembly
+offline_baseline,offline,offline-rules,C1,4,C1-R03,component,COMPONENT_MATCH,buffer -> accepted library component,CORRECT,,,True,False,buffer_1 = buffer
+offline_baseline,offline,offline-rules,C1,4,C1-R04,component,COMPONENT_MATCH,selective -> accepted library component,CORRECT,,,True,False,selective_soldering = selective_soldering
+offline_baseline,offline,offline-rules,C1,4,C1-R05,component,COMPONENT_MATCH,review -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,C1,4,C1-R06,value,PARAMETER_VALUE,assembly 30 s PER_CIRCUIT,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"30.0 s x 1 = 30.0 s per entity; expected 120.0 (30.0 per_item, x4)"
+offline_baseline,offline,offline-rules,C1,4,C1-R07,basis,SEMANTIC_BASIS,assembly time basis = per circuit,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"expected per_item, model per_entity (work_units=1); time per entity CHANGED"
+offline_baseline,offline,offline-rules,C1,4,C1-R08,value,PARAMETER_VALUE,4 circuits per rack,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_PARAM (-)
+offline_baseline,offline,offline-rules,C1,4,C1-R09,value,PARAMETER_VALUE,buffer 3 racks,CORRECT,,,True,False,buffer_1: 3.0
+offline_baseline,offline,offline-rules,C1,4,C1-R10,value,PARAMETER_VALUE,review 15 s PER_CIRCUIT,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"15.0 s x 1 = 15.0 s per entity; expected 60.0 (15.0 per_item, x4)"
+offline_baseline,offline,offline-rules,C1,4,C1-R11,basis,SEMANTIC_BASIS,review time basis = per circuit,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"expected per_item, model per_entity (work_units=1); time per entity CHANGED"
+offline_baseline,offline,offline-rules,C1,4,C1-R12,value,PARAMETER_VALUE,3 racks,CORRECT,,,True,False,carrier: 3.0
+offline_baseline,offline,offline-rules,C1,4,C1-R13,carrier,CARRIER_SEMANTICS,"rack taken at assembly, freed after review, immediately available",WRONG,CARRIER_SEMANTICS_ERROR,CRITICAL,True,False,"seize ['manual_assembly'], release ['inspection_2'], release_via []"
+offline_baseline,offline,offline-rules,C1,4,C1-R14,shared_resource,RESOURCE_ASSIGNMENT,same operator assembles and reviews,CORRECT,,,True,False,"['operator_1', 'operator_1']"
+offline_baseline,offline,offline-rules,C1,4,C1-R15,no_resource,RESOURCE_ASSIGNMENT,selective is automatic,CORRECT,,,True,False,
+offline_baseline,offline,offline-rules,C1,4,C1-R16,strategy,STRATEGY,no priority stated -> none invented,CORRECT,,,True,False,"fifo + «'Operario' hace Manual assembly, Inspection. Cuando varias tareas le requieren a la vez, ¿cuál tiene»"
+offline_baseline,offline,offline-rules,C1,4,C1-R17,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,C1,4,C1-R18,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,C1,4,C1-R19,ambiguity,AMBIGUITY_DETECTION,"'la selectiva tarda 20 s' with 4 circuits/rack: per rack or per circuit? must ASK, not guess",WRONG,AMBIGUITY_NOT_DETECTED,CRITICAL,True,False,resolved silently
+offline_baseline,offline,offline-rules,C1,5,C1-R01,flow,TOPOLOGY,topology in flow order,WRONG,TOPOLOGY_ERROR,CRITICAL,True,False,"missing roles [] (flagged: []); order OK; extra nodes [('transport_1', 'rack_transport'), ('inspection_2', 'inspection')]"
+offline_baseline,offline,offline-rules,C1,5,C1-R02,component,COMPONENT_MATCH,assembly -> accepted library component,CORRECT,,,True,False,manual_assembly = manual_assembly
+offline_baseline,offline,offline-rules,C1,5,C1-R03,component,COMPONENT_MATCH,buffer -> accepted library component,CORRECT,,,True,False,buffer_1 = buffer
+offline_baseline,offline,offline-rules,C1,5,C1-R04,component,COMPONENT_MATCH,selective -> accepted library component,CORRECT,,,True,False,selective_soldering = selective_soldering
+offline_baseline,offline,offline-rules,C1,5,C1-R05,component,COMPONENT_MATCH,review -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,C1,5,C1-R06,value,PARAMETER_VALUE,assembly 30 s PER_CIRCUIT,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"30.0 s x 1 = 30.0 s per entity; expected 120.0 (30.0 per_item, x4)"
+offline_baseline,offline,offline-rules,C1,5,C1-R07,basis,SEMANTIC_BASIS,assembly time basis = per circuit,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"expected per_item, model per_entity (work_units=1); time per entity CHANGED"
+offline_baseline,offline,offline-rules,C1,5,C1-R08,value,PARAMETER_VALUE,4 circuits per rack,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_PARAM (-)
+offline_baseline,offline,offline-rules,C1,5,C1-R09,value,PARAMETER_VALUE,buffer 3 racks,CORRECT,,,True,False,buffer_1: 3.0
+offline_baseline,offline,offline-rules,C1,5,C1-R10,value,PARAMETER_VALUE,review 15 s PER_CIRCUIT,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"15.0 s x 1 = 15.0 s per entity; expected 60.0 (15.0 per_item, x4)"
+offline_baseline,offline,offline-rules,C1,5,C1-R11,basis,SEMANTIC_BASIS,review time basis = per circuit,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"expected per_item, model per_entity (work_units=1); time per entity CHANGED"
+offline_baseline,offline,offline-rules,C1,5,C1-R12,value,PARAMETER_VALUE,3 racks,CORRECT,,,True,False,carrier: 3.0
+offline_baseline,offline,offline-rules,C1,5,C1-R13,carrier,CARRIER_SEMANTICS,"rack taken at assembly, freed after review, immediately available",WRONG,CARRIER_SEMANTICS_ERROR,CRITICAL,True,False,"seize ['manual_assembly'], release ['inspection_2'], release_via []"
+offline_baseline,offline,offline-rules,C1,5,C1-R14,shared_resource,RESOURCE_ASSIGNMENT,same operator assembles and reviews,CORRECT,,,True,False,"['operator_1', 'operator_1']"
+offline_baseline,offline,offline-rules,C1,5,C1-R15,no_resource,RESOURCE_ASSIGNMENT,selective is automatic,CORRECT,,,True,False,
+offline_baseline,offline,offline-rules,C1,5,C1-R16,strategy,STRATEGY,no priority stated -> none invented,CORRECT,,,True,False,"fifo + «'Operario' hace Manual assembly, Inspection. Cuando varias tareas le requieren a la vez, ¿cuál tiene»"
+offline_baseline,offline,offline-rules,C1,5,C1-R17,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,C1,5,C1-R18,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,C1,5,C1-R19,ambiguity,AMBIGUITY_DETECTION,"'la selectiva tarda 20 s' with 4 circuits/rack: per rack or per circuit? must ASK, not guess",WRONG,AMBIGUITY_NOT_DETECTED,CRITICAL,True,False,resolved silently
+offline_baseline,offline,offline-rules,C2,1,C2-R01,flow,TOPOLOGY,topology in flow order,CORRECT,,,True,False,
+offline_baseline,offline,offline-rules,C2,1,C2-R02,component,COMPONENT_MATCH,assembly -> accepted library component,CORRECT,,,True,False,manual_assembly = manual_assembly
+offline_baseline,offline,offline-rules,C2,1,C2-R03,component,COMPONENT_MATCH,transport -> accepted library component,CORRECT,,,True,False,transport_1 = rack_transport
+offline_baseline,offline,offline-rules,C2,1,C2-R04,component,COMPONENT_MATCH,buffer -> accepted library component,CORRECT,,,True,False,buffer_1 = buffer
+offline_baseline,offline,offline-rules,C2,1,C2-R05,component,COMPONENT_MATCH,selective -> accepted library component,CORRECT,,,True,False,selective_soldering = selective_soldering
+offline_baseline,offline,offline-rules,C2,1,C2-R06,component,COMPONENT_MATCH,review -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,C2,1,C2-R07,missing,MISSING_DETECTION,distance assembly->selective not given -> MISSING,MISSING_DETECTED,,,True,False,NO_DISTANCE; question «Distancia de 'Transporte 1' (m)»
+offline_baseline,offline,offline-rules,C2,1,C2-R08,missing,MISSING_DETECTION,walking speed not given -> MISSING,MISSING_DETECTED,,,True,False,NO_TRAVEL; question «Velocidad de 'Transporte 1' (m/s)»
+offline_baseline,offline,offline-rules,C2,1,C2-R09,missing,MISSING_DETECTION,load time not given -> MISSING,MISSING_DETECTED,,,True,False,transport_1_load_time = None; «Tiempo de carga en 'Transporte 1' (s)»
+offline_baseline,offline,offline-rules,C2,1,C2-R10,missing,MISSING_DETECTION,unload time not given -> MISSING,MISSING_DETECTED,,,True,False,transport_1_unload_time = None; «Tiempo de descarga en 'Transporte 1' (s)»
+offline_baseline,offline,offline-rules,C2,1,C2-R11,missing,MISSING_DETECTION,walking distance to review: needed only if walking is modelled (engineer decides),MISSING_DETECTED,,,False,False,[GOLD_REQUIRES_ENGINEER_REVIEW: not counted] NO_DISTANCE; question «Distancia de 'Transporte 1' (m)»
+offline_baseline,offline,offline-rules,C2,1,C2-R12,value,PARAMETER_VALUE,assembly 120 s per rack,CORRECT,,,True,False,manual_assembly: 120.0 s x 1 = 120.0 s per entity
+offline_baseline,offline,offline-rules,C2,1,C2-R13,value,PARAMETER_VALUE,buffer 3,CORRECT,,,True,False,buffer_1: 3.0
+offline_baseline,offline,offline-rules,C2,1,C2-R14,value,PARAMETER_VALUE,selective 20 s per rack,CORRECT,,,True,False,selective_soldering: 20.0 s x 1 = 20.0 s per entity
+offline_baseline,offline,offline-rules,C2,1,C2-R15,value,PARAMETER_VALUE,review 60 s per rack,CORRECT,,,True,False,inspection: 60.0 s x 1 = 60.0 s per entity
+offline_baseline,offline,offline-rules,C2,1,C2-R16,value,PARAMETER_VALUE,3 racks,CORRECT,,,True,False,carrier: 3.0
+offline_baseline,offline,offline-rules,C2,1,C2-R17,carrier,CARRIER_SEMANTICS,rack loop,CORRECT,,,True,False,seize ['manual_assembly'] release ['inspection']
+offline_baseline,offline,offline-rules,C2,1,C2-R18,shared_resource,RESOURCE_ASSIGNMENT,same operator,WRONG,RESOURCE_ASSIGNMENT_ERROR,CRITICAL,True,False,"roles ['assembly', 'transport', 'review'] -> operators ['operator_1', None, 'operator_1']"
+offline_baseline,offline,offline-rules,C2,1,C2-R19,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,C2,1,C2-R20,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,C3,1,C3-R01,flow,TOPOLOGY,topology in flow order,WRONG,TOPOLOGY_ERROR,CRITICAL,True,False,missing roles ['buffer'] (flagged: []); order OK; extra nodes []
+offline_baseline,offline,offline-rules,C3,1,C3-R02,component,COMPONENT_MATCH,assembly -> accepted library component,CORRECT,,,True,False,manual_assembly = manual_assembly
+offline_baseline,offline,offline-rules,C3,1,C3-R03,component,COMPONENT_MATCH,buffer -> accepted library component,OMITTED,SILENT_OMISSION,CRITICAL,True,False,step not in the model and not flagged
+offline_baseline,offline,offline-rules,C3,1,C3-R04,component,COMPONENT_MATCH,selective -> accepted library component,CORRECT,,,True,False,selective_soldering = selective_soldering
+offline_baseline,offline,offline-rules,C3,1,C3-R05,component,COMPONENT_MATCH,review -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,C3,1,C3-R06,strategy,STRATEGY,WIP target strategy protecting the selective,CORRECT,,,True,False,wip_target
+offline_baseline,offline,offline-rules,C3,1,C3-R07,strategy,STRATEGY,feeding tasks = assembly (intent not explicit),CORRECT,,,False,False,[GOLD_REQUIRES_ENGINEER_REVIEW: not counted] wip_target
+offline_baseline,offline,offline-rules,C3,1,C3-R08,missing,MISSING_DETECTION,WIP target value not given -> MISSING,MISSING_DETECTED,,,True,False,wip_target = None; «WIP objetivo delante de la estación protegida (units)»
+offline_baseline,offline,offline-rules,C3,1,C3-R09,value,PARAMETER_VALUE,assembly 2 min,CORRECT,,,True,True,manual_assembly: 120.0 s x 1 = 120.0 s per entity
+offline_baseline,offline,offline-rules,C3,1,C3-R10,value,PARAMETER_VALUE,buffer 3,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_NODE (role 'buffer' not found in the model)
+offline_baseline,offline,offline-rules,C3,1,C3-R11,value,PARAMETER_VALUE,selective 40 s,CORRECT,,,True,False,selective_soldering: 40.0 s x 1 = 40.0 s per entity
+offline_baseline,offline,offline-rules,C3,1,C3-R12,value,PARAMETER_VALUE,review 50 s,CORRECT,,,True,False,inspection: 50.0 s x 1 = 50.0 s per entity
+offline_baseline,offline,offline-rules,C3,1,C3-R13,value,PARAMETER_VALUE,3 racks,CORRECT,,,True,False,carrier: 3.0
+offline_baseline,offline,offline-rules,C3,1,C3-R14,shared_resource,RESOURCE_ASSIGNMENT,same operator,CORRECT,,,True,False,"['operator_1', 'operator_1']"
+offline_baseline,offline,offline-rules,C3,1,C3-R15,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,C3,1,C3-R16,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,C4,1,C4-R01,flow,TOPOLOGY,topology in flow order,CORRECT,,,True,False,
+offline_baseline,offline,offline-rules,C4,1,C4-R02,component,COMPONENT_MATCH,assembly -> accepted library component,CORRECT,,,True,False,manual_assembly = manual_assembly
+offline_baseline,offline,offline-rules,C4,1,C4-R03,component,COMPONENT_MATCH,buffer -> accepted library component,CORRECT,,,True,False,buffer_1 = buffer
+offline_baseline,offline,offline-rules,C4,1,C4-R04,component,COMPONENT_MATCH,machine -> accepted library component,CORRECT,,,True,False,machine = machine
+offline_baseline,offline,offline-rules,C4,1,C4-R05,component,COMPONENT_MATCH,inspection -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,C4,1,C4-R06,missing,MISSING_DETECTION,buffer capacity -> MISSING,MISSING_DETECTED,,,True,False,buffer_1_capacity = None; «Capacidad de 'Buffer 1' (units)»
+offline_baseline,offline,offline-rules,C4,1,C4-R07,missing,MISSING_DETECTION,inspection time -> MISSING,MISSING_DETECTED,,,True,False,inspection_time = None; «Tiempo de proceso de 'Inspection' (s)»
+offline_baseline,offline,offline-rules,C4,1,C4-R08,value,PARAMETER_VALUE,assembly 50 s,CORRECT,,,True,False,manual_assembly: 50.0 s x 1 = 50.0 s per entity
+offline_baseline,offline,offline-rules,C4,1,C4-R09,value,PARAMETER_VALUE,machine 40 s,CORRECT,,,True,False,machine: 40.0 s x 1 = 40.0 s per entity
+offline_baseline,offline,offline-rules,C4,1,C4-R10,shared_resource,RESOURCE_ASSIGNMENT,same operator,CORRECT,,,True,False,"['operator_1', 'operator_1']"
+offline_baseline,offline,offline-rules,C4,1,C4-R11,strategy,STRATEGY,no rule invented,CORRECT,,,True,False,"fifo + «'Operario' hace Manual assembly, Inspection. Cuando varias tareas le requieren a la vez, ¿cuál tiene»"
+offline_baseline,offline,offline-rules,C4,1,C4-R12,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,C4,1,C4-R13,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,D1,1,D1-R01,flow,TOPOLOGY,topology in flow order,CORRECT,,,True,False,
+offline_baseline,offline,offline-rules,D1,1,D1-R02,component,COMPONENT_MATCH,assembly -> accepted library component,CORRECT,,,True,False,manual_assembly = manual_assembly
+offline_baseline,offline,offline-rules,D1,1,D1-R03,component,COMPONENT_MATCH,buffer -> accepted library component,CORRECT,,,True,False,buffer_de_entrada = buffer
+offline_baseline,offline,offline-rules,D1,1,D1-R04,component,COMPONENT_MATCH,selective -> accepted library component,CORRECT,,,True,False,selective_soldering = selective_soldering
+offline_baseline,offline,offline-rules,D1,1,D1-R05,component,COMPONENT_MATCH,review -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,D1,1,D1-R06,conflict,CONFLICT_DETECTION,capacity 5 vs 3 -> ASK,WRONG,CONTRADICTION_NOT_DETECTED,CRITICAL,True,False,model uses 5.0 (provided_by_client); silent choice
+offline_baseline,offline,offline-rules,D1,1,D1-R07,value,PARAMETER_VALUE,assembly 120 s,CORRECT,,,True,False,manual_assembly: 120.0 s x 1 = 120.0 s per entity
+offline_baseline,offline,offline-rules,D1,1,D1-R08,value,PARAMETER_VALUE,selective 30 s,CORRECT,,,True,False,selective_soldering: 30.0 s x 1 = 30.0 s per entity
+offline_baseline,offline,offline-rules,D1,1,D1-R09,value,PARAMETER_VALUE,review 60 s,CORRECT,,,True,False,inspection: 60.0 s x 1 = 60.0 s per entity
+offline_baseline,offline,offline-rules,D1,1,D1-R10,value,PARAMETER_VALUE,4 racks,WRONG,PARAMETER_VALUE_ERROR,CRITICAL,True,False,carrier: 3.0 != 4.0
+offline_baseline,offline,offline-rules,D1,1,D1-R11,shared_resource,RESOURCE_ASSIGNMENT,same operator,CORRECT,,,True,False,"['operator_1', 'operator_1']"
+offline_baseline,offline,offline-rules,D1,1,D1-R12,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,D1,1,D1-R13,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,D2,1,D2-R01,flow,TOPOLOGY,topology in flow order,WRONG,TOPOLOGY_ERROR,CRITICAL,True,False,"missing roles [] (flagged: []); order OK; extra nodes [('transport_1', 'transport')]"
+offline_baseline,offline,offline-rules,D2,1,D2-R02,component,COMPONENT_MATCH,assembly -> accepted library component,CORRECT,,,True,False,manual_assembly = manual_assembly
+offline_baseline,offline,offline-rules,D2,1,D2-R03,component,COMPONENT_MATCH,buffer -> accepted library component,CORRECT,,,True,False,buffer_1 = buffer
+offline_baseline,offline,offline-rules,D2,1,D2-R04,component,COMPONENT_MATCH,machine -> accepted library component,CORRECT,,,True,False,machine = machine
+offline_baseline,offline,offline-rules,D2,1,D2-R05,component,COMPONENT_MATCH,inspection -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,D2,1,D2-R06,conflict,CONFLICT_DETECTION,60 s vs 75 s -> ASK,WRONG,CONTRADICTION_NOT_DETECTED,CRITICAL,True,False,model uses 60.0 (provided_by_client); silent choice
+offline_baseline,offline,offline-rules,D2,1,D2-R07,value,PARAMETER_VALUE,buffer 5,CORRECT,,,True,False,buffer_1: 5.0
+offline_baseline,offline,offline-rules,D2,1,D2-R08,value,PARAMETER_VALUE,machine 45 s,CORRECT,,,True,False,machine: 45.0 s x 1 = 45.0 s per entity
+offline_baseline,offline,offline-rules,D2,1,D2-R09,value,PARAMETER_VALUE,inspection 20 s,CORRECT,,,True,False,inspection: 20.0 s x 1 = 20.0 s per entity
+offline_baseline,offline,offline-rules,D2,1,D2-R10,shared_resource,RESOURCE_ASSIGNMENT,same operator,CORRECT,,,True,False,"['operator_1', 'operator_1']"
+offline_baseline,offline,offline-rules,D2,1,D2-R11,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,D2,1,D2-R12,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,D3,1,D3-R01,flow,TOPOLOGY,"topology: the text does not say whether inspection is before or after the machine (case design flaw found while validating the harness; kept as written, excluded from accuracy)",WRONG,TOPOLOGY_ERROR,CRITICAL,False,False,[GOLD_REQUIRES_ENGINEER_REVIEW: not counted] missing roles [] (flagged: []); order WRONG; extra nodes []
+offline_baseline,offline,offline-rules,D3,1,D3-R02,component,COMPONENT_MATCH,assembly -> accepted library component,CORRECT,,,True,False,manual_assembly = manual_assembly
+offline_baseline,offline,offline-rules,D3,1,D3-R03,component,COMPONENT_MATCH,buffer -> accepted library component,CORRECT,,,True,False,buffer_1 = buffer
+offline_baseline,offline,offline-rules,D3,1,D3-R04,component,COMPONENT_MATCH,machine -> accepted library component,CORRECT,,,True,False,machine = machine
+offline_baseline,offline,offline-rules,D3,1,D3-R05,component,COMPONENT_MATCH,inspection -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,D3,1,D3-R06,conflict,CONFLICT_DETECTION,one operator vs two operators -> ASK,WRONG,CONTRADICTION_NOT_DETECTED,CRITICAL,True,False,model uses 1.0 (assumed); silent choice
+offline_baseline,offline,offline-rules,D3,1,D3-R07,value,PARAMETER_VALUE,assembly 60 s,CORRECT,,,True,False,manual_assembly: 60.0 s x 1 = 60.0 s per entity
+offline_baseline,offline,offline-rules,D3,1,D3-R08,value,PARAMETER_VALUE,buffer 5,CORRECT,,,True,False,buffer_1: 5.0
+offline_baseline,offline,offline-rules,D3,1,D3-R09,value,PARAMETER_VALUE,machine 45 s,CORRECT,,,True,False,machine: 45.0 s x 1 = 45.0 s per entity
+offline_baseline,offline,offline-rules,D3,1,D3-R10,value,PARAMETER_VALUE,inspection 20 s,CORRECT,,,True,False,inspection: 20.0 s x 1 = 20.0 s per entity
+offline_baseline,offline,offline-rules,D3,1,D3-R11,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,D3,1,D3-R12,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,D4,1,D4-R01,flow,TOPOLOGY,topology in flow order,WRONG,TOPOLOGY_ERROR,CRITICAL,True,False,"missing roles [] (flagged: []); order WRONG; extra nodes [('transport_2', 'rack_transport')]"
+offline_baseline,offline,offline-rules,D4,1,D4-R02,component,COMPONENT_MATCH,assembly -> accepted library component,CORRECT,,,True,False,manual_assembly = manual_assembly
+offline_baseline,offline,offline-rules,D4,1,D4-R03,component,COMPONENT_MATCH,transport -> accepted library component,CORRECT,,,True,False,transport_1 = rack_transport
+offline_baseline,offline,offline-rules,D4,1,D4-R04,component,COMPONENT_MATCH,buffer -> accepted library component,CORRECT,,,True,False,buffer_1 = buffer
+offline_baseline,offline,offline-rules,D4,1,D4-R05,component,COMPONENT_MATCH,selective -> accepted library component,CORRECT,,,True,False,selective_soldering = selective_soldering
+offline_baseline,offline,offline-rules,D4,1,D4-R06,component,COMPONENT_MATCH,review -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,D4,1,D4-R07,conflict,CONFLICT_DETECTION,8 m vs 12 m -> ASK,WRONG,CONTRADICTION_NOT_DETECTED,MAJOR,True,False,"no value chosen (NO_DISTANCE); asked as missing or not represented, conflict not stated"
+offline_baseline,offline,offline-rules,D4,1,D4-R08,value,PARAMETER_VALUE,assembly 100 s,WRONG,FALSE_MISSING,MINOR,True,False,manual_assembly_time has no value although the text gives it; asked «Tiempo de carga en 'Transporte 1' (s)»
+offline_baseline,offline,offline-rules,D4,1,D4-R09,value,PARAMETER_VALUE,load 4 s,WRONG,FALSE_MISSING,MINOR,True,False,transport_1_load_time has no value although the text gives it; asked «Tiempo de carga en 'Transporte 1' (s)»
+offline_baseline,offline,offline-rules,D4,1,D4-R10,value,PARAMETER_VALUE,unload 4 s,WRONG,FALSE_MISSING,MINOR,True,False,transport_1_unload_time has no value although the text gives it; asked «Tiempo de carga en 'Transporte 1' (s)»
+offline_baseline,offline,offline-rules,D4,1,D4-R11,value,PARAMETER_VALUE,1 m/s,WRONG,FALSE_MISSING,MINOR,True,False,operator_walking_speed has no value although the text gives it
+offline_baseline,offline,offline-rules,D4,1,D4-R12,value,PARAMETER_VALUE,buffer 3,CORRECT,,,True,False,buffer_1: 3.0
+offline_baseline,offline,offline-rules,D4,1,D4-R13,value,PARAMETER_VALUE,selective 30 s,CORRECT,,,True,False,selective_soldering: 30.0 s x 1 = 30.0 s per entity
+offline_baseline,offline,offline-rules,D4,1,D4-R14,value,PARAMETER_VALUE,review 50 s,CORRECT,,,True,False,inspection: 50.0 s x 1 = 50.0 s per entity
+offline_baseline,offline,offline-rules,D4,1,D4-R15,value,PARAMETER_VALUE,2 racks,WRONG,PARAMETER_VALUE_ERROR,CRITICAL,True,False,carrier: 3.0 != 2.0
+offline_baseline,offline,offline-rules,D4,1,D4-R16,shared_resource,RESOURCE_ASSIGNMENT,same operator,WRONG,RESOURCE_ASSIGNMENT_ERROR,CRITICAL,True,False,"roles ['assembly', 'transport', 'review'] -> operators [None, 'operator_1', 'operator_1']"
+offline_baseline,offline,offline-rules,D4,1,D4-R17,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,D4,1,D4-R18,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,E1,1,E1-R01,unsupported,UNSUPPORTED_RULE_DETECTION,"behaviour not representable with library rules -> CustomRuleCandidate / flagged, never approximated",UNSUPPORTED_CORRECTLY_DETECTED,,,True,False,"«Cuando solo quede un bastidor esperando antes de la selectiva, el operario termina la pieza que está revisando y vuelve a montaje, excepto cuando haya más de tr»"
+offline_baseline,offline,offline-rules,E1,1,E1-R02,flow,TOPOLOGY,topology in flow order,WRONG,TOPOLOGY_ERROR,CRITICAL,True,False,missing roles ['buffer'] (flagged: []); order OK; extra nodes []
+offline_baseline,offline,offline-rules,E1,1,E1-R03,component,COMPONENT_MATCH,assembly -> accepted library component,CORRECT,,,True,False,manual_assembly = manual_assembly
+offline_baseline,offline,offline-rules,E1,1,E1-R04,component,COMPONENT_MATCH,buffer -> accepted library component,OMITTED,SILENT_OMISSION,CRITICAL,True,False,step not in the model and not flagged
+offline_baseline,offline,offline-rules,E1,1,E1-R05,component,COMPONENT_MATCH,selective -> accepted library component,CORRECT,,,True,False,selective_soldering = selective_soldering
+offline_baseline,offline,offline-rules,E1,1,E1-R06,component,COMPONENT_MATCH,review -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,E1,1,E1-R07,value,PARAMETER_VALUE,assembly 120 s,CORRECT,,,True,False,manual_assembly: 120.0 s x 1 = 120.0 s per entity
+offline_baseline,offline,offline-rules,E1,1,E1-R08,value,PARAMETER_VALUE,buffer 3,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_NODE (role 'buffer' not found in the model)
+offline_baseline,offline,offline-rules,E1,1,E1-R09,value,PARAMETER_VALUE,selective 30 s,CORRECT,,,True,False,selective_soldering: 30.0 s x 1 = 30.0 s per entity
+offline_baseline,offline,offline-rules,E1,1,E1-R10,value,PARAMETER_VALUE,review 60 s,CORRECT,,,True,False,inspection: 60.0 s x 1 = 60.0 s per entity
+offline_baseline,offline,offline-rules,E1,1,E1-R11,shared_resource,RESOURCE_ASSIGNMENT,same operator,CORRECT,,,True,False,"['operator_1', 'operator_1']"
+offline_baseline,offline,offline-rules,E1,1,E1-R12,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,E1,2,E1-R01,unsupported,UNSUPPORTED_RULE_DETECTION,"behaviour not representable with library rules -> CustomRuleCandidate / flagged, never approximated",UNSUPPORTED_CORRECTLY_DETECTED,,,True,False,"«Cuando solo quede un bastidor esperando antes de la selectiva, el operario termina la pieza que está revisando y vuelve a montaje, excepto cuando haya más de tr»"
+offline_baseline,offline,offline-rules,E1,2,E1-R02,flow,TOPOLOGY,topology in flow order,WRONG,TOPOLOGY_ERROR,CRITICAL,True,False,missing roles ['buffer'] (flagged: []); order OK; extra nodes []
+offline_baseline,offline,offline-rules,E1,2,E1-R03,component,COMPONENT_MATCH,assembly -> accepted library component,CORRECT,,,True,False,manual_assembly = manual_assembly
+offline_baseline,offline,offline-rules,E1,2,E1-R04,component,COMPONENT_MATCH,buffer -> accepted library component,OMITTED,SILENT_OMISSION,CRITICAL,True,False,step not in the model and not flagged
+offline_baseline,offline,offline-rules,E1,2,E1-R05,component,COMPONENT_MATCH,selective -> accepted library component,CORRECT,,,True,False,selective_soldering = selective_soldering
+offline_baseline,offline,offline-rules,E1,2,E1-R06,component,COMPONENT_MATCH,review -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,E1,2,E1-R07,value,PARAMETER_VALUE,assembly 120 s,CORRECT,,,True,False,manual_assembly: 120.0 s x 1 = 120.0 s per entity
+offline_baseline,offline,offline-rules,E1,2,E1-R08,value,PARAMETER_VALUE,buffer 3,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_NODE (role 'buffer' not found in the model)
+offline_baseline,offline,offline-rules,E1,2,E1-R09,value,PARAMETER_VALUE,selective 30 s,CORRECT,,,True,False,selective_soldering: 30.0 s x 1 = 30.0 s per entity
+offline_baseline,offline,offline-rules,E1,2,E1-R10,value,PARAMETER_VALUE,review 60 s,CORRECT,,,True,False,inspection: 60.0 s x 1 = 60.0 s per entity
+offline_baseline,offline,offline-rules,E1,2,E1-R11,shared_resource,RESOURCE_ASSIGNMENT,same operator,CORRECT,,,True,False,"['operator_1', 'operator_1']"
+offline_baseline,offline,offline-rules,E1,2,E1-R12,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,E1,3,E1-R01,unsupported,UNSUPPORTED_RULE_DETECTION,"behaviour not representable with library rules -> CustomRuleCandidate / flagged, never approximated",UNSUPPORTED_CORRECTLY_DETECTED,,,True,False,"«Cuando solo quede un bastidor esperando antes de la selectiva, el operario termina la pieza que está revisando y vuelve a montaje, excepto cuando haya más de tr»"
+offline_baseline,offline,offline-rules,E1,3,E1-R02,flow,TOPOLOGY,topology in flow order,WRONG,TOPOLOGY_ERROR,CRITICAL,True,False,missing roles ['buffer'] (flagged: []); order OK; extra nodes []
+offline_baseline,offline,offline-rules,E1,3,E1-R03,component,COMPONENT_MATCH,assembly -> accepted library component,CORRECT,,,True,False,manual_assembly = manual_assembly
+offline_baseline,offline,offline-rules,E1,3,E1-R04,component,COMPONENT_MATCH,buffer -> accepted library component,OMITTED,SILENT_OMISSION,CRITICAL,True,False,step not in the model and not flagged
+offline_baseline,offline,offline-rules,E1,3,E1-R05,component,COMPONENT_MATCH,selective -> accepted library component,CORRECT,,,True,False,selective_soldering = selective_soldering
+offline_baseline,offline,offline-rules,E1,3,E1-R06,component,COMPONENT_MATCH,review -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,E1,3,E1-R07,value,PARAMETER_VALUE,assembly 120 s,CORRECT,,,True,False,manual_assembly: 120.0 s x 1 = 120.0 s per entity
+offline_baseline,offline,offline-rules,E1,3,E1-R08,value,PARAMETER_VALUE,buffer 3,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_NODE (role 'buffer' not found in the model)
+offline_baseline,offline,offline-rules,E1,3,E1-R09,value,PARAMETER_VALUE,selective 30 s,CORRECT,,,True,False,selective_soldering: 30.0 s x 1 = 30.0 s per entity
+offline_baseline,offline,offline-rules,E1,3,E1-R10,value,PARAMETER_VALUE,review 60 s,CORRECT,,,True,False,inspection: 60.0 s x 1 = 60.0 s per entity
+offline_baseline,offline,offline-rules,E1,3,E1-R11,shared_resource,RESOURCE_ASSIGNMENT,same operator,CORRECT,,,True,False,"['operator_1', 'operator_1']"
+offline_baseline,offline,offline-rules,E1,3,E1-R12,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,E1,4,E1-R01,unsupported,UNSUPPORTED_RULE_DETECTION,"behaviour not representable with library rules -> CustomRuleCandidate / flagged, never approximated",UNSUPPORTED_CORRECTLY_DETECTED,,,True,False,"«Cuando solo quede un bastidor esperando antes de la selectiva, el operario termina la pieza que está revisando y vuelve a montaje, excepto cuando haya más de tr»"
+offline_baseline,offline,offline-rules,E1,4,E1-R02,flow,TOPOLOGY,topology in flow order,WRONG,TOPOLOGY_ERROR,CRITICAL,True,False,missing roles ['buffer'] (flagged: []); order OK; extra nodes []
+offline_baseline,offline,offline-rules,E1,4,E1-R03,component,COMPONENT_MATCH,assembly -> accepted library component,CORRECT,,,True,False,manual_assembly = manual_assembly
+offline_baseline,offline,offline-rules,E1,4,E1-R04,component,COMPONENT_MATCH,buffer -> accepted library component,OMITTED,SILENT_OMISSION,CRITICAL,True,False,step not in the model and not flagged
+offline_baseline,offline,offline-rules,E1,4,E1-R05,component,COMPONENT_MATCH,selective -> accepted library component,CORRECT,,,True,False,selective_soldering = selective_soldering
+offline_baseline,offline,offline-rules,E1,4,E1-R06,component,COMPONENT_MATCH,review -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,E1,4,E1-R07,value,PARAMETER_VALUE,assembly 120 s,CORRECT,,,True,False,manual_assembly: 120.0 s x 1 = 120.0 s per entity
+offline_baseline,offline,offline-rules,E1,4,E1-R08,value,PARAMETER_VALUE,buffer 3,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_NODE (role 'buffer' not found in the model)
+offline_baseline,offline,offline-rules,E1,4,E1-R09,value,PARAMETER_VALUE,selective 30 s,CORRECT,,,True,False,selective_soldering: 30.0 s x 1 = 30.0 s per entity
+offline_baseline,offline,offline-rules,E1,4,E1-R10,value,PARAMETER_VALUE,review 60 s,CORRECT,,,True,False,inspection: 60.0 s x 1 = 60.0 s per entity
+offline_baseline,offline,offline-rules,E1,4,E1-R11,shared_resource,RESOURCE_ASSIGNMENT,same operator,CORRECT,,,True,False,"['operator_1', 'operator_1']"
+offline_baseline,offline,offline-rules,E1,4,E1-R12,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,E1,5,E1-R01,unsupported,UNSUPPORTED_RULE_DETECTION,"behaviour not representable with library rules -> CustomRuleCandidate / flagged, never approximated",UNSUPPORTED_CORRECTLY_DETECTED,,,True,False,"«Cuando solo quede un bastidor esperando antes de la selectiva, el operario termina la pieza que está revisando y vuelve a montaje, excepto cuando haya más de tr»"
+offline_baseline,offline,offline-rules,E1,5,E1-R02,flow,TOPOLOGY,topology in flow order,WRONG,TOPOLOGY_ERROR,CRITICAL,True,False,missing roles ['buffer'] (flagged: []); order OK; extra nodes []
+offline_baseline,offline,offline-rules,E1,5,E1-R03,component,COMPONENT_MATCH,assembly -> accepted library component,CORRECT,,,True,False,manual_assembly = manual_assembly
+offline_baseline,offline,offline-rules,E1,5,E1-R04,component,COMPONENT_MATCH,buffer -> accepted library component,OMITTED,SILENT_OMISSION,CRITICAL,True,False,step not in the model and not flagged
+offline_baseline,offline,offline-rules,E1,5,E1-R05,component,COMPONENT_MATCH,selective -> accepted library component,CORRECT,,,True,False,selective_soldering = selective_soldering
+offline_baseline,offline,offline-rules,E1,5,E1-R06,component,COMPONENT_MATCH,review -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,E1,5,E1-R07,value,PARAMETER_VALUE,assembly 120 s,CORRECT,,,True,False,manual_assembly: 120.0 s x 1 = 120.0 s per entity
+offline_baseline,offline,offline-rules,E1,5,E1-R08,value,PARAMETER_VALUE,buffer 3,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_NODE (role 'buffer' not found in the model)
+offline_baseline,offline,offline-rules,E1,5,E1-R09,value,PARAMETER_VALUE,selective 30 s,CORRECT,,,True,False,selective_soldering: 30.0 s x 1 = 30.0 s per entity
+offline_baseline,offline,offline-rules,E1,5,E1-R10,value,PARAMETER_VALUE,review 60 s,CORRECT,,,True,False,inspection: 60.0 s x 1 = 60.0 s per entity
+offline_baseline,offline,offline-rules,E1,5,E1-R11,shared_resource,RESOURCE_ASSIGNMENT,same operator,CORRECT,,,True,False,"['operator_1', 'operator_1']"
+offline_baseline,offline,offline-rules,E1,5,E1-R12,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,E2,1,E2-R01,unsupported,UNSUPPORTED_RULE_DETECTION,"behaviour not representable with library rules -> CustomRuleCandidate / flagged, never approximated",OMITTED,SILENT_OMISSION,CRITICAL,True,False,behaviour neither modelled nor flagged
+offline_baseline,offline,offline-rules,E2,1,E2-R02,flow,TOPOLOGY,topology in flow order,WRONG,TOPOLOGY_ERROR,CRITICAL,True,False,"missing roles ['buffer'] (flagged: []); order OK; extra nodes [('inspection_2', 'inspection')]"
+offline_baseline,offline,offline-rules,E2,1,E2-R03,component,COMPONENT_MATCH,assembly -> accepted library component,CORRECT,,,True,False,manual_assembly = manual_assembly
+offline_baseline,offline,offline-rules,E2,1,E2-R04,component,COMPONENT_MATCH,buffer -> accepted library component,WRONG,COMPONENT_MATCH_ERROR,CRITICAL,True,False,no node with ['buffer']; extra components ['inspection']
+offline_baseline,offline,offline-rules,E2,1,E2-R05,component,COMPONENT_MATCH,selective -> accepted library component,CORRECT,,,True,False,selective_soldering = selective_soldering
+offline_baseline,offline,offline-rules,E2,1,E2-R06,component,COMPONENT_MATCH,review -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,E2,1,E2-R07,value,PARAMETER_VALUE,assembly 120 s,CORRECT,,,True,False,manual_assembly: 120.0 s x 1 = 120.0 s per entity
+offline_baseline,offline,offline-rules,E2,1,E2-R08,value,PARAMETER_VALUE,buffer 3,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_NODE (role 'buffer' not found in the model)
+offline_baseline,offline,offline-rules,E2,1,E2-R09,value,PARAMETER_VALUE,selective 30 s,CORRECT,,,True,False,selective_soldering: 30.0 s x 1 = 30.0 s per entity
+offline_baseline,offline,offline-rules,E2,1,E2-R10,value,PARAMETER_VALUE,review 60 s,CORRECT,,,True,False,inspection: 60.0 s x 1 = 60.0 s per entity
+offline_baseline,offline,offline-rules,E2,1,E2-R11,shared_resource,RESOURCE_ASSIGNMENT,same operator,CORRECT,,,True,False,"['operator_1', 'operator_1']"
+offline_baseline,offline,offline-rules,E2,1,E2-R12,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,E3,1,E3-R01,unsupported,UNSUPPORTED_RULE_DETECTION,"idle-duration pre-emption -> flagged, never approximated",UNSUPPORTED_CORRECTLY_DETECTED,,,True,False,"«Si la máquina lleva más de 10 minutos parada esperando piezas, el operario deja lo que esté haciendo y monta una pieza urgente»"
+offline_baseline,offline,offline-rules,E3,1,E3-R02,flow,TOPOLOGY,topology in flow order,CORRECT,,,True,False,
+offline_baseline,offline,offline-rules,E3,1,E3-R03,component,COMPONENT_MATCH,assembly -> accepted library component,CORRECT,,,True,False,manual_assembly = manual_assembly
+offline_baseline,offline,offline-rules,E3,1,E3-R04,component,COMPONENT_MATCH,buffer -> accepted library component,CORRECT,,,True,False,buffer_1 = buffer
+offline_baseline,offline,offline-rules,E3,1,E3-R05,component,COMPONENT_MATCH,machine -> accepted library component,CORRECT,,,True,False,machine = machine
+offline_baseline,offline,offline-rules,E3,1,E3-R06,component,COMPONENT_MATCH,inspection -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,E3,1,E3-R07,value,PARAMETER_VALUE,assembly 60 s,CORRECT,,,True,False,manual_assembly: 60.0 s x 1 = 60.0 s per entity
+offline_baseline,offline,offline-rules,E3,1,E3-R08,value,PARAMETER_VALUE,buffer 5,CORRECT,,,True,False,buffer_1: 5.0
+offline_baseline,offline,offline-rules,E3,1,E3-R09,value,PARAMETER_VALUE,machine 45 s,CORRECT,,,True,False,machine: 45.0 s x 1 = 45.0 s per entity
+offline_baseline,offline,offline-rules,E3,1,E3-R10,value,PARAMETER_VALUE,inspection 20 s,CORRECT,,,True,False,inspection: 20.0 s x 1 = 20.0 s per entity
+offline_baseline,offline,offline-rules,E3,1,E3-R11,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,E4,1,E4-R01,unsupported,UNSUPPORTED_RULE_DETECTION,"product mix + type priority -> flagged, never approximated",UNSUPPORTED_CORRECTLY_DETECTED,,,True,False,«El 30 % de las piezas son rojas y el resto azules»
+offline_baseline,offline,offline-rules,E4,1,E4-R02,flow,TOPOLOGY,topology in flow order,CORRECT,,,True,False,
+offline_baseline,offline,offline-rules,E4,1,E4-R03,component,COMPONENT_MATCH,assembly -> accepted library component,CORRECT,,,True,False,manual_assembly = manual_assembly
+offline_baseline,offline,offline-rules,E4,1,E4-R04,component,COMPONENT_MATCH,buffer -> accepted library component,CORRECT,,,True,False,buffer_1 = buffer
+offline_baseline,offline,offline-rules,E4,1,E4-R05,component,COMPONENT_MATCH,machine -> accepted library component,CORRECT,,,True,False,machine = machine
+offline_baseline,offline,offline-rules,E4,1,E4-R06,component,COMPONENT_MATCH,inspection -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,E4,1,E4-R07,value,PARAMETER_VALUE,assembly 60 s,CORRECT,,,True,False,manual_assembly: 60.0 s x 1 = 60.0 s per entity
+offline_baseline,offline,offline-rules,E4,1,E4-R08,value,PARAMETER_VALUE,buffer 5,CORRECT,,,True,False,buffer_1: 5.0
+offline_baseline,offline,offline-rules,E4,1,E4-R09,value,PARAMETER_VALUE,machine 45 s,CORRECT,,,True,False,machine: 45.0 s x 1 = 45.0 s per entity
+offline_baseline,offline,offline-rules,E4,1,E4-R10,value,PARAMETER_VALUE,inspection 20 s,CORRECT,,,True,False,inspection: 20.0 s x 1 = 20.0 s per entity
+offline_baseline,offline,offline-rules,E4,1,E4-R11,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,F1,1,F1-R01,flow,TOPOLOGY,topology in flow order,WRONG,TOPOLOGY_ERROR,CRITICAL,True,False,"missing roles ['assembly', 'buffer'] (flagged: []); order OK; extra nodes []"
+offline_baseline,offline,offline-rules,F1,1,F1-R02,component,COMPONENT_MATCH,assembly -> accepted library component,OMITTED,SILENT_OMISSION,CRITICAL,True,False,step not in the model and not flagged
+offline_baseline,offline,offline-rules,F1,1,F1-R03,component,COMPONENT_MATCH,transport -> accepted library component,CORRECT,,,True,False,transport_1 = rack_transport
+offline_baseline,offline,offline-rules,F1,1,F1-R04,component,COMPONENT_MATCH,buffer -> accepted library component,OMITTED,SILENT_OMISSION,CRITICAL,True,False,step not in the model and not flagged
+offline_baseline,offline,offline-rules,F1,1,F1-R05,component,COMPONENT_MATCH,selective -> accepted library component,WRONG,COMPONENT_MATCH_ERROR,CRITICAL,True,False,step present as 'machine' (machine); expected one of ['selective_soldering']
+offline_baseline,offline,offline-rules,F1,1,F1-R06,component,COMPONENT_MATCH,review -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,F1,1,F1-R07,value,PARAMETER_VALUE,load 30 s PER_BOARD,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_NODE (role 'assembly' not found in the model)
+offline_baseline,offline,offline-rules,F1,1,F1-R08,basis,SEMANTIC_BASIS,assembly per board,OMITTED,SILENT_OMISSION,CRITICAL,True,False,role not in the model
+offline_baseline,offline,offline-rules,F1,1,F1-R09,value,PARAMETER_VALUE,4 boards per rack,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_PARAM (-)
+offline_baseline,offline,offline-rules,F1,1,F1-R10,value,PARAMETER_VALUE,load 5 s,WRONG,FALSE_MISSING,MINOR,True,False,transport_1_load_time has no value although the text gives it; asked «Tiempo de carga en 'Transporte 1' (s)»
+offline_baseline,offline,offline-rules,F1,1,F1-R11,value,PARAMETER_VALUE,unload 5 s,WRONG,FALSE_MISSING,MINOR,True,False,transport_1_unload_time has no value although the text gives it; asked «Tiempo de carga en 'Transporte 1' (s)»
+offline_baseline,offline,offline-rules,F1,1,F1-R12,value,PARAMETER_VALUE,10 m,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_NODE (role missing)
+offline_baseline,offline,offline-rules,F1,1,F1-R13,value,PARAMETER_VALUE,5 m,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_NODE (role missing)
+offline_baseline,offline,offline-rules,F1,1,F1-R14,value,PARAMETER_VALUE,1.2 m/s,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_TRAVEL (-)
+offline_baseline,offline,offline-rules,F1,1,F1-R15,value,PARAMETER_VALUE,3 racks in front of the selective,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_NODE (role 'buffer' not found in the model)
+offline_baseline,offline,offline-rules,F1,1,F1-R16,value,PARAMETER_VALUE,selective 20 s PER_RACK,CORRECT,,,True,False,machine: 20.0 s x 1 = 20.0 s per entity
+offline_baseline,offline,offline-rules,F1,1,F1-R17,basis,SEMANTIC_BASIS,selective per rack,CORRECT,,,True,False,per_entity (work_units=1)
+offline_baseline,offline,offline-rules,F1,1,F1-R18,value,PARAMETER_VALUE,review+cleaning 15 s PER_BOARD,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"15.0 s x 1 = 15.0 s per entity; expected 60.0 (15.0 per_item, x4)"
+offline_baseline,offline,offline-rules,F1,1,F1-R19,basis,SEMANTIC_BASIS,review per board,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"expected per_item, model per_entity (work_units=1); time per entity CHANGED"
+offline_baseline,offline,offline-rules,F1,1,F1-R20,value,PARAMETER_VALUE,3 racks,WRONG,PARAMETER_VALUE_ERROR,CRITICAL,True,False,carrier: 2.0 != 3.0
+offline_baseline,offline,offline-rules,F1,1,F1-R21,carrier,CARRIER_SEMANTICS,"rack loop, immediate return",WRONG,CARRIER_SEMANTICS_ERROR,CRITICAL,True,False,"seize ['machine'], release ['inspection'], release_via []"
+offline_baseline,offline,offline-rules,F1,1,F1-R22,shared_resource,RESOURCE_ASSIGNMENT,one operator does everything,WRONG,RESOURCE_ASSIGNMENT_ERROR,CRITICAL,True,False,"roles ['assembly', 'transport', 'review'] -> operators [None, None, 'operator_1']"
+offline_baseline,offline,offline-rules,F1,1,F1-R23,strategy,STRATEGY,keep the selective fed with a WIP target,WRONG,STRATEGY_ERROR,CRITICAL,True,False,no operator found
+offline_baseline,offline,offline-rules,F1,1,F1-R24,value,PARAMETER_VALUE,target 2 racks ready,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_STRATEGY (-)
+offline_baseline,offline,offline-rules,F1,1,F1-R25,strategy,STRATEGY,feeding tasks = assembly + transport,WRONG,STRATEGY_ERROR,CRITICAL,False,False,[GOLD_REQUIRES_ENGINEER_REVIEW: not counted] no operator found
+offline_baseline,offline,offline-rules,F1,1,F1-R26,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,F1,1,F1-R27,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,F1,2,F1-R01,flow,TOPOLOGY,topology in flow order,WRONG,TOPOLOGY_ERROR,CRITICAL,True,False,"missing roles ['assembly', 'buffer'] (flagged: []); order OK; extra nodes []"
+offline_baseline,offline,offline-rules,F1,2,F1-R02,component,COMPONENT_MATCH,assembly -> accepted library component,OMITTED,SILENT_OMISSION,CRITICAL,True,False,step not in the model and not flagged
+offline_baseline,offline,offline-rules,F1,2,F1-R03,component,COMPONENT_MATCH,transport -> accepted library component,CORRECT,,,True,False,transport_1 = rack_transport
+offline_baseline,offline,offline-rules,F1,2,F1-R04,component,COMPONENT_MATCH,buffer -> accepted library component,OMITTED,SILENT_OMISSION,CRITICAL,True,False,step not in the model and not flagged
+offline_baseline,offline,offline-rules,F1,2,F1-R05,component,COMPONENT_MATCH,selective -> accepted library component,WRONG,COMPONENT_MATCH_ERROR,CRITICAL,True,False,step present as 'machine' (machine); expected one of ['selective_soldering']
+offline_baseline,offline,offline-rules,F1,2,F1-R06,component,COMPONENT_MATCH,review -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,F1,2,F1-R07,value,PARAMETER_VALUE,load 30 s PER_BOARD,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_NODE (role 'assembly' not found in the model)
+offline_baseline,offline,offline-rules,F1,2,F1-R08,basis,SEMANTIC_BASIS,assembly per board,OMITTED,SILENT_OMISSION,CRITICAL,True,False,role not in the model
+offline_baseline,offline,offline-rules,F1,2,F1-R09,value,PARAMETER_VALUE,4 boards per rack,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_PARAM (-)
+offline_baseline,offline,offline-rules,F1,2,F1-R10,value,PARAMETER_VALUE,load 5 s,WRONG,FALSE_MISSING,MINOR,True,False,transport_1_load_time has no value although the text gives it; asked «Tiempo de carga en 'Transporte 1' (s)»
+offline_baseline,offline,offline-rules,F1,2,F1-R11,value,PARAMETER_VALUE,unload 5 s,WRONG,FALSE_MISSING,MINOR,True,False,transport_1_unload_time has no value although the text gives it; asked «Tiempo de carga en 'Transporte 1' (s)»
+offline_baseline,offline,offline-rules,F1,2,F1-R12,value,PARAMETER_VALUE,10 m,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_NODE (role missing)
+offline_baseline,offline,offline-rules,F1,2,F1-R13,value,PARAMETER_VALUE,5 m,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_NODE (role missing)
+offline_baseline,offline,offline-rules,F1,2,F1-R14,value,PARAMETER_VALUE,1.2 m/s,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_TRAVEL (-)
+offline_baseline,offline,offline-rules,F1,2,F1-R15,value,PARAMETER_VALUE,3 racks in front of the selective,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_NODE (role 'buffer' not found in the model)
+offline_baseline,offline,offline-rules,F1,2,F1-R16,value,PARAMETER_VALUE,selective 20 s PER_RACK,CORRECT,,,True,False,machine: 20.0 s x 1 = 20.0 s per entity
+offline_baseline,offline,offline-rules,F1,2,F1-R17,basis,SEMANTIC_BASIS,selective per rack,CORRECT,,,True,False,per_entity (work_units=1)
+offline_baseline,offline,offline-rules,F1,2,F1-R18,value,PARAMETER_VALUE,review+cleaning 15 s PER_BOARD,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"15.0 s x 1 = 15.0 s per entity; expected 60.0 (15.0 per_item, x4)"
+offline_baseline,offline,offline-rules,F1,2,F1-R19,basis,SEMANTIC_BASIS,review per board,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"expected per_item, model per_entity (work_units=1); time per entity CHANGED"
+offline_baseline,offline,offline-rules,F1,2,F1-R20,value,PARAMETER_VALUE,3 racks,WRONG,PARAMETER_VALUE_ERROR,CRITICAL,True,False,carrier: 2.0 != 3.0
+offline_baseline,offline,offline-rules,F1,2,F1-R21,carrier,CARRIER_SEMANTICS,"rack loop, immediate return",WRONG,CARRIER_SEMANTICS_ERROR,CRITICAL,True,False,"seize ['machine'], release ['inspection'], release_via []"
+offline_baseline,offline,offline-rules,F1,2,F1-R22,shared_resource,RESOURCE_ASSIGNMENT,one operator does everything,WRONG,RESOURCE_ASSIGNMENT_ERROR,CRITICAL,True,False,"roles ['assembly', 'transport', 'review'] -> operators [None, None, 'operator_1']"
+offline_baseline,offline,offline-rules,F1,2,F1-R23,strategy,STRATEGY,keep the selective fed with a WIP target,WRONG,STRATEGY_ERROR,CRITICAL,True,False,no operator found
+offline_baseline,offline,offline-rules,F1,2,F1-R24,value,PARAMETER_VALUE,target 2 racks ready,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_STRATEGY (-)
+offline_baseline,offline,offline-rules,F1,2,F1-R25,strategy,STRATEGY,feeding tasks = assembly + transport,WRONG,STRATEGY_ERROR,CRITICAL,False,False,[GOLD_REQUIRES_ENGINEER_REVIEW: not counted] no operator found
+offline_baseline,offline,offline-rules,F1,2,F1-R26,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,F1,2,F1-R27,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,F1,3,F1-R01,flow,TOPOLOGY,topology in flow order,WRONG,TOPOLOGY_ERROR,CRITICAL,True,False,"missing roles ['assembly', 'buffer'] (flagged: []); order OK; extra nodes []"
+offline_baseline,offline,offline-rules,F1,3,F1-R02,component,COMPONENT_MATCH,assembly -> accepted library component,OMITTED,SILENT_OMISSION,CRITICAL,True,False,step not in the model and not flagged
+offline_baseline,offline,offline-rules,F1,3,F1-R03,component,COMPONENT_MATCH,transport -> accepted library component,CORRECT,,,True,False,transport_1 = rack_transport
+offline_baseline,offline,offline-rules,F1,3,F1-R04,component,COMPONENT_MATCH,buffer -> accepted library component,OMITTED,SILENT_OMISSION,CRITICAL,True,False,step not in the model and not flagged
+offline_baseline,offline,offline-rules,F1,3,F1-R05,component,COMPONENT_MATCH,selective -> accepted library component,WRONG,COMPONENT_MATCH_ERROR,CRITICAL,True,False,step present as 'machine' (machine); expected one of ['selective_soldering']
+offline_baseline,offline,offline-rules,F1,3,F1-R06,component,COMPONENT_MATCH,review -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,F1,3,F1-R07,value,PARAMETER_VALUE,load 30 s PER_BOARD,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_NODE (role 'assembly' not found in the model)
+offline_baseline,offline,offline-rules,F1,3,F1-R08,basis,SEMANTIC_BASIS,assembly per board,OMITTED,SILENT_OMISSION,CRITICAL,True,False,role not in the model
+offline_baseline,offline,offline-rules,F1,3,F1-R09,value,PARAMETER_VALUE,4 boards per rack,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_PARAM (-)
+offline_baseline,offline,offline-rules,F1,3,F1-R10,value,PARAMETER_VALUE,load 5 s,WRONG,FALSE_MISSING,MINOR,True,False,transport_1_load_time has no value although the text gives it; asked «Tiempo de carga en 'Transporte 1' (s)»
+offline_baseline,offline,offline-rules,F1,3,F1-R11,value,PARAMETER_VALUE,unload 5 s,WRONG,FALSE_MISSING,MINOR,True,False,transport_1_unload_time has no value although the text gives it; asked «Tiempo de carga en 'Transporte 1' (s)»
+offline_baseline,offline,offline-rules,F1,3,F1-R12,value,PARAMETER_VALUE,10 m,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_NODE (role missing)
+offline_baseline,offline,offline-rules,F1,3,F1-R13,value,PARAMETER_VALUE,5 m,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_NODE (role missing)
+offline_baseline,offline,offline-rules,F1,3,F1-R14,value,PARAMETER_VALUE,1.2 m/s,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_TRAVEL (-)
+offline_baseline,offline,offline-rules,F1,3,F1-R15,value,PARAMETER_VALUE,3 racks in front of the selective,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_NODE (role 'buffer' not found in the model)
+offline_baseline,offline,offline-rules,F1,3,F1-R16,value,PARAMETER_VALUE,selective 20 s PER_RACK,CORRECT,,,True,False,machine: 20.0 s x 1 = 20.0 s per entity
+offline_baseline,offline,offline-rules,F1,3,F1-R17,basis,SEMANTIC_BASIS,selective per rack,CORRECT,,,True,False,per_entity (work_units=1)
+offline_baseline,offline,offline-rules,F1,3,F1-R18,value,PARAMETER_VALUE,review+cleaning 15 s PER_BOARD,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"15.0 s x 1 = 15.0 s per entity; expected 60.0 (15.0 per_item, x4)"
+offline_baseline,offline,offline-rules,F1,3,F1-R19,basis,SEMANTIC_BASIS,review per board,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"expected per_item, model per_entity (work_units=1); time per entity CHANGED"
+offline_baseline,offline,offline-rules,F1,3,F1-R20,value,PARAMETER_VALUE,3 racks,WRONG,PARAMETER_VALUE_ERROR,CRITICAL,True,False,carrier: 2.0 != 3.0
+offline_baseline,offline,offline-rules,F1,3,F1-R21,carrier,CARRIER_SEMANTICS,"rack loop, immediate return",WRONG,CARRIER_SEMANTICS_ERROR,CRITICAL,True,False,"seize ['machine'], release ['inspection'], release_via []"
+offline_baseline,offline,offline-rules,F1,3,F1-R22,shared_resource,RESOURCE_ASSIGNMENT,one operator does everything,WRONG,RESOURCE_ASSIGNMENT_ERROR,CRITICAL,True,False,"roles ['assembly', 'transport', 'review'] -> operators [None, None, 'operator_1']"
+offline_baseline,offline,offline-rules,F1,3,F1-R23,strategy,STRATEGY,keep the selective fed with a WIP target,WRONG,STRATEGY_ERROR,CRITICAL,True,False,no operator found
+offline_baseline,offline,offline-rules,F1,3,F1-R24,value,PARAMETER_VALUE,target 2 racks ready,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_STRATEGY (-)
+offline_baseline,offline,offline-rules,F1,3,F1-R25,strategy,STRATEGY,feeding tasks = assembly + transport,WRONG,STRATEGY_ERROR,CRITICAL,False,False,[GOLD_REQUIRES_ENGINEER_REVIEW: not counted] no operator found
+offline_baseline,offline,offline-rules,F1,3,F1-R26,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,F1,3,F1-R27,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,F1,4,F1-R01,flow,TOPOLOGY,topology in flow order,WRONG,TOPOLOGY_ERROR,CRITICAL,True,False,"missing roles ['assembly', 'buffer'] (flagged: []); order OK; extra nodes []"
+offline_baseline,offline,offline-rules,F1,4,F1-R02,component,COMPONENT_MATCH,assembly -> accepted library component,OMITTED,SILENT_OMISSION,CRITICAL,True,False,step not in the model and not flagged
+offline_baseline,offline,offline-rules,F1,4,F1-R03,component,COMPONENT_MATCH,transport -> accepted library component,CORRECT,,,True,False,transport_1 = rack_transport
+offline_baseline,offline,offline-rules,F1,4,F1-R04,component,COMPONENT_MATCH,buffer -> accepted library component,OMITTED,SILENT_OMISSION,CRITICAL,True,False,step not in the model and not flagged
+offline_baseline,offline,offline-rules,F1,4,F1-R05,component,COMPONENT_MATCH,selective -> accepted library component,WRONG,COMPONENT_MATCH_ERROR,CRITICAL,True,False,step present as 'machine' (machine); expected one of ['selective_soldering']
+offline_baseline,offline,offline-rules,F1,4,F1-R06,component,COMPONENT_MATCH,review -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,F1,4,F1-R07,value,PARAMETER_VALUE,load 30 s PER_BOARD,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_NODE (role 'assembly' not found in the model)
+offline_baseline,offline,offline-rules,F1,4,F1-R08,basis,SEMANTIC_BASIS,assembly per board,OMITTED,SILENT_OMISSION,CRITICAL,True,False,role not in the model
+offline_baseline,offline,offline-rules,F1,4,F1-R09,value,PARAMETER_VALUE,4 boards per rack,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_PARAM (-)
+offline_baseline,offline,offline-rules,F1,4,F1-R10,value,PARAMETER_VALUE,load 5 s,WRONG,FALSE_MISSING,MINOR,True,False,transport_1_load_time has no value although the text gives it; asked «Tiempo de carga en 'Transporte 1' (s)»
+offline_baseline,offline,offline-rules,F1,4,F1-R11,value,PARAMETER_VALUE,unload 5 s,WRONG,FALSE_MISSING,MINOR,True,False,transport_1_unload_time has no value although the text gives it; asked «Tiempo de carga en 'Transporte 1' (s)»
+offline_baseline,offline,offline-rules,F1,4,F1-R12,value,PARAMETER_VALUE,10 m,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_NODE (role missing)
+offline_baseline,offline,offline-rules,F1,4,F1-R13,value,PARAMETER_VALUE,5 m,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_NODE (role missing)
+offline_baseline,offline,offline-rules,F1,4,F1-R14,value,PARAMETER_VALUE,1.2 m/s,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_TRAVEL (-)
+offline_baseline,offline,offline-rules,F1,4,F1-R15,value,PARAMETER_VALUE,3 racks in front of the selective,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_NODE (role 'buffer' not found in the model)
+offline_baseline,offline,offline-rules,F1,4,F1-R16,value,PARAMETER_VALUE,selective 20 s PER_RACK,CORRECT,,,True,False,machine: 20.0 s x 1 = 20.0 s per entity
+offline_baseline,offline,offline-rules,F1,4,F1-R17,basis,SEMANTIC_BASIS,selective per rack,CORRECT,,,True,False,per_entity (work_units=1)
+offline_baseline,offline,offline-rules,F1,4,F1-R18,value,PARAMETER_VALUE,review+cleaning 15 s PER_BOARD,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"15.0 s x 1 = 15.0 s per entity; expected 60.0 (15.0 per_item, x4)"
+offline_baseline,offline,offline-rules,F1,4,F1-R19,basis,SEMANTIC_BASIS,review per board,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"expected per_item, model per_entity (work_units=1); time per entity CHANGED"
+offline_baseline,offline,offline-rules,F1,4,F1-R20,value,PARAMETER_VALUE,3 racks,WRONG,PARAMETER_VALUE_ERROR,CRITICAL,True,False,carrier: 2.0 != 3.0
+offline_baseline,offline,offline-rules,F1,4,F1-R21,carrier,CARRIER_SEMANTICS,"rack loop, immediate return",WRONG,CARRIER_SEMANTICS_ERROR,CRITICAL,True,False,"seize ['machine'], release ['inspection'], release_via []"
+offline_baseline,offline,offline-rules,F1,4,F1-R22,shared_resource,RESOURCE_ASSIGNMENT,one operator does everything,WRONG,RESOURCE_ASSIGNMENT_ERROR,CRITICAL,True,False,"roles ['assembly', 'transport', 'review'] -> operators [None, None, 'operator_1']"
+offline_baseline,offline,offline-rules,F1,4,F1-R23,strategy,STRATEGY,keep the selective fed with a WIP target,WRONG,STRATEGY_ERROR,CRITICAL,True,False,no operator found
+offline_baseline,offline,offline-rules,F1,4,F1-R24,value,PARAMETER_VALUE,target 2 racks ready,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_STRATEGY (-)
+offline_baseline,offline,offline-rules,F1,4,F1-R25,strategy,STRATEGY,feeding tasks = assembly + transport,WRONG,STRATEGY_ERROR,CRITICAL,False,False,[GOLD_REQUIRES_ENGINEER_REVIEW: not counted] no operator found
+offline_baseline,offline,offline-rules,F1,4,F1-R26,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,F1,4,F1-R27,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,F1,5,F1-R01,flow,TOPOLOGY,topology in flow order,WRONG,TOPOLOGY_ERROR,CRITICAL,True,False,"missing roles ['assembly', 'buffer'] (flagged: []); order OK; extra nodes []"
+offline_baseline,offline,offline-rules,F1,5,F1-R02,component,COMPONENT_MATCH,assembly -> accepted library component,OMITTED,SILENT_OMISSION,CRITICAL,True,False,step not in the model and not flagged
+offline_baseline,offline,offline-rules,F1,5,F1-R03,component,COMPONENT_MATCH,transport -> accepted library component,CORRECT,,,True,False,transport_1 = rack_transport
+offline_baseline,offline,offline-rules,F1,5,F1-R04,component,COMPONENT_MATCH,buffer -> accepted library component,OMITTED,SILENT_OMISSION,CRITICAL,True,False,step not in the model and not flagged
+offline_baseline,offline,offline-rules,F1,5,F1-R05,component,COMPONENT_MATCH,selective -> accepted library component,WRONG,COMPONENT_MATCH_ERROR,CRITICAL,True,False,step present as 'machine' (machine); expected one of ['selective_soldering']
+offline_baseline,offline,offline-rules,F1,5,F1-R06,component,COMPONENT_MATCH,review -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,F1,5,F1-R07,value,PARAMETER_VALUE,load 30 s PER_BOARD,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_NODE (role 'assembly' not found in the model)
+offline_baseline,offline,offline-rules,F1,5,F1-R08,basis,SEMANTIC_BASIS,assembly per board,OMITTED,SILENT_OMISSION,CRITICAL,True,False,role not in the model
+offline_baseline,offline,offline-rules,F1,5,F1-R09,value,PARAMETER_VALUE,4 boards per rack,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_PARAM (-)
+offline_baseline,offline,offline-rules,F1,5,F1-R10,value,PARAMETER_VALUE,load 5 s,WRONG,FALSE_MISSING,MINOR,True,False,transport_1_load_time has no value although the text gives it; asked «Tiempo de carga en 'Transporte 1' (s)»
+offline_baseline,offline,offline-rules,F1,5,F1-R11,value,PARAMETER_VALUE,unload 5 s,WRONG,FALSE_MISSING,MINOR,True,False,transport_1_unload_time has no value although the text gives it; asked «Tiempo de carga en 'Transporte 1' (s)»
+offline_baseline,offline,offline-rules,F1,5,F1-R12,value,PARAMETER_VALUE,10 m,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_NODE (role missing)
+offline_baseline,offline,offline-rules,F1,5,F1-R13,value,PARAMETER_VALUE,5 m,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_NODE (role missing)
+offline_baseline,offline,offline-rules,F1,5,F1-R14,value,PARAMETER_VALUE,1.2 m/s,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_TRAVEL (-)
+offline_baseline,offline,offline-rules,F1,5,F1-R15,value,PARAMETER_VALUE,3 racks in front of the selective,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_NODE (role 'buffer' not found in the model)
+offline_baseline,offline,offline-rules,F1,5,F1-R16,value,PARAMETER_VALUE,selective 20 s PER_RACK,CORRECT,,,True,False,machine: 20.0 s x 1 = 20.0 s per entity
+offline_baseline,offline,offline-rules,F1,5,F1-R17,basis,SEMANTIC_BASIS,selective per rack,CORRECT,,,True,False,per_entity (work_units=1)
+offline_baseline,offline,offline-rules,F1,5,F1-R18,value,PARAMETER_VALUE,review+cleaning 15 s PER_BOARD,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"15.0 s x 1 = 15.0 s per entity; expected 60.0 (15.0 per_item, x4)"
+offline_baseline,offline,offline-rules,F1,5,F1-R19,basis,SEMANTIC_BASIS,review per board,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"expected per_item, model per_entity (work_units=1); time per entity CHANGED"
+offline_baseline,offline,offline-rules,F1,5,F1-R20,value,PARAMETER_VALUE,3 racks,WRONG,PARAMETER_VALUE_ERROR,CRITICAL,True,False,carrier: 2.0 != 3.0
+offline_baseline,offline,offline-rules,F1,5,F1-R21,carrier,CARRIER_SEMANTICS,"rack loop, immediate return",WRONG,CARRIER_SEMANTICS_ERROR,CRITICAL,True,False,"seize ['machine'], release ['inspection'], release_via []"
+offline_baseline,offline,offline-rules,F1,5,F1-R22,shared_resource,RESOURCE_ASSIGNMENT,one operator does everything,WRONG,RESOURCE_ASSIGNMENT_ERROR,CRITICAL,True,False,"roles ['assembly', 'transport', 'review'] -> operators [None, None, 'operator_1']"
+offline_baseline,offline,offline-rules,F1,5,F1-R23,strategy,STRATEGY,keep the selective fed with a WIP target,WRONG,STRATEGY_ERROR,CRITICAL,True,False,no operator found
+offline_baseline,offline,offline-rules,F1,5,F1-R24,value,PARAMETER_VALUE,target 2 racks ready,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_STRATEGY (-)
+offline_baseline,offline,offline-rules,F1,5,F1-R25,strategy,STRATEGY,feeding tasks = assembly + transport,WRONG,STRATEGY_ERROR,CRITICAL,False,False,[GOLD_REQUIRES_ENGINEER_REVIEW: not counted] no operator found
+offline_baseline,offline,offline-rules,F1,5,F1-R26,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,F1,5,F1-R27,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,F2,1,F2-R01,supply,PARAMETER_VALUE,random arrivals,CORRECT,,,True,False,interarrival
+offline_baseline,offline,offline-rules,F2,1,F2-R02,distribution,PARAMETER_VALUE,exp(60 s),WRONG,PARAMETER_VALUE_ERROR,CRITICAL,True,False,"expected {'dist': 'exponential', 'mean': 60}, got {'dist': 'constant', 'unit': 's', 'provenance': {'status': 'provided_by_client', 'source': 'description'}, 'value': 60.0}"
+offline_baseline,offline,offline-rules,F2,1,F2-R03,component,COMPONENT_MATCH,aoi -> accepted library component,CORRECT,,,True,False,aoi = aoi
+offline_baseline,offline,offline-rules,F2,1,F2-R04,value,PARAMETER_VALUE,AOI 30 s,CORRECT,,,True,False,aoi: 30.0 s x 1 = 30.0 s per entity
+offline_baseline,offline,offline-rules,F2,1,F2-R05,value,PARAMETER_VALUE,90 % good,WRONG,PARAMETER_VALUE_ERROR,CRITICAL,True,False,aoi: 1.0 != 0.9
+offline_baseline,offline,offline-rules,F2,1,F2-R06,unsupported,UNSUPPORTED_RULE_DETECTION,rework loop back to the AOI queue: modelled correctly or flagged as not representable,UNSUPPORTED_CORRECTLY_DETECTED,,,True,False,«las que fallan van a reparación»
+offline_baseline,offline,offline-rules,F2,1,F2-R07,routing,ROUTING,"60/40 split: modelled or flagged, never linearised silently",UNSUPPORTED_CORRECTLY_DETECTED,,,True,False,"not representable, flagged: «De las buenas, el 60 % va a la línea de test A y el 40 % a la línea B»"
+offline_baseline,offline,offline-rules,F2,1,F2-R08,distribution,PARAMETER_VALUE,"test A U(60,90)",WRONG,PARAMETER_VALUE_ERROR,CRITICAL,True,False,"expected {'dist': 'uniform', 'low': 60, 'high': 90}, got {'dist': 'constant', 'unit': 's', 'value': 90.0}"
+offline_baseline,offline,offline-rules,F2,1,F2-R09,distribution,PARAMETER_VALUE,"test B U(80,110)",OMITTED,SILENT_OMISSION,CRITICAL,True,False,role missing
+offline_baseline,offline,offline-rules,F2,1,F2-R10,distribution,PARAMETER_VALUE,"rework TRI(60,90,180)",OMITTED,SILENT_OMISSION,CRITICAL,True,False,role missing
+offline_baseline,offline,offline-rules,F2,1,F2-R11,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,F3,1,F3-R01,flow,TOPOLOGY,topology in flow order,CORRECT,,,True,False,steps in order (wrong components counted separately: ['packaging'])
+offline_baseline,offline,offline-rules,F3,1,F3-R02,component,COMPONENT_MATCH,assembly -> accepted library component,CORRECT,,,True,False,manual_assembly = manual_assembly
+offline_baseline,offline,offline-rules,F3,1,F3-R03,component,COMPONENT_MATCH,buffer -> accepted library component,CORRECT,,,True,False,buffer_1 = buffer
+offline_baseline,offline,offline-rules,F3,1,F3-R04,component,COMPONENT_MATCH,test -> accepted library component,CORRECT,,,True,False,test_station = test_station
+offline_baseline,offline,offline-rules,F3,1,F3-R05,component,COMPONENT_MATCH,packaging -> accepted library component,WRONG,COMPONENT_MATCH_ERROR,CRITICAL,True,False,step present as 'machine' (machine); expected one of ['packaging']
+offline_baseline,offline,offline-rules,F3,1,F3-R06,value,PARAMETER_VALUE,assembly 90 s,CORRECT,,,True,False,manual_assembly: 90.0 s x 1 = 90.0 s per entity
+offline_baseline,offline,offline-rules,F3,1,F3-R07,value,PARAMETER_VALUE,buffer 4,CORRECT,,,True,False,buffer_1: 4.0
+offline_baseline,offline,offline-rules,F3,1,F3-R08,value,PARAMETER_VALUE,test 120 s,CORRECT,,,True,False,test_station: 120.0 s x 1 = 120.0 s per entity
+offline_baseline,offline,offline-rules,F3,1,F3-R09,value,PARAMETER_VALUE,packing 40 s,CORRECT,,,True,False,machine: 40.0 s x 1 = 40.0 s per entity
+offline_baseline,offline,offline-rules,F3,1,F3-R10,shared_resource,RESOURCE_ASSIGNMENT,assembler does assembly+packing; technician (another resource) does the test,WRONG,RESOURCE_ASSIGNMENT_ERROR,CRITICAL,True,False,"roles ['assembly', 'packaging'] -> operators [None, None]"
+offline_baseline,offline,offline-rules,F3,1,F3-R11,value,PARAMETER_VALUE,one technician,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_OPERATOR (test_station)
+offline_baseline,offline,offline-rules,F3,1,F3-R12,value,PARAMETER_VALUE,one assembler,OMITTED,PARAMETER_VALUE_ERROR,MAJOR,True,False,NO_OPERATOR; flagged «Hay un montador y un técnico»
+offline_baseline,offline,offline-rules,F3,1,F3-R13,strategy,STRATEGY,no rule invented,WRONG,STRATEGY_ERROR,MAJOR,True,False,no operator found
+offline_baseline,offline,offline-rules,F3,1,F3-R14,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,F3,1,F3-R15,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,F4,1,F4-R01,flow,TOPOLOGY,topology in flow order,WRONG,TOPOLOGY_ERROR,CRITICAL,True,False,"missing roles [] (flagged: []); order OK; extra nodes [('machine_2', 'machine')]"
+offline_baseline,offline,offline-rules,F4,1,F4-R02,component,COMPONENT_MATCH,press -> accepted library component,CORRECT,,,True,False,machine = machine
+offline_baseline,offline,offline-rules,F4,1,F4-R03,component,COMPONENT_MATCH,buffer -> accepted library component,CORRECT,,,True,False,buffer_1 = buffer
+offline_baseline,offline,offline-rules,F4,1,F4-R04,component,COMPONENT_MATCH,test -> accepted library component,CORRECT,,,True,False,test_station = test_station
+offline_baseline,offline,offline-rules,F4,1,F4-R05,value,PARAMETER_VALUE,press 55 s,CORRECT,,,True,False,machine: 55.0 s x 1 = 55.0 s per entity
+offline_baseline,offline,offline-rules,F4,1,F4-R06,value,PARAMETER_VALUE,buffer 10,CORRECT,,,True,False,buffer_1: 10.0
+offline_baseline,offline,offline-rules,F4,1,F4-R07,value,PARAMETER_VALUE,test 50 s,CORRECT,,,True,False,test_station: 50.0 s x 1 = 50.0 s per entity
+offline_baseline,offline,offline-rules,F4,1,F4-R08,value,PARAMETER_VALUE,3 % scrap,WRONG,PARAMETER_VALUE_ERROR,CRITICAL,True,False,test_station: 1.0 != 0.97
+offline_baseline,offline,offline-rules,F4,1,F4-R09,unsupported,UNSUPPORTED_RULE_DETECTION,"breakdowns MTBF 2 h / MTTR 10 min: modelled or flagged, never dropped",OMITTED,SILENT_OMISSION,CRITICAL,True,False,behaviour neither modelled nor flagged
+offline_baseline,offline,offline-rules,F4,1,F4-R10,value,PARAMETER_VALUE,40 h,CORRECT,,,True,False,simulation.horizon: 144000.0
+offline_baseline,offline,offline-rules,F4,1,F4-R11,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,P1,1,P1-R01,flow,TOPOLOGY,topology in flow order,CORRECT,,,True,False,
+offline_baseline,offline,offline-rules,P1,1,P1-R02,component,COMPONENT_MATCH,assembly -> accepted library component,CORRECT,,,True,False,manual_assembly = manual_assembly
+offline_baseline,offline,offline-rules,P1,1,P1-R03,component,COMPONENT_MATCH,buffer -> accepted library component,CORRECT,,,True,False,buffer_1 = buffer
+offline_baseline,offline,offline-rules,P1,1,P1-R04,component,COMPONENT_MATCH,machine -> accepted library component,CORRECT,,,True,False,machine = machine
+offline_baseline,offline,offline-rules,P1,1,P1-R05,component,COMPONENT_MATCH,inspection -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,P1,1,P1-R06,value,PARAMETER_VALUE,assembly 60 s/piece,CORRECT,,,True,True,manual_assembly: 60.0 s x 1 = 60.0 s per entity
+offline_baseline,offline,offline-rules,P1,1,P1-R07,value,PARAMETER_VALUE,buffer capacity 5,CORRECT,,,True,False,buffer_1: 5.0
+offline_baseline,offline,offline-rules,P1,1,P1-R08,value,PARAMETER_VALUE,machine 45 s/piece,CORRECT,,,True,False,machine: 45.0 s x 1 = 45.0 s per entity
+offline_baseline,offline,offline-rules,P1,1,P1-R09,value,PARAMETER_VALUE,inspection 20 s/piece,CORRECT,,,True,False,inspection: 20.0 s x 1 = 20.0 s per entity
+offline_baseline,offline,offline-rules,P1,1,P1-R10,shared_resource,RESOURCE_ASSIGNMENT,same operator assembles and inspects,CORRECT,,,True,False,"['operator_1', 'operator_1']"
+offline_baseline,offline,offline-rules,P1,1,P1-R11,no_resource,RESOURCE_ASSIGNMENT,machine is automatic (no operator),CORRECT,,,True,False,
+offline_baseline,offline,offline-rules,P1,1,P1-R12,value,PARAMETER_VALUE,one operator,CORRECT,,,True,False,manual_assembly: 1.0
+offline_baseline,offline,offline-rules,P1,1,P1-R13,strategy,STRATEGY,operator priority NOT stated: no invented rule (FIFO only as visible assumption or question),CORRECT,,,True,False,"fifo + «'Operario' hace Manual assembly, Inspection. Cuando varias tareas le requieren a la vez, ¿cuál tiene»"
+offline_baseline,offline,offline-rules,P1,1,P1-R14,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,P1,1,P1-R15,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,P2,1,P2-R01,flow,TOPOLOGY,topology in flow order,CORRECT,,,True,False,steps in order (wrong components counted separately: ['assembly'])
+offline_baseline,offline,offline-rules,P2,1,P2-R02,component,COMPONENT_MATCH,assembly -> accepted library component,WRONG,COMPONENT_MATCH_ERROR,CRITICAL,True,False,"step present as 'wave_soldering' (wave_soldering); expected one of ['manual_assembly', 'manual_process']"
+offline_baseline,offline,offline-rules,P2,1,P2-R03,component,COMPONENT_MATCH,buffer -> accepted library component,CORRECT,,,True,False,buffer_1 = buffer
+offline_baseline,offline,offline-rules,P2,1,P2-R04,component,COMPONENT_MATCH,selective -> accepted library component,CORRECT,,,True,False,selective_soldering = selective_soldering
+offline_baseline,offline,offline-rules,P2,1,P2-R05,component,COMPONENT_MATCH,review -> accepted library component,CORRECT,,,True,False,inspection = inspection
+offline_baseline,offline,offline-rules,P2,1,P2-R06,value,PARAMETER_VALUE,assembly 30 s PER_CIRCUIT,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,True,"30.0 s x 1 = 30.0 s per entity; expected 120.0 (30.0 per_item, x4)"
+offline_baseline,offline,offline-rules,P2,1,P2-R07,basis,SEMANTIC_BASIS,assembly time basis = per circuit,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"expected per_item, model per_entity (work_units=1); time per entity CHANGED"
+offline_baseline,offline,offline-rules,P2,1,P2-R08,value,PARAMETER_VALUE,4 circuits per rack,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_PARAM (-)
+offline_baseline,offline,offline-rules,P2,1,P2-R09,value,PARAMETER_VALUE,buffer 3 racks,CORRECT,,,True,False,buffer_1: 3.0
+offline_baseline,offline,offline-rules,P2,1,P2-R10,value,PARAMETER_VALUE,selective 20 s PER_RACK,CORRECT,,,True,False,selective_soldering: 20.0 s x 1 = 20.0 s per entity
+offline_baseline,offline,offline-rules,P2,1,P2-R11,basis,SEMANTIC_BASIS,selective time basis = per rack,CORRECT,,,True,False,per_entity (work_units=1)
+offline_baseline,offline,offline-rules,P2,1,P2-R12,value,PARAMETER_VALUE,review 15 s PER_CIRCUIT,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"15.0 s x 1 = 15.0 s per entity; expected 60.0 (15.0 per_item, x4)"
+offline_baseline,offline,offline-rules,P2,1,P2-R13,basis,SEMANTIC_BASIS,review time basis = per circuit,WRONG,SEMANTIC_BASIS_ERROR,CRITICAL,True,False,"expected per_item, model per_entity (work_units=1); time per entity CHANGED"
+offline_baseline,offline,offline-rules,P2,1,P2-R14,value,PARAMETER_VALUE,3 racks,CORRECT,,,True,False,carrier: 3.0
+offline_baseline,offline,offline-rules,P2,1,P2-R15,carrier,CARRIER_SEMANTICS,"rack taken at assembly, freed after review, immediately available",CORRECT,,,True,False,seize ['wave_soldering'] release ['inspection']
+offline_baseline,offline,offline-rules,P2,1,P2-R16,shared_resource,RESOURCE_ASSIGNMENT,same operator assembles and reviews,CORRECT,,,True,False,"['operator_1', 'operator_1']"
+offline_baseline,offline,offline-rules,P2,1,P2-R17,no_resource,RESOURCE_ASSIGNMENT,selective is automatic,CORRECT,,,True,False,
+offline_baseline,offline,offline-rules,P2,1,P2-R18,strategy,STRATEGY,no priority stated -> none invented,CORRECT,,,True,False,"fifo + «'Operario' hace Wave soldering, Revisa y montaje. Cuando varias tareas le requieren a la vez, ¿cuál »"
+offline_baseline,offline,offline-rules,P2,1,P2-R19,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,P2,1,P2-R20,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite
+offline_baseline,offline,offline-rules,P3,1,P3-R01,flow,TOPOLOGY,topology in flow order,WRONG,TOPOLOGY_ERROR,CRITICAL,True,False,"missing roles ['buffer', 'packaging'] (flagged: []); order WRONG; extra nodes []"
+offline_baseline,offline,offline-rules,P3,1,P3-R02,component,COMPONENT_MATCH,assembly -> accepted library component,CORRECT,,,True,False,manual_assembly = manual_assembly
+offline_baseline,offline,offline-rules,P3,1,P3-R03,component,COMPONENT_MATCH,buffer -> accepted library component,OMITTED,SILENT_OMISSION,CRITICAL,True,False,step not in the model and not flagged
+offline_baseline,offline,offline-rules,P3,1,P3-R04,component,COMPONENT_MATCH,test -> accepted library component,CORRECT,,,True,False,functional_test = functional_test
+offline_baseline,offline,offline-rules,P3,1,P3-R05,component,COMPONENT_MATCH,packaging -> accepted library component,OMITTED,SILENT_OMISSION,CRITICAL,True,False,step not in the model and not flagged
+offline_baseline,offline,offline-rules,P3,1,P3-R06,value,PARAMETER_VALUE,assembly 90 s,CORRECT,,,True,True,manual_assembly: 90.0 s x 1 = 90.0 s per entity
+offline_baseline,offline,offline-rules,P3,1,P3-R07,value,PARAMETER_VALUE,buffer 4,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_NODE (role 'buffer' not found in the model)
+offline_baseline,offline,offline-rules,P3,1,P3-R08,value,PARAMETER_VALUE,test 120 s,CORRECT,,,True,True,functional_test: 120.0 s x 1 = 120.0 s per entity
+offline_baseline,offline,offline-rules,P3,1,P3-R09,value,PARAMETER_VALUE,packing 40 s,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_NODE (role 'packaging' not found in the model)
+offline_baseline,offline,offline-rules,P3,1,P3-R10,shared_resource,RESOURCE_ASSIGNMENT,assembler does assembly+packing; technician (another resource) does the test,WRONG,RESOURCE_ASSIGNMENT_ERROR,CRITICAL,True,False,"roles ['assembly', 'packaging'] -> operators [None, None]"
+offline_baseline,offline,offline-rules,P3,1,P3-R11,value,PARAMETER_VALUE,one technician,OMITTED,SILENT_OMISSION,CRITICAL,True,False,NO_OPERATOR (functional_test)
+offline_baseline,offline,offline-rules,P3,1,P3-R12,value,PARAMETER_VALUE,one assembler,OMITTED,PARAMETER_VALUE_ERROR,MAJOR,True,False,NO_OPERATOR; flagged «Hay un montador y un técnico»
+offline_baseline,offline,offline-rules,P3,1,P3-R13,strategy,STRATEGY,no rule invented,WRONG,STRATEGY_ERROR,MAJOR,True,False,no operator found
+offline_baseline,offline,offline-rules,P3,1,P3-R14,value,PARAMETER_VALUE,horizon 8 h,CORRECT,,,True,False,simulation.horizon: 28800.0
+offline_baseline,offline,offline-rules,P3,1,P3-R15,supply,PARAMETER_VALUE,unlimited supply,CORRECT,,,True,False,infinite

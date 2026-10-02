@@ -1,0 +1,7 @@
+id: E4
+family: E_UNSUPPORTED_RULE
+title: Product colours with priority
+purpose: Product mix + priority by type (no product mix in ISMS).
+text: Fuente infinita. Un operario monta cada pieza en 60 segundos. Las piezas esperan en un buffer de 5. Una máquina las
+  procesa en 45 segundos. Después el mismo operario inspecciona cada pieza en 20 segundos. El 30 % de las piezas son rojas
+  y el resto azules; en la inspección las rojas tienen prioridad sobre las azules. Simular 8 horas.

@@ -1,0 +1,737 @@
+{
+ "case": "F2",
+ "family": "F_REALISTIC",
+ "schema_valid": true,
+ "compiles": true,
+ "verifier_status": "INCOMPLETE",
+ "error": null,
+ "semantically_correct": false,
+ "wall_s": 0.009,
+ "interpreter": "offline-rules",
+ "draft": {
+  "model_name": "Conformal coating → AOI → Test station",
+  "horizon_value": 8.0,
+  "horizon_unit": "h",
+  "supply": "interarrival",
+  "interarrival": {
+   "dist": "constant",
+   "value": 60.0,
+   "low": null,
+   "mode": null,
+   "high": null,
+   "mean": null,
+   "std": null,
+   "unit": "s"
+  },
+  "resources": [],
+  "steps": [
+   {
+    "id": "coating",
+    "name": "Conformal coating",
+    "component": "coating",
+    "time": {
+     "dist": "constant",
+     "value": 60.0,
+     "low": null,
+     "mode": null,
+     "high": null,
+     "mean": null,
+     "std": null,
+     "unit": "s"
+    },
+    "capacity": null,
+    "resources": [],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   },
+   {
+    "id": "aoi",
+    "name": "AOI",
+    "component": "aoi",
+    "time": {
+     "dist": "constant",
+     "value": 30.0,
+     "low": null,
+     "mode": null,
+     "high": null,
+     "mean": null,
+     "std": null,
+     "unit": "s"
+    },
+    "capacity": null,
+    "resources": [],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   },
+   {
+    "id": "buffer_1",
+    "name": "Buffer 1",
+    "component": "buffer",
+    "time": null,
+    "capacity": null,
+    "resources": [],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   },
+   {
+    "id": "buffer_2",
+    "name": "Buffer 2",
+    "component": "buffer",
+    "time": null,
+    "capacity": 5,
+    "resources": [],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   },
+   {
+    "id": "test_station",
+    "name": "Test station",
+    "component": "test_station",
+    "time": {
+     "dist": "constant",
+     "value": 90.0,
+     "low": null,
+     "mode": null,
+     "high": null,
+     "mean": null,
+     "std": null,
+     "unit": "s"
+    },
+    "capacity": null,
+    "resources": [],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   }
+  ],
+  "policies": [],
+  "carrier_loops": [],
+  "experiments": [],
+  "missing_information": [],
+  "assumptions": [],
+  "confidence_notes": [
+   "Interpretado por el intérprete OFFLINE (reglas deterministas ES/EN)."
+  ],
+  "items": null,
+  "custom_rules": [],
+  "unparsed": [
+   "El 90 % sale bien",
+   "las que fallan van a reparación",
+   "donde un técnico tarda entre 60 y 180 s (lo más habitual 90 s)",
+   "De las buenas, el 60 % va a la línea de test A y el 40 % a la línea B",
+   "el B entre 80 y 110 s",
+   "con distribución uniforme"
+  ],
+  "layout_known": false
+ },
+ "model": {
+  "isms_version": "0.1",
+  "meta": {
+   "name": "Conformal coating → AOI → Test station",
+   "description": "Las placas llegan de media cada 60 segundos, de forma aleatoria (exponencial). Esperan en una cola y pasan por una AOI que tarda 30 segundos. El 90 % sale bien; las que fallan van a reparación, donde un técnico tarda entre 60 y 180 s (lo más habitual 90 s), y vuelven a la cola de la AOI. De las buenas, el 60 % va a la línea de test A y el 40 % a la línea B; cada línea tiene delante un buffer de 5. El test A dura entre 60 y 90 s y el B entre 80 y 110 s, con distribución uniforme. Simular 8 horas.",
+   "tags": [],
+   "domain": null,
+   "origin": "ai_generated",
+   "generated_by": {
+    "interpreter": "offline-rules",
+    "prompt_version": "offline_rules_v2",
+    "compiler": "compiler_v2",
+    "prototype_mode": false,
+    "at": "2026-10-02T06:00:13+00:00"
+   }
+  },
+  "simulation": {
+   "horizon": {
+    "value": 8.0,
+    "unit": "h",
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": null
+    }
+   },
+   "warmup": {
+    "value": 0.0,
+    "unit": "s",
+    "provenance": null
+   },
+   "kind": "terminating",
+   "replications": 1,
+   "base_seed": 12345,
+   "trace": false,
+   "dispatch_timing": "end_of_timestep",
+   "check_invariants": true
+  },
+  "entities": [
+   {
+    "id": "unit",
+    "name": "Unit",
+    "description": ""
+   }
+  ],
+  "parameters": [
+   {
+    "id": "coating_time",
+    "value": 60.0,
+    "unit": "s",
+    "description": "Tiempo de 'Conformal coating'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "aoi_time",
+    "value": 30.0,
+    "unit": "s",
+    "description": "Tiempo de 'AOI'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "buffer_1_capacity",
+    "value": null,
+    "unit": "units",
+    "description": "Capacidad de 'Buffer 1'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": null
+   },
+   {
+    "id": "buffer_2_capacity",
+    "value": 5.0,
+    "unit": "units",
+    "description": "Capacidad de 'Buffer 2'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "test_station_time",
+    "value": 90.0,
+    "unit": "s",
+    "description": "Tiempo de 'Test station'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   }
+  ],
+  "resources": [],
+  "nodes": [
+   {
+    "id": "source",
+    "name": "Source",
+    "component": "source",
+    "component_version": null,
+    "params": {
+     "arrival": "interarrival",
+     "interarrival": {
+      "dist": "constant",
+      "unit": "s",
+      "provenance": {
+       "status": "provided_by_client",
+       "source": "description"
+      },
+      "value": 60.0
+     }
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "coating",
+    "name": "Conformal coating",
+    "component": "coating",
+    "component_version": "1.0.0",
+    "params": {
+     "process_time": {
+      "dist": "constant",
+      "unit": "s",
+      "value": "$coating_time"
+     }
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "aoi",
+    "name": "AOI",
+    "component": "aoi",
+    "component_version": "1.0.0",
+    "params": {
+     "process_time": {
+      "dist": "constant",
+      "unit": "s",
+      "value": "$aoi_time"
+     }
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "buffer_1",
+    "name": "Buffer 1",
+    "component": "buffer",
+    "component_version": "1.0.0",
+    "params": {
+     "capacity": "$buffer_1_capacity"
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "buffer_2",
+    "name": "Buffer 2",
+    "component": "buffer",
+    "component_version": "1.0.0",
+    "params": {
+     "capacity": "$buffer_2_capacity"
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "test_station",
+    "name": "Test station",
+    "component": "test_station",
+    "component_version": "1.0.0",
+    "params": {
+     "process_time": {
+      "dist": "constant",
+      "unit": "s",
+      "value": "$test_station_time"
+     }
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "sink",
+    "name": "Sink",
+    "component": "sink",
+    "component_version": null,
+    "params": {},
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   }
+  ],
+  "edges": [
+   {
+    "source": "source",
+    "target": "coating",
+    "probability": null
+   },
+   {
+    "source": "coating",
+    "target": "aoi",
+    "probability": null
+   },
+   {
+    "source": "aoi",
+    "target": "buffer_1",
+    "probability": null
+   },
+   {
+    "source": "buffer_1",
+    "target": "buffer_2",
+    "probability": null
+   },
+   {
+    "source": "buffer_2",
+    "target": "test_station",
+    "probability": null
+   },
+   {
+    "source": "test_station",
+    "target": "sink",
+    "probability": null
+   }
+  ],
+  "assumptions": [],
+  "missing": [
+   {
+    "question": "No he usado esta frase: «El 90 % sale bien». Si describe algo del proceso, reformúlala o añádelo a mano.",
+    "path": null,
+    "required": false
+   },
+   {
+    "question": "No he usado esta frase: «las que fallan van a reparación». Si describe algo del proceso, reformúlala o añádelo a mano.",
+    "path": null,
+    "required": false
+   },
+   {
+    "question": "No he usado esta frase: «donde un técnico tarda entre 60 y 180 s (lo más habitual 90 s)». Si describe algo del proceso, reformúlala o añádelo a mano.",
+    "path": null,
+    "required": false
+   },
+   {
+    "question": "No he usado esta frase: «De las buenas, el 60 % va a la línea de test A y el 40 % a la línea B». Si describe algo del proceso, reformúlala o añádelo a mano.",
+    "path": null,
+    "required": false
+   },
+   {
+    "question": "No he usado esta frase: «el B entre 80 y 110 s». Si describe algo del proceso, reformúlala o añádelo a mano.",
+    "path": null,
+    "required": false
+   },
+   {
+    "question": "No he usado esta frase: «con distribución uniforme». Si describe algo del proceso, reformúlala o añádelo a mano.",
+    "path": null,
+    "required": false
+   }
+  ],
+  "approval": {
+   "approved": false,
+   "by": null,
+   "at": null,
+   "model_hash": null,
+   "note": ""
+  },
+  "experiments": [],
+  "custom_rule_candidates": []
+ },
+ "questions": [
+  "Capacidad de 'Buffer 1' (units)",
+  "No he usado esta frase: «El 90 % sale bien». Si describe algo del proceso, reformúlala o añádelo a mano.",
+  "No he usado esta frase: «las que fallan van a reparación». Si describe algo del proceso, reformúlala o añádelo a mano.",
+  "No he usado esta frase: «donde un técnico tarda entre 60 y 180 s (lo más habitual 90 s)». Si describe algo del proceso, reformúlala o añádelo a mano.",
+  "No he usado esta frase: «De las buenas, el 60 % va a la línea de test A y el 40 % a la línea B». Si describe algo del proceso, reformúlala o añádelo a mano.",
+  "No he usado esta frase: «el B entre 80 y 110 s». Si describe algo del proceso, reformúlala o añádelo a mano.",
+  "No he usado esta frase: «con distribución uniforme». Si describe algo del proceso, reformúlala o añádelo a mano."
+ ],
+ "assumptions": [],
+ "custom_rules": [],
+ "unparsed": [
+  "El 90 % sale bien",
+  "las que fallan van a reparación",
+  "donde un técnico tarda entre 60 y 180 s (lo más habitual 90 s)",
+  "De las buenas, el 60 % va a la línea de test A y el 40 % a la línea B",
+  "el B entre 80 y 110 s",
+  "con distribución uniforme"
+ ],
+ "confidence_notes_dropped_by_compiler": [
+  "Interpretado por el intérprete OFFLINE (reglas deterministas ES/EN)."
+ ],
+ "evaluation": {
+  "case": "F2",
+  "results": [
+   {
+    "case": "F2",
+    "req": "F2-R01",
+    "kind": "supply",
+    "metric": "PARAMETER_VALUE",
+    "description": "random arrivals",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "interarrival",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F2",
+    "req": "F2-R02",
+    "kind": "distribution",
+    "metric": "PARAMETER_VALUE",
+    "description": "exp(60 s)",
+    "status": "WRONG",
+    "error_type": "PARAMETER_VALUE_ERROR",
+    "severity": "CRITICAL",
+    "detail": "expected {'dist': 'exponential', 'mean': 60}, got {'dist': 'constant', 'unit': 's', 'provenance': {'status': 'provided_by_client', 'source': 'description'}, 'value': 60.0}",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F2",
+    "req": "F2-R03",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "aoi -> accepted library component",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "aoi = aoi",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F2",
+    "req": "F2-R04",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "AOI 30 s",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "aoi: 30.0 s x 1 = 30.0 s per entity",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F2",
+    "req": "F2-R05",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "90 % good",
+    "status": "WRONG",
+    "error_type": "PARAMETER_VALUE_ERROR",
+    "severity": "CRITICAL",
+    "detail": "aoi: 1.0 != 0.9",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F2",
+    "req": "F2-R06",
+    "kind": "unsupported",
+    "metric": "UNSUPPORTED_RULE_DETECTION",
+    "description": "rework loop back to the AOI queue: modelled correctly or flagged as not representable",
+    "status": "UNSUPPORTED_CORRECTLY_DETECTED",
+    "error_type": null,
+    "severity": null,
+    "detail": "«las que fallan van a reparación»",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F2",
+    "req": "F2-R07",
+    "kind": "routing",
+    "metric": "ROUTING",
+    "description": "60/40 split: modelled or flagged, never linearised silently",
+    "status": "UNSUPPORTED_CORRECTLY_DETECTED",
+    "error_type": null,
+    "severity": null,
+    "detail": "not representable, flagged: «De las buenas, el 60 % va a la línea de test A y el 40 % a la línea B»",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F2",
+    "req": "F2-R08",
+    "kind": "distribution",
+    "metric": "PARAMETER_VALUE",
+    "description": "test A U(60,90)",
+    "status": "WRONG",
+    "error_type": "PARAMETER_VALUE_ERROR",
+    "severity": "CRITICAL",
+    "detail": "expected {'dist': 'uniform', 'low': 60, 'high': 90}, got {'dist': 'constant', 'unit': 's', 'value': 90.0}",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F2",
+    "req": "F2-R09",
+    "kind": "distribution",
+    "metric": "PARAMETER_VALUE",
+    "description": "test B U(80,110)",
+    "status": "OMITTED",
+    "error_type": "SILENT_OMISSION",
+    "severity": "CRITICAL",
+    "detail": "role missing",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F2",
+    "req": "F2-R10",
+    "kind": "distribution",
+    "metric": "PARAMETER_VALUE",
+    "description": "rework TRI(60,90,180)",
+    "status": "OMITTED",
+    "error_type": "SILENT_OMISSION",
+    "severity": "CRITICAL",
+    "detail": "role missing",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F2",
+    "req": "F2-R11",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "horizon 8 h",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "simulation.horizon: 28800.0",
+    "evaluated": true,
+    "unit_sensitive": false
+   }
+  ],
+  "grounding": [
+   {
+    "parameter": "coating_time",
+    "value": 60.0,
+    "unit": "s",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "aoi_time",
+    "value": 30.0,
+    "unit": "s",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "buffer_1_capacity",
+    "value": null,
+    "unit": "units",
+    "status": "MISSING",
+    "grounded": null,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "buffer_2_capacity",
+    "value": 5.0,
+    "unit": "units",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "test_station_time",
+    "value": 90.0,
+    "unit": "s",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   }
+  ],
+  "role_map": {
+   "queue": "buffer_1",
+   "aoi": "aoi",
+   "rework": null,
+   "queue_a": "buffer_2",
+   "test_a": "test_station",
+   "queue_b": null,
+   "test_b": null
+  },
+  "semantically_correct": false
+ },
+ "llm_calls": [],
+ "repeat": 1,
+ "signature": {
+  "topology": [
+   "source",
+   "coating",
+   "aoi",
+   "buffer",
+   "buffer",
+   "test_station",
+   "sink"
+  ],
+  "components": {
+   "queue": "buffer",
+   "aoi": "aoi",
+   "rework": null,
+   "queue_a": "buffer",
+   "test_a": "test_station",
+   "queue_b": null,
+   "test_b": null
+  },
+  "loose_roles": [],
+  "requirements": {
+   "F2-R01": "CORRECT",
+   "F2-R02": "WRONG",
+   "F2-R03": "CORRECT",
+   "F2-R04": "CORRECT",
+   "F2-R05": "WRONG",
+   "F2-R06": "UNSUPPORTED_CORRECTLY_DETECTED",
+   "F2-R07": "UNSUPPORTED_CORRECTLY_DETECTED",
+   "F2-R08": "WRONG",
+   "F2-R09": "OMITTED",
+   "F2-R10": "OMITTED",
+   "F2-R11": "CORRECT"
+  },
+  "missing": [
+   [
+    "queue",
+    "capacity"
+   ]
+  ],
+  "assumption_paths": [],
+  "custom_rules": 0
+ }
+}

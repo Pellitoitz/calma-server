@@ -1,0 +1,97 @@
+id: E4
+gold_source: explicit spec (MVP + product mix)
+gold_status: VALID
+roles:
+- role: assembly
+  accept:
+  - manual_assembly
+  - manual_process
+  keywords:
+  - montaje
+  - monta
+  - assembl
+  - ensambl
+  - carga
+  - coloca
+- role: buffer
+  accept:
+  - buffer
+  keywords:
+  - buffer
+  - cola
+  - pulmon
+  - estanteria
+  - queue
+  - almacen
+- role: machine
+  accept:
+  - machine
+  keywords:
+  - maquina
+  - machine
+- role: inspection
+  accept:
+  - inspection
+  keywords:
+  - inspecc
+  - inspect
+  - revis
+requirements:
+- kind: unsupported
+  keywords:
+  - rojas
+  - azules
+  - '30'
+  - prioridad
+  min_hits: 2
+  description: product mix + type priority -> flagged, never approximated
+  id: E4-R01
+- kind: flow
+  description: topology in flow order
+  id: E4-R02
+- kind: component
+  role: assembly
+  description: assembly -> accepted library component
+  id: E4-R03
+- kind: component
+  role: buffer
+  description: buffer -> accepted library component
+  id: E4-R04
+- kind: component
+  role: machine
+  description: machine -> accepted library component
+  id: E4-R05
+- kind: component
+  role: inspection
+  description: inspection -> accepted library component
+  id: E4-R06
+- kind: value
+  role: assembly
+  field: process_time
+  expect: 60
+  description: assembly 60 s
+  id: E4-R07
+- kind: value
+  role: buffer
+  field: capacity
+  expect: 5
+  description: buffer 5
+  id: E4-R08
+- kind: value
+  role: machine
+  field: process_time
+  expect: 45
+  description: machine 45 s
+  id: E4-R09
+- kind: value
+  role: inspection
+  field: process_time
+  expect: 20
+  description: inspection 20 s
+  id: E4-R10
+- kind: value
+  target: horizon
+  expect: 28800
+  description: horizon 8 h
+  severity: MAJOR
+  id: E4-R11

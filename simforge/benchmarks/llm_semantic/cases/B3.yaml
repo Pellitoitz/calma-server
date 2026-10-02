@@ -1,0 +1,9 @@
+id: B3
+family: B_UNITS_BASIS
+title: Distances in cm and mm, minutes
+purpose: 1250 cm, 3500 mm, 2 min, 0,9 m/s.
+text: Un operario monta cada bastidor en 2 min y lo lleva andando hasta el buffer de la selectiva, que está a 1250 cm del
+  puesto de montaje. Cargar el bastidor en el carro le lleva 5 s y descargarlo 3 s. El operario camina a 0,9 m/s. En el buffer
+  de la selectiva caben 4 bastidores. La selectiva tarda 40 s por bastidor. Después el mismo operario revisa el bastidor en
+  45 s; la mesa de revisión está a 3500 mm del buffer. Hay 2 bastidores en circulación y vuelven al montaje en cuanto termina
+  la revisión. Material ilimitado. Simular 8 horas.

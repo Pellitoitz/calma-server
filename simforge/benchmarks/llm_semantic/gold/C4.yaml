@@ -1,0 +1,109 @@
+id: C4
+gold_source: explicit spec
+gold_status: VALID
+roles:
+- role: assembly
+  accept:
+  - manual_assembly
+  - manual_process
+  keywords:
+  - montaje
+  - monta
+  - assembl
+  - ensambl
+  - carga
+  - coloca
+- role: buffer
+  accept:
+  - buffer
+  keywords:
+  - buffer
+  - cola
+  - pulmon
+  - estanteria
+  - queue
+  - almacen
+- role: machine
+  accept:
+  - machine
+  keywords:
+  - maquina
+  - machine
+- role: inspection
+  accept:
+  - inspection
+  keywords:
+  - inspecc
+  - inspect
+  - revis
+requirements:
+- kind: flow
+  description: topology in flow order
+  id: C4-R01
+- kind: component
+  role: assembly
+  description: assembly -> accepted library component
+  id: C4-R02
+- kind: component
+  role: buffer
+  description: buffer -> accepted library component
+  id: C4-R03
+- kind: component
+  role: machine
+  description: machine -> accepted library component
+  id: C4-R04
+- kind: component
+  role: inspection
+  description: inspection -> accepted library component
+  id: C4-R05
+- kind: missing
+  role: buffer
+  field: capacity
+  keywords:
+  - capacidad
+  - buffer
+  description: buffer capacity -> MISSING
+  id: C4-R06
+- kind: missing
+  role: inspection
+  field: process_time
+  keywords:
+  - inspecc
+  - tiempo
+  description: inspection time -> MISSING
+  id: C4-R07
+- kind: value
+  role: assembly
+  field: process_time
+  expect: 50
+  description: assembly 50 s
+  id: C4-R08
+- kind: value
+  role: machine
+  field: process_time
+  expect: 40
+  description: machine 40 s
+  id: C4-R09
+- kind: shared_resource
+  roles:
+  - assembly
+  - inspection
+  description: same operator
+  id: C4-R10
+- kind: strategy
+  operator_of: assembly
+  rule: unspecified
+  severity: MAJOR
+  description: no rule invented
+  id: C4-R11
+- kind: value
+  target: horizon
+  expect: 28800
+  description: horizon 8 h
+  severity: MAJOR
+  id: C4-R12
+- kind: supply
+  expect: infinite
+  description: unlimited supply
+  severity: MAJOR
+  id: C4-R13

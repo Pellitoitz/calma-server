@@ -1,0 +1,8 @@
+id: P3
+family: PERTURBATION
+title: F3 perturbed
+purpose: Order, synonyms, '1,5 min', '2 minutos'.
+text: 'Simulamos 8 horas con suministro continuo. Un único técnico de pruebas se encarga del test funcional: 2 minutos por
+  equipo. Antes, el montador ensambla cada equipo en 1,5 min y lo deja en un buffer de 4. Cuando el test termina, el mismo
+  montador embala el equipo, 40 s. Hay un montador y un técnico.'
+perturbation_of: F3

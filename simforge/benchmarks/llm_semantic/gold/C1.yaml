@@ -1,0 +1,145 @@
+id: C1
+gold_source: explicit spec (B1 with the selective basis removed)
+gold_status: VALID
+roles:
+- role: assembly
+  accept:
+  - manual_assembly
+  - manual_process
+  keywords:
+  - montaje
+  - monta
+  - assembl
+  - ensambl
+  - carga
+  - coloca
+- role: buffer
+  accept:
+  - buffer
+  keywords:
+  - buffer
+  - cola
+  - pulmon
+  - estanteria
+  - queue
+  - almacen
+- role: selective
+  accept:
+  - selective_soldering
+  keywords:
+  - selectiva
+  - selective
+- role: review
+  accept:
+  - inspection
+  - cleaning
+  keywords:
+  - revis
+  - inspecc
+  - limpi
+  - review
+requirements:
+- kind: flow
+  description: topology in flow order
+  id: C1-R01
+- kind: component
+  role: assembly
+  description: assembly -> accepted library component
+  id: C1-R02
+- kind: component
+  role: buffer
+  description: buffer -> accepted library component
+  id: C1-R03
+- kind: component
+  role: selective
+  description: selective -> accepted library component
+  id: C1-R04
+- kind: component
+  role: review
+  description: review -> accepted library component
+  id: C1-R05
+- kind: value
+  role: assembly
+  field: process_time
+  expect: 30
+  description: assembly 30 s PER_CIRCUIT
+  per: per_item
+  items: 4
+  id: C1-R06
+- kind: basis
+  role: assembly
+  expect: per_item
+  description: assembly time basis = per circuit
+  id: C1-R07
+- kind: value
+  target: items_per_entity
+  expect: 4
+  description: 4 circuits per rack
+  id: C1-R08
+- kind: value
+  role: buffer
+  field: capacity
+  expect: 3
+  description: buffer 3 racks
+  id: C1-R09
+- kind: value
+  role: review
+  field: process_time
+  expect: 15
+  description: review 15 s PER_CIRCUIT
+  per: per_item
+  items: 4
+  id: C1-R10
+- kind: basis
+  role: review
+  expect: per_item
+  description: review time basis = per circuit
+  id: C1-R11
+- kind: value
+  target: carrier_quantity
+  expect: 3
+  description: 3 racks
+  id: C1-R12
+- kind: carrier
+  seize: assembly
+  release: review
+  return: immediate
+  description: rack taken at assembly, freed after review, immediately available
+  id: C1-R13
+- kind: shared_resource
+  roles:
+  - assembly
+  - review
+  description: same operator assembles and reviews
+  id: C1-R14
+- kind: no_resource
+  role: selective
+  description: selective is automatic
+  id: C1-R15
+- kind: strategy
+  operator_of: assembly
+  rule: unspecified
+  severity: MAJOR
+  description: no priority stated -> none invented
+  id: C1-R16
+- kind: value
+  target: horizon
+  expect: 28800
+  description: horizon 8 h
+  severity: MAJOR
+  id: C1-R17
+- kind: supply
+  expect: infinite
+  description: unlimited supply
+  severity: MAJOR
+  id: C1-R18
+- kind: ambiguity
+  role: selective
+  keywords:
+  - selectiv
+  - circuito
+  - bastidor
+  - 'por '
+  min_hits: 3
+  description: '''la selectiva tarda 20 s'' with 4 circuits/rack: per rack or per circuit? must ASK, not guess'
+  id: C1-R19

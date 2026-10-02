@@ -1,0 +1,108 @@
+id: D1
+gold_source: explicit spec
+gold_status: VALID
+roles:
+- role: assembly
+  accept:
+  - manual_assembly
+  - manual_process
+  keywords:
+  - montaje
+  - monta
+  - assembl
+  - ensambl
+  - carga
+  - coloca
+- role: buffer
+  accept:
+  - buffer
+  keywords:
+  - buffer
+  - cola
+  - pulmon
+  - estanteria
+  - queue
+  - almacen
+- role: selective
+  accept:
+  - selective_soldering
+  keywords:
+  - selectiva
+  - selective
+- role: review
+  accept:
+  - inspection
+  - cleaning
+  keywords:
+  - revis
+  - inspecc
+  - limpi
+  - review
+requirements:
+- kind: flow
+  description: topology in flow order
+  id: D1-R01
+- kind: component
+  role: assembly
+  description: assembly -> accepted library component
+  id: D1-R02
+- kind: component
+  role: buffer
+  description: buffer -> accepted library component
+  id: D1-R03
+- kind: component
+  role: selective
+  description: selective -> accepted library component
+  id: D1-R04
+- kind: component
+  role: review
+  description: review -> accepted library component
+  id: D1-R05
+- kind: conflict
+  role: buffer
+  field: capacity
+  values:
+  - 5
+  - 3
+  description: capacity 5 vs 3 -> ASK
+  id: D1-R06
+- kind: value
+  role: assembly
+  field: process_time
+  expect: 120
+  description: assembly 120 s
+  id: D1-R07
+- kind: value
+  role: selective
+  field: process_time
+  expect: 30
+  description: selective 30 s
+  id: D1-R08
+- kind: value
+  role: review
+  field: process_time
+  expect: 60
+  description: review 60 s
+  id: D1-R09
+- kind: value
+  target: carrier_quantity
+  expect: 4
+  description: 4 racks
+  id: D1-R10
+- kind: shared_resource
+  roles:
+  - assembly
+  - review
+  description: same operator
+  id: D1-R11
+- kind: value
+  target: horizon
+  expect: 28800
+  description: horizon 8 h
+  severity: MAJOR
+  id: D1-R12
+- kind: supply
+  expect: infinite
+  description: unlimited supply
+  severity: MAJOR
+  id: D1-R13

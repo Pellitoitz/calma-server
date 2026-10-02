@@ -1,0 +1,880 @@
+{
+ "case": "D2",
+ "family": "D_CONTRADICTION",
+ "schema_valid": true,
+ "compiles": true,
+ "verifier_status": "INCOMPLETE",
+ "error": null,
+ "semantically_correct": false,
+ "wall_s": 0.005,
+ "interpreter": "offline-rules",
+ "draft": {
+  "model_name": "Manual assembly → Machine → Inspection → Transporte 1",
+  "horizon_value": 8.0,
+  "horizon_unit": "h",
+  "supply": "infinite",
+  "interarrival": null,
+  "resources": [
+   {
+    "id": "operator_1",
+    "name": "Operario",
+    "kind": "operator",
+    "quantity": 1,
+    "walking_speed_m_s": null
+   }
+  ],
+  "steps": [
+   {
+    "id": "manual_assembly",
+    "name": "Manual assembly",
+    "component": "manual_assembly",
+    "time": {
+     "dist": "constant",
+     "value": 60.0,
+     "low": null,
+     "mode": null,
+     "high": null,
+     "mean": null,
+     "std": null,
+     "unit": "s"
+    },
+    "capacity": null,
+    "resources": [
+     "operator_1"
+    ],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   },
+   {
+    "id": "buffer_1",
+    "name": "Buffer 1",
+    "component": "buffer",
+    "time": null,
+    "capacity": 5,
+    "resources": [],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   },
+   {
+    "id": "machine",
+    "name": "Machine",
+    "component": "machine",
+    "time": {
+     "dist": "constant",
+     "value": 45.0,
+     "low": null,
+     "mode": null,
+     "high": null,
+     "mean": null,
+     "std": null,
+     "unit": "s"
+    },
+    "capacity": null,
+    "resources": [],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   },
+   {
+    "id": "inspection",
+    "name": "Inspection",
+    "component": "inspection",
+    "time": {
+     "dist": "constant",
+     "value": 20.0,
+     "low": null,
+     "mode": null,
+     "high": null,
+     "mean": null,
+     "std": null,
+     "unit": "s"
+    },
+    "capacity": null,
+    "resources": [
+     "operator_1"
+    ],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   },
+   {
+    "id": "transport_1",
+    "name": "Transporte 1",
+    "component": "transport",
+    "time": null,
+    "capacity": null,
+    "resources": [],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   }
+  ],
+  "policies": [],
+  "carrier_loops": [],
+  "experiments": [],
+  "missing_information": [
+   {
+    "question": "¿Quién realiza 'Transporte 1'? (el operario u otro recurso)",
+    "required": false
+   }
+  ],
+  "assumptions": [],
+  "confidence_notes": [
+   "Interpretado por el intérprete OFFLINE (reglas deterministas ES/EN)."
+  ],
+  "items": null,
+  "custom_rules": [],
+  "unparsed": [],
+  "layout_known": false
+ },
+ "model": {
+  "isms_version": "0.1",
+  "meta": {
+   "name": "Manual assembly → Machine → Inspection → Transporte 1",
+   "description": "Fuente infinita. Un operario monta cada pieza en 60 segundos. Las piezas esperan en un buffer de 5. Una máquina las procesa en 45 segundos. Después el mismo operario inspecciona cada pieza en 20 segundos. Por cierto, el montaje de cada pieza lleva 75 segundos. Simular 8 horas.",
+   "tags": [],
+   "domain": null,
+   "origin": "ai_generated",
+   "generated_by": {
+    "interpreter": "offline-rules",
+    "prompt_version": "offline_rules_v2",
+    "compiler": "compiler_v2",
+    "prototype_mode": false,
+    "at": "2026-10-02T06:00:13+00:00"
+   }
+  },
+  "simulation": {
+   "horizon": {
+    "value": 8.0,
+    "unit": "h",
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": null
+    }
+   },
+   "warmup": {
+    "value": 0.0,
+    "unit": "s",
+    "provenance": null
+   },
+   "kind": "terminating",
+   "replications": 1,
+   "base_seed": 12345,
+   "trace": false,
+   "dispatch_timing": "end_of_timestep",
+   "check_invariants": true
+  },
+  "entities": [
+   {
+    "id": "unit",
+    "name": "Unit",
+    "description": ""
+   }
+  ],
+  "parameters": [
+   {
+    "id": "manual_assembly_time",
+    "value": 60.0,
+    "unit": "s",
+    "description": "Tiempo de 'Manual assembly'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "buffer_1_capacity",
+    "value": 5.0,
+    "unit": "units",
+    "description": "Capacidad de 'Buffer 1'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "machine_time",
+    "value": 45.0,
+    "unit": "s",
+    "description": "Tiempo de 'Machine'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "inspection_time",
+    "value": 20.0,
+    "unit": "s",
+    "description": "Tiempo de 'Inspection'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "transport_1_load_time",
+    "value": null,
+    "unit": "s",
+    "description": "Tiempo de carga en 'Transporte 1'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": null
+   },
+   {
+    "id": "transport_1_unload_time",
+    "value": null,
+    "unit": "s",
+    "description": "Tiempo de descarga en 'Transporte 1'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": null
+   },
+   {
+    "id": "operator_1_count",
+    "value": 1.0,
+    "unit": "units",
+    "description": "Número de Operario",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "transport_1_distance",
+    "value": null,
+    "unit": "m",
+    "description": "Distancia de 'Transporte 1'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": null
+   },
+   {
+    "id": "transport_1_speed",
+    "value": null,
+    "unit": "m/s",
+    "description": "Velocidad de 'Transporte 1'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": null
+   }
+  ],
+  "resources": [
+   {
+    "id": "operator_1",
+    "name": "Operario",
+    "kind": "operator",
+    "quantity": "$operator_1_count",
+    "dispatch": "fifo",
+    "wip_target": null,
+    "travel": null,
+    "home": null,
+    "cost_per_hour": null,
+    "provenance": null
+   }
+  ],
+  "nodes": [
+   {
+    "id": "source",
+    "name": "Source",
+    "component": "source",
+    "component_version": null,
+    "params": {
+     "arrival": "infinite"
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "manual_assembly",
+    "name": "Manual assembly",
+    "component": "manual_assembly",
+    "component_version": "1.0.0",
+    "params": {
+     "process_time": {
+      "dist": "constant",
+      "unit": "s",
+      "value": "$manual_assembly_time"
+     },
+     "resources": [
+      {
+       "resource": "operator_1"
+      }
+     ]
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "buffer_1",
+    "name": "Buffer 1",
+    "component": "buffer",
+    "component_version": "1.0.0",
+    "params": {
+     "capacity": "$buffer_1_capacity"
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "machine",
+    "name": "Machine",
+    "component": "machine",
+    "component_version": "1.0.0",
+    "params": {
+     "process_time": {
+      "dist": "constant",
+      "unit": "s",
+      "value": "$machine_time"
+     }
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "inspection",
+    "name": "Inspection",
+    "component": "inspection",
+    "component_version": "1.0.0",
+    "params": {
+     "process_time": {
+      "dist": "constant",
+      "unit": "s",
+      "value": "$inspection_time"
+     },
+     "resources": [
+      {
+       "resource": "operator_1"
+      }
+     ]
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "transport_1",
+    "name": "Transporte 1",
+    "component": "transport",
+    "component_version": "1.0.0",
+    "params": {
+     "capacity": 1,
+     "load_time": {
+      "dist": "constant",
+      "unit": "s",
+      "value": "$transport_1_load_time"
+     },
+     "unload_time": {
+      "dist": "constant",
+      "unit": "s",
+      "value": "$transport_1_unload_time"
+     },
+     "reserve_destination": true,
+     "return_empty": false,
+     "distance": {
+      "value": "$transport_1_distance",
+      "unit": "m"
+     },
+     "speed": {
+      "value": "$transport_1_speed",
+      "unit": "m/s"
+     }
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "sink",
+    "name": "Sink",
+    "component": "sink",
+    "component_version": null,
+    "params": {},
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   }
+  ],
+  "edges": [
+   {
+    "source": "source",
+    "target": "manual_assembly",
+    "probability": null
+   },
+   {
+    "source": "manual_assembly",
+    "target": "buffer_1",
+    "probability": null
+   },
+   {
+    "source": "buffer_1",
+    "target": "machine",
+    "probability": null
+   },
+   {
+    "source": "machine",
+    "target": "inspection",
+    "probability": null
+   },
+   {
+    "source": "inspection",
+    "target": "transport_1",
+    "probability": null
+   },
+   {
+    "source": "transport_1",
+    "target": "sink",
+    "probability": null
+   }
+  ],
+  "assumptions": [
+   {
+    "id": "a1",
+    "text": "'Transporte 1': 1 unidad por viaje (no se indicó).",
+    "path": "nodes.transport_1.params.capacity",
+    "origin": "ai",
+    "accepted": false
+   },
+   {
+    "id": "a2",
+    "text": "'Transporte 1': el viaje empieza sólo cuando hay sitio en el destino (evita que el operario espere cargado).",
+    "path": "nodes.transport_1.params.reserve_destination",
+    "origin": "ai",
+    "accepted": false
+   },
+   {
+    "id": "a3",
+    "text": "Los desplazamientos del operario entre puestos no se modelan (no se indicaron distancias).",
+    "path": "resources",
+    "origin": "ai",
+    "accepted": false
+   },
+   {
+    "id": "a4",
+    "text": "'Operario' es compartido por Manual assembly, Inspection: se asume FIFO (atiende la petición más antigua).",
+    "path": "resources.operator_1.dispatch",
+    "origin": "ai",
+    "accepted": false
+   }
+  ],
+  "missing": [
+   {
+    "question": "'Operario' hace Manual assembly, Inspection. Cuando varias tareas le requieren a la vez, ¿cuál tiene prioridad? (p.ej. mantener alimentada la máquina / vaciar primero la inspección / FIFO)",
+    "path": "resources.operator_1.dispatch",
+    "required": false
+   },
+   {
+    "question": "¿Quién realiza 'Transporte 1'? (el operario u otro recurso)",
+    "path": null,
+    "required": false
+   }
+  ],
+  "approval": {
+   "approved": false,
+   "by": null,
+   "at": null,
+   "model_hash": null,
+   "note": ""
+  },
+  "experiments": [],
+  "custom_rule_candidates": []
+ },
+ "questions": [
+  "Tiempo de carga en 'Transporte 1' (s)",
+  "Tiempo de descarga en 'Transporte 1' (s)",
+  "Distancia de 'Transporte 1' (m)",
+  "Velocidad de 'Transporte 1' (m/s)",
+  "'Operario' hace Manual assembly, Inspection. Cuando varias tareas le requieren a la vez, ¿cuál tiene prioridad? (p.ej. mantener alimentada la máquina / vaciar primero la inspección / FIFO)",
+  "¿Quién realiza 'Transporte 1'? (el operario u otro recurso)"
+ ],
+ "assumptions": [
+  "'Transporte 1': 1 unidad por viaje (no se indicó).",
+  "'Transporte 1': el viaje empieza sólo cuando hay sitio en el destino (evita que el operario espere cargado).",
+  "Los desplazamientos del operario entre puestos no se modelan (no se indicaron distancias).",
+  "'Operario' es compartido por Manual assembly, Inspection: se asume FIFO (atiende la petición más antigua)."
+ ],
+ "custom_rules": [],
+ "unparsed": [],
+ "confidence_notes_dropped_by_compiler": [
+  "Interpretado por el intérprete OFFLINE (reglas deterministas ES/EN)."
+ ],
+ "evaluation": {
+  "case": "D2",
+  "results": [
+   {
+    "case": "D2",
+    "req": "D2-R01",
+    "kind": "flow",
+    "metric": "TOPOLOGY",
+    "description": "topology in flow order",
+    "status": "WRONG",
+    "error_type": "TOPOLOGY_ERROR",
+    "severity": "CRITICAL",
+    "detail": "missing roles [] (flagged: []); order OK; extra nodes [('transport_1', 'transport')]",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "D2",
+    "req": "D2-R02",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "assembly -> accepted library component",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "manual_assembly = manual_assembly",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "D2",
+    "req": "D2-R03",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "buffer -> accepted library component",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "buffer_1 = buffer",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "D2",
+    "req": "D2-R04",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "machine -> accepted library component",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "machine = machine",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "D2",
+    "req": "D2-R05",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "inspection -> accepted library component",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "inspection = inspection",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "D2",
+    "req": "D2-R06",
+    "kind": "conflict",
+    "metric": "CONFLICT_DETECTION",
+    "description": "60 s vs 75 s -> ASK",
+    "status": "WRONG",
+    "error_type": "CONTRADICTION_NOT_DETECTED",
+    "severity": "CRITICAL",
+    "detail": "model uses 60.0 (provided_by_client); silent choice",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "D2",
+    "req": "D2-R07",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "buffer 5",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "buffer_1: 5.0",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "D2",
+    "req": "D2-R08",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "machine 45 s",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "machine: 45.0 s x 1 = 45.0 s per entity",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "D2",
+    "req": "D2-R09",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "inspection 20 s",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "inspection: 20.0 s x 1 = 20.0 s per entity",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "D2",
+    "req": "D2-R10",
+    "kind": "shared_resource",
+    "metric": "RESOURCE_ASSIGNMENT",
+    "description": "same operator",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "['operator_1', 'operator_1']",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "D2",
+    "req": "D2-R11",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "horizon 8 h",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "simulation.horizon: 28800.0",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "D2",
+    "req": "D2-R12",
+    "kind": "supply",
+    "metric": "PARAMETER_VALUE",
+    "description": "unlimited supply",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "infinite",
+    "evaluated": true,
+    "unit_sensitive": false
+   }
+  ],
+  "grounding": [
+   {
+    "parameter": "manual_assembly_time",
+    "value": 60.0,
+    "unit": "s",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "buffer_1_capacity",
+    "value": 5.0,
+    "unit": "units",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "machine_time",
+    "value": 45.0,
+    "unit": "s",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "inspection_time",
+    "value": 20.0,
+    "unit": "s",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "transport_1_load_time",
+    "value": null,
+    "unit": "s",
+    "status": "MISSING",
+    "grounded": null,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "transport_1_unload_time",
+    "value": null,
+    "unit": "s",
+    "status": "MISSING",
+    "grounded": null,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "operator_1_count",
+    "value": 1.0,
+    "unit": "units",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "transport_1_distance",
+    "value": null,
+    "unit": "m",
+    "status": "MISSING",
+    "grounded": null,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "transport_1_speed",
+    "value": null,
+    "unit": "m/s",
+    "status": "MISSING",
+    "grounded": null,
+    "verdict": "OK"
+   }
+  ],
+  "role_map": {
+   "assembly": "manual_assembly",
+   "buffer": "buffer_1",
+   "machine": "machine",
+   "inspection": "inspection"
+  },
+  "semantically_correct": false
+ },
+ "llm_calls": [],
+ "repeat": 1,
+ "signature": {
+  "topology": [
+   "source",
+   "manual_assembly",
+   "buffer",
+   "machine",
+   "inspection",
+   "transport",
+   "sink"
+  ],
+  "components": {
+   "assembly": "manual_assembly",
+   "buffer": "buffer",
+   "machine": "machine",
+   "inspection": "inspection"
+  },
+  "loose_roles": [],
+  "requirements": {
+   "D2-R01": "WRONG",
+   "D2-R02": "CORRECT",
+   "D2-R03": "CORRECT",
+   "D2-R04": "CORRECT",
+   "D2-R05": "CORRECT",
+   "D2-R06": "WRONG",
+   "D2-R07": "CORRECT",
+   "D2-R08": "CORRECT",
+   "D2-R09": "CORRECT",
+   "D2-R10": "CORRECT",
+   "D2-R11": "CORRECT",
+   "D2-R12": "CORRECT"
+  },
+  "missing": [
+   [
+    "transport",
+    "distance"
+   ],
+   [
+    "transport",
+    "load_time"
+   ],
+   [
+    "transport",
+    "speed"
+   ],
+   [
+    "transport",
+    "unload_time"
+   ]
+  ],
+  "assumption_paths": [
+   "nodes.transport_1.params.capacity",
+   "nodes.transport_1.params.reserve_destination",
+   "resources",
+   "resources.operator_1.dispatch"
+  ],
+  "custom_rules": 0
+ }
+}

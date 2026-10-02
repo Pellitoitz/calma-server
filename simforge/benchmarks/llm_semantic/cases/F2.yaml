@@ -1,0 +1,9 @@
+id: F2
+family: F_REALISTIC
+title: Probabilistic routing and rework loop
+purpose: Branching (60/40) and a rework loop; parser V1 is linear.
+text: Las placas llegan de media cada 60 segundos, de forma aleatoria (exponencial). Esperan en una cola y pasan por una AOI
+  que tarda 30 segundos. El 90 % sale bien; las que fallan van a reparación, donde un técnico tarda entre 60 y 180 s (lo más
+  habitual 90 s), y vuelven a la cola de la AOI. De las buenas, el 60 % va a la línea de test A y el 40 % a la línea B; cada
+  línea tiene delante un buffer de 5. El test A dura entre 60 y 90 s y el B entre 80 y 110 s, con distribución uniforme. Simular
+  8 horas.

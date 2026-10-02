@@ -1,0 +1,107 @@
+id: B4
+gold_source: explicit spec
+gold_status: VALID
+roles:
+- role: test
+  accept:
+  - test_station
+  - functional_test
+  keywords:
+  - test
+  - prueba
+  - banco
+- role: buffer
+  accept:
+  - buffer
+  keywords:
+  - buffer
+  - cola
+  - pulmon
+  - estanteria
+  - queue
+  - almacen
+- role: packaging
+  accept:
+  - packaging
+  keywords:
+  - embala
+  - packag
+  - empaquet
+requirements:
+- kind: flow
+  description: topology in flow order
+  id: B4-R01
+- kind: component
+  role: test
+  description: test -> accepted library component
+  id: B4-R02
+- kind: component
+  role: buffer
+  description: buffer -> accepted library component
+  id: B4-R03
+- kind: component
+  role: packaging
+  description: packaging -> accepted library component
+  id: B4-R04
+- kind: value
+  role: test
+  field: process_time
+  expect: 45
+  description: test 0.75 min PER_BOX
+  raw: 0.75
+  unit_sensitive: true
+  per: per_entity
+  items: 10
+  id: B4-R05
+- kind: basis
+  role: test
+  expect: per_entity
+  description: test per box
+  id: B4-R06
+- kind: value
+  role: packaging
+  field: process_time
+  expect: 3
+  description: packaging 3 s PER_PIECE
+  per: per_item
+  items: 10
+  id: B4-R07
+- kind: basis
+  role: packaging
+  expect: per_item
+  description: packaging per piece
+  id: B4-R08
+- kind: value
+  target: items_per_entity
+  expect: 10
+  description: 10 pieces per box
+  id: B4-R09
+- kind: value
+  role: buffer
+  field: capacity
+  expect: 2
+  description: buffer 2 boxes
+  id: B4-R10
+- kind: no_resource
+  role: test
+  description: test automatic
+  id: B4-R11
+- kind: value
+  role: packaging
+  field: operator_quantity
+  expect: 1
+  description: one operator packs
+  id: B4-R12
+- kind: value
+  target: horizon
+  expect: 27000
+  raw: 7.5
+  unit_sensitive: true
+  description: 7.5 h
+  severity: MAJOR
+  id: B4-R13
+- kind: supply
+  expect: infinite
+  description: unlimited supply
+  severity: MAJOR
+  id: B4-R14

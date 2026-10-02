@@ -1,0 +1,8 @@
+id: D4
+family: D_CONTRADICTION
+title: Distance 8 m vs 12 m
+purpose: Two distances for the same path.
+text: Hay 2 bastidores. Un operario monta cada bastidor en 100 s y lo lleva al buffer de la selectiva, que está a 8 metros
+  del montaje; cargar y descargar el carro le lleva 4 s cada vez. Camina a 1 m/s. En el buffer caben 3 bastidores. La selectiva
+  tarda 30 s por bastidor. El mismo operario revisa el bastidor en 50 s junto al buffer (a 0 m) y el bastidor vuelve libre
+  al montaje. Recuerda que entre el montaje y la selectiva hay 12 m de pasillo. Material ilimitado; 8 horas.

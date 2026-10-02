@@ -1,0 +1,425 @@
+case,family,req,kind,description,expected,gold_status,gold_source
+A1,A_PARAPHRASE,A1-R01,flow,topology in flow order,{},VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A1,A_PARAPHRASE,A1-R02,component,assembly -> accepted library component,"{""role"": ""assembly""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A1,A_PARAPHRASE,A1-R03,component,buffer -> accepted library component,"{""role"": ""buffer""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A1,A_PARAPHRASE,A1-R04,component,machine -> accepted library component,"{""role"": ""machine""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A1,A_PARAPHRASE,A1-R05,component,inspection -> accepted library component,"{""role"": ""inspection""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A1,A_PARAPHRASE,A1-R06,value,assembly 60 s/piece,"{""role"": ""assembly"", ""field"": ""process_time"", ""expect"": 60}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A1,A_PARAPHRASE,A1-R07,value,buffer capacity 5,"{""role"": ""buffer"", ""field"": ""capacity"", ""expect"": 5}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A1,A_PARAPHRASE,A1-R08,value,machine 45 s/piece,"{""role"": ""machine"", ""field"": ""process_time"", ""expect"": 45}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A1,A_PARAPHRASE,A1-R09,value,inspection 20 s/piece,"{""role"": ""inspection"", ""field"": ""process_time"", ""expect"": 20}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A1,A_PARAPHRASE,A1-R10,shared_resource,same operator assembles and inspects,"{""roles"": [""assembly"", ""inspection""]}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A1,A_PARAPHRASE,A1-R11,no_resource,machine is automatic (no operator),"{""role"": ""machine""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A1,A_PARAPHRASE,A1-R12,value,one operator,"{""role"": ""assembly"", ""field"": ""operator_quantity"", ""expect"": 1}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A1,A_PARAPHRASE,A1-R13,strategy,operator priority NOT stated: no invented rule (FIFO only as visible assumption or question),"{""operator_of"": ""assembly"", ""rule"": ""unspecified"", ""severity"": ""MAJOR""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A1,A_PARAPHRASE,A1-R14,value,horizon 8 h,"{""target"": ""horizon"", ""expect"": 28800, ""severity"": ""MAJOR""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A1,A_PARAPHRASE,A1-R15,supply,unlimited supply,"{""expect"": ""infinite"", ""severity"": ""MAJOR""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A2,A_PARAPHRASE,A2-R01,flow,topology in flow order,{},VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A2,A_PARAPHRASE,A2-R02,component,assembly -> accepted library component,"{""role"": ""assembly""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A2,A_PARAPHRASE,A2-R03,component,buffer -> accepted library component,"{""role"": ""buffer""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A2,A_PARAPHRASE,A2-R04,component,machine -> accepted library component,"{""role"": ""machine""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A2,A_PARAPHRASE,A2-R05,component,inspection -> accepted library component,"{""role"": ""inspection""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A2,A_PARAPHRASE,A2-R06,value,assembly 60 s/piece,"{""role"": ""assembly"", ""field"": ""process_time"", ""expect"": 60, ""raw"": 1, ""unit_sensitive"": true}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A2,A_PARAPHRASE,A2-R07,value,buffer capacity 5,"{""role"": ""buffer"", ""field"": ""capacity"", ""expect"": 5}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A2,A_PARAPHRASE,A2-R08,value,machine 45 s/piece,"{""role"": ""machine"", ""field"": ""process_time"", ""expect"": 45}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A2,A_PARAPHRASE,A2-R09,value,inspection 20 s/piece,"{""role"": ""inspection"", ""field"": ""process_time"", ""expect"": 20}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A2,A_PARAPHRASE,A2-R10,shared_resource,same operator assembles and inspects,"{""roles"": [""assembly"", ""inspection""]}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A2,A_PARAPHRASE,A2-R11,no_resource,machine is automatic (no operator),"{""role"": ""machine""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A2,A_PARAPHRASE,A2-R12,value,one operator,"{""role"": ""assembly"", ""field"": ""operator_quantity"", ""expect"": 1}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A2,A_PARAPHRASE,A2-R13,strategy,operator priority NOT stated: no invented rule (FIFO only as visible assumption or question),"{""operator_of"": ""assembly"", ""rule"": ""unspecified"", ""severity"": ""MAJOR""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A2,A_PARAPHRASE,A2-R14,value,horizon 8 h,"{""target"": ""horizon"", ""expect"": 28800, ""severity"": ""MAJOR""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A2,A_PARAPHRASE,A2-R15,supply,unlimited supply,"{""expect"": ""infinite"", ""severity"": ""MAJOR""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A3,A_PARAPHRASE,A3-R01,flow,topology in flow order,{},VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A3,A_PARAPHRASE,A3-R02,component,assembly -> accepted library component,"{""role"": ""assembly""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A3,A_PARAPHRASE,A3-R03,component,buffer -> accepted library component,"{""role"": ""buffer""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A3,A_PARAPHRASE,A3-R04,component,machine -> accepted library component,"{""role"": ""machine""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A3,A_PARAPHRASE,A3-R05,component,inspection -> accepted library component,"{""role"": ""inspection""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A3,A_PARAPHRASE,A3-R06,value,assembly 60 s/piece,"{""role"": ""assembly"", ""field"": ""process_time"", ""expect"": 60}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A3,A_PARAPHRASE,A3-R07,value,buffer capacity 5,"{""role"": ""buffer"", ""field"": ""capacity"", ""expect"": 5}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A3,A_PARAPHRASE,A3-R08,value,machine 45 s/piece,"{""role"": ""machine"", ""field"": ""process_time"", ""expect"": 45}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A3,A_PARAPHRASE,A3-R09,value,inspection 20 s/piece,"{""role"": ""inspection"", ""field"": ""process_time"", ""expect"": 20}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A3,A_PARAPHRASE,A3-R10,shared_resource,same operator assembles and inspects,"{""roles"": [""assembly"", ""inspection""]}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A3,A_PARAPHRASE,A3-R11,no_resource,machine is automatic (no operator),"{""role"": ""machine""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A3,A_PARAPHRASE,A3-R12,value,one operator,"{""role"": ""assembly"", ""field"": ""operator_quantity"", ""expect"": 1}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A3,A_PARAPHRASE,A3-R13,strategy,operator priority NOT stated: no invented rule (FIFO only as visible assumption or question),"{""operator_of"": ""assembly"", ""rule"": ""unspecified"", ""severity"": ""MAJOR""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A3,A_PARAPHRASE,A3-R14,value,horizon 8 h,"{""target"": ""horizon"", ""expect"": 28800, ""severity"": ""MAJOR""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A3,A_PARAPHRASE,A3-R15,supply,unlimited supply,"{""expect"": ""infinite"", ""severity"": ""MAJOR""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A4,A_PARAPHRASE,A4-R01,flow,topology in flow order,{},VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A4,A_PARAPHRASE,A4-R02,component,assembly -> accepted library component,"{""role"": ""assembly""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A4,A_PARAPHRASE,A4-R03,component,buffer -> accepted library component,"{""role"": ""buffer""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A4,A_PARAPHRASE,A4-R04,component,machine -> accepted library component,"{""role"": ""machine""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A4,A_PARAPHRASE,A4-R05,component,inspection -> accepted library component,"{""role"": ""inspection""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A4,A_PARAPHRASE,A4-R06,value,assembly 60 s/piece,"{""role"": ""assembly"", ""field"": ""process_time"", ""expect"": 60}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A4,A_PARAPHRASE,A4-R07,value,buffer capacity 5,"{""role"": ""buffer"", ""field"": ""capacity"", ""expect"": 5}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A4,A_PARAPHRASE,A4-R08,value,machine 45 s/piece,"{""role"": ""machine"", ""field"": ""process_time"", ""expect"": 45}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A4,A_PARAPHRASE,A4-R09,value,inspection 20 s/piece,"{""role"": ""inspection"", ""field"": ""process_time"", ""expect"": 20}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A4,A_PARAPHRASE,A4-R10,shared_resource,same operator assembles and inspects,"{""roles"": [""assembly"", ""inspection""]}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A4,A_PARAPHRASE,A4-R11,no_resource,machine is automatic (no operator),"{""role"": ""machine""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A4,A_PARAPHRASE,A4-R12,value,one operator,"{""role"": ""assembly"", ""field"": ""operator_quantity"", ""expect"": 1}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A4,A_PARAPHRASE,A4-R13,strategy,operator priority NOT stated: no invented rule (FIFO only as visible assumption or question),"{""operator_of"": ""assembly"", ""rule"": ""unspecified"", ""severity"": ""MAJOR""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A4,A_PARAPHRASE,A4-R14,value,horizon 8 h,"{""target"": ""horizon"", ""expect"": 28800, ""severity"": ""MAJOR""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+A4,A_PARAPHRASE,A4-R15,supply,unlimited supply,"{""expect"": ""infinite"", ""severity"": ""MAJOR""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+B1,B_UNITS_BASIS,B1-R01,flow,topology in flow order,{},VALID,explicit spec
+B1,B_UNITS_BASIS,B1-R02,component,assembly -> accepted library component,"{""role"": ""assembly""}",VALID,explicit spec
+B1,B_UNITS_BASIS,B1-R03,component,buffer -> accepted library component,"{""role"": ""buffer""}",VALID,explicit spec
+B1,B_UNITS_BASIS,B1-R04,component,selective -> accepted library component,"{""role"": ""selective""}",VALID,explicit spec
+B1,B_UNITS_BASIS,B1-R05,component,review -> accepted library component,"{""role"": ""review""}",VALID,explicit spec
+B1,B_UNITS_BASIS,B1-R06,value,assembly 30 s PER_CIRCUIT,"{""role"": ""assembly"", ""field"": ""process_time"", ""expect"": 30, ""per"": ""per_item"", ""items"": 4}",VALID,explicit spec
+B1,B_UNITS_BASIS,B1-R07,basis,assembly time basis = per circuit,"{""role"": ""assembly"", ""expect"": ""per_item""}",VALID,explicit spec
+B1,B_UNITS_BASIS,B1-R08,value,4 circuits per rack,"{""target"": ""items_per_entity"", ""expect"": 4}",VALID,explicit spec
+B1,B_UNITS_BASIS,B1-R09,value,buffer 3 racks,"{""role"": ""buffer"", ""field"": ""capacity"", ""expect"": 3}",VALID,explicit spec
+B1,B_UNITS_BASIS,B1-R10,value,selective 20 s PER_RACK,"{""role"": ""selective"", ""field"": ""process_time"", ""expect"": 20, ""per"": ""per_entity"", ""items"": 4}",VALID,explicit spec
+B1,B_UNITS_BASIS,B1-R11,basis,selective time basis = per rack,"{""role"": ""selective"", ""expect"": ""per_entity""}",VALID,explicit spec
+B1,B_UNITS_BASIS,B1-R12,value,review 15 s PER_CIRCUIT,"{""role"": ""review"", ""field"": ""process_time"", ""expect"": 15, ""per"": ""per_item"", ""items"": 4}",VALID,explicit spec
+B1,B_UNITS_BASIS,B1-R13,basis,review time basis = per circuit,"{""role"": ""review"", ""expect"": ""per_item""}",VALID,explicit spec
+B1,B_UNITS_BASIS,B1-R14,value,3 racks,"{""target"": ""carrier_quantity"", ""expect"": 3}",VALID,explicit spec
+B1,B_UNITS_BASIS,B1-R15,carrier,"rack taken at assembly, freed after review, immediately available","{""seize"": ""assembly"", ""release"": ""review"", ""return"": ""immediate""}",VALID,explicit spec
+B1,B_UNITS_BASIS,B1-R16,shared_resource,same operator assembles and reviews,"{""roles"": [""assembly"", ""review""]}",VALID,explicit spec
+B1,B_UNITS_BASIS,B1-R17,no_resource,selective is automatic,"{""role"": ""selective""}",VALID,explicit spec
+B1,B_UNITS_BASIS,B1-R18,strategy,no priority stated -> none invented,"{""operator_of"": ""assembly"", ""rule"": ""unspecified"", ""severity"": ""MAJOR""}",VALID,explicit spec
+B1,B_UNITS_BASIS,B1-R19,value,horizon 8 h,"{""target"": ""horizon"", ""expect"": 28800, ""severity"": ""MAJOR""}",VALID,explicit spec
+B1,B_UNITS_BASIS,B1-R20,supply,unlimited supply,"{""expect"": ""infinite"", ""severity"": ""MAJOR""}",VALID,explicit spec
+B2,B_UNITS_BASIS,B2-R01,flow,topology in flow order,{},VALID,explicit spec
+B2,B_UNITS_BASIS,B2-R02,component,printer -> accepted library component,"{""role"": ""printer""}",VALID,explicit spec
+B2,B_UNITS_BASIS,B2-R03,component,buffer_1 -> accepted library component,"{""role"": ""buffer_1""}",VALID,explicit spec
+B2,B_UNITS_BASIS,B2-R04,component,pnp -> accepted library component,"{""role"": ""pnp""}",VALID,explicit spec
+B2,B_UNITS_BASIS,B2-R05,component,buffer_2 -> accepted library component,"{""role"": ""buffer_2""}",VALID,explicit spec
+B2,B_UNITS_BASIS,B2-R06,component,reflow -> accepted library component,"{""role"": ""reflow""}",VALID,explicit spec
+B2,B_UNITS_BASIS,B2-R07,component,buffer_3 -> accepted library component,"{""role"": ""buffer_3""}",VALID,explicit spec
+B2,B_UNITS_BASIS,B2-R08,component,aoi -> accepted library component,"{""role"": ""aoi""}",VALID,explicit spec
+B2,B_UNITS_BASIS,B2-R09,value,printer 2 min PER_PANEL,"{""role"": ""printer"", ""field"": ""process_time"", ""expect"": 120, ""raw"": 2, ""unit_sensitive"": true, ""per"": ""per_entity"", ""items"": 6}",VALID,explicit spec
+B2,B_UNITS_BASIS,B2-R10,basis,printer per panel,"{""role"": ""printer"", ""expect"": ""per_entity""}",VALID,explicit spec
+B2,B_UNITS_BASIS,B2-R11,value,pick&place 15 s PER_BOARD,"{""role"": ""pnp"", ""field"": ""process_time"", ""expect"": 15, ""per"": ""per_item"", ""items"": 6}",VALID,explicit spec
+B2,B_UNITS_BASIS,B2-R12,basis,pick&place per board,"{""role"": ""pnp"", ""expect"": ""per_item""}",VALID,explicit spec
+B2,B_UNITS_BASIS,B2-R13,value,reflow 4 min PER_PANEL,"{""role"": ""reflow"", ""field"": ""process_time"", ""expect"": 240, ""raw"": 4, ""unit_sensitive"": true, ""per"": ""per_entity"", ""items"": 6}",VALID,explicit spec
+B2,B_UNITS_BASIS,B2-R14,basis,reflow per panel,"{""role"": ""reflow"", ""expect"": ""per_entity""}",VALID,explicit spec
+B2,B_UNITS_BASIS,B2-R15,value,AOI 1500 ms PER_BOARD,"{""role"": ""aoi"", ""field"": ""process_time"", ""expect"": 1.5, ""raw"": 1500, ""unit_sensitive"": true, ""per"": ""per_item"", ""items"": 6}",VALID,explicit spec
+B2,B_UNITS_BASIS,B2-R16,basis,AOI per board,"{""role"": ""aoi"", ""expect"": ""per_item""}",VALID,explicit spec
+B2,B_UNITS_BASIS,B2-R17,value,6 boards per panel,"{""target"": ""items_per_entity"", ""expect"": 6}",VALID,explicit spec
+B2,B_UNITS_BASIS,B2-R18,value,buffer 1 = 2 panels,"{""role"": ""buffer_1"", ""field"": ""capacity"", ""expect"": 2}",VALID,explicit spec
+B2,B_UNITS_BASIS,B2-R19,value,buffer 2 = 2 panels,"{""role"": ""buffer_2"", ""field"": ""capacity"", ""expect"": 2}",VALID,explicit spec
+B2,B_UNITS_BASIS,B2-R20,value,buffer 3 = 2 panels,"{""role"": ""buffer_3"", ""field"": ""capacity"", ""expect"": 2}",VALID,explicit spec
+B2,B_UNITS_BASIS,B2-R21,no_resource,printer automatic,"{""role"": ""printer""}",VALID,explicit spec
+B2,B_UNITS_BASIS,B2-R22,no_resource,pnp automatic,"{""role"": ""pnp""}",VALID,explicit spec
+B2,B_UNITS_BASIS,B2-R23,no_resource,reflow automatic,"{""role"": ""reflow""}",VALID,explicit spec
+B2,B_UNITS_BASIS,B2-R24,no_resource,aoi automatic,"{""role"": ""aoi""}",VALID,explicit spec
+B2,B_UNITS_BASIS,B2-R25,value,horizon 8 h,"{""target"": ""horizon"", ""expect"": 28800, ""severity"": ""MAJOR""}",VALID,explicit spec
+B2,B_UNITS_BASIS,B2-R26,supply,unlimited supply,"{""expect"": ""infinite"", ""severity"": ""MAJOR""}",VALID,explicit spec
+B3,B_UNITS_BASIS,B3-R01,flow,topology in flow order,{},VALID,explicit spec
+B3,B_UNITS_BASIS,B3-R02,component,assembly -> accepted library component,"{""role"": ""assembly""}",VALID,explicit spec
+B3,B_UNITS_BASIS,B3-R03,component,transport -> accepted library component,"{""role"": ""transport""}",VALID,explicit spec
+B3,B_UNITS_BASIS,B3-R04,component,buffer -> accepted library component,"{""role"": ""buffer""}",VALID,explicit spec
+B3,B_UNITS_BASIS,B3-R05,component,selective -> accepted library component,"{""role"": ""selective""}",VALID,explicit spec
+B3,B_UNITS_BASIS,B3-R06,component,review -> accepted library component,"{""role"": ""review""}",VALID,explicit spec
+B3,B_UNITS_BASIS,B3-R07,value,assembly 2 min per rack,"{""role"": ""assembly"", ""field"": ""process_time"", ""expect"": 120, ""raw"": 2, ""unit_sensitive"": true, ""per"": ""per_entity""}",VALID,explicit spec
+B3,B_UNITS_BASIS,B3-R08,value,load 5 s,"{""role"": ""transport"", ""field"": ""load_time"", ""expect"": 5}",VALID,explicit spec
+B3,B_UNITS_BASIS,B3-R09,value,unload 3 s,"{""role"": ""transport"", ""field"": ""unload_time"", ""expect"": 3}",VALID,explicit spec
+B3,B_UNITS_BASIS,B3-R10,value,assembly->buffer 1250 cm = 12.5 m,"{""target"": ""distance"", ""between"": [""assembly"", ""buffer""], ""expect"": 12.5, ""raw"": 1250, ""unit_sensitive"": true}",VALID,explicit spec
+B3,B_UNITS_BASIS,B3-R11,value,buffer->review 3500 mm = 3.5 m,"{""target"": ""distance"", ""between"": [""buffer"", ""review""], ""expect"": 3.5, ""raw"": 3500, ""unit_sensitive"": true}",VALID,explicit spec
+B3,B_UNITS_BASIS,B3-R12,value,walking speed 0.9 m/s,"{""target"": ""walking_speed"", ""expect"": 0.9}",VALID,explicit spec
+B3,B_UNITS_BASIS,B3-R13,value,buffer 4 racks,"{""role"": ""buffer"", ""field"": ""capacity"", ""expect"": 4}",VALID,explicit spec
+B3,B_UNITS_BASIS,B3-R14,value,selective 40 s per rack,"{""role"": ""selective"", ""field"": ""process_time"", ""expect"": 40}",VALID,explicit spec
+B3,B_UNITS_BASIS,B3-R15,value,review 45 s per rack,"{""role"": ""review"", ""field"": ""process_time"", ""expect"": 45}",VALID,explicit spec
+B3,B_UNITS_BASIS,B3-R16,value,2 racks,"{""target"": ""carrier_quantity"", ""expect"": 2}",VALID,explicit spec
+B3,B_UNITS_BASIS,B3-R17,carrier,rack loop,"{""seize"": ""assembly"", ""release"": ""review"", ""return"": ""immediate""}",VALID,explicit spec
+B3,B_UNITS_BASIS,B3-R18,shared_resource,"one operator: assembly, transport, review","{""roles"": [""assembly"", ""transport"", ""review""]}",VALID,explicit spec
+B3,B_UNITS_BASIS,B3-R19,strategy,no rule invented,"{""operator_of"": ""assembly"", ""rule"": ""unspecified"", ""severity"": ""MAJOR""}",VALID,explicit spec
+B3,B_UNITS_BASIS,B3-R20,value,horizon 8 h,"{""target"": ""horizon"", ""expect"": 28800, ""severity"": ""MAJOR""}",VALID,explicit spec
+B3,B_UNITS_BASIS,B3-R21,supply,unlimited supply,"{""expect"": ""infinite"", ""severity"": ""MAJOR""}",VALID,explicit spec
+B4,B_UNITS_BASIS,B4-R01,flow,topology in flow order,{},VALID,explicit spec
+B4,B_UNITS_BASIS,B4-R02,component,test -> accepted library component,"{""role"": ""test""}",VALID,explicit spec
+B4,B_UNITS_BASIS,B4-R03,component,buffer -> accepted library component,"{""role"": ""buffer""}",VALID,explicit spec
+B4,B_UNITS_BASIS,B4-R04,component,packaging -> accepted library component,"{""role"": ""packaging""}",VALID,explicit spec
+B4,B_UNITS_BASIS,B4-R05,value,test 0.75 min PER_BOX,"{""role"": ""test"", ""field"": ""process_time"", ""expect"": 45, ""raw"": 0.75, ""unit_sensitive"": true, ""per"": ""per_entity"", ""items"": 10}",VALID,explicit spec
+B4,B_UNITS_BASIS,B4-R06,basis,test per box,"{""role"": ""test"", ""expect"": ""per_entity""}",VALID,explicit spec
+B4,B_UNITS_BASIS,B4-R07,value,packaging 3 s PER_PIECE,"{""role"": ""packaging"", ""field"": ""process_time"", ""expect"": 3, ""per"": ""per_item"", ""items"": 10}",VALID,explicit spec
+B4,B_UNITS_BASIS,B4-R08,basis,packaging per piece,"{""role"": ""packaging"", ""expect"": ""per_item""}",VALID,explicit spec
+B4,B_UNITS_BASIS,B4-R09,value,10 pieces per box,"{""target"": ""items_per_entity"", ""expect"": 10}",VALID,explicit spec
+B4,B_UNITS_BASIS,B4-R10,value,buffer 2 boxes,"{""role"": ""buffer"", ""field"": ""capacity"", ""expect"": 2}",VALID,explicit spec
+B4,B_UNITS_BASIS,B4-R11,no_resource,test automatic,"{""role"": ""test""}",VALID,explicit spec
+B4,B_UNITS_BASIS,B4-R12,value,one operator packs,"{""role"": ""packaging"", ""field"": ""operator_quantity"", ""expect"": 1}",VALID,explicit spec
+B4,B_UNITS_BASIS,B4-R13,value,7.5 h,"{""target"": ""horizon"", ""expect"": 27000, ""raw"": 7.5, ""unit_sensitive"": true, ""severity"": ""MAJOR""}",VALID,explicit spec
+B4,B_UNITS_BASIS,B4-R14,supply,unlimited supply,"{""expect"": ""infinite"", ""severity"": ""MAJOR""}",VALID,explicit spec
+C1,C_MISSING_AMBIGUITY,C1-R01,flow,topology in flow order,{},VALID,explicit spec (B1 with the selective basis removed)
+C1,C_MISSING_AMBIGUITY,C1-R02,component,assembly -> accepted library component,"{""role"": ""assembly""}",VALID,explicit spec (B1 with the selective basis removed)
+C1,C_MISSING_AMBIGUITY,C1-R03,component,buffer -> accepted library component,"{""role"": ""buffer""}",VALID,explicit spec (B1 with the selective basis removed)
+C1,C_MISSING_AMBIGUITY,C1-R04,component,selective -> accepted library component,"{""role"": ""selective""}",VALID,explicit spec (B1 with the selective basis removed)
+C1,C_MISSING_AMBIGUITY,C1-R05,component,review -> accepted library component,"{""role"": ""review""}",VALID,explicit spec (B1 with the selective basis removed)
+C1,C_MISSING_AMBIGUITY,C1-R06,value,assembly 30 s PER_CIRCUIT,"{""role"": ""assembly"", ""field"": ""process_time"", ""expect"": 30, ""per"": ""per_item"", ""items"": 4}",VALID,explicit spec (B1 with the selective basis removed)
+C1,C_MISSING_AMBIGUITY,C1-R07,basis,assembly time basis = per circuit,"{""role"": ""assembly"", ""expect"": ""per_item""}",VALID,explicit spec (B1 with the selective basis removed)
+C1,C_MISSING_AMBIGUITY,C1-R08,value,4 circuits per rack,"{""target"": ""items_per_entity"", ""expect"": 4}",VALID,explicit spec (B1 with the selective basis removed)
+C1,C_MISSING_AMBIGUITY,C1-R09,value,buffer 3 racks,"{""role"": ""buffer"", ""field"": ""capacity"", ""expect"": 3}",VALID,explicit spec (B1 with the selective basis removed)
+C1,C_MISSING_AMBIGUITY,C1-R10,value,review 15 s PER_CIRCUIT,"{""role"": ""review"", ""field"": ""process_time"", ""expect"": 15, ""per"": ""per_item"", ""items"": 4}",VALID,explicit spec (B1 with the selective basis removed)
+C1,C_MISSING_AMBIGUITY,C1-R11,basis,review time basis = per circuit,"{""role"": ""review"", ""expect"": ""per_item""}",VALID,explicit spec (B1 with the selective basis removed)
+C1,C_MISSING_AMBIGUITY,C1-R12,value,3 racks,"{""target"": ""carrier_quantity"", ""expect"": 3}",VALID,explicit spec (B1 with the selective basis removed)
+C1,C_MISSING_AMBIGUITY,C1-R13,carrier,"rack taken at assembly, freed after review, immediately available","{""seize"": ""assembly"", ""release"": ""review"", ""return"": ""immediate""}",VALID,explicit spec (B1 with the selective basis removed)
+C1,C_MISSING_AMBIGUITY,C1-R14,shared_resource,same operator assembles and reviews,"{""roles"": [""assembly"", ""review""]}",VALID,explicit spec (B1 with the selective basis removed)
+C1,C_MISSING_AMBIGUITY,C1-R15,no_resource,selective is automatic,"{""role"": ""selective""}",VALID,explicit spec (B1 with the selective basis removed)
+C1,C_MISSING_AMBIGUITY,C1-R16,strategy,no priority stated -> none invented,"{""operator_of"": ""assembly"", ""rule"": ""unspecified"", ""severity"": ""MAJOR""}",VALID,explicit spec (B1 with the selective basis removed)
+C1,C_MISSING_AMBIGUITY,C1-R17,value,horizon 8 h,"{""target"": ""horizon"", ""expect"": 28800, ""severity"": ""MAJOR""}",VALID,explicit spec (B1 with the selective basis removed)
+C1,C_MISSING_AMBIGUITY,C1-R18,supply,unlimited supply,"{""expect"": ""infinite"", ""severity"": ""MAJOR""}",VALID,explicit spec (B1 with the selective basis removed)
+C1,C_MISSING_AMBIGUITY,C1-R19,ambiguity,"'la selectiva tarda 20 s' with 4 circuits/rack: per rack or per circuit? must ASK, not guess","{""role"": ""selective"", ""keywords"": [""selectiv"", ""circuito"", ""bastidor"", ""por ""], ""min_hits"": 3}",VALID,explicit spec (B1 with the selective basis removed)
+C2,C_MISSING_AMBIGUITY,C2-R01,flow,topology in flow order,{},VALID,explicit spec
+C2,C_MISSING_AMBIGUITY,C2-R02,component,assembly -> accepted library component,"{""role"": ""assembly""}",VALID,explicit spec
+C2,C_MISSING_AMBIGUITY,C2-R03,component,transport -> accepted library component,"{""role"": ""transport""}",VALID,explicit spec
+C2,C_MISSING_AMBIGUITY,C2-R04,component,buffer -> accepted library component,"{""role"": ""buffer""}",VALID,explicit spec
+C2,C_MISSING_AMBIGUITY,C2-R05,component,selective -> accepted library component,"{""role"": ""selective""}",VALID,explicit spec
+C2,C_MISSING_AMBIGUITY,C2-R06,component,review -> accepted library component,"{""role"": ""review""}",VALID,explicit spec
+C2,C_MISSING_AMBIGUITY,C2-R07,missing,distance assembly->selective not given -> MISSING,"{""target"": ""distance"", ""between"": [""assembly"", ""buffer""], ""keywords"": [""distancia"", ""metros"", ""distance""]}",VALID,explicit spec
+C2,C_MISSING_AMBIGUITY,C2-R08,missing,walking speed not given -> MISSING,"{""target"": ""walking_speed"", ""keywords"": [""velocidad"", ""speed""]}",VALID,explicit spec
+C2,C_MISSING_AMBIGUITY,C2-R09,missing,load time not given -> MISSING,"{""role"": ""transport"", ""field"": ""load_time"", ""keywords"": [""carga""]}",VALID,explicit spec
+C2,C_MISSING_AMBIGUITY,C2-R10,missing,unload time not given -> MISSING,"{""role"": ""transport"", ""field"": ""unload_time"", ""keywords"": [""descarga""]}",VALID,explicit spec
+C2,C_MISSING_AMBIGUITY,C2-R11,missing,walking distance to review: needed only if walking is modelled (engineer decides),"{""target"": ""distance"", ""between"": [""buffer"", ""review""], ""keywords"": [""distancia""], ""gold_status"": ""GOLD_REQUIRES_ENGINEER_REVIEW""}",GOLD_REQUIRES_ENGINEER_REVIEW,explicit spec
+C2,C_MISSING_AMBIGUITY,C2-R12,value,assembly 120 s per rack,"{""role"": ""assembly"", ""field"": ""process_time"", ""expect"": 120}",VALID,explicit spec
+C2,C_MISSING_AMBIGUITY,C2-R13,value,buffer 3,"{""role"": ""buffer"", ""field"": ""capacity"", ""expect"": 3}",VALID,explicit spec
+C2,C_MISSING_AMBIGUITY,C2-R14,value,selective 20 s per rack,"{""role"": ""selective"", ""field"": ""process_time"", ""expect"": 20}",VALID,explicit spec
+C2,C_MISSING_AMBIGUITY,C2-R15,value,review 60 s per rack,"{""role"": ""review"", ""field"": ""process_time"", ""expect"": 60}",VALID,explicit spec
+C2,C_MISSING_AMBIGUITY,C2-R16,value,3 racks,"{""target"": ""carrier_quantity"", ""expect"": 3}",VALID,explicit spec
+C2,C_MISSING_AMBIGUITY,C2-R17,carrier,rack loop,"{""seize"": ""assembly"", ""release"": ""review"", ""return"": ""immediate""}",VALID,explicit spec
+C2,C_MISSING_AMBIGUITY,C2-R18,shared_resource,same operator,"{""roles"": [""assembly"", ""transport"", ""review""]}",VALID,explicit spec
+C2,C_MISSING_AMBIGUITY,C2-R19,value,horizon 8 h,"{""target"": ""horizon"", ""expect"": 28800, ""severity"": ""MAJOR""}",VALID,explicit spec
+C2,C_MISSING_AMBIGUITY,C2-R20,supply,unlimited supply,"{""expect"": ""infinite"", ""severity"": ""MAJOR""}",VALID,explicit spec
+C3,C_MISSING_AMBIGUITY,C3-R01,flow,topology in flow order,{},VALID,explicit spec
+C3,C_MISSING_AMBIGUITY,C3-R02,component,assembly -> accepted library component,"{""role"": ""assembly""}",VALID,explicit spec
+C3,C_MISSING_AMBIGUITY,C3-R03,component,buffer -> accepted library component,"{""role"": ""buffer""}",VALID,explicit spec
+C3,C_MISSING_AMBIGUITY,C3-R04,component,selective -> accepted library component,"{""role"": ""selective""}",VALID,explicit spec
+C3,C_MISSING_AMBIGUITY,C3-R05,component,review -> accepted library component,"{""role"": ""review""}",VALID,explicit spec
+C3,C_MISSING_AMBIGUITY,C3-R06,strategy,WIP target strategy protecting the selective,"{""operator_of"": ""assembly"", ""rule"": ""wip_target"", ""protected"": ""selective""}",VALID,explicit spec
+C3,C_MISSING_AMBIGUITY,C3-R07,strategy,feeding tasks = assembly (intent not explicit),"{""operator_of"": ""assembly"", ""rule"": ""wip_target"", ""feeders"": [""assembly""], ""gold_status"": ""GOLD_REQUIRES_ENGINEER_REVIEW""}",GOLD_REQUIRES_ENGINEER_REVIEW,explicit spec
+C3,C_MISSING_AMBIGUITY,C3-R08,missing,WIP target value not given -> MISSING,"{""target"": ""wip_target"", ""keywords"": [""wip"", ""objetivo"", ""target""]}",VALID,explicit spec
+C3,C_MISSING_AMBIGUITY,C3-R09,value,assembly 2 min,"{""role"": ""assembly"", ""field"": ""process_time"", ""expect"": 120, ""raw"": 2, ""unit_sensitive"": true}",VALID,explicit spec
+C3,C_MISSING_AMBIGUITY,C3-R10,value,buffer 3,"{""role"": ""buffer"", ""field"": ""capacity"", ""expect"": 3}",VALID,explicit spec
+C3,C_MISSING_AMBIGUITY,C3-R11,value,selective 40 s,"{""role"": ""selective"", ""field"": ""process_time"", ""expect"": 40}",VALID,explicit spec
+C3,C_MISSING_AMBIGUITY,C3-R12,value,review 50 s,"{""role"": ""review"", ""field"": ""process_time"", ""expect"": 50}",VALID,explicit spec
+C3,C_MISSING_AMBIGUITY,C3-R13,value,3 racks,"{""target"": ""carrier_quantity"", ""expect"": 3}",VALID,explicit spec
+C3,C_MISSING_AMBIGUITY,C3-R14,shared_resource,same operator,"{""roles"": [""assembly"", ""review""]}",VALID,explicit spec
+C3,C_MISSING_AMBIGUITY,C3-R15,value,horizon 8 h,"{""target"": ""horizon"", ""expect"": 28800, ""severity"": ""MAJOR""}",VALID,explicit spec
+C3,C_MISSING_AMBIGUITY,C3-R16,supply,unlimited supply,"{""expect"": ""infinite"", ""severity"": ""MAJOR""}",VALID,explicit spec
+C4,C_MISSING_AMBIGUITY,C4-R01,flow,topology in flow order,{},VALID,explicit spec
+C4,C_MISSING_AMBIGUITY,C4-R02,component,assembly -> accepted library component,"{""role"": ""assembly""}",VALID,explicit spec
+C4,C_MISSING_AMBIGUITY,C4-R03,component,buffer -> accepted library component,"{""role"": ""buffer""}",VALID,explicit spec
+C4,C_MISSING_AMBIGUITY,C4-R04,component,machine -> accepted library component,"{""role"": ""machine""}",VALID,explicit spec
+C4,C_MISSING_AMBIGUITY,C4-R05,component,inspection -> accepted library component,"{""role"": ""inspection""}",VALID,explicit spec
+C4,C_MISSING_AMBIGUITY,C4-R06,missing,buffer capacity -> MISSING,"{""role"": ""buffer"", ""field"": ""capacity"", ""keywords"": [""capacidad"", ""buffer""]}",VALID,explicit spec
+C4,C_MISSING_AMBIGUITY,C4-R07,missing,inspection time -> MISSING,"{""role"": ""inspection"", ""field"": ""process_time"", ""keywords"": [""inspecc"", ""tiempo""]}",VALID,explicit spec
+C4,C_MISSING_AMBIGUITY,C4-R08,value,assembly 50 s,"{""role"": ""assembly"", ""field"": ""process_time"", ""expect"": 50}",VALID,explicit spec
+C4,C_MISSING_AMBIGUITY,C4-R09,value,machine 40 s,"{""role"": ""machine"", ""field"": ""process_time"", ""expect"": 40}",VALID,explicit spec
+C4,C_MISSING_AMBIGUITY,C4-R10,shared_resource,same operator,"{""roles"": [""assembly"", ""inspection""]}",VALID,explicit spec
+C4,C_MISSING_AMBIGUITY,C4-R11,strategy,no rule invented,"{""operator_of"": ""assembly"", ""rule"": ""unspecified"", ""severity"": ""MAJOR""}",VALID,explicit spec
+C4,C_MISSING_AMBIGUITY,C4-R12,value,horizon 8 h,"{""target"": ""horizon"", ""expect"": 28800, ""severity"": ""MAJOR""}",VALID,explicit spec
+C4,C_MISSING_AMBIGUITY,C4-R13,supply,unlimited supply,"{""expect"": ""infinite"", ""severity"": ""MAJOR""}",VALID,explicit spec
+D1,D_CONTRADICTION,D1-R01,flow,topology in flow order,{},VALID,explicit spec
+D1,D_CONTRADICTION,D1-R02,component,assembly -> accepted library component,"{""role"": ""assembly""}",VALID,explicit spec
+D1,D_CONTRADICTION,D1-R03,component,buffer -> accepted library component,"{""role"": ""buffer""}",VALID,explicit spec
+D1,D_CONTRADICTION,D1-R04,component,selective -> accepted library component,"{""role"": ""selective""}",VALID,explicit spec
+D1,D_CONTRADICTION,D1-R05,component,review -> accepted library component,"{""role"": ""review""}",VALID,explicit spec
+D1,D_CONTRADICTION,D1-R06,conflict,capacity 5 vs 3 -> ASK,"{""role"": ""buffer"", ""field"": ""capacity"", ""values"": [5, 3]}",VALID,explicit spec
+D1,D_CONTRADICTION,D1-R07,value,assembly 120 s,"{""role"": ""assembly"", ""field"": ""process_time"", ""expect"": 120}",VALID,explicit spec
+D1,D_CONTRADICTION,D1-R08,value,selective 30 s,"{""role"": ""selective"", ""field"": ""process_time"", ""expect"": 30}",VALID,explicit spec
+D1,D_CONTRADICTION,D1-R09,value,review 60 s,"{""role"": ""review"", ""field"": ""process_time"", ""expect"": 60}",VALID,explicit spec
+D1,D_CONTRADICTION,D1-R10,value,4 racks,"{""target"": ""carrier_quantity"", ""expect"": 4}",VALID,explicit spec
+D1,D_CONTRADICTION,D1-R11,shared_resource,same operator,"{""roles"": [""assembly"", ""review""]}",VALID,explicit spec
+D1,D_CONTRADICTION,D1-R12,value,horizon 8 h,"{""target"": ""horizon"", ""expect"": 28800, ""severity"": ""MAJOR""}",VALID,explicit spec
+D1,D_CONTRADICTION,D1-R13,supply,unlimited supply,"{""expect"": ""infinite"", ""severity"": ""MAJOR""}",VALID,explicit spec
+D2,D_CONTRADICTION,D2-R01,flow,topology in flow order,{},VALID,explicit spec (MVP + contradiction)
+D2,D_CONTRADICTION,D2-R02,component,assembly -> accepted library component,"{""role"": ""assembly""}",VALID,explicit spec (MVP + contradiction)
+D2,D_CONTRADICTION,D2-R03,component,buffer -> accepted library component,"{""role"": ""buffer""}",VALID,explicit spec (MVP + contradiction)
+D2,D_CONTRADICTION,D2-R04,component,machine -> accepted library component,"{""role"": ""machine""}",VALID,explicit spec (MVP + contradiction)
+D2,D_CONTRADICTION,D2-R05,component,inspection -> accepted library component,"{""role"": ""inspection""}",VALID,explicit spec (MVP + contradiction)
+D2,D_CONTRADICTION,D2-R06,conflict,60 s vs 75 s -> ASK,"{""role"": ""assembly"", ""field"": ""process_time"", ""values"": [60, 75]}",VALID,explicit spec (MVP + contradiction)
+D2,D_CONTRADICTION,D2-R07,value,buffer 5,"{""role"": ""buffer"", ""field"": ""capacity"", ""expect"": 5}",VALID,explicit spec (MVP + contradiction)
+D2,D_CONTRADICTION,D2-R08,value,machine 45 s,"{""role"": ""machine"", ""field"": ""process_time"", ""expect"": 45}",VALID,explicit spec (MVP + contradiction)
+D2,D_CONTRADICTION,D2-R09,value,inspection 20 s,"{""role"": ""inspection"", ""field"": ""process_time"", ""expect"": 20}",VALID,explicit spec (MVP + contradiction)
+D2,D_CONTRADICTION,D2-R10,shared_resource,same operator,"{""roles"": [""assembly"", ""inspection""]}",VALID,explicit spec (MVP + contradiction)
+D2,D_CONTRADICTION,D2-R11,value,horizon 8 h,"{""target"": ""horizon"", ""expect"": 28800, ""severity"": ""MAJOR""}",VALID,explicit spec (MVP + contradiction)
+D2,D_CONTRADICTION,D2-R12,supply,unlimited supply,"{""expect"": ""infinite"", ""severity"": ""MAJOR""}",VALID,explicit spec (MVP + contradiction)
+D3,D_CONTRADICTION,D3-R01,flow,"topology: the text does not say whether inspection is before or after the machine (case design flaw found while validating the harness; kept as written, excluded from accuracy)","{""gold_status"": ""GOLD_REQUIRES_ENGINEER_REVIEW""}",GOLD_REQUIRES_ENGINEER_REVIEW,explicit spec (MVP + contradiction)
+D3,D_CONTRADICTION,D3-R02,component,assembly -> accepted library component,"{""role"": ""assembly""}",VALID,explicit spec (MVP + contradiction)
+D3,D_CONTRADICTION,D3-R03,component,buffer -> accepted library component,"{""role"": ""buffer""}",VALID,explicit spec (MVP + contradiction)
+D3,D_CONTRADICTION,D3-R04,component,machine -> accepted library component,"{""role"": ""machine""}",VALID,explicit spec (MVP + contradiction)
+D3,D_CONTRADICTION,D3-R05,component,inspection -> accepted library component,"{""role"": ""inspection""}",VALID,explicit spec (MVP + contradiction)
+D3,D_CONTRADICTION,D3-R06,conflict,one operator vs two operators -> ASK,"{""role"": ""assembly"", ""field"": ""operator_quantity"", ""values"": [1, 2], ""keywords"": [""operari""]}",VALID,explicit spec (MVP + contradiction)
+D3,D_CONTRADICTION,D3-R07,value,assembly 60 s,"{""role"": ""assembly"", ""field"": ""process_time"", ""expect"": 60}",VALID,explicit spec (MVP + contradiction)
+D3,D_CONTRADICTION,D3-R08,value,buffer 5,"{""role"": ""buffer"", ""field"": ""capacity"", ""expect"": 5}",VALID,explicit spec (MVP + contradiction)
+D3,D_CONTRADICTION,D3-R09,value,machine 45 s,"{""role"": ""machine"", ""field"": ""process_time"", ""expect"": 45}",VALID,explicit spec (MVP + contradiction)
+D3,D_CONTRADICTION,D3-R10,value,inspection 20 s,"{""role"": ""inspection"", ""field"": ""process_time"", ""expect"": 20}",VALID,explicit spec (MVP + contradiction)
+D3,D_CONTRADICTION,D3-R11,value,horizon 8 h,"{""target"": ""horizon"", ""expect"": 28800, ""severity"": ""MAJOR""}",VALID,explicit spec (MVP + contradiction)
+D3,D_CONTRADICTION,D3-R12,supply,unlimited supply,"{""expect"": ""infinite"", ""severity"": ""MAJOR""}",VALID,explicit spec (MVP + contradiction)
+D4,D_CONTRADICTION,D4-R01,flow,topology in flow order,{},VALID,explicit spec
+D4,D_CONTRADICTION,D4-R02,component,assembly -> accepted library component,"{""role"": ""assembly""}",VALID,explicit spec
+D4,D_CONTRADICTION,D4-R03,component,transport -> accepted library component,"{""role"": ""transport""}",VALID,explicit spec
+D4,D_CONTRADICTION,D4-R04,component,buffer -> accepted library component,"{""role"": ""buffer""}",VALID,explicit spec
+D4,D_CONTRADICTION,D4-R05,component,selective -> accepted library component,"{""role"": ""selective""}",VALID,explicit spec
+D4,D_CONTRADICTION,D4-R06,component,review -> accepted library component,"{""role"": ""review""}",VALID,explicit spec
+D4,D_CONTRADICTION,D4-R07,conflict,8 m vs 12 m -> ASK,"{""target"": ""distance"", ""between"": [""assembly"", ""buffer""], ""values"": [8, 12]}",VALID,explicit spec
+D4,D_CONTRADICTION,D4-R08,value,assembly 100 s,"{""role"": ""assembly"", ""field"": ""process_time"", ""expect"": 100}",VALID,explicit spec
+D4,D_CONTRADICTION,D4-R09,value,load 4 s,"{""role"": ""transport"", ""field"": ""load_time"", ""expect"": 4}",VALID,explicit spec
+D4,D_CONTRADICTION,D4-R10,value,unload 4 s,"{""role"": ""transport"", ""field"": ""unload_time"", ""expect"": 4}",VALID,explicit spec
+D4,D_CONTRADICTION,D4-R11,value,1 m/s,"{""target"": ""walking_speed"", ""expect"": 1}",VALID,explicit spec
+D4,D_CONTRADICTION,D4-R12,value,buffer 3,"{""role"": ""buffer"", ""field"": ""capacity"", ""expect"": 3}",VALID,explicit spec
+D4,D_CONTRADICTION,D4-R13,value,selective 30 s,"{""role"": ""selective"", ""field"": ""process_time"", ""expect"": 30}",VALID,explicit spec
+D4,D_CONTRADICTION,D4-R14,value,review 50 s,"{""role"": ""review"", ""field"": ""process_time"", ""expect"": 50}",VALID,explicit spec
+D4,D_CONTRADICTION,D4-R15,value,2 racks,"{""target"": ""carrier_quantity"", ""expect"": 2}",VALID,explicit spec
+D4,D_CONTRADICTION,D4-R16,shared_resource,same operator,"{""roles"": [""assembly"", ""transport"", ""review""]}",VALID,explicit spec
+D4,D_CONTRADICTION,D4-R17,value,horizon 8 h,"{""target"": ""horizon"", ""expect"": 28800, ""severity"": ""MAJOR""}",VALID,explicit spec
+D4,D_CONTRADICTION,D4-R18,supply,unlimited supply,"{""expect"": ""infinite"", ""severity"": ""MAJOR""}",VALID,explicit spec
+E1,E_UNSUPPORTED_RULE,E1-R01,unsupported,"behaviour not representable with library rules -> CustomRuleCandidate / flagged, never approximated","{""keywords"": [""quede"", ""un bastidor"", ""termina"", ""vuelve"", ""excepto"", ""tres"", ""esperando""], ""min_hits"": 3}",VALID,explicit spec
+E1,E_UNSUPPORTED_RULE,E1-R02,flow,topology in flow order,{},VALID,explicit spec
+E1,E_UNSUPPORTED_RULE,E1-R03,component,assembly -> accepted library component,"{""role"": ""assembly""}",VALID,explicit spec
+E1,E_UNSUPPORTED_RULE,E1-R04,component,buffer -> accepted library component,"{""role"": ""buffer""}",VALID,explicit spec
+E1,E_UNSUPPORTED_RULE,E1-R05,component,selective -> accepted library component,"{""role"": ""selective""}",VALID,explicit spec
+E1,E_UNSUPPORTED_RULE,E1-R06,component,review -> accepted library component,"{""role"": ""review""}",VALID,explicit spec
+E1,E_UNSUPPORTED_RULE,E1-R07,value,assembly 120 s,"{""role"": ""assembly"", ""field"": ""process_time"", ""expect"": 120}",VALID,explicit spec
+E1,E_UNSUPPORTED_RULE,E1-R08,value,buffer 3,"{""role"": ""buffer"", ""field"": ""capacity"", ""expect"": 3}",VALID,explicit spec
+E1,E_UNSUPPORTED_RULE,E1-R09,value,selective 30 s,"{""role"": ""selective"", ""field"": ""process_time"", ""expect"": 30}",VALID,explicit spec
+E1,E_UNSUPPORTED_RULE,E1-R10,value,review 60 s,"{""role"": ""review"", ""field"": ""process_time"", ""expect"": 60}",VALID,explicit spec
+E1,E_UNSUPPORTED_RULE,E1-R11,shared_resource,same operator,"{""roles"": [""assembly"", ""review""]}",VALID,explicit spec
+E1,E_UNSUPPORTED_RULE,E1-R12,value,horizon 8 h,"{""target"": ""horizon"", ""expect"": 28800, ""severity"": ""MAJOR""}",VALID,explicit spec
+E2,E_UNSUPPORTED_RULE,E2-R01,unsupported,"behaviour not representable with library rules -> CustomRuleCandidate / flagged, never approximated","{""keywords"": [""solo"", ""al menos dos"", ""esperando"", ""revis"", ""mientras"", ""montando""], ""min_hits"": 3}",VALID,explicit spec
+E2,E_UNSUPPORTED_RULE,E2-R02,flow,topology in flow order,{},VALID,explicit spec
+E2,E_UNSUPPORTED_RULE,E2-R03,component,assembly -> accepted library component,"{""role"": ""assembly""}",VALID,explicit spec
+E2,E_UNSUPPORTED_RULE,E2-R04,component,buffer -> accepted library component,"{""role"": ""buffer""}",VALID,explicit spec
+E2,E_UNSUPPORTED_RULE,E2-R05,component,selective -> accepted library component,"{""role"": ""selective""}",VALID,explicit spec
+E2,E_UNSUPPORTED_RULE,E2-R06,component,review -> accepted library component,"{""role"": ""review""}",VALID,explicit spec
+E2,E_UNSUPPORTED_RULE,E2-R07,value,assembly 120 s,"{""role"": ""assembly"", ""field"": ""process_time"", ""expect"": 120}",VALID,explicit spec
+E2,E_UNSUPPORTED_RULE,E2-R08,value,buffer 3,"{""role"": ""buffer"", ""field"": ""capacity"", ""expect"": 3}",VALID,explicit spec
+E2,E_UNSUPPORTED_RULE,E2-R09,value,selective 30 s,"{""role"": ""selective"", ""field"": ""process_time"", ""expect"": 30}",VALID,explicit spec
+E2,E_UNSUPPORTED_RULE,E2-R10,value,review 60 s,"{""role"": ""review"", ""field"": ""process_time"", ""expect"": 60}",VALID,explicit spec
+E2,E_UNSUPPORTED_RULE,E2-R11,shared_resource,same operator,"{""roles"": [""assembly"", ""review""]}",VALID,explicit spec
+E2,E_UNSUPPORTED_RULE,E2-R12,value,horizon 8 h,"{""target"": ""horizon"", ""expect"": 28800, ""severity"": ""MAJOR""}",VALID,explicit spec
+E3,E_UNSUPPORTED_RULE,E3-R01,unsupported,"idle-duration pre-emption -> flagged, never approximated","{""keywords"": [""10 minutos"", ""parada"", ""deja"", ""urgente"", ""si la maquina""], ""min_hits"": 2}",VALID,explicit spec (MVP + rule)
+E3,E_UNSUPPORTED_RULE,E3-R02,flow,topology in flow order,{},VALID,explicit spec (MVP + rule)
+E3,E_UNSUPPORTED_RULE,E3-R03,component,assembly -> accepted library component,"{""role"": ""assembly""}",VALID,explicit spec (MVP + rule)
+E3,E_UNSUPPORTED_RULE,E3-R04,component,buffer -> accepted library component,"{""role"": ""buffer""}",VALID,explicit spec (MVP + rule)
+E3,E_UNSUPPORTED_RULE,E3-R05,component,machine -> accepted library component,"{""role"": ""machine""}",VALID,explicit spec (MVP + rule)
+E3,E_UNSUPPORTED_RULE,E3-R06,component,inspection -> accepted library component,"{""role"": ""inspection""}",VALID,explicit spec (MVP + rule)
+E3,E_UNSUPPORTED_RULE,E3-R07,value,assembly 60 s,"{""role"": ""assembly"", ""field"": ""process_time"", ""expect"": 60}",VALID,explicit spec (MVP + rule)
+E3,E_UNSUPPORTED_RULE,E3-R08,value,buffer 5,"{""role"": ""buffer"", ""field"": ""capacity"", ""expect"": 5}",VALID,explicit spec (MVP + rule)
+E3,E_UNSUPPORTED_RULE,E3-R09,value,machine 45 s,"{""role"": ""machine"", ""field"": ""process_time"", ""expect"": 45}",VALID,explicit spec (MVP + rule)
+E3,E_UNSUPPORTED_RULE,E3-R10,value,inspection 20 s,"{""role"": ""inspection"", ""field"": ""process_time"", ""expect"": 20}",VALID,explicit spec (MVP + rule)
+E3,E_UNSUPPORTED_RULE,E3-R11,value,horizon 8 h,"{""target"": ""horizon"", ""expect"": 28800, ""severity"": ""MAJOR""}",VALID,explicit spec (MVP + rule)
+E4,E_UNSUPPORTED_RULE,E4-R01,unsupported,"product mix + type priority -> flagged, never approximated","{""keywords"": [""rojas"", ""azules"", ""30"", ""prioridad""], ""min_hits"": 2}",VALID,explicit spec (MVP + product mix)
+E4,E_UNSUPPORTED_RULE,E4-R02,flow,topology in flow order,{},VALID,explicit spec (MVP + product mix)
+E4,E_UNSUPPORTED_RULE,E4-R03,component,assembly -> accepted library component,"{""role"": ""assembly""}",VALID,explicit spec (MVP + product mix)
+E4,E_UNSUPPORTED_RULE,E4-R04,component,buffer -> accepted library component,"{""role"": ""buffer""}",VALID,explicit spec (MVP + product mix)
+E4,E_UNSUPPORTED_RULE,E4-R05,component,machine -> accepted library component,"{""role"": ""machine""}",VALID,explicit spec (MVP + product mix)
+E4,E_UNSUPPORTED_RULE,E4-R06,component,inspection -> accepted library component,"{""role"": ""inspection""}",VALID,explicit spec (MVP + product mix)
+E4,E_UNSUPPORTED_RULE,E4-R07,value,assembly 60 s,"{""role"": ""assembly"", ""field"": ""process_time"", ""expect"": 60}",VALID,explicit spec (MVP + product mix)
+E4,E_UNSUPPORTED_RULE,E4-R08,value,buffer 5,"{""role"": ""buffer"", ""field"": ""capacity"", ""expect"": 5}",VALID,explicit spec (MVP + product mix)
+E4,E_UNSUPPORTED_RULE,E4-R09,value,machine 45 s,"{""role"": ""machine"", ""field"": ""process_time"", ""expect"": 45}",VALID,explicit spec (MVP + product mix)
+E4,E_UNSUPPORTED_RULE,E4-R10,value,inspection 20 s,"{""role"": ""inspection"", ""field"": ""process_time"", ""expect"": 20}",VALID,explicit spec (MVP + product mix)
+E4,E_UNSUPPORTED_RULE,E4-R11,value,horizon 8 h,"{""target"": ""horizon"", ""expect"": 28800, ""severity"": ""MAJOR""}",VALID,explicit spec (MVP + product mix)
+F1,F_REALISTIC,F1-R01,flow,topology in flow order,{},VALID,selective model validated by hand (docs/diagnostics/selective_rack_anomaly.md: 1-rack cycle 235 s)
+F1,F_REALISTIC,F1-R02,component,assembly -> accepted library component,"{""role"": ""assembly""}",VALID,selective model validated by hand (docs/diagnostics/selective_rack_anomaly.md: 1-rack cycle 235 s)
+F1,F_REALISTIC,F1-R03,component,transport -> accepted library component,"{""role"": ""transport""}",VALID,selective model validated by hand (docs/diagnostics/selective_rack_anomaly.md: 1-rack cycle 235 s)
+F1,F_REALISTIC,F1-R04,component,buffer -> accepted library component,"{""role"": ""buffer""}",VALID,selective model validated by hand (docs/diagnostics/selective_rack_anomaly.md: 1-rack cycle 235 s)
+F1,F_REALISTIC,F1-R05,component,selective -> accepted library component,"{""role"": ""selective""}",VALID,selective model validated by hand (docs/diagnostics/selective_rack_anomaly.md: 1-rack cycle 235 s)
+F1,F_REALISTIC,F1-R06,component,review -> accepted library component,"{""role"": ""review""}",VALID,selective model validated by hand (docs/diagnostics/selective_rack_anomaly.md: 1-rack cycle 235 s)
+F1,F_REALISTIC,F1-R07,value,load 30 s PER_BOARD,"{""role"": ""assembly"", ""field"": ""process_time"", ""expect"": 30, ""per"": ""per_item"", ""items"": 4}",VALID,selective model validated by hand (docs/diagnostics/selective_rack_anomaly.md: 1-rack cycle 235 s)
+F1,F_REALISTIC,F1-R08,basis,assembly per board,"{""role"": ""assembly"", ""expect"": ""per_item""}",VALID,selective model validated by hand (docs/diagnostics/selective_rack_anomaly.md: 1-rack cycle 235 s)
+F1,F_REALISTIC,F1-R09,value,4 boards per rack,"{""target"": ""items_per_entity"", ""expect"": 4}",VALID,selective model validated by hand (docs/diagnostics/selective_rack_anomaly.md: 1-rack cycle 235 s)
+F1,F_REALISTIC,F1-R10,value,load 5 s,"{""role"": ""transport"", ""field"": ""load_time"", ""expect"": 5}",VALID,selective model validated by hand (docs/diagnostics/selective_rack_anomaly.md: 1-rack cycle 235 s)
+F1,F_REALISTIC,F1-R11,value,unload 5 s,"{""role"": ""transport"", ""field"": ""unload_time"", ""expect"": 5}",VALID,selective model validated by hand (docs/diagnostics/selective_rack_anomaly.md: 1-rack cycle 235 s)
+F1,F_REALISTIC,F1-R12,value,10 m,"{""target"": ""distance"", ""between"": [""assembly"", ""buffer""], ""expect"": 10}",VALID,selective model validated by hand (docs/diagnostics/selective_rack_anomaly.md: 1-rack cycle 235 s)
+F1,F_REALISTIC,F1-R13,value,5 m,"{""target"": ""distance"", ""between"": [""buffer"", ""review""], ""expect"": 5}",VALID,selective model validated by hand (docs/diagnostics/selective_rack_anomaly.md: 1-rack cycle 235 s)
+F1,F_REALISTIC,F1-R14,value,1.2 m/s,"{""target"": ""walking_speed"", ""expect"": 1.2}",VALID,selective model validated by hand (docs/diagnostics/selective_rack_anomaly.md: 1-rack cycle 235 s)
+F1,F_REALISTIC,F1-R15,value,3 racks in front of the selective,"{""role"": ""buffer"", ""field"": ""capacity"", ""expect"": 3}",VALID,selective model validated by hand (docs/diagnostics/selective_rack_anomaly.md: 1-rack cycle 235 s)
+F1,F_REALISTIC,F1-R16,value,selective 20 s PER_RACK,"{""role"": ""selective"", ""field"": ""process_time"", ""expect"": 20, ""per"": ""per_entity"", ""items"": 4}",VALID,selective model validated by hand (docs/diagnostics/selective_rack_anomaly.md: 1-rack cycle 235 s)
+F1,F_REALISTIC,F1-R17,basis,selective per rack,"{""role"": ""selective"", ""expect"": ""per_entity""}",VALID,selective model validated by hand (docs/diagnostics/selective_rack_anomaly.md: 1-rack cycle 235 s)
+F1,F_REALISTIC,F1-R18,value,review+cleaning 15 s PER_BOARD,"{""role"": ""review"", ""field"": ""process_time"", ""expect"": 15, ""per"": ""per_item"", ""items"": 4}",VALID,selective model validated by hand (docs/diagnostics/selective_rack_anomaly.md: 1-rack cycle 235 s)
+F1,F_REALISTIC,F1-R19,basis,review per board,"{""role"": ""review"", ""expect"": ""per_item""}",VALID,selective model validated by hand (docs/diagnostics/selective_rack_anomaly.md: 1-rack cycle 235 s)
+F1,F_REALISTIC,F1-R20,value,3 racks,"{""target"": ""carrier_quantity"", ""expect"": 3}",VALID,selective model validated by hand (docs/diagnostics/selective_rack_anomaly.md: 1-rack cycle 235 s)
+F1,F_REALISTIC,F1-R21,carrier,"rack loop, immediate return","{""seize"": ""assembly"", ""release"": ""review"", ""return"": ""immediate""}",VALID,selective model validated by hand (docs/diagnostics/selective_rack_anomaly.md: 1-rack cycle 235 s)
+F1,F_REALISTIC,F1-R22,shared_resource,one operator does everything,"{""roles"": [""assembly"", ""transport"", ""review""]}",VALID,selective model validated by hand (docs/diagnostics/selective_rack_anomaly.md: 1-rack cycle 235 s)
+F1,F_REALISTIC,F1-R23,strategy,keep the selective fed with a WIP target,"{""operator_of"": ""assembly"", ""rule"": ""wip_target"", ""protected"": ""selective""}",VALID,selective model validated by hand (docs/diagnostics/selective_rack_anomaly.md: 1-rack cycle 235 s)
+F1,F_REALISTIC,F1-R24,value,target 2 racks ready,"{""target"": ""wip_target"", ""expect"": 2}",VALID,selective model validated by hand (docs/diagnostics/selective_rack_anomaly.md: 1-rack cycle 235 s)
+F1,F_REALISTIC,F1-R25,strategy,feeding tasks = assembly + transport,"{""operator_of"": ""assembly"", ""rule"": ""wip_target"", ""feeders"": [""assembly"", ""transport""], ""gold_status"": ""GOLD_REQUIRES_ENGINEER_REVIEW""}",GOLD_REQUIRES_ENGINEER_REVIEW,selective model validated by hand (docs/diagnostics/selective_rack_anomaly.md: 1-rack cycle 235 s)
+F1,F_REALISTIC,F1-R26,value,horizon 8 h,"{""target"": ""horizon"", ""expect"": 28800, ""severity"": ""MAJOR""}",VALID,selective model validated by hand (docs/diagnostics/selective_rack_anomaly.md: 1-rack cycle 235 s)
+F1,F_REALISTIC,F1-R27,supply,unlimited supply,"{""expect"": ""infinite"", ""severity"": ""MAJOR""}",VALID,selective model validated by hand (docs/diagnostics/selective_rack_anomaly.md: 1-rack cycle 235 s)
+F2,F_REALISTIC,F2-R01,supply,random arrivals,"{""expect"": ""interarrival""}",VALID,examples/04_rework_routing.yaml (manual)
+F2,F_REALISTIC,F2-R02,distribution,exp(60 s),"{""field"": ""interarrival"", ""expect"": {""dist"": ""exponential"", ""mean"": 60}}",VALID,examples/04_rework_routing.yaml (manual)
+F2,F_REALISTIC,F2-R03,component,aoi -> accepted library component,"{""role"": ""aoi""}",VALID,examples/04_rework_routing.yaml (manual)
+F2,F_REALISTIC,F2-R04,value,AOI 30 s,"{""role"": ""aoi"", ""field"": ""process_time"", ""expect"": 30}",VALID,examples/04_rework_routing.yaml (manual)
+F2,F_REALISTIC,F2-R05,value,90 % good,"{""role"": ""aoi"", ""field"": ""yield_rate"", ""expect"": 0.9}",VALID,examples/04_rework_routing.yaml (manual)
+F2,F_REALISTIC,F2-R06,unsupported,rework loop back to the AOI queue: modelled correctly or flagged as not representable,"{""keywords"": [""repar"", ""vuelven"", ""cola"", ""fallan""], ""min_hits"": 2, ""approximation_check"": false}",VALID,examples/04_rework_routing.yaml (manual)
+F2,F_REALISTIC,F2-R07,routing,"60/40 split: modelled or flagged, never linearised silently","{""from"": ""aoi"", ""to"": {""queue_a"": 0.6, ""queue_b"": 0.4}, ""keywords"": [""60 %"", ""40 %"", ""linea a"", ""linea b"", ""linea de test""]}",VALID,examples/04_rework_routing.yaml (manual)
+F2,F_REALISTIC,F2-R08,distribution,"test A U(60,90)","{""role"": ""test_a"", ""field"": ""process_time"", ""expect"": {""dist"": ""uniform"", ""low"": 60, ""high"": 90}}",VALID,examples/04_rework_routing.yaml (manual)
+F2,F_REALISTIC,F2-R09,distribution,"test B U(80,110)","{""role"": ""test_b"", ""field"": ""process_time"", ""expect"": {""dist"": ""uniform"", ""low"": 80, ""high"": 110}}",VALID,examples/04_rework_routing.yaml (manual)
+F2,F_REALISTIC,F2-R10,distribution,"rework TRI(60,90,180)","{""role"": ""rework"", ""field"": ""process_time"", ""expect"": {""dist"": ""triangular"", ""low"": 60, ""mode"": 90, ""high"": 180}}",VALID,examples/04_rework_routing.yaml (manual)
+F2,F_REALISTIC,F2-R11,value,horizon 8 h,"{""target"": ""horizon"", ""expect"": 28800, ""severity"": ""MAJOR""}",VALID,examples/04_rework_routing.yaml (manual)
+F3,F_REALISTIC,F3-R01,flow,topology in flow order,{},VALID,explicit spec
+F3,F_REALISTIC,F3-R02,component,assembly -> accepted library component,"{""role"": ""assembly""}",VALID,explicit spec
+F3,F_REALISTIC,F3-R03,component,buffer -> accepted library component,"{""role"": ""buffer""}",VALID,explicit spec
+F3,F_REALISTIC,F3-R04,component,test -> accepted library component,"{""role"": ""test""}",VALID,explicit spec
+F3,F_REALISTIC,F3-R05,component,packaging -> accepted library component,"{""role"": ""packaging""}",VALID,explicit spec
+F3,F_REALISTIC,F3-R06,value,assembly 90 s,"{""role"": ""assembly"", ""field"": ""process_time"", ""expect"": 90}",VALID,explicit spec
+F3,F_REALISTIC,F3-R07,value,buffer 4,"{""role"": ""buffer"", ""field"": ""capacity"", ""expect"": 4}",VALID,explicit spec
+F3,F_REALISTIC,F3-R08,value,test 120 s,"{""role"": ""test"", ""field"": ""process_time"", ""expect"": 120}",VALID,explicit spec
+F3,F_REALISTIC,F3-R09,value,packing 40 s,"{""role"": ""packaging"", ""field"": ""process_time"", ""expect"": 40}",VALID,explicit spec
+F3,F_REALISTIC,F3-R10,shared_resource,assembler does assembly+packing; technician (another resource) does the test,"{""roles"": [""assembly"", ""packaging""], ""distinct_from"": [""test""]}",VALID,explicit spec
+F3,F_REALISTIC,F3-R11,value,one technician,"{""role"": ""test"", ""field"": ""operator_quantity"", ""expect"": 1}",VALID,explicit spec
+F3,F_REALISTIC,F3-R12,value,one assembler,"{""role"": ""assembly"", ""field"": ""operator_quantity"", ""expect"": 1}",VALID,explicit spec
+F3,F_REALISTIC,F3-R13,strategy,no rule invented,"{""operator_of"": ""assembly"", ""rule"": ""unspecified"", ""severity"": ""MAJOR""}",VALID,explicit spec
+F3,F_REALISTIC,F3-R14,value,horizon 8 h,"{""target"": ""horizon"", ""expect"": 28800, ""severity"": ""MAJOR""}",VALID,explicit spec
+F3,F_REALISTIC,F3-R15,supply,unlimited supply,"{""expect"": ""infinite"", ""severity"": ""MAJOR""}",VALID,explicit spec
+F4,F_REALISTIC,F4-R01,flow,topology in flow order,{},VALID,explicit spec (deterministic variant of examples/03)
+F4,F_REALISTIC,F4-R02,component,press -> accepted library component,"{""role"": ""press""}",VALID,explicit spec (deterministic variant of examples/03)
+F4,F_REALISTIC,F4-R03,component,buffer -> accepted library component,"{""role"": ""buffer""}",VALID,explicit spec (deterministic variant of examples/03)
+F4,F_REALISTIC,F4-R04,component,test -> accepted library component,"{""role"": ""test""}",VALID,explicit spec (deterministic variant of examples/03)
+F4,F_REALISTIC,F4-R05,value,press 55 s,"{""role"": ""press"", ""field"": ""process_time"", ""expect"": 55}",VALID,explicit spec (deterministic variant of examples/03)
+F4,F_REALISTIC,F4-R06,value,buffer 10,"{""role"": ""buffer"", ""field"": ""capacity"", ""expect"": 10}",VALID,explicit spec (deterministic variant of examples/03)
+F4,F_REALISTIC,F4-R07,value,test 50 s,"{""role"": ""test"", ""field"": ""process_time"", ""expect"": 50}",VALID,explicit spec (deterministic variant of examples/03)
+F4,F_REALISTIC,F4-R08,value,3 % scrap,"{""role"": ""test"", ""field"": ""yield_rate"", ""expect"": 0.97}",VALID,explicit spec (deterministic variant of examples/03)
+F4,F_REALISTIC,F4-R09,unsupported,"breakdowns MTBF 2 h / MTTR 10 min: modelled or flagged, never dropped","{""keywords"": [""aver"", ""2 horas"", ""10 minutos"", ""repar""], ""min_hits"": 2, ""approximation_check"": false}",VALID,explicit spec (deterministic variant of examples/03)
+F4,F_REALISTIC,F4-R10,value,40 h,"{""target"": ""horizon"", ""expect"": 144000, ""severity"": ""MAJOR""}",VALID,explicit spec (deterministic variant of examples/03)
+F4,F_REALISTIC,F4-R11,supply,unlimited supply,"{""expect"": ""infinite"", ""severity"": ""MAJOR""}",VALID,explicit spec (deterministic variant of examples/03)
+P1,PERTURBATION,P1-R01,flow,topology in flow order,{},VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+P1,PERTURBATION,P1-R02,component,assembly -> accepted library component,"{""role"": ""assembly""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+P1,PERTURBATION,P1-R03,component,buffer -> accepted library component,"{""role"": ""buffer""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+P1,PERTURBATION,P1-R04,component,machine -> accepted library component,"{""role"": ""machine""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+P1,PERTURBATION,P1-R05,component,inspection -> accepted library component,"{""role"": ""inspection""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+P1,PERTURBATION,P1-R06,value,assembly 60 s/piece,"{""role"": ""assembly"", ""field"": ""process_time"", ""expect"": 60, ""raw"": 1, ""unit_sensitive"": true}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+P1,PERTURBATION,P1-R07,value,buffer capacity 5,"{""role"": ""buffer"", ""field"": ""capacity"", ""expect"": 5}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+P1,PERTURBATION,P1-R08,value,machine 45 s/piece,"{""role"": ""machine"", ""field"": ""process_time"", ""expect"": 45}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+P1,PERTURBATION,P1-R09,value,inspection 20 s/piece,"{""role"": ""inspection"", ""field"": ""process_time"", ""expect"": 20}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+P1,PERTURBATION,P1-R10,shared_resource,same operator assembles and inspects,"{""roles"": [""assembly"", ""inspection""]}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+P1,PERTURBATION,P1-R11,no_resource,machine is automatic (no operator),"{""role"": ""machine""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+P1,PERTURBATION,P1-R12,value,one operator,"{""role"": ""assembly"", ""field"": ""operator_quantity"", ""expect"": 1}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+P1,PERTURBATION,P1-R13,strategy,operator priority NOT stated: no invented rule (FIFO only as visible assumption or question),"{""operator_of"": ""assembly"", ""rule"": ""unspecified"", ""severity"": ""MAJOR""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+P1,PERTURBATION,P1-R14,value,horizon 8 h,"{""target"": ""horizon"", ""expect"": 28800, ""severity"": ""MAJOR""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+P1,PERTURBATION,P1-R15,supply,unlimited supply,"{""expect"": ""infinite"", ""severity"": ""MAJOR""}",VALID,"examples/02_shared_operator.yaml (manual, golden test: 359 u) and the validated MVP (tests/test_nl_orchestration.py). Difference with example 02: no priority is stated in these texts -> the gold requires NOT inventing one."
+P2,PERTURBATION,P2-R01,flow,topology in flow order,{},VALID,explicit spec (= B1)
+P2,PERTURBATION,P2-R02,component,assembly -> accepted library component,"{""role"": ""assembly""}",VALID,explicit spec (= B1)
+P2,PERTURBATION,P2-R03,component,buffer -> accepted library component,"{""role"": ""buffer""}",VALID,explicit spec (= B1)
+P2,PERTURBATION,P2-R04,component,selective -> accepted library component,"{""role"": ""selective""}",VALID,explicit spec (= B1)
+P2,PERTURBATION,P2-R05,component,review -> accepted library component,"{""role"": ""review""}",VALID,explicit spec (= B1)
+P2,PERTURBATION,P2-R06,value,assembly 30 s PER_CIRCUIT,"{""role"": ""assembly"", ""field"": ""process_time"", ""expect"": 30, ""per"": ""per_item"", ""items"": 4, ""raw"": 0.5, ""unit_sensitive"": true}",VALID,explicit spec (= B1)
+P2,PERTURBATION,P2-R07,basis,assembly time basis = per circuit,"{""role"": ""assembly"", ""expect"": ""per_item""}",VALID,explicit spec (= B1)
+P2,PERTURBATION,P2-R08,value,4 circuits per rack,"{""target"": ""items_per_entity"", ""expect"": 4}",VALID,explicit spec (= B1)
+P2,PERTURBATION,P2-R09,value,buffer 3 racks,"{""role"": ""buffer"", ""field"": ""capacity"", ""expect"": 3}",VALID,explicit spec (= B1)
+P2,PERTURBATION,P2-R10,value,selective 20 s PER_RACK,"{""role"": ""selective"", ""field"": ""process_time"", ""expect"": 20, ""per"": ""per_entity"", ""items"": 4}",VALID,explicit spec (= B1)
+P2,PERTURBATION,P2-R11,basis,selective time basis = per rack,"{""role"": ""selective"", ""expect"": ""per_entity""}",VALID,explicit spec (= B1)
+P2,PERTURBATION,P2-R12,value,review 15 s PER_CIRCUIT,"{""role"": ""review"", ""field"": ""process_time"", ""expect"": 15, ""per"": ""per_item"", ""items"": 4}",VALID,explicit spec (= B1)
+P2,PERTURBATION,P2-R13,basis,review time basis = per circuit,"{""role"": ""review"", ""expect"": ""per_item""}",VALID,explicit spec (= B1)
+P2,PERTURBATION,P2-R14,value,3 racks,"{""target"": ""carrier_quantity"", ""expect"": 3}",VALID,explicit spec (= B1)
+P2,PERTURBATION,P2-R15,carrier,"rack taken at assembly, freed after review, immediately available","{""seize"": ""assembly"", ""release"": ""review"", ""return"": ""immediate""}",VALID,explicit spec (= B1)
+P2,PERTURBATION,P2-R16,shared_resource,same operator assembles and reviews,"{""roles"": [""assembly"", ""review""]}",VALID,explicit spec (= B1)
+P2,PERTURBATION,P2-R17,no_resource,selective is automatic,"{""role"": ""selective""}",VALID,explicit spec (= B1)
+P2,PERTURBATION,P2-R18,strategy,no priority stated -> none invented,"{""operator_of"": ""assembly"", ""rule"": ""unspecified"", ""severity"": ""MAJOR""}",VALID,explicit spec (= B1)
+P2,PERTURBATION,P2-R19,value,horizon 8 h,"{""target"": ""horizon"", ""expect"": 28800, ""severity"": ""MAJOR""}",VALID,explicit spec (= B1)
+P2,PERTURBATION,P2-R20,supply,unlimited supply,"{""expect"": ""infinite"", ""severity"": ""MAJOR""}",VALID,explicit spec (= B1)
+P3,PERTURBATION,P3-R01,flow,topology in flow order,{},VALID,explicit spec (= F3)
+P3,PERTURBATION,P3-R02,component,assembly -> accepted library component,"{""role"": ""assembly""}",VALID,explicit spec (= F3)
+P3,PERTURBATION,P3-R03,component,buffer -> accepted library component,"{""role"": ""buffer""}",VALID,explicit spec (= F3)
+P3,PERTURBATION,P3-R04,component,test -> accepted library component,"{""role"": ""test""}",VALID,explicit spec (= F3)
+P3,PERTURBATION,P3-R05,component,packaging -> accepted library component,"{""role"": ""packaging""}",VALID,explicit spec (= F3)
+P3,PERTURBATION,P3-R06,value,assembly 90 s,"{""role"": ""assembly"", ""field"": ""process_time"", ""expect"": 90, ""raw"": 1.5, ""unit_sensitive"": true}",VALID,explicit spec (= F3)
+P3,PERTURBATION,P3-R07,value,buffer 4,"{""role"": ""buffer"", ""field"": ""capacity"", ""expect"": 4}",VALID,explicit spec (= F3)
+P3,PERTURBATION,P3-R08,value,test 120 s,"{""role"": ""test"", ""field"": ""process_time"", ""expect"": 120, ""raw"": 2, ""unit_sensitive"": true}",VALID,explicit spec (= F3)
+P3,PERTURBATION,P3-R09,value,packing 40 s,"{""role"": ""packaging"", ""field"": ""process_time"", ""expect"": 40}",VALID,explicit spec (= F3)
+P3,PERTURBATION,P3-R10,shared_resource,assembler does assembly+packing; technician (another resource) does the test,"{""roles"": [""assembly"", ""packaging""], ""distinct_from"": [""test""]}",VALID,explicit spec (= F3)
+P3,PERTURBATION,P3-R11,value,one technician,"{""role"": ""test"", ""field"": ""operator_quantity"", ""expect"": 1}",VALID,explicit spec (= F3)
+P3,PERTURBATION,P3-R12,value,one assembler,"{""role"": ""assembly"", ""field"": ""operator_quantity"", ""expect"": 1}",VALID,explicit spec (= F3)
+P3,PERTURBATION,P3-R13,strategy,no rule invented,"{""operator_of"": ""assembly"", ""rule"": ""unspecified"", ""severity"": ""MAJOR""}",VALID,explicit spec (= F3)
+P3,PERTURBATION,P3-R14,value,horizon 8 h,"{""target"": ""horizon"", ""expect"": 28800, ""severity"": ""MAJOR""}",VALID,explicit spec (= F3)
+P3,PERTURBATION,P3-R15,supply,unlimited supply,"{""expect"": ""infinite"", ""severity"": ""MAJOR""}",VALID,explicit spec (= F3)

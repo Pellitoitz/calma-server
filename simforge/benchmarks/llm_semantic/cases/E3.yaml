@@ -1,0 +1,7 @@
+id: E3
+family: E_UNSUPPORTED_RULE
+title: Interrupt after 10 min idle
+purpose: Pre-emption triggered by a state duration.
+text: Fuente infinita. Un operario monta cada pieza en 60 segundos. Las piezas esperan en un buffer de 5. Una máquina las
+  procesa en 45 segundos. Después el mismo operario inspecciona cada pieza en 20 segundos. Si la máquina lleva más de 10 minutos
+  parada esperando piezas, el operario deja lo que esté haciendo y monta una pieza urgente. Simular 8 horas.

@@ -1,0 +1,57 @@
+{
+ "label": "offline_baseline",
+ "provider": "offline",
+ "model": "offline-rules",
+ "started_at": "2026-10-02T06:00:12+00:00",
+ "frozen": true,
+ "unfrozen_files": [],
+ "commit": "cae03a9ebdf9162a0f24b7fce2a36cc8499ec851",
+ "process_parser_version": "process_parser_v1",
+ "compiler_version": "compiler_v2",
+ "isms_version": "0.1",
+ "engine_version": "0.3.0",
+ "library_version": {
+  "components": {
+   "aoi": "1.0.0",
+   "buffer": "1.0.0",
+   "cleaning": "1.0.0",
+   "coating": "1.0.0",
+   "functional_test": "1.0.0",
+   "ict": "1.0.0",
+   "inspection": "1.0.0",
+   "machine": "1.0.0",
+   "manual_assembly": "1.0.0",
+   "manual_insertion": "1.0.0",
+   "manual_process": "1.0.0",
+   "packaging": "1.0.0",
+   "pick_and_place": "1.0.0",
+   "rack_transport": "1.0.0",
+   "reflow": "1.0.0",
+   "rework": "1.0.0",
+   "router": "1.0.0",
+   "screen_printer": "1.0.0",
+   "selective_soldering": "1.0.0",
+   "sink": "1.0.0",
+   "source": "1.0.0",
+   "spi": "1.0.0",
+   "test_station": "1.0.0",
+   "transport": "1.0.0",
+   "transport_delay": "1.0.0",
+   "wave_soldering": "1.0.0"
+  },
+  "content_hash": "113651d59b39991a"
+ },
+ "rules_library_version": {
+  "rules": {
+   "shared_operator": "1.0.0",
+   "carrier": "1.0.0",
+   "fifo": "1.0.0",
+   "static_priority": "1.0.0",
+   "wip_target_priority": "1.0.0"
+  },
+  "content_hash": "c1fa3e27bf29429b"
+ },
+ "anthropic_sdk_version": "1.9.0",
+ "python": "3.11.15",
+ "finished_at": "2026-10-02T06:00:13+00:00"
+}

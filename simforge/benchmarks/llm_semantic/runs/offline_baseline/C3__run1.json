@@ -1,0 +1,839 @@
+{
+ "case": "C3",
+ "family": "C_MISSING_AMBIGUITY",
+ "schema_valid": true,
+ "compiles": true,
+ "verifier_status": "INCOMPLETE",
+ "error": null,
+ "semantically_correct": false,
+ "wall_s": 0.01,
+ "interpreter": "offline-rules",
+ "draft": {
+  "model_name": "Manual assembly → Selective soldering → Revisa y montaje",
+  "horizon_value": 8.0,
+  "horizon_unit": "h",
+  "supply": "unknown",
+  "interarrival": null,
+  "resources": [
+   {
+    "id": "racks",
+    "name": "bastidores",
+    "kind": "carrier",
+    "quantity": 3,
+    "walking_speed_m_s": null
+   },
+   {
+    "id": "operator_1",
+    "name": "Operario",
+    "kind": "operator",
+    "quantity": 1,
+    "walking_speed_m_s": null
+   }
+  ],
+  "steps": [
+   {
+    "id": "manual_assembly",
+    "name": "Manual assembly",
+    "component": "manual_assembly",
+    "time": {
+     "dist": "constant",
+     "value": 2.0,
+     "low": null,
+     "mode": null,
+     "high": null,
+     "mean": null,
+     "std": null,
+     "unit": "min"
+    },
+    "capacity": null,
+    "resources": [
+     "operator_1"
+    ],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   },
+   {
+    "id": "selective_soldering",
+    "name": "Selective soldering",
+    "component": "selective_soldering",
+    "time": {
+     "dist": "constant",
+     "value": 40.0,
+     "low": null,
+     "mode": null,
+     "high": null,
+     "mean": null,
+     "std": null,
+     "unit": "s"
+    },
+    "capacity": null,
+    "resources": [],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   },
+   {
+    "id": "inspection",
+    "name": "Revisa y montaje",
+    "component": "inspection",
+    "time": {
+     "dist": "constant",
+     "value": 50.0,
+     "low": null,
+     "mode": null,
+     "high": null,
+     "mean": null,
+     "std": null,
+     "unit": "s"
+    },
+    "capacity": null,
+    "resources": [
+     "operator_1"
+    ],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   }
+  ],
+  "policies": [
+   {
+    "resource": "operator_1",
+    "rule": "wip_target",
+    "priority_order": [],
+    "protected_step": "selective_soldering",
+    "feeder_steps": [
+     "manual_assembly"
+    ],
+    "target": null
+   }
+  ],
+  "carrier_loops": [
+   {
+    "resource": "racks",
+    "seize_at": "manual_assembly",
+    "release_at": "inspection",
+    "return_mode": "immediate"
+   }
+  ],
+  "experiments": [],
+  "missing_information": [],
+  "assumptions": [
+   "'Revisa y montaje' se modela como un único paso (inspection).",
+   "Cada unidad toma un rack en 'Manual assembly' y lo libera al terminar 'Revisa y montaje'."
+  ],
+  "confidence_notes": [
+   "Interpretado por el intérprete OFFLINE (reglas deterministas ES/EN)."
+  ],
+  "items": null,
+  "custom_rules": [],
+  "unparsed": [
+   "Material ilimitado"
+  ],
+  "layout_known": false
+ },
+ "model": {
+  "isms_version": "0.1",
+  "meta": {
+   "name": "Manual assembly → Selective soldering → Revisa y montaje",
+   "description": "Hay 3 bastidores. Un operario monta cada bastidor en 2 minutos. Los bastidores esperan en un buffer de 3 antes de la selectiva, que tarda 40 s por bastidor. Luego el mismo operario revisa cada bastidor en 50 s y el bastidor vuelve libre al montaje. Quiero que el operario mantenga alimentada la selectiva con una estrategia de WIP objetivo. Material ilimitado; simular 8 horas.",
+   "tags": [],
+   "domain": null,
+   "origin": "ai_generated",
+   "generated_by": {
+    "interpreter": "offline-rules",
+    "prompt_version": "offline_rules_v2",
+    "compiler": "compiler_v2",
+    "prototype_mode": false,
+    "at": "2026-10-02T06:00:13+00:00"
+   }
+  },
+  "simulation": {
+   "horizon": {
+    "value": 8.0,
+    "unit": "h",
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": null
+    }
+   },
+   "warmup": {
+    "value": 0.0,
+    "unit": "s",
+    "provenance": null
+   },
+   "kind": "terminating",
+   "replications": 1,
+   "base_seed": 12345,
+   "trace": false,
+   "dispatch_timing": "end_of_timestep",
+   "check_invariants": true
+  },
+  "entities": [
+   {
+    "id": "unit",
+    "name": "Unit",
+    "description": ""
+   }
+  ],
+  "parameters": [
+   {
+    "id": "manual_assembly_time",
+    "value": 2.0,
+    "unit": "min",
+    "description": "Tiempo de 'Manual assembly'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "selective_soldering_time",
+    "value": 40.0,
+    "unit": "s",
+    "description": "Tiempo de 'Selective soldering'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "inspection_time",
+    "value": 50.0,
+    "unit": "s",
+    "description": "Tiempo de 'Revisa y montaje'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "racks_count",
+    "value": 3.0,
+    "unit": "units",
+    "description": "Número de bastidores",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "operator_1_count",
+    "value": 1.0,
+    "unit": "units",
+    "description": "Número de Operario",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "wip_target",
+    "value": null,
+    "unit": "units",
+    "description": "WIP objetivo delante de la estación protegida",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": null
+   }
+  ],
+  "resources": [
+   {
+    "id": "racks",
+    "name": "bastidores",
+    "kind": "carrier",
+    "quantity": "$racks_count",
+    "dispatch": "fifo",
+    "wip_target": null,
+    "travel": null,
+    "home": null,
+    "cost_per_hour": null,
+    "provenance": null
+   },
+   {
+    "id": "operator_1",
+    "name": "Operario",
+    "kind": "operator",
+    "quantity": "$operator_1_count",
+    "dispatch": "wip_target",
+    "wip_target": {
+     "protected_node": "selective_soldering",
+     "feed_nodes": [
+      "selective_soldering"
+     ],
+     "feeder_nodes": [
+      "manual_assembly"
+     ],
+     "target": "$wip_target",
+     "count_feeder_in_process": true,
+     "unblock_protected": true,
+     "preempt_below": null
+    },
+    "travel": null,
+    "home": null,
+    "cost_per_hour": null,
+    "provenance": null
+   }
+  ],
+  "nodes": [
+   {
+    "id": "source",
+    "name": "Source",
+    "component": "source",
+    "component_version": null,
+    "params": {
+     "arrival": "infinite"
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "manual_assembly",
+    "name": "Manual assembly",
+    "component": "manual_assembly",
+    "component_version": "1.0.0",
+    "params": {
+     "process_time": {
+      "dist": "constant",
+      "unit": "min",
+      "value": "$manual_assembly_time"
+     },
+     "resources": [
+      {
+       "resource": "operator_1"
+      }
+     ]
+    },
+    "priority": 0,
+    "seize": [
+     {
+      "resource": "racks",
+      "quantity": 1
+     }
+    ],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "selective_soldering",
+    "name": "Selective soldering",
+    "component": "selective_soldering",
+    "component_version": "1.0.0",
+    "params": {
+     "process_time": {
+      "dist": "constant",
+      "unit": "s",
+      "value": "$selective_soldering_time"
+     }
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "inspection",
+    "name": "Revisa y montaje",
+    "component": "inspection",
+    "component_version": "1.0.0",
+    "params": {
+     "process_time": {
+      "dist": "constant",
+      "unit": "s",
+      "value": "$inspection_time"
+     },
+     "resources": [
+      {
+       "resource": "operator_1"
+      }
+     ]
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [
+     "racks"
+    ],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "sink",
+    "name": "Sink",
+    "component": "sink",
+    "component_version": null,
+    "params": {},
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   }
+  ],
+  "edges": [
+   {
+    "source": "source",
+    "target": "manual_assembly",
+    "probability": null
+   },
+   {
+    "source": "manual_assembly",
+    "target": "selective_soldering",
+    "probability": null
+   },
+   {
+    "source": "selective_soldering",
+    "target": "inspection",
+    "probability": null
+   },
+   {
+    "source": "inspection",
+    "target": "sink",
+    "probability": null
+   }
+  ],
+  "assumptions": [
+   {
+    "id": "a1",
+    "text": "Suministro infinito (la primera estación nunca espera material): no se indicó la llegada.",
+    "path": "nodes.source.params.arrival",
+    "origin": "ai",
+    "accepted": false
+   },
+   {
+    "id": "a2",
+    "text": "Los desplazamientos del operario entre puestos no se modelan (no se indicaron distancias).",
+    "path": "resources",
+    "origin": "ai",
+    "accepted": false
+   },
+   {
+    "id": "a3",
+    "text": "WIP que alimenta 'Selective soldering' = contenido de Selective soldering + unidades en proceso en las tareas alimentadoras.",
+    "path": "resources.operator_1.wip_target.feed_nodes",
+    "origin": "ai",
+    "accepted": false
+   },
+   {
+    "id": "a4",
+    "text": "El operario no interrumpe una tarea a medias (sin preemption); si la estación protegida está bloqueada, atiende primero aguas abajo.",
+    "path": "resources.operator_1.wip_target",
+    "origin": "ai",
+    "accepted": false
+   },
+   {
+    "id": "a5",
+    "text": "'Revisa y montaje' se modela como un único paso (inspection).",
+    "path": null,
+    "origin": "ai",
+    "accepted": false
+   },
+   {
+    "id": "a6",
+    "text": "Cada unidad toma un rack en 'Manual assembly' y lo libera al terminar 'Revisa y montaje'.",
+    "path": null,
+    "origin": "ai",
+    "accepted": false
+   }
+  ],
+  "missing": [
+   {
+    "question": "No he usado esta frase: «Material ilimitado». Si describe algo del proceso, reformúlala o añádelo a mano.",
+    "path": null,
+    "required": false
+   }
+  ],
+  "approval": {
+   "approved": false,
+   "by": null,
+   "at": null,
+   "model_hash": null,
+   "note": ""
+  },
+  "experiments": [],
+  "custom_rule_candidates": []
+ },
+ "questions": [
+  "WIP objetivo delante de la estación protegida (units)",
+  "No he usado esta frase: «Material ilimitado». Si describe algo del proceso, reformúlala o añádelo a mano."
+ ],
+ "assumptions": [
+  "Suministro infinito (la primera estación nunca espera material): no se indicó la llegada.",
+  "Los desplazamientos del operario entre puestos no se modelan (no se indicaron distancias).",
+  "WIP que alimenta 'Selective soldering' = contenido de Selective soldering + unidades en proceso en las tareas alimentadoras.",
+  "El operario no interrumpe una tarea a medias (sin preemption); si la estación protegida está bloqueada, atiende primero aguas abajo.",
+  "'Revisa y montaje' se modela como un único paso (inspection).",
+  "Cada unidad toma un rack en 'Manual assembly' y lo libera al terminar 'Revisa y montaje'."
+ ],
+ "custom_rules": [],
+ "unparsed": [
+  "Material ilimitado"
+ ],
+ "confidence_notes_dropped_by_compiler": [
+  "Interpretado por el intérprete OFFLINE (reglas deterministas ES/EN)."
+ ],
+ "evaluation": {
+  "case": "C3",
+  "results": [
+   {
+    "case": "C3",
+    "req": "C3-R01",
+    "kind": "flow",
+    "metric": "TOPOLOGY",
+    "description": "topology in flow order",
+    "status": "WRONG",
+    "error_type": "TOPOLOGY_ERROR",
+    "severity": "CRITICAL",
+    "detail": "missing roles ['buffer'] (flagged: []); order OK; extra nodes []",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "C3",
+    "req": "C3-R02",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "assembly -> accepted library component",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "manual_assembly = manual_assembly",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "C3",
+    "req": "C3-R03",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "buffer -> accepted library component",
+    "status": "OMITTED",
+    "error_type": "SILENT_OMISSION",
+    "severity": "CRITICAL",
+    "detail": "step not in the model and not flagged",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "C3",
+    "req": "C3-R04",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "selective -> accepted library component",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "selective_soldering = selective_soldering",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "C3",
+    "req": "C3-R05",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "review -> accepted library component",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "inspection = inspection",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "C3",
+    "req": "C3-R06",
+    "kind": "strategy",
+    "metric": "STRATEGY",
+    "description": "WIP target strategy protecting the selective",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "wip_target",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "C3",
+    "req": "C3-R07",
+    "kind": "strategy",
+    "metric": "STRATEGY",
+    "description": "feeding tasks = assembly (intent not explicit)",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "[GOLD_REQUIRES_ENGINEER_REVIEW: not counted] wip_target",
+    "evaluated": false,
+    "unit_sensitive": false
+   },
+   {
+    "case": "C3",
+    "req": "C3-R08",
+    "kind": "missing",
+    "metric": "MISSING_DETECTION",
+    "description": "WIP target value not given -> MISSING",
+    "status": "MISSING_DETECTED",
+    "error_type": null,
+    "severity": null,
+    "detail": "wip_target = None; «WIP objetivo delante de la estación protegida (units)»",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "C3",
+    "req": "C3-R09",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "assembly 2 min",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "manual_assembly: 120.0 s x 1 = 120.0 s per entity",
+    "evaluated": true,
+    "unit_sensitive": true
+   },
+   {
+    "case": "C3",
+    "req": "C3-R10",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "buffer 3",
+    "status": "OMITTED",
+    "error_type": "SILENT_OMISSION",
+    "severity": "CRITICAL",
+    "detail": "NO_NODE (role 'buffer' not found in the model)",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "C3",
+    "req": "C3-R11",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "selective 40 s",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "selective_soldering: 40.0 s x 1 = 40.0 s per entity",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "C3",
+    "req": "C3-R12",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "review 50 s",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "inspection: 50.0 s x 1 = 50.0 s per entity",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "C3",
+    "req": "C3-R13",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "3 racks",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "carrier: 3.0",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "C3",
+    "req": "C3-R14",
+    "kind": "shared_resource",
+    "metric": "RESOURCE_ASSIGNMENT",
+    "description": "same operator",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "['operator_1', 'operator_1']",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "C3",
+    "req": "C3-R15",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "horizon 8 h",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "simulation.horizon: 28800.0",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "C3",
+    "req": "C3-R16",
+    "kind": "supply",
+    "metric": "PARAMETER_VALUE",
+    "description": "unlimited supply",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "infinite",
+    "evaluated": true,
+    "unit_sensitive": false
+   }
+  ],
+  "grounding": [
+   {
+    "parameter": "manual_assembly_time",
+    "value": 2.0,
+    "unit": "min",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "selective_soldering_time",
+    "value": 40.0,
+    "unit": "s",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "inspection_time",
+    "value": 50.0,
+    "unit": "s",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "racks_count",
+    "value": 3.0,
+    "unit": "units",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "operator_1_count",
+    "value": 1.0,
+    "unit": "units",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "wip_target",
+    "value": null,
+    "unit": "units",
+    "status": "MISSING",
+    "grounded": null,
+    "verdict": "OK"
+   }
+  ],
+  "role_map": {
+   "assembly": "manual_assembly",
+   "buffer": null,
+   "selective": "selective_soldering",
+   "review": "inspection"
+  },
+  "semantically_correct": false
+ },
+ "llm_calls": [],
+ "repeat": 1,
+ "signature": {
+  "topology": [
+   "source",
+   "manual_assembly",
+   "selective_soldering",
+   "inspection",
+   "sink"
+  ],
+  "components": {
+   "assembly": "manual_assembly",
+   "buffer": null,
+   "selective": "selective_soldering",
+   "review": "inspection"
+  },
+  "loose_roles": [],
+  "requirements": {
+   "C3-R01": "WRONG",
+   "C3-R02": "CORRECT",
+   "C3-R03": "OMITTED",
+   "C3-R04": "CORRECT",
+   "C3-R05": "CORRECT",
+   "C3-R06": "CORRECT",
+   "C3-R07": "CORRECT",
+   "C3-R08": "MISSING_DETECTED",
+   "C3-R09": "CORRECT",
+   "C3-R10": "OMITTED",
+   "C3-R11": "CORRECT",
+   "C3-R12": "CORRECT",
+   "C3-R13": "CORRECT",
+   "C3-R14": "CORRECT",
+   "C3-R15": "CORRECT",
+   "C3-R16": "CORRECT"
+  },
+  "missing": [],
+  "assumption_paths": [
+   "",
+   "nodes.source.params.arrival",
+   "resources",
+   "resources.operator_1.wip_target",
+   "resources.operator_1.wip_target.feed_nodes"
+  ],
+  "custom_rules": 0
+ }
+}

@@ -1,0 +1,1081 @@
+{
+ "case": "F1",
+ "family": "F_REALISTIC",
+ "schema_valid": true,
+ "compiles": true,
+ "verifier_status": "INCOMPLETE",
+ "error": null,
+ "semantically_correct": false,
+ "wall_s": 0.008,
+ "interpreter": "offline-rules",
+ "draft": {
+  "model_name": "Transporte 1 → Machine → Inspection",
+  "horizon_value": 8.0,
+  "horizon_unit": "h",
+  "supply": "unknown",
+  "interarrival": null,
+  "resources": [
+   {
+    "id": "racks",
+    "name": "bastidores",
+    "kind": "carrier",
+    "quantity": 2,
+    "walking_speed_m_s": null
+   },
+   {
+    "id": "operator_1",
+    "name": "Operario",
+    "kind": "operator",
+    "quantity": 1,
+    "walking_speed_m_s": null
+   }
+  ],
+  "steps": [
+   {
+    "id": "transport_1",
+    "name": "Transporte 1",
+    "component": "rack_transport",
+    "time": null,
+    "capacity": null,
+    "resources": [],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   },
+   {
+    "id": "machine",
+    "name": "Machine",
+    "component": "machine",
+    "time": {
+     "dist": "constant",
+     "value": 20.0,
+     "low": null,
+     "mode": null,
+     "high": null,
+     "mean": null,
+     "std": null,
+     "unit": "s"
+    },
+    "capacity": null,
+    "resources": [],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   },
+   {
+    "id": "inspection",
+    "name": "Inspection",
+    "component": "inspection",
+    "time": {
+     "dist": "constant",
+     "value": 15.0,
+     "low": null,
+     "mode": null,
+     "high": null,
+     "mean": null,
+     "std": null,
+     "unit": "s"
+    },
+    "capacity": null,
+    "resources": [
+     "operator_1"
+    ],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   }
+  ],
+  "policies": [],
+  "carrier_loops": [
+   {
+    "resource": "racks",
+    "seize_at": "machine",
+    "release_at": "inspection",
+    "return_mode": "unknown"
+   }
+  ],
+  "experiments": [],
+  "missing_information": [
+   {
+    "question": "¿Quién realiza 'Transporte 1'? (el operario u otro recurso)",
+    "required": false
+   }
+  ],
+  "assumptions": [
+   "Cada unidad toma un rack en 'Machine' y lo libera al terminar 'Inspection'."
+  ],
+  "confidence_notes": [
+   "Interpretado por el intérprete OFFLINE (reglas deterministas ES/EN)."
+  ],
+  "items": null,
+  "custom_rules": [
+   {
+    "description": "Cuando el bastidor está lleno, el mismo operario lo lleva en un carro hasta la entrada de la selectiva, que está a 10 metros",
+    "reason": "ninguna regla de la biblioteca la cubre"
+   },
+   {
+    "description": "Cuando termina, el bastidor vacío queda disponible enseguida",
+    "reason": "ninguna regla de la biblioteca la cubre"
+   },
+   {
+    "description": "La prioridad del operario es que la selectiva no se quede sin trabajo: que siempre haya 2 bastidores listos delante",
+    "reason": "prioridad no interpretable con las tareas del operario"
+   }
+  ],
+  "unparsed": [
+   "La mesa de revisión está a 5 metros de la entrada de la selectiva",
+   "Placas sin límite"
+  ],
+  "layout_known": false
+ },
+ "model": {
+  "isms_version": "0.1",
+  "meta": {
+   "name": "Transporte 1 → Machine → Inspection",
+   "description": "En la célula de soldadura selectiva tenemos 3 bastidores que van y vienen. En cada bastidor se cargan 4 placas y el operario tarda 30 segundos en colocar cada placa. Cuando el bastidor está lleno, el mismo operario lo lleva en un carro hasta la entrada de la selectiva, que está a 10 metros; meter el bastidor en el carro y sacarlo le lleva 5 segundos cada vez. Delante de la selectiva caben 3 bastidores. La máquina suelda el bastidor entero en 20 segundos. La mesa de revisión está a 5 metros de la",
+   "tags": [],
+   "domain": null,
+   "origin": "ai_generated",
+   "generated_by": {
+    "interpreter": "offline-rules",
+    "prompt_version": "offline_rules_v2",
+    "compiler": "compiler_v2",
+    "prototype_mode": false,
+    "at": "2026-10-02T06:00:13+00:00"
+   }
+  },
+  "simulation": {
+   "horizon": {
+    "value": 8.0,
+    "unit": "h",
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": null
+    }
+   },
+   "warmup": {
+    "value": 0.0,
+    "unit": "s",
+    "provenance": null
+   },
+   "kind": "terminating",
+   "replications": 1,
+   "base_seed": 12345,
+   "trace": false,
+   "dispatch_timing": "end_of_timestep",
+   "check_invariants": true
+  },
+  "entities": [
+   {
+    "id": "unit",
+    "name": "Unit",
+    "description": ""
+   }
+  ],
+  "parameters": [
+   {
+    "id": "transport_1_load_time",
+    "value": null,
+    "unit": "s",
+    "description": "Tiempo de carga en 'Transporte 1'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": null
+   },
+   {
+    "id": "transport_1_unload_time",
+    "value": null,
+    "unit": "s",
+    "description": "Tiempo de descarga en 'Transporte 1'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": null
+   },
+   {
+    "id": "machine_time",
+    "value": 20.0,
+    "unit": "s",
+    "description": "Tiempo de 'Machine'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "inspection_time",
+    "value": 15.0,
+    "unit": "s",
+    "description": "Tiempo de 'Inspection'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "racks_count",
+    "value": 2.0,
+    "unit": "units",
+    "description": "Número de bastidores",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "operator_1_count",
+    "value": 1.0,
+    "unit": "units",
+    "description": "Número de Operario",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "transport_1_distance",
+    "value": null,
+    "unit": "m",
+    "description": "Distancia de 'Transporte 1'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": null
+   },
+   {
+    "id": "transport_1_speed",
+    "value": null,
+    "unit": "m/s",
+    "description": "Velocidad de 'Transporte 1'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": null
+   }
+  ],
+  "resources": [
+   {
+    "id": "racks",
+    "name": "bastidores",
+    "kind": "carrier",
+    "quantity": "$racks_count",
+    "dispatch": "fifo",
+    "wip_target": null,
+    "travel": null,
+    "home": null,
+    "cost_per_hour": null,
+    "provenance": null
+   },
+   {
+    "id": "operator_1",
+    "name": "Operario",
+    "kind": "operator",
+    "quantity": "$operator_1_count",
+    "dispatch": "fifo",
+    "wip_target": null,
+    "travel": null,
+    "home": null,
+    "cost_per_hour": null,
+    "provenance": null
+   }
+  ],
+  "nodes": [
+   {
+    "id": "source",
+    "name": "Source",
+    "component": "source",
+    "component_version": null,
+    "params": {
+     "arrival": "infinite"
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "transport_1",
+    "name": "Transporte 1",
+    "component": "rack_transport",
+    "component_version": "1.0.0",
+    "params": {
+     "capacity": 1,
+     "load_time": {
+      "dist": "constant",
+      "unit": "s",
+      "value": "$transport_1_load_time"
+     },
+     "unload_time": {
+      "dist": "constant",
+      "unit": "s",
+      "value": "$transport_1_unload_time"
+     },
+     "reserve_destination": true,
+     "return_empty": false,
+     "distance": {
+      "value": "$transport_1_distance",
+      "unit": "m"
+     },
+     "speed": {
+      "value": "$transport_1_speed",
+      "unit": "m/s"
+     }
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "machine",
+    "name": "Machine",
+    "component": "machine",
+    "component_version": "1.0.0",
+    "params": {
+     "process_time": {
+      "dist": "constant",
+      "unit": "s",
+      "value": "$machine_time"
+     }
+    },
+    "priority": 0,
+    "seize": [
+     {
+      "resource": "racks",
+      "quantity": 1
+     }
+    ],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "inspection",
+    "name": "Inspection",
+    "component": "inspection",
+    "component_version": "1.0.0",
+    "params": {
+     "process_time": {
+      "dist": "constant",
+      "unit": "s",
+      "value": "$inspection_time"
+     },
+     "resources": [
+      {
+       "resource": "operator_1"
+      }
+     ]
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [
+     "racks"
+    ],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "sink",
+    "name": "Sink",
+    "component": "sink",
+    "component_version": null,
+    "params": {},
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   }
+  ],
+  "edges": [
+   {
+    "source": "source",
+    "target": "transport_1",
+    "probability": null
+   },
+   {
+    "source": "transport_1",
+    "target": "machine",
+    "probability": null
+   },
+   {
+    "source": "machine",
+    "target": "inspection",
+    "probability": null
+   },
+   {
+    "source": "inspection",
+    "target": "sink",
+    "probability": null
+   }
+  ],
+  "assumptions": [
+   {
+    "id": "a1",
+    "text": "Suministro infinito (la primera estación nunca espera material): no se indicó la llegada.",
+    "path": "nodes.source.params.arrival",
+    "origin": "ai",
+    "accepted": false
+   },
+   {
+    "id": "a2",
+    "text": "'Transporte 1': 1 unidad por viaje (no se indicó).",
+    "path": "nodes.transport_1.params.capacity",
+    "origin": "ai",
+    "accepted": false
+   },
+   {
+    "id": "a3",
+    "text": "'Transporte 1': el viaje empieza sólo cuando hay sitio en el destino (evita que el operario espere cargado).",
+    "path": "nodes.transport_1.params.reserve_destination",
+    "origin": "ai",
+    "accepted": false
+   },
+   {
+    "id": "a4",
+    "text": "Cada unidad toma un rack en 'Machine' y lo libera al terminar 'Inspection'.",
+    "path": null,
+    "origin": "ai",
+    "accepted": false
+   }
+  ],
+  "missing": [
+   {
+    "question": "¿Cómo vuelven los racks vacíos al inicio? (disponibles inmediatamente al liberarse, o con un transporte)",
+    "path": "nodes.inspection.release_via",
+    "required": true
+   },
+   {
+    "question": "No he usado esta frase: «La mesa de revisión está a 5 metros de la entrada de la selectiva». Si describe algo del proceso, reformúlala o añádelo a mano.",
+    "path": null,
+    "required": false
+   },
+   {
+    "question": "No he usado esta frase: «Placas sin límite». Si describe algo del proceso, reformúlala o añádelo a mano.",
+    "path": null,
+    "required": false
+   },
+   {
+    "question": "¿Quién realiza 'Transporte 1'? (el operario u otro recurso)",
+    "path": null,
+    "required": false
+   }
+  ],
+  "approval": {
+   "approved": false,
+   "by": null,
+   "at": null,
+   "model_hash": null,
+   "note": ""
+  },
+  "experiments": [],
+  "custom_rule_candidates": [
+   {
+    "id": "rule_1",
+    "description": "Cuando el bastidor está lleno, el mismo operario lo lleva en un carro hasta la entrada de la selectiva, que está a 10 metros",
+    "inputs": [],
+    "outputs": [],
+    "expected_behavior": "Cuando el bastidor está lleno, el mismo operario lo lleva en un carro hasta la entrada de la selectiva, que está a 10 metros",
+    "reason_not_found": "ninguna regla de la biblioteca la cubre",
+    "status": "proposed",
+    "implementation": null
+   },
+   {
+    "id": "rule_2",
+    "description": "Cuando termina, el bastidor vacío queda disponible enseguida",
+    "inputs": [],
+    "outputs": [],
+    "expected_behavior": "Cuando termina, el bastidor vacío queda disponible enseguida",
+    "reason_not_found": "ninguna regla de la biblioteca la cubre",
+    "status": "proposed",
+    "implementation": null
+   },
+   {
+    "id": "rule_3",
+    "description": "La prioridad del operario es que la selectiva no se quede sin trabajo: que siempre haya 2 bastidores listos delante",
+    "inputs": [],
+    "outputs": [],
+    "expected_behavior": "La prioridad del operario es que la selectiva no se quede sin trabajo: que siempre haya 2 bastidores listos delante",
+    "reason_not_found": "prioridad no interpretable con las tareas del operario",
+    "status": "proposed",
+    "implementation": null
+   }
+  ]
+ },
+ "questions": [
+  "Tiempo de carga en 'Transporte 1' (s)",
+  "Tiempo de descarga en 'Transporte 1' (s)",
+  "Distancia de 'Transporte 1' (m)",
+  "Velocidad de 'Transporte 1' (m/s)",
+  "¿Cómo vuelven los racks vacíos al inicio? (disponibles inmediatamente al liberarse, o con un transporte)",
+  "No he usado esta frase: «La mesa de revisión está a 5 metros de la entrada de la selectiva». Si describe algo del proceso, reformúlala o añádelo a mano.",
+  "No he usado esta frase: «Placas sin límite». Si describe algo del proceso, reformúlala o añádelo a mano.",
+  "¿Quién realiza 'Transporte 1'? (el operario u otro recurso)"
+ ],
+ "assumptions": [
+  "Suministro infinito (la primera estación nunca espera material): no se indicó la llegada.",
+  "'Transporte 1': 1 unidad por viaje (no se indicó).",
+  "'Transporte 1': el viaje empieza sólo cuando hay sitio en el destino (evita que el operario espere cargado).",
+  "Cada unidad toma un rack en 'Machine' y lo libera al terminar 'Inspection'."
+ ],
+ "custom_rules": [
+  "Cuando el bastidor está lleno, el mismo operario lo lleva en un carro hasta la entrada de la selectiva, que está a 10 metros",
+  "Cuando termina, el bastidor vacío queda disponible enseguida",
+  "La prioridad del operario es que la selectiva no se quede sin trabajo: que siempre haya 2 bastidores listos delante"
+ ],
+ "unparsed": [
+  "La mesa de revisión está a 5 metros de la entrada de la selectiva",
+  "Placas sin límite"
+ ],
+ "confidence_notes_dropped_by_compiler": [
+  "Interpretado por el intérprete OFFLINE (reglas deterministas ES/EN)."
+ ],
+ "evaluation": {
+  "case": "F1",
+  "results": [
+   {
+    "case": "F1",
+    "req": "F1-R01",
+    "kind": "flow",
+    "metric": "TOPOLOGY",
+    "description": "topology in flow order",
+    "status": "WRONG",
+    "error_type": "TOPOLOGY_ERROR",
+    "severity": "CRITICAL",
+    "detail": "missing roles ['assembly', 'buffer'] (flagged: []); order OK; extra nodes []",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F1",
+    "req": "F1-R02",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "assembly -> accepted library component",
+    "status": "OMITTED",
+    "error_type": "SILENT_OMISSION",
+    "severity": "CRITICAL",
+    "detail": "step not in the model and not flagged",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F1",
+    "req": "F1-R03",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "transport -> accepted library component",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "transport_1 = rack_transport",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F1",
+    "req": "F1-R04",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "buffer -> accepted library component",
+    "status": "OMITTED",
+    "error_type": "SILENT_OMISSION",
+    "severity": "CRITICAL",
+    "detail": "step not in the model and not flagged",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F1",
+    "req": "F1-R05",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "selective -> accepted library component",
+    "status": "WRONG",
+    "error_type": "COMPONENT_MATCH_ERROR",
+    "severity": "CRITICAL",
+    "detail": "step present as 'machine' (machine); expected one of ['selective_soldering']",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F1",
+    "req": "F1-R06",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "review -> accepted library component",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "inspection = inspection",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F1",
+    "req": "F1-R07",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "load 30 s PER_BOARD",
+    "status": "OMITTED",
+    "error_type": "SILENT_OMISSION",
+    "severity": "CRITICAL",
+    "detail": "NO_NODE (role 'assembly' not found in the model)",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F1",
+    "req": "F1-R08",
+    "kind": "basis",
+    "metric": "SEMANTIC_BASIS",
+    "description": "assembly per board",
+    "status": "OMITTED",
+    "error_type": "SILENT_OMISSION",
+    "severity": "CRITICAL",
+    "detail": "role not in the model",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F1",
+    "req": "F1-R09",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "4 boards per rack",
+    "status": "OMITTED",
+    "error_type": "SILENT_OMISSION",
+    "severity": "CRITICAL",
+    "detail": "NO_PARAM (-)",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F1",
+    "req": "F1-R10",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "load 5 s",
+    "status": "WRONG",
+    "error_type": "FALSE_MISSING",
+    "severity": "MINOR",
+    "detail": "transport_1_load_time has no value although the text gives it; asked «Tiempo de carga en 'Transporte 1' (s)»",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F1",
+    "req": "F1-R11",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "unload 5 s",
+    "status": "WRONG",
+    "error_type": "FALSE_MISSING",
+    "severity": "MINOR",
+    "detail": "transport_1_unload_time has no value although the text gives it; asked «Tiempo de carga en 'Transporte 1' (s)»",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F1",
+    "req": "F1-R12",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "10 m",
+    "status": "OMITTED",
+    "error_type": "SILENT_OMISSION",
+    "severity": "CRITICAL",
+    "detail": "NO_NODE (role missing)",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F1",
+    "req": "F1-R13",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "5 m",
+    "status": "OMITTED",
+    "error_type": "SILENT_OMISSION",
+    "severity": "CRITICAL",
+    "detail": "NO_NODE (role missing)",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F1",
+    "req": "F1-R14",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "1.2 m/s",
+    "status": "OMITTED",
+    "error_type": "SILENT_OMISSION",
+    "severity": "CRITICAL",
+    "detail": "NO_TRAVEL (-)",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F1",
+    "req": "F1-R15",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "3 racks in front of the selective",
+    "status": "OMITTED",
+    "error_type": "SILENT_OMISSION",
+    "severity": "CRITICAL",
+    "detail": "NO_NODE (role 'buffer' not found in the model)",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F1",
+    "req": "F1-R16",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "selective 20 s PER_RACK",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "machine: 20.0 s x 1 = 20.0 s per entity",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F1",
+    "req": "F1-R17",
+    "kind": "basis",
+    "metric": "SEMANTIC_BASIS",
+    "description": "selective per rack",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "per_entity (work_units=1)",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F1",
+    "req": "F1-R18",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "review+cleaning 15 s PER_BOARD",
+    "status": "WRONG",
+    "error_type": "SEMANTIC_BASIS_ERROR",
+    "severity": "CRITICAL",
+    "detail": "15.0 s x 1 = 15.0 s per entity; expected 60.0 (15.0 per_item, x4)",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F1",
+    "req": "F1-R19",
+    "kind": "basis",
+    "metric": "SEMANTIC_BASIS",
+    "description": "review per board",
+    "status": "WRONG",
+    "error_type": "SEMANTIC_BASIS_ERROR",
+    "severity": "CRITICAL",
+    "detail": "expected per_item, model per_entity (work_units=1); time per entity CHANGED",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F1",
+    "req": "F1-R20",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "3 racks",
+    "status": "WRONG",
+    "error_type": "PARAMETER_VALUE_ERROR",
+    "severity": "CRITICAL",
+    "detail": "carrier: 2.0 != 3.0",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F1",
+    "req": "F1-R21",
+    "kind": "carrier",
+    "metric": "CARRIER_SEMANTICS",
+    "description": "rack loop, immediate return",
+    "status": "WRONG",
+    "error_type": "CARRIER_SEMANTICS_ERROR",
+    "severity": "CRITICAL",
+    "detail": "seize ['machine'], release ['inspection'], release_via []",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F1",
+    "req": "F1-R22",
+    "kind": "shared_resource",
+    "metric": "RESOURCE_ASSIGNMENT",
+    "description": "one operator does everything",
+    "status": "WRONG",
+    "error_type": "RESOURCE_ASSIGNMENT_ERROR",
+    "severity": "CRITICAL",
+    "detail": "roles ['assembly', 'transport', 'review'] -> operators [None, None, 'operator_1']",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F1",
+    "req": "F1-R23",
+    "kind": "strategy",
+    "metric": "STRATEGY",
+    "description": "keep the selective fed with a WIP target",
+    "status": "WRONG",
+    "error_type": "STRATEGY_ERROR",
+    "severity": "CRITICAL",
+    "detail": "no operator found",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F1",
+    "req": "F1-R24",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "target 2 racks ready",
+    "status": "OMITTED",
+    "error_type": "SILENT_OMISSION",
+    "severity": "CRITICAL",
+    "detail": "NO_STRATEGY (-)",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F1",
+    "req": "F1-R25",
+    "kind": "strategy",
+    "metric": "STRATEGY",
+    "description": "feeding tasks = assembly + transport",
+    "status": "WRONG",
+    "error_type": "STRATEGY_ERROR",
+    "severity": "CRITICAL",
+    "detail": "[GOLD_REQUIRES_ENGINEER_REVIEW: not counted] no operator found",
+    "evaluated": false,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F1",
+    "req": "F1-R26",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "horizon 8 h",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "simulation.horizon: 28800.0",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "F1",
+    "req": "F1-R27",
+    "kind": "supply",
+    "metric": "PARAMETER_VALUE",
+    "description": "unlimited supply",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "infinite",
+    "evaluated": true,
+    "unit_sensitive": false
+   }
+  ],
+  "grounding": [
+   {
+    "parameter": "transport_1_load_time",
+    "value": null,
+    "unit": "s",
+    "status": "MISSING",
+    "grounded": null,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "transport_1_unload_time",
+    "value": null,
+    "unit": "s",
+    "status": "MISSING",
+    "grounded": null,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "machine_time",
+    "value": 20.0,
+    "unit": "s",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "inspection_time",
+    "value": 15.0,
+    "unit": "s",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "racks_count",
+    "value": 2.0,
+    "unit": "units",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "operator_1_count",
+    "value": 1.0,
+    "unit": "units",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "transport_1_distance",
+    "value": null,
+    "unit": "m",
+    "status": "MISSING",
+    "grounded": null,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "transport_1_speed",
+    "value": null,
+    "unit": "m/s",
+    "status": "MISSING",
+    "grounded": null,
+    "verdict": "OK"
+   }
+  ],
+  "role_map": {
+   "assembly": null,
+   "transport": "transport_1",
+   "buffer": null,
+   "selective": "machine",
+   "review": "inspection",
+   "selective(loose)": true
+  },
+  "semantically_correct": false
+ },
+ "llm_calls": [],
+ "repeat": 5,
+ "signature": {
+  "topology": [
+   "source",
+   "rack_transport",
+   "machine",
+   "inspection",
+   "sink"
+  ],
+  "components": {
+   "assembly": null,
+   "transport": "rack_transport",
+   "buffer": null,
+   "selective": "machine",
+   "review": "inspection"
+  },
+  "loose_roles": [
+   "selective"
+  ],
+  "requirements": {
+   "F1-R01": "WRONG",
+   "F1-R02": "OMITTED",
+   "F1-R03": "CORRECT",
+   "F1-R04": "OMITTED",
+   "F1-R05": "WRONG",
+   "F1-R06": "CORRECT",
+   "F1-R07": "OMITTED",
+   "F1-R08": "OMITTED",
+   "F1-R09": "OMITTED",
+   "F1-R10": "WRONG",
+   "F1-R11": "WRONG",
+   "F1-R12": "OMITTED",
+   "F1-R13": "OMITTED",
+   "F1-R14": "OMITTED",
+   "F1-R15": "OMITTED",
+   "F1-R16": "CORRECT",
+   "F1-R17": "CORRECT",
+   "F1-R18": "WRONG",
+   "F1-R19": "WRONG",
+   "F1-R20": "WRONG",
+   "F1-R21": "WRONG",
+   "F1-R22": "WRONG",
+   "F1-R23": "WRONG",
+   "F1-R24": "OMITTED",
+   "F1-R25": "WRONG",
+   "F1-R26": "CORRECT",
+   "F1-R27": "CORRECT"
+  },
+  "missing": [
+   [
+    "transport",
+    "distance"
+   ],
+   [
+    "transport",
+    "load_time"
+   ],
+   [
+    "transport",
+    "speed"
+   ],
+   [
+    "transport",
+    "unload_time"
+   ]
+  ],
+  "assumption_paths": [
+   "",
+   "nodes.<transport>.params.capacity",
+   "nodes.<transport>.params.reserve_destination",
+   "nodes.source.params.arrival"
+  ],
+  "custom_rules": 3
+ }
+}

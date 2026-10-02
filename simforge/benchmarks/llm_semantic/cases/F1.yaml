@@ -1,0 +1,11 @@
+id: F1
+family: F_REALISTIC
+title: Selective cell (plant language)
+purpose: Validated selective model, no library words.
+text: 'En la célula de soldadura selectiva tenemos 3 bastidores que van y vienen. En cada bastidor se cargan 4 placas y el
+  operario tarda 30 segundos en colocar cada placa. Cuando el bastidor está lleno, el mismo operario lo lleva en un carro
+  hasta la entrada de la selectiva, que está a 10 metros; meter el bastidor en el carro y sacarlo le lleva 5 segundos cada
+  vez. Delante de la selectiva caben 3 bastidores. La máquina suelda el bastidor entero en 20 segundos. La mesa de revisión
+  está a 5 metros de la entrada de la selectiva; allí el operario revisa y limpia cada placa en 15 segundos. Cuando termina,
+  el bastidor vacío queda disponible enseguida. El operario anda a 1,2 m/s. La prioridad del operario es que la selectiva
+  no se quede sin trabajo: que siempre haya 2 bastidores listos delante. Placas sin límite. Turno de 8 horas.'

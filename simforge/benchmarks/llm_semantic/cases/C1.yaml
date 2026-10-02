@@ -1,0 +1,8 @@
+id: C1
+family: C_MISSING_AMBIGUITY
+title: Ambiguous basis
+purpose: Selective time without basis in a per-circuit context.
+text: 'Cada bastidor lleva 4 circuitos y hay 3 bastidores. Un operario monta los circuitos en el bastidor: 30 segundos por
+  circuito. El bastidor montado espera en un buffer donde caben 3 bastidores. La selectiva tarda 20 segundos. Después el mismo
+  operario revisa cada circuito: 15 segundos por circuito. Al terminar la revisión el bastidor queda libre y vuelve enseguida
+  al montaje. Hay circuitos de sobra. Simular 8 horas.'

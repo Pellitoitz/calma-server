@@ -1,0 +1,7 @@
+id: A4
+family: A_PARAPHRASE
+title: English
+purpose: Same process in English.
+text: Unlimited supply of parts. One operator assembles each part by hand in 60 seconds. Assembled parts wait in a buffer
+  that holds up to 5 parts. A machine then processes each part in 45 seconds. Finally, the same operator inspects every part,
+  which takes 20 seconds. Run the simulation for an 8-hour shift.

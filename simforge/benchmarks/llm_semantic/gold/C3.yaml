@@ -1,0 +1,130 @@
+id: C3
+gold_source: explicit spec
+gold_status: VALID
+roles:
+- role: assembly
+  accept:
+  - manual_assembly
+  - manual_process
+  keywords:
+  - montaje
+  - monta
+  - assembl
+  - ensambl
+  - carga
+  - coloca
+- role: buffer
+  accept:
+  - buffer
+  keywords:
+  - buffer
+  - cola
+  - pulmon
+  - estanteria
+  - queue
+  - almacen
+- role: selective
+  accept:
+  - selective_soldering
+  keywords:
+  - selectiva
+  - selective
+- role: review
+  accept:
+  - inspection
+  - cleaning
+  keywords:
+  - revis
+  - inspecc
+  - limpi
+  - review
+requirements:
+- kind: flow
+  description: topology in flow order
+  id: C3-R01
+- kind: component
+  role: assembly
+  description: assembly -> accepted library component
+  id: C3-R02
+- kind: component
+  role: buffer
+  description: buffer -> accepted library component
+  id: C3-R03
+- kind: component
+  role: selective
+  description: selective -> accepted library component
+  id: C3-R04
+- kind: component
+  role: review
+  description: review -> accepted library component
+  id: C3-R05
+- kind: strategy
+  operator_of: assembly
+  rule: wip_target
+  protected: selective
+  description: WIP target strategy protecting the selective
+  id: C3-R06
+- kind: strategy
+  operator_of: assembly
+  rule: wip_target
+  feeders:
+  - assembly
+  gold_status: GOLD_REQUIRES_ENGINEER_REVIEW
+  description: feeding tasks = assembly (intent not explicit)
+  id: C3-R07
+- kind: missing
+  target: wip_target
+  keywords:
+  - wip
+  - objetivo
+  - target
+  description: WIP target value not given -> MISSING
+  id: C3-R08
+- kind: value
+  role: assembly
+  field: process_time
+  expect: 120
+  description: assembly 2 min
+  raw: 2
+  unit_sensitive: true
+  id: C3-R09
+- kind: value
+  role: buffer
+  field: capacity
+  expect: 3
+  description: buffer 3
+  id: C3-R10
+- kind: value
+  role: selective
+  field: process_time
+  expect: 40
+  description: selective 40 s
+  id: C3-R11
+- kind: value
+  role: review
+  field: process_time
+  expect: 50
+  description: review 50 s
+  id: C3-R12
+- kind: value
+  target: carrier_quantity
+  expect: 3
+  description: 3 racks
+  id: C3-R13
+- kind: shared_resource
+  roles:
+  - assembly
+  - review
+  description: same operator
+  id: C3-R14
+- kind: value
+  target: horizon
+  expect: 28800
+  description: horizon 8 h
+  severity: MAJOR
+  id: C3-R15
+- kind: supply
+  expect: infinite
+  description: unlimited supply
+  severity: MAJOR
+  id: C3-R16

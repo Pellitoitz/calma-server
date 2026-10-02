@@ -1,0 +1,7 @@
+id: B4
+family: B_UNITS_BASIS
+title: Per box vs per piece, decimal minutes and hours
+purpose: 0,75 min/box, 3 s/piece, 10 pieces/box, 7,5 h.
+text: 'Cada caja contiene 10 piezas. Un banco de test automático prueba la caja completa en 0,75 minutos. Las cajas probadas
+  esperan en un buffer de 2 cajas. Después un operario embala las piezas: 3 segundos por pieza. Llegan cajas sin parar. El
+  turno dura 7,5 horas.'

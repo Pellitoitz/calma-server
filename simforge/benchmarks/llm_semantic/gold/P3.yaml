@@ -1,0 +1,125 @@
+id: P3
+gold_source: explicit spec (= F3)
+gold_status: VALID
+roles:
+- role: assembly
+  accept:
+  - manual_assembly
+  - manual_process
+  keywords:
+  - montaje
+  - monta
+  - assembl
+  - ensambl
+  - carga
+  - coloca
+- role: buffer
+  accept:
+  - buffer
+  keywords:
+  - buffer
+  - cola
+  - pulmon
+  - estanteria
+  - queue
+  - almacen
+- role: test
+  accept:
+  - test_station
+  - functional_test
+  keywords:
+  - test
+  - prueba
+  - banco
+- role: packaging
+  accept:
+  - packaging
+  keywords:
+  - embala
+  - packag
+  - empaquet
+requirements:
+- kind: flow
+  description: topology in flow order
+  id: P3-R01
+- kind: component
+  role: assembly
+  description: assembly -> accepted library component
+  id: P3-R02
+- kind: component
+  role: buffer
+  description: buffer -> accepted library component
+  id: P3-R03
+- kind: component
+  role: test
+  description: test -> accepted library component
+  id: P3-R04
+- kind: component
+  role: packaging
+  description: packaging -> accepted library component
+  id: P3-R05
+- kind: value
+  role: assembly
+  field: process_time
+  expect: 90
+  description: assembly 90 s
+  raw: 1.5
+  unit_sensitive: true
+  id: P3-R06
+- kind: value
+  role: buffer
+  field: capacity
+  expect: 4
+  description: buffer 4
+  id: P3-R07
+- kind: value
+  role: test
+  field: process_time
+  expect: 120
+  description: test 120 s
+  raw: 2
+  unit_sensitive: true
+  id: P3-R08
+- kind: value
+  role: packaging
+  field: process_time
+  expect: 40
+  description: packing 40 s
+  id: P3-R09
+- kind: shared_resource
+  roles:
+  - assembly
+  - packaging
+  distinct_from:
+  - test
+  description: assembler does assembly+packing; technician (another resource) does the test
+  id: P3-R10
+- kind: value
+  role: test
+  field: operator_quantity
+  expect: 1
+  description: one technician
+  id: P3-R11
+- kind: value
+  role: assembly
+  field: operator_quantity
+  expect: 1
+  description: one assembler
+  id: P3-R12
+- kind: strategy
+  operator_of: assembly
+  rule: unspecified
+  severity: MAJOR
+  description: no rule invented
+  id: P3-R13
+- kind: value
+  target: horizon
+  expect: 28800
+  description: horizon 8 h
+  severity: MAJOR
+  id: P3-R14
+- kind: supply
+  expect: infinite
+  description: unlimited supply
+  severity: MAJOR
+  id: P3-R15

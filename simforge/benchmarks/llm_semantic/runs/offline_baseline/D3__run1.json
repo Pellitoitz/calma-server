@@ -1,0 +1,678 @@
+{
+ "case": "D3",
+ "family": "D_CONTRADICTION",
+ "schema_valid": true,
+ "compiles": true,
+ "verifier_status": "EXECUTABLE",
+ "error": null,
+ "semantically_correct": false,
+ "wall_s": 0.006,
+ "interpreter": "offline-rules",
+ "draft": {
+  "model_name": "Manual assembly → Inspection → Machine",
+  "horizon_value": 8.0,
+  "horizon_unit": "h",
+  "supply": "infinite",
+  "interarrival": null,
+  "resources": [
+   {
+    "id": "operator_1",
+    "name": "Operario",
+    "kind": "operator",
+    "quantity": null,
+    "walking_speed_m_s": null
+   }
+  ],
+  "steps": [
+   {
+    "id": "manual_assembly",
+    "name": "Manual assembly",
+    "component": "manual_assembly",
+    "time": {
+     "dist": "constant",
+     "value": 60.0,
+     "low": null,
+     "mode": null,
+     "high": null,
+     "mean": null,
+     "std": null,
+     "unit": "s"
+    },
+    "capacity": null,
+    "resources": [
+     "operator_1"
+    ],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   },
+   {
+    "id": "inspection",
+    "name": "Inspection",
+    "component": "inspection",
+    "time": {
+     "dist": "constant",
+     "value": 20.0,
+     "low": null,
+     "mode": null,
+     "high": null,
+     "mean": null,
+     "std": null,
+     "unit": "s"
+    },
+    "capacity": null,
+    "resources": [],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   },
+   {
+    "id": "buffer_1",
+    "name": "Buffer 1",
+    "component": "buffer",
+    "time": null,
+    "capacity": 5,
+    "resources": [],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   },
+   {
+    "id": "machine",
+    "name": "Machine",
+    "component": "machine",
+    "time": {
+     "dist": "constant",
+     "value": 45.0,
+     "low": null,
+     "mode": null,
+     "high": null,
+     "mean": null,
+     "std": null,
+     "unit": "s"
+    },
+    "capacity": null,
+    "resources": [],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   }
+  ],
+  "policies": [],
+  "carrier_loops": [],
+  "experiments": [],
+  "missing_information": [],
+  "assumptions": [],
+  "confidence_notes": [
+   "Interpretado por el intérprete OFFLINE (reglas deterministas ES/EN)."
+  ],
+  "items": null,
+  "custom_rules": [],
+  "unparsed": [],
+  "layout_known": false
+ },
+ "model": {
+  "isms_version": "0.1",
+  "meta": {
+   "name": "Manual assembly → Inspection → Machine",
+   "description": "Fuente infinita. Un único operario hace el montaje (60 s por pieza) y la inspección (20 s por pieza). Entre el montaje y la máquina hay un buffer de 5 piezas; la máquina tarda 45 s por pieza. En esta línea trabajan dos operarios. Simular 8 horas.",
+   "tags": [],
+   "domain": null,
+   "origin": "ai_generated",
+   "generated_by": {
+    "interpreter": "offline-rules",
+    "prompt_version": "offline_rules_v2",
+    "compiler": "compiler_v2",
+    "prototype_mode": false,
+    "at": "2026-10-02T06:00:13+00:00"
+   }
+  },
+  "simulation": {
+   "horizon": {
+    "value": 8.0,
+    "unit": "h",
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": null
+    }
+   },
+   "warmup": {
+    "value": 0.0,
+    "unit": "s",
+    "provenance": null
+   },
+   "kind": "terminating",
+   "replications": 1,
+   "base_seed": 12345,
+   "trace": false,
+   "dispatch_timing": "end_of_timestep",
+   "check_invariants": true
+  },
+  "entities": [
+   {
+    "id": "unit",
+    "name": "Unit",
+    "description": ""
+   }
+  ],
+  "parameters": [
+   {
+    "id": "manual_assembly_time",
+    "value": 60.0,
+    "unit": "s",
+    "description": "Tiempo de 'Manual assembly'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "inspection_time",
+    "value": 20.0,
+    "unit": "s",
+    "description": "Tiempo de 'Inspection'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "buffer_1_capacity",
+    "value": 5.0,
+    "unit": "units",
+    "description": "Capacidad de 'Buffer 1'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "machine_time",
+    "value": 45.0,
+    "unit": "s",
+    "description": "Tiempo de 'Machine'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "operator_1_count",
+    "value": 1.0,
+    "unit": "units",
+    "description": "Número de Operario",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "assumed",
+     "source": "assumed",
+     "note": "quantity not stated",
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   }
+  ],
+  "resources": [
+   {
+    "id": "operator_1",
+    "name": "Operario",
+    "kind": "operator",
+    "quantity": "$operator_1_count",
+    "dispatch": "fifo",
+    "wip_target": null,
+    "travel": null,
+    "home": null,
+    "cost_per_hour": null,
+    "provenance": null
+   }
+  ],
+  "nodes": [
+   {
+    "id": "source",
+    "name": "Source",
+    "component": "source",
+    "component_version": null,
+    "params": {
+     "arrival": "infinite"
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "manual_assembly",
+    "name": "Manual assembly",
+    "component": "manual_assembly",
+    "component_version": "1.0.0",
+    "params": {
+     "process_time": {
+      "dist": "constant",
+      "unit": "s",
+      "value": "$manual_assembly_time"
+     },
+     "resources": [
+      {
+       "resource": "operator_1"
+      }
+     ]
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "inspection",
+    "name": "Inspection",
+    "component": "inspection",
+    "component_version": "1.0.0",
+    "params": {
+     "process_time": {
+      "dist": "constant",
+      "unit": "s",
+      "value": "$inspection_time"
+     }
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "buffer_1",
+    "name": "Buffer 1",
+    "component": "buffer",
+    "component_version": "1.0.0",
+    "params": {
+     "capacity": "$buffer_1_capacity"
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "machine",
+    "name": "Machine",
+    "component": "machine",
+    "component_version": "1.0.0",
+    "params": {
+     "process_time": {
+      "dist": "constant",
+      "unit": "s",
+      "value": "$machine_time"
+     }
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "sink",
+    "name": "Sink",
+    "component": "sink",
+    "component_version": null,
+    "params": {},
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   }
+  ],
+  "edges": [
+   {
+    "source": "source",
+    "target": "manual_assembly",
+    "probability": null
+   },
+   {
+    "source": "manual_assembly",
+    "target": "inspection",
+    "probability": null
+   },
+   {
+    "source": "inspection",
+    "target": "buffer_1",
+    "probability": null
+   },
+   {
+    "source": "buffer_1",
+    "target": "machine",
+    "probability": null
+   },
+   {
+    "source": "machine",
+    "target": "sink",
+    "probability": null
+   }
+  ],
+  "assumptions": [
+   {
+    "id": "a1",
+    "text": "Se asume 1 unidad de 'Operario' (no se indicó cantidad).",
+    "path": "parameters.operator_1_count.value",
+    "origin": "ai",
+    "accepted": false
+   }
+  ],
+  "missing": [],
+  "approval": {
+   "approved": false,
+   "by": null,
+   "at": null,
+   "model_hash": null,
+   "note": ""
+  },
+  "experiments": [],
+  "custom_rule_candidates": []
+ },
+ "questions": [],
+ "assumptions": [
+  "Se asume 1 unidad de 'Operario' (no se indicó cantidad)."
+ ],
+ "custom_rules": [],
+ "unparsed": [],
+ "confidence_notes_dropped_by_compiler": [
+  "Interpretado por el intérprete OFFLINE (reglas deterministas ES/EN)."
+ ],
+ "evaluation": {
+  "case": "D3",
+  "results": [
+   {
+    "case": "D3",
+    "req": "D3-R01",
+    "kind": "flow",
+    "metric": "TOPOLOGY",
+    "description": "topology: the text does not say whether inspection is before or after the machine (case design flaw found while validating the harness; kept as written, excluded from accuracy)",
+    "status": "WRONG",
+    "error_type": "TOPOLOGY_ERROR",
+    "severity": "CRITICAL",
+    "detail": "[GOLD_REQUIRES_ENGINEER_REVIEW: not counted] missing roles [] (flagged: []); order WRONG; extra nodes []",
+    "evaluated": false,
+    "unit_sensitive": false
+   },
+   {
+    "case": "D3",
+    "req": "D3-R02",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "assembly -> accepted library component",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "manual_assembly = manual_assembly",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "D3",
+    "req": "D3-R03",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "buffer -> accepted library component",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "buffer_1 = buffer",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "D3",
+    "req": "D3-R04",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "machine -> accepted library component",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "machine = machine",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "D3",
+    "req": "D3-R05",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "inspection -> accepted library component",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "inspection = inspection",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "D3",
+    "req": "D3-R06",
+    "kind": "conflict",
+    "metric": "CONFLICT_DETECTION",
+    "description": "one operator vs two operators -> ASK",
+    "status": "WRONG",
+    "error_type": "CONTRADICTION_NOT_DETECTED",
+    "severity": "CRITICAL",
+    "detail": "model uses 1.0 (assumed); silent choice",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "D3",
+    "req": "D3-R07",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "assembly 60 s",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "manual_assembly: 60.0 s x 1 = 60.0 s per entity",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "D3",
+    "req": "D3-R08",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "buffer 5",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "buffer_1: 5.0",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "D3",
+    "req": "D3-R09",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "machine 45 s",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "machine: 45.0 s x 1 = 45.0 s per entity",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "D3",
+    "req": "D3-R10",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "inspection 20 s",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "inspection: 20.0 s x 1 = 20.0 s per entity",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "D3",
+    "req": "D3-R11",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "horizon 8 h",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "simulation.horizon: 28800.0",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "D3",
+    "req": "D3-R12",
+    "kind": "supply",
+    "metric": "PARAMETER_VALUE",
+    "description": "unlimited supply",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "infinite",
+    "evaluated": true,
+    "unit_sensitive": false
+   }
+  ],
+  "grounding": [
+   {
+    "parameter": "manual_assembly_time",
+    "value": 60.0,
+    "unit": "s",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "inspection_time",
+    "value": 20.0,
+    "unit": "s",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "buffer_1_capacity",
+    "value": 5.0,
+    "unit": "units",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "machine_time",
+    "value": 45.0,
+    "unit": "s",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "operator_1_count",
+    "value": 1.0,
+    "unit": "units",
+    "status": "ASSUMED",
+    "grounded": true,
+    "verdict": "OK"
+   }
+  ],
+  "role_map": {
+   "assembly": "manual_assembly",
+   "buffer": "buffer_1",
+   "machine": "machine",
+   "inspection": "inspection"
+  },
+  "semantically_correct": false
+ },
+ "llm_calls": [],
+ "repeat": 1,
+ "signature": {
+  "topology": [
+   "source",
+   "manual_assembly",
+   "inspection",
+   "buffer",
+   "machine",
+   "sink"
+  ],
+  "components": {
+   "assembly": "manual_assembly",
+   "buffer": "buffer",
+   "machine": "machine",
+   "inspection": "inspection"
+  },
+  "loose_roles": [],
+  "requirements": {
+   "D3-R01": "WRONG",
+   "D3-R02": "CORRECT",
+   "D3-R03": "CORRECT",
+   "D3-R04": "CORRECT",
+   "D3-R05": "CORRECT",
+   "D3-R06": "WRONG",
+   "D3-R07": "CORRECT",
+   "D3-R08": "CORRECT",
+   "D3-R09": "CORRECT",
+   "D3-R10": "CORRECT",
+   "D3-R11": "CORRECT",
+   "D3-R12": "CORRECT"
+  },
+  "missing": [],
+  "assumption_paths": [
+   "parameters.operator_1_count.value"
+  ],
+  "custom_rules": 0
+ }
+}

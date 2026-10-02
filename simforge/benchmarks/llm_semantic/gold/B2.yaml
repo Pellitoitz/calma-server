@@ -1,0 +1,199 @@
+id: B2
+gold_source: explicit spec
+gold_status: VALID
+roles:
+- role: printer
+  accept:
+  - screen_printer
+  keywords:
+  - serigraf
+  - printer
+- role: buffer_1
+  accept:
+  - buffer
+  keywords:
+  - buffer
+  - cola
+  - pulmon
+  - estanteria
+  - queue
+  - almacen
+- role: pnp
+  accept:
+  - pick_and_place
+  keywords:
+  - pick
+  - coloca
+- role: buffer_2
+  accept:
+  - buffer
+  keywords:
+  - buffer
+  - cola
+  - pulmon
+  - estanteria
+  - queue
+  - almacen
+- role: reflow
+  accept:
+  - reflow
+  keywords:
+  - reflow
+  - horno
+- role: buffer_3
+  accept:
+  - buffer
+  keywords:
+  - buffer
+  - cola
+  - pulmon
+  - estanteria
+  - queue
+  - almacen
+- role: aoi
+  accept:
+  - aoi
+  - inspection
+  keywords:
+  - aoi
+  - optica
+requirements:
+- kind: flow
+  description: topology in flow order
+  id: B2-R01
+- kind: component
+  role: printer
+  description: printer -> accepted library component
+  id: B2-R02
+- kind: component
+  role: buffer_1
+  description: buffer_1 -> accepted library component
+  id: B2-R03
+- kind: component
+  role: pnp
+  description: pnp -> accepted library component
+  id: B2-R04
+- kind: component
+  role: buffer_2
+  description: buffer_2 -> accepted library component
+  id: B2-R05
+- kind: component
+  role: reflow
+  description: reflow -> accepted library component
+  id: B2-R06
+- kind: component
+  role: buffer_3
+  description: buffer_3 -> accepted library component
+  id: B2-R07
+- kind: component
+  role: aoi
+  description: aoi -> accepted library component
+  id: B2-R08
+- kind: value
+  role: printer
+  field: process_time
+  expect: 120
+  description: printer 2 min PER_PANEL
+  raw: 2
+  unit_sensitive: true
+  per: per_entity
+  items: 6
+  id: B2-R09
+- kind: basis
+  role: printer
+  expect: per_entity
+  description: printer per panel
+  id: B2-R10
+- kind: value
+  role: pnp
+  field: process_time
+  expect: 15
+  description: pick&place 15 s PER_BOARD
+  per: per_item
+  items: 6
+  id: B2-R11
+- kind: basis
+  role: pnp
+  expect: per_item
+  description: pick&place per board
+  id: B2-R12
+- kind: value
+  role: reflow
+  field: process_time
+  expect: 240
+  description: reflow 4 min PER_PANEL
+  raw: 4
+  unit_sensitive: true
+  per: per_entity
+  items: 6
+  id: B2-R13
+- kind: basis
+  role: reflow
+  expect: per_entity
+  description: reflow per panel
+  id: B2-R14
+- kind: value
+  role: aoi
+  field: process_time
+  expect: 1.5
+  description: AOI 1500 ms PER_BOARD
+  raw: 1500
+  unit_sensitive: true
+  per: per_item
+  items: 6
+  id: B2-R15
+- kind: basis
+  role: aoi
+  expect: per_item
+  description: AOI per board
+  id: B2-R16
+- kind: value
+  target: items_per_entity
+  expect: 6
+  description: 6 boards per panel
+  id: B2-R17
+- kind: value
+  role: buffer_1
+  field: capacity
+  expect: 2
+  description: buffer 1 = 2 panels
+  id: B2-R18
+- kind: value
+  role: buffer_2
+  field: capacity
+  expect: 2
+  description: buffer 2 = 2 panels
+  id: B2-R19
+- kind: value
+  role: buffer_3
+  field: capacity
+  expect: 2
+  description: buffer 3 = 2 panels
+  id: B2-R20
+- kind: no_resource
+  role: printer
+  description: printer automatic
+  id: B2-R21
+- kind: no_resource
+  role: pnp
+  description: pnp automatic
+  id: B2-R22
+- kind: no_resource
+  role: reflow
+  description: reflow automatic
+  id: B2-R23
+- kind: no_resource
+  role: aoi
+  description: aoi automatic
+  id: B2-R24
+- kind: value
+  target: horizon
+  expect: 28800
+  description: horizon 8 h
+  severity: MAJOR
+  id: B2-R25
+- kind: supply
+  expect: infinite
+  description: unlimited supply
+  severity: MAJOR
+  id: B2-R26

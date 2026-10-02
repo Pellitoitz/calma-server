@@ -1,0 +1,107 @@
+id: E2
+gold_source: explicit spec
+gold_status: VALID
+roles:
+- role: assembly
+  accept:
+  - manual_assembly
+  - manual_process
+  keywords:
+  - montaje
+  - monta
+  - assembl
+  - ensambl
+  - carga
+  - coloca
+- role: buffer
+  accept:
+  - buffer
+  keywords:
+  - buffer
+  - cola
+  - pulmon
+  - estanteria
+  - queue
+  - almacen
+- role: selective
+  accept:
+  - selective_soldering
+  keywords:
+  - selectiva
+  - selective
+- role: review
+  accept:
+  - inspection
+  - cleaning
+  keywords:
+  - revis
+  - inspecc
+  - limpi
+  - review
+requirements:
+- kind: unsupported
+  keywords:
+  - solo
+  - al menos dos
+  - esperando
+  - revis
+  - mientras
+  - montando
+  min_hits: 3
+  description: behaviour not representable with library rules -> CustomRuleCandidate / flagged, never approximated
+  id: E2-R01
+- kind: flow
+  description: topology in flow order
+  id: E2-R02
+- kind: component
+  role: assembly
+  description: assembly -> accepted library component
+  id: E2-R03
+- kind: component
+  role: buffer
+  description: buffer -> accepted library component
+  id: E2-R04
+- kind: component
+  role: selective
+  description: selective -> accepted library component
+  id: E2-R05
+- kind: component
+  role: review
+  description: review -> accepted library component
+  id: E2-R06
+- kind: value
+  role: assembly
+  field: process_time
+  expect: 120
+  description: assembly 120 s
+  id: E2-R07
+- kind: value
+  role: buffer
+  field: capacity
+  expect: 3
+  description: buffer 3
+  id: E2-R08
+- kind: value
+  role: selective
+  field: process_time
+  expect: 30
+  description: selective 30 s
+  id: E2-R09
+- kind: value
+  role: review
+  field: process_time
+  expect: 60
+  description: review 60 s
+  id: E2-R10
+- kind: shared_resource
+  roles:
+  - assembly
+  - review
+  description: same operator
+  id: E2-R11
+- kind: value
+  target: horizon
+  expect: 28800
+  description: horizon 8 h
+  severity: MAJOR
+  id: E2-R12

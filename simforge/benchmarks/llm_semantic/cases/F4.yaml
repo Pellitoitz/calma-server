@@ -1,0 +1,7 @@
+id: F4
+family: F_REALISTIC
+title: Breakdowns (not in the interpretation schema)
+purpose: Failures MTBF/MTTR must be flagged.
+text: La prensa estampa cada pieza en 55 s. Las piezas pasan a un buffer de 10 y luego a un banco de test de 50 s por pieza;
+  el 3 % se rechaza y se tira. La prensa se avería de media cada 2 horas y tarda unos 10 minutos en repararse. Material siempre
+  disponible. Simular 40 horas.

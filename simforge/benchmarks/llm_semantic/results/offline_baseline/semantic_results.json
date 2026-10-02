@@ -1,0 +1,992 @@
+{
+ "meta": {
+  "label": "offline_baseline",
+  "provider": "offline",
+  "model": "offline-rules",
+  "started_at": "2026-10-02T06:00:12+00:00",
+  "frozen": true,
+  "unfrozen_files": [],
+  "commit": "cae03a9ebdf9162a0f24b7fce2a36cc8499ec851",
+  "process_parser_version": "process_parser_v1",
+  "compiler_version": "compiler_v2",
+  "isms_version": "0.1",
+  "engine_version": "0.3.0",
+  "library_version": {
+   "components": {
+    "aoi": "1.0.0",
+    "buffer": "1.0.0",
+    "cleaning": "1.0.0",
+    "coating": "1.0.0",
+    "functional_test": "1.0.0",
+    "ict": "1.0.0",
+    "inspection": "1.0.0",
+    "machine": "1.0.0",
+    "manual_assembly": "1.0.0",
+    "manual_insertion": "1.0.0",
+    "manual_process": "1.0.0",
+    "packaging": "1.0.0",
+    "pick_and_place": "1.0.0",
+    "rack_transport": "1.0.0",
+    "reflow": "1.0.0",
+    "rework": "1.0.0",
+    "router": "1.0.0",
+    "screen_printer": "1.0.0",
+    "selective_soldering": "1.0.0",
+    "sink": "1.0.0",
+    "source": "1.0.0",
+    "spi": "1.0.0",
+    "test_station": "1.0.0",
+    "transport": "1.0.0",
+    "transport_delay": "1.0.0",
+    "wave_soldering": "1.0.0"
+   },
+   "content_hash": "113651d59b39991a"
+  },
+  "rules_library_version": {
+   "rules": {
+    "shared_operator": "1.0.0",
+    "carrier": "1.0.0",
+    "fifo": "1.0.0",
+    "static_priority": "1.0.0",
+    "wip_target_priority": "1.0.0"
+   },
+   "content_hash": "c1fa3e27bf29429b"
+  },
+  "anthropic_sdk_version": "1.9.0",
+  "python": "3.11.15",
+  "finished_at": "2026-10-02T06:00:13+00:00"
+ },
+ "metrics": {
+  "SEMANTIC_REQUIREMENT_ACCURACY": {
+   "value": 0.6946,
+   "num": 257,
+   "den": 370
+  },
+  "SCHEMA_VALID_RATE": {
+   "value": 1.0,
+   "num": 24,
+   "den": 24
+  },
+  "COMPILE_RATE": {
+   "value": 1.0,
+   "num": 24,
+   "den": 24
+  },
+  "EXECUTABLE_RATE": {
+   "value": 0.3333,
+   "num": 8,
+   "den": 24
+  },
+  "SEMANTICALLY_CORRECT_RUNS": {
+   "value": 0.1667,
+   "num": 4,
+   "den": 24
+  },
+  "INVENTED_DATA_RATE": {
+   "value": 0.0,
+   "num": 0,
+   "den": 113
+  },
+  "SILENT_OMISSION_RATE": {
+   "value": 0.0919,
+   "num": 34,
+   "den": 370
+  },
+  "MISSING_DETECTION_RECALL": {
+   "value": 1.0,
+   "num": 7,
+   "den": 7
+  },
+  "AMBIGUITY_DETECTION_RATE": {
+   "value": 0.0,
+   "num": 0,
+   "den": 1
+  },
+  "CONFLICT_DETECTION_RATE": {
+   "value": 0.0,
+   "num": 0,
+   "den": 4
+  },
+  "UNSUPPORTED_RULE_DETECTION_RATE": {
+   "value": 0.6667,
+   "num": 4,
+   "den": 6
+  },
+  "COMPONENT_MATCH_ACCURACY": {
+   "value": 0.8469,
+   "num": 83,
+   "den": 98
+  },
+  "TOPOLOGY_ACCURACY": {
+   "value": 0.4091,
+   "num": 9,
+   "den": 22
+  },
+  "PARAMETER_VALUE_ACCURACY": {
+   "value": 0.6879,
+   "num": 119,
+   "den": 173
+  },
+  "UNIT_ACCURACY": {
+   "value": 0.4,
+   "num": 4,
+   "den": 10
+  },
+  "SEMANTIC_BASIS_ACCURACY": {
+   "value": 0.3571,
+   "num": 5,
+   "den": 14
+  },
+  "RESOURCE_ASSIGNMENT_ACCURACY": {
+   "value": 0.75,
+   "num": 21,
+   "den": 28
+  },
+  "STRATEGY_ACCURACY": {
+   "value": 0.6364,
+   "num": 7,
+   "den": 11
+  },
+  "CARRIER_SEMANTICS_ACCURACY": {
+   "value": 0.2,
+   "num": 1,
+   "den": 5
+  },
+  "ROUTING_ACCURACY": {
+   "value": 1.0,
+   "num": 1,
+   "den": 1
+  }
+ },
+ "severity_counts": {
+  "CRITICAL": 93,
+  "MINOR": 14,
+  "MAJOR": 6
+ },
+ "error_types": {
+  "COMPONENT_MATCH_ERROR": 9,
+  "TOPOLOGY_ERROR": 13,
+  "FALSE_MISSING": 14,
+  "SILENT_OMISSION": 34,
+  "RESOURCE_ASSIGNMENT_ERROR": 6,
+  "STRATEGY_ERROR": 4,
+  "SEMANTIC_BASIS_ERROR": 15,
+  "CARRIER_SEMANTICS_ERROR": 4,
+  "PARAMETER_VALUE_ERROR": 9,
+  "AMBIGUITY_NOT_DETECTED": 1,
+  "CONTRADICTION_NOT_DETECTED": 4
+ },
+ "by_family": {
+  "A_PARAPHRASE": {
+   "evaluated": 60,
+   "positive": 44,
+   "CRITICAL": 13,
+   "MAJOR": 1,
+   "MINOR": 2
+  },
+  "B_UNITS_BASIS": {
+   "evaluated": 81,
+   "positive": 49,
+   "CRITICAL": 24,
+   "MAJOR": 2,
+   "MINOR": 6
+  },
+  "C_MISSING_AMBIGUITY": {
+   "evaluated": 66,
+   "positive": 54,
+   "CRITICAL": 12,
+   "MAJOR": 0,
+   "MINOR": 0
+  },
+  "D_CONTRADICTION": {
+   "evaluated": 54,
+   "positive": 41,
+   "CRITICAL": 8,
+   "MAJOR": 1,
+   "MINOR": 4
+  },
+  "E_UNSUPPORTED_RULE": {
+   "evaluated": 46,
+   "positive": 39,
+   "CRITICAL": 7,
+   "MAJOR": 0,
+   "MINOR": 0
+  },
+  "F_REALISTIC": {
+   "evaluated": 63,
+   "positive": 30,
+   "CRITICAL": 29,
+   "MAJOR": 2,
+   "MINOR": 2
+  }
+ },
+ "matrix": [
+  {
+   "case": "A1",
+   "family": "A_PARAPHRASE",
+   "schema": true,
+   "compile": true,
+   "verify": "EXECUTABLE",
+   "semantic": false,
+   "requirements_ok": 13,
+   "requirements": 15,
+   "critical": 2,
+   "major": 0,
+   "minor": 0
+  },
+  {
+   "case": "A2",
+   "family": "A_PARAPHRASE",
+   "schema": true,
+   "compile": true,
+   "verify": "INCOMPLETE",
+   "semantic": false,
+   "requirements_ok": 7,
+   "requirements": 15,
+   "critical": 5,
+   "major": 1,
+   "minor": 2
+  },
+  {
+   "case": "A3",
+   "family": "A_PARAPHRASE",
+   "schema": true,
+   "compile": true,
+   "verify": "CONFIGURED",
+   "semantic": false,
+   "requirements_ok": 9,
+   "requirements": 15,
+   "critical": 6,
+   "major": 0,
+   "minor": 0
+  },
+  {
+   "case": "A4",
+   "family": "A_PARAPHRASE",
+   "schema": true,
+   "compile": true,
+   "verify": "EXECUTABLE",
+   "semantic": true,
+   "requirements_ok": 15,
+   "requirements": 15,
+   "critical": 0,
+   "major": 0,
+   "minor": 0
+  },
+  {
+   "case": "B1",
+   "family": "B_UNITS_BASIS",
+   "schema": true,
+   "compile": true,
+   "verify": "INCOMPLETE",
+   "semantic": false,
+   "requirements_ok": 13,
+   "requirements": 20,
+   "critical": 7,
+   "major": 0,
+   "minor": 0
+  },
+  {
+   "case": "B2",
+   "family": "B_UNITS_BASIS",
+   "schema": true,
+   "compile": true,
+   "verify": "INCOMPLETE",
+   "semantic": false,
+   "requirements_ok": 16,
+   "requirements": 26,
+   "critical": 9,
+   "major": 0,
+   "minor": 1
+  },
+  {
+   "case": "B3",
+   "family": "B_UNITS_BASIS",
+   "schema": true,
+   "compile": true,
+   "verify": "INCOMPLETE",
+   "semantic": false,
+   "requirements_ok": 11,
+   "requirements": 21,
+   "critical": 4,
+   "major": 1,
+   "minor": 5
+  },
+  {
+   "case": "B4",
+   "family": "B_UNITS_BASIS",
+   "schema": true,
+   "compile": true,
+   "verify": "EXECUTABLE",
+   "semantic": false,
+   "requirements_ok": 9,
+   "requirements": 14,
+   "critical": 4,
+   "major": 1,
+   "minor": 0
+  },
+  {
+   "case": "C1",
+   "family": "C_MISSING_AMBIGUITY",
+   "schema": true,
+   "compile": true,
+   "verify": "INCOMPLETE",
+   "semantic": false,
+   "requirements_ok": 11,
+   "requirements": 19,
+   "critical": 8,
+   "major": 0,
+   "minor": 0
+  },
+  {
+   "case": "C2",
+   "family": "C_MISSING_AMBIGUITY",
+   "schema": true,
+   "compile": true,
+   "verify": "INCOMPLETE",
+   "semantic": false,
+   "requirements_ok": 18,
+   "requirements": 19,
+   "critical": 1,
+   "major": 0,
+   "minor": 0
+  },
+  {
+   "case": "C3",
+   "family": "C_MISSING_AMBIGUITY",
+   "schema": true,
+   "compile": true,
+   "verify": "INCOMPLETE",
+   "semantic": false,
+   "requirements_ok": 12,
+   "requirements": 15,
+   "critical": 3,
+   "major": 0,
+   "minor": 0
+  },
+  {
+   "case": "C4",
+   "family": "C_MISSING_AMBIGUITY",
+   "schema": true,
+   "compile": true,
+   "verify": "INCOMPLETE",
+   "semantic": true,
+   "requirements_ok": 13,
+   "requirements": 13,
+   "critical": 0,
+   "major": 0,
+   "minor": 0
+  },
+  {
+   "case": "D1",
+   "family": "D_CONTRADICTION",
+   "schema": true,
+   "compile": true,
+   "verify": "EXECUTABLE",
+   "semantic": false,
+   "requirements_ok": 11,
+   "requirements": 13,
+   "critical": 2,
+   "major": 0,
+   "minor": 0
+  },
+  {
+   "case": "D2",
+   "family": "D_CONTRADICTION",
+   "schema": true,
+   "compile": true,
+   "verify": "INCOMPLETE",
+   "semantic": false,
+   "requirements_ok": 10,
+   "requirements": 12,
+   "critical": 2,
+   "major": 0,
+   "minor": 0
+  },
+  {
+   "case": "D3",
+   "family": "D_CONTRADICTION",
+   "schema": true,
+   "compile": true,
+   "verify": "EXECUTABLE",
+   "semantic": false,
+   "requirements_ok": 10,
+   "requirements": 11,
+   "critical": 1,
+   "major": 0,
+   "minor": 0
+  },
+  {
+   "case": "D4",
+   "family": "D_CONTRADICTION",
+   "schema": true,
+   "compile": true,
+   "verify": "INCOMPLETE",
+   "semantic": false,
+   "requirements_ok": 10,
+   "requirements": 18,
+   "critical": 3,
+   "major": 1,
+   "minor": 4
+  },
+  {
+   "case": "E1",
+   "family": "E_UNSUPPORTED_RULE",
+   "schema": true,
+   "compile": true,
+   "verify": "CONFIGURED",
+   "semantic": false,
+   "requirements_ok": 9,
+   "requirements": 12,
+   "critical": 3,
+   "major": 0,
+   "minor": 0
+  },
+  {
+   "case": "E2",
+   "family": "E_UNSUPPORTED_RULE",
+   "schema": true,
+   "compile": true,
+   "verify": "INCOMPLETE",
+   "semantic": false,
+   "requirements_ok": 8,
+   "requirements": 12,
+   "critical": 4,
+   "major": 0,
+   "minor": 0
+  },
+  {
+   "case": "E3",
+   "family": "E_UNSUPPORTED_RULE",
+   "schema": true,
+   "compile": true,
+   "verify": "CONFIGURED",
+   "semantic": true,
+   "requirements_ok": 11,
+   "requirements": 11,
+   "critical": 0,
+   "major": 0,
+   "minor": 0
+  },
+  {
+   "case": "E4",
+   "family": "E_UNSUPPORTED_RULE",
+   "schema": true,
+   "compile": true,
+   "verify": "EXECUTABLE",
+   "semantic": true,
+   "requirements_ok": 11,
+   "requirements": 11,
+   "critical": 0,
+   "major": 0,
+   "minor": 0
+  },
+  {
+   "case": "F1",
+   "family": "F_REALISTIC",
+   "schema": true,
+   "compile": true,
+   "verify": "INCOMPLETE",
+   "semantic": false,
+   "requirements_ok": 6,
+   "requirements": 26,
+   "critical": 18,
+   "major": 0,
+   "minor": 2
+  },
+  {
+   "case": "F2",
+   "family": "F_REALISTIC",
+   "schema": true,
+   "compile": true,
+   "verify": "INCOMPLETE",
+   "semantic": false,
+   "requirements_ok": 6,
+   "requirements": 11,
+   "critical": 5,
+   "major": 0,
+   "minor": 0
+  },
+  {
+   "case": "F3",
+   "family": "F_REALISTIC",
+   "schema": true,
+   "compile": true,
+   "verify": "EXECUTABLE",
+   "semantic": false,
+   "requirements_ok": 10,
+   "requirements": 15,
+   "critical": 3,
+   "major": 2,
+   "minor": 0
+  },
+  {
+   "case": "F4",
+   "family": "F_REALISTIC",
+   "schema": true,
+   "compile": true,
+   "verify": "EXECUTABLE",
+   "semantic": false,
+   "requirements_ok": 8,
+   "requirements": 11,
+   "critical": 3,
+   "major": 0,
+   "minor": 0
+  }
+ ],
+ "valid_but_wrong": [
+  {
+   "case": "A1",
+   "verifier": "EXECUTABLE",
+   "wrong_requirements": [
+    {
+     "req": "A1-R02",
+     "description": "assembly -> accepted library component",
+     "status": "WRONG",
+     "error": "COMPONENT_MATCH_ERROR",
+     "severity": "CRITICAL",
+     "ease": "EASY_TO_NOTICE",
+     "detail": "step present as 'machine' (machine); expected one of ['manual_assembly', 'manual_process']"
+    },
+    {
+     "req": "A1-R05",
+     "description": "inspection -> accepted library component",
+     "status": "WRONG",
+     "error": "COMPONENT_MATCH_ERROR",
+     "severity": "CRITICAL",
+     "ease": "EASY_TO_NOTICE",
+     "detail": "step present as 'machine' (machine_3); expected one of ['inspection']"
+    }
+   ],
+   "hard_to_notice": false
+  },
+  {
+   "case": "B4",
+   "verifier": "EXECUTABLE",
+   "wrong_requirements": [
+    {
+     "req": "B4-R04",
+     "description": "packaging -> accepted library component",
+     "status": "WRONG",
+     "error": "COMPONENT_MATCH_ERROR",
+     "severity": "CRITICAL",
+     "ease": "EASY_TO_NOTICE",
+     "detail": "step present as 'wave_soldering' (wave_soldering); expected one of ['packaging']"
+    },
+    {
+     "req": "B4-R07",
+     "description": "packaging 3 s PER_PIECE",
+     "status": "WRONG",
+     "error": "SEMANTIC_BASIS_ERROR",
+     "severity": "CRITICAL",
+     "ease": "HARD_TO_NOTICE",
+     "detail": "3.0 s x 1 = 3.0 s per entity; expected 30.0 (3.0 per_item, x10)"
+    },
+    {
+     "req": "B4-R08",
+     "description": "packaging per piece",
+     "status": "WRONG",
+     "error": "SEMANTIC_BASIS_ERROR",
+     "severity": "CRITICAL",
+     "ease": "HARD_TO_NOTICE",
+     "detail": "expected per_item, model per_entity (work_units=1); time per entity CHANGED"
+    },
+    {
+     "req": "B4-R09",
+     "description": "10 pieces per box",
+     "status": "OMITTED",
+     "error": "SILENT_OMISSION",
+     "severity": "CRITICAL",
+     "ease": "MODERATE_TO_NOTICE",
+     "detail": "NO_PARAM (-)"
+    },
+    {
+     "req": "B4-R13",
+     "description": "7.5 h",
+     "status": "WRONG",
+     "error": "PARAMETER_VALUE_ERROR",
+     "severity": "MAJOR",
+     "ease": "MODERATE_TO_NOTICE",
+     "detail": "simulation.horizon: 28800.0 != 27000.0"
+    }
+   ],
+   "hard_to_notice": true
+  },
+  {
+   "case": "D1",
+   "verifier": "EXECUTABLE",
+   "wrong_requirements": [
+    {
+     "req": "D1-R06",
+     "description": "capacity 5 vs 3 -> ASK",
+     "status": "WRONG",
+     "error": "CONTRADICTION_NOT_DETECTED",
+     "severity": "CRITICAL",
+     "ease": "HARD_TO_NOTICE",
+     "detail": "model uses 5.0 (provided_by_client); silent choice"
+    },
+    {
+     "req": "D1-R10",
+     "description": "4 racks",
+     "status": "WRONG",
+     "error": "PARAMETER_VALUE_ERROR",
+     "severity": "CRITICAL",
+     "ease": "MODERATE_TO_NOTICE",
+     "detail": "carrier: 3.0 != 4.0"
+    }
+   ],
+   "hard_to_notice": true
+  },
+  {
+   "case": "D3",
+   "verifier": "EXECUTABLE",
+   "wrong_requirements": [
+    {
+     "req": "D3-R06",
+     "description": "one operator vs two operators -> ASK",
+     "status": "WRONG",
+     "error": "CONTRADICTION_NOT_DETECTED",
+     "severity": "CRITICAL",
+     "ease": "HARD_TO_NOTICE",
+     "detail": "model uses 1.0 (assumed); silent choice"
+    }
+   ],
+   "hard_to_notice": true
+  },
+  {
+   "case": "F3",
+   "verifier": "EXECUTABLE",
+   "wrong_requirements": [
+    {
+     "req": "F3-R05",
+     "description": "packaging -> accepted library component",
+     "status": "WRONG",
+     "error": "COMPONENT_MATCH_ERROR",
+     "severity": "CRITICAL",
+     "ease": "EASY_TO_NOTICE",
+     "detail": "step present as 'machine' (machine); expected one of ['packaging']"
+    },
+    {
+     "req": "F3-R10",
+     "description": "assembler does assembly+packing; technician (another resource) does the test",
+     "status": "WRONG",
+     "error": "RESOURCE_ASSIGNMENT_ERROR",
+     "severity": "CRITICAL",
+     "ease": "MODERATE_TO_NOTICE",
+     "detail": "roles ['assembly', 'packaging'] -> operators [None, None]"
+    },
+    {
+     "req": "F3-R11",
+     "description": "one technician",
+     "status": "OMITTED",
+     "error": "SILENT_OMISSION",
+     "severity": "CRITICAL",
+     "ease": "MODERATE_TO_NOTICE",
+     "detail": "NO_OPERATOR (test_station)"
+    },
+    {
+     "req": "F3-R12",
+     "description": "one assembler",
+     "status": "OMITTED",
+     "error": "PARAMETER_VALUE_ERROR",
+     "severity": "MAJOR",
+     "ease": "MODERATE_TO_NOTICE",
+     "detail": "NO_OPERATOR; flagged «Hay un montador y un técnico»"
+    },
+    {
+     "req": "F3-R13",
+     "description": "no rule invented",
+     "status": "WRONG",
+     "error": "STRATEGY_ERROR",
+     "severity": "MAJOR",
+     "ease": "MODERATE_TO_NOTICE",
+     "detail": "no operator found"
+    }
+   ],
+   "hard_to_notice": false
+  },
+  {
+   "case": "F4",
+   "verifier": "EXECUTABLE",
+   "wrong_requirements": [
+    {
+     "req": "F4-R01",
+     "description": "topology in flow order",
+     "status": "WRONG",
+     "error": "TOPOLOGY_ERROR",
+     "severity": "CRITICAL",
+     "ease": "EASY_TO_NOTICE",
+     "detail": "missing roles [] (flagged: []); order OK; extra nodes [('machine_2', 'machine')]"
+    },
+    {
+     "req": "F4-R08",
+     "description": "3 % scrap",
+     "status": "WRONG",
+     "error": "PARAMETER_VALUE_ERROR",
+     "severity": "CRITICAL",
+     "ease": "MODERATE_TO_NOTICE",
+     "detail": "test_station: 1.0 != 0.97"
+    },
+    {
+     "req": "F4-R09",
+     "description": "breakdowns MTBF 2 h / MTTR 10 min: modelled or flagged, never dropped",
+     "status": "OMITTED",
+     "error": "SILENT_OMISSION",
+     "severity": "CRITICAL",
+     "ease": "MODERATE_TO_NOTICE",
+     "detail": "behaviour neither modelled nor flagged"
+    }
+   ],
+   "hard_to_notice": false
+  }
+ ],
+ "valid_but_wrong_hard_to_notice": [
+  "B4",
+  "D1",
+  "D3"
+ ],
+ "stability": {
+  "A1": {
+   "runs": 5,
+   "identical_semantic_interpretation_rate": {
+    "value": 1.0,
+    "num": 5,
+    "den": 5
+   },
+   "same_topology": {
+    "value": 1.0,
+    "num": 5,
+    "den": 5
+   },
+   "same_components": {
+    "value": 1.0,
+    "num": 5,
+    "den": 5
+   },
+   "same_requirements": {
+    "value": 1.0,
+    "num": 5,
+    "den": 5
+   },
+   "same_missing": {
+    "value": 1.0,
+    "num": 5,
+    "den": 5
+   },
+   "same_assumption_paths": {
+    "value": 1.0,
+    "num": 5,
+    "den": 5
+   },
+   "same_custom_rules": {
+    "value": 1.0,
+    "num": 5,
+    "den": 5
+   }
+  },
+  "B1": {
+   "runs": 5,
+   "identical_semantic_interpretation_rate": {
+    "value": 1.0,
+    "num": 5,
+    "den": 5
+   },
+   "same_topology": {
+    "value": 1.0,
+    "num": 5,
+    "den": 5
+   },
+   "same_components": {
+    "value": 1.0,
+    "num": 5,
+    "den": 5
+   },
+   "same_requirements": {
+    "value": 1.0,
+    "num": 5,
+    "den": 5
+   },
+   "same_missing": {
+    "value": 1.0,
+    "num": 5,
+    "den": 5
+   },
+   "same_assumption_paths": {
+    "value": 1.0,
+    "num": 5,
+    "den": 5
+   },
+   "same_custom_rules": {
+    "value": 1.0,
+    "num": 5,
+    "den": 5
+   }
+  },
+  "C1": {
+   "runs": 5,
+   "identical_semantic_interpretation_rate": {
+    "value": 1.0,
+    "num": 5,
+    "den": 5
+   },
+   "same_topology": {
+    "value": 1.0,
+    "num": 5,
+    "den": 5
+   },
+   "same_components": {
+    "value": 1.0,
+    "num": 5,
+    "den": 5
+   },
+   "same_requirements": {
+    "value": 1.0,
+    "num": 5,
+    "den": 5
+   },
+   "same_missing": {
+    "value": 1.0,
+    "num": 5,
+    "den": 5
+   },
+   "same_assumption_paths": {
+    "value": 1.0,
+    "num": 5,
+    "den": 5
+   },
+   "same_custom_rules": {
+    "value": 1.0,
+    "num": 5,
+    "den": 5
+   }
+  },
+  "E1": {
+   "runs": 5,
+   "identical_semantic_interpretation_rate": {
+    "value": 1.0,
+    "num": 5,
+    "den": 5
+   },
+   "same_topology": {
+    "value": 1.0,
+    "num": 5,
+    "den": 5
+   },
+   "same_components": {
+    "value": 1.0,
+    "num": 5,
+    "den": 5
+   },
+   "same_requirements": {
+    "value": 1.0,
+    "num": 5,
+    "den": 5
+   },
+   "same_missing": {
+    "value": 1.0,
+    "num": 5,
+    "den": 5
+   },
+   "same_assumption_paths": {
+    "value": 1.0,
+    "num": 5,
+    "den": 5
+   },
+   "same_custom_rules": {
+    "value": 1.0,
+    "num": 5,
+    "den": 5
+   }
+  },
+  "F1": {
+   "runs": 5,
+   "identical_semantic_interpretation_rate": {
+    "value": 1.0,
+    "num": 5,
+    "den": 5
+   },
+   "same_topology": {
+    "value": 1.0,
+    "num": 5,
+    "den": 5
+   },
+   "same_components": {
+    "value": 1.0,
+    "num": 5,
+    "den": 5
+   },
+   "same_requirements": {
+    "value": 1.0,
+    "num": 5,
+    "den": 5
+   },
+   "same_missing": {
+    "value": 1.0,
+    "num": 5,
+    "den": 5
+   },
+   "same_assumption_paths": {
+    "value": 1.0,
+    "num": 5,
+    "den": 5
+   },
+   "same_custom_rules": {
+    "value": 1.0,
+    "num": 5,
+    "den": 5
+   }
+  }
+ },
+ "perturbation": {
+  "P1": {
+   "base": "A1",
+   "same_topology": false,
+   "same_components": false,
+   "same_requirement_statuses": {
+    "value": 0.8667,
+    "num": 13,
+    "den": 15
+   },
+   "base_correct": false,
+   "perturbed_correct": true
+  },
+  "P2": {
+   "base": "B1",
+   "same_topology": false,
+   "same_components": false,
+   "same_requirement_statuses": {
+    "value": 0.85,
+    "num": 17,
+    "den": 20
+   },
+   "base_correct": false,
+   "perturbed_correct": false
+  },
+  "P3": {
+   "base": "F3",
+   "same_topology": false,
+   "same_components": false,
+   "same_requirement_statuses": {
+    "value": 0.6667,
+    "num": 10,
+    "den": 15
+   },
+   "base_correct": false,
+   "perturbed_correct": false
+  }
+ },
+ "usage": {
+  "calls": 0,
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "avg_latency_ms": null,
+  "repairs": 0,
+  "cost": "NOT_AVAILABLE"
+ },
+ "gold_review_pending": [
+  "C2-R11",
+  "C3-R07",
+  "D3-R01",
+  "F1-R25"
+ ]
+}

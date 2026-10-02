@@ -1,0 +1,8 @@
+id: A1
+family: A_PARAPHRASE
+title: Technical Spanish
+purpose: Same validated process, technical register.
+text: 'Línea con suministro ilimitado de piezas. Estación 1: montaje manual, tiempo de ciclo 60 s/pieza, realizado por un
+  operario. A continuación, buffer intermedio de capacidad 5 unidades. Estación 2: máquina automática con tiempo de ciclo
+  45 s/pieza. Estación 3: inspección final de 20 s/pieza, realizada por el mismo operario de la estación 1. Horizonte de simulación:
+  8 horas.'

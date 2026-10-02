@@ -1,0 +1,8 @@
+id: E1
+family: E_UNSUPPORTED_RULE
+title: Conditional return with exception
+purpose: Looks like WIP target but has extra conditions.
+text: Hay 4 bastidores. Un operario monta cada bastidor en 120 s. Los bastidores montados esperan en un buffer de 3 antes
+  de la selectiva, que tarda 30 s por bastidor. Después el mismo operario revisa el bastidor en 60 s y el bastidor vuelve
+  libre al montaje. Material ilimitado; simular 8 horas. Cuando solo quede un bastidor esperando antes de la selectiva, el
+  operario termina la pieza que está revisando y vuelve a montaje, excepto cuando haya más de tres bastidores esperando revisión.

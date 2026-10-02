@@ -1,0 +1,8 @@
+id: B1
+family: B_UNITS_BASIS
+title: Per circuit vs per rack
+purpose: 30 s/circuit and 15 s/circuit must stay PER_CIRCUIT; 20 s/rack PER_RACK.
+text: 'Cada bastidor lleva 4 circuitos y hay 3 bastidores. Un operario monta los circuitos en el bastidor: 30 segundos por
+  circuito. El bastidor montado espera en un buffer donde caben 3 bastidores. La selectiva suelda el bastidor completo en
+  20 segundos. Después el mismo operario revisa cada circuito: 15 segundos por circuito. Al terminar la revisión el bastidor
+  queda libre y vuelve enseguida al montaje. Hay circuitos de sobra. Simular 8 horas.'

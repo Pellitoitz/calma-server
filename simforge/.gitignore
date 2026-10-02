@@ -12,3 +12,4 @@ client_data/
 build/
 dist/
 benchmarks/*/results/
+!benchmarks/llm_semantic/results/

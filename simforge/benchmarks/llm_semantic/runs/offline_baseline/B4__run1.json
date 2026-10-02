@@ -1,0 +1,664 @@
+{
+ "case": "B4",
+ "family": "B_UNITS_BASIS",
+ "schema_valid": true,
+ "compiles": true,
+ "verifier_status": "EXECUTABLE",
+ "error": null,
+ "semantically_correct": false,
+ "wall_s": 0.006,
+ "interpreter": "offline-rules",
+ "draft": {
+  "model_name": "Test station → Wave soldering",
+  "horizon_value": null,
+  "horizon_unit": "h",
+  "supply": "unknown",
+  "interarrival": null,
+  "resources": [
+   {
+    "id": "operator_1",
+    "name": "Operario",
+    "kind": "operator",
+    "quantity": 1,
+    "walking_speed_m_s": null
+   }
+  ],
+  "steps": [
+   {
+    "id": "test_station",
+    "name": "Test station",
+    "component": "test_station",
+    "time": {
+     "dist": "constant",
+     "value": 0.75,
+     "low": null,
+     "mode": null,
+     "high": null,
+     "mean": null,
+     "std": null,
+     "unit": "min"
+    },
+    "capacity": null,
+    "resources": [],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   },
+   {
+    "id": "buffer_1",
+    "name": "Buffer 1",
+    "component": "buffer",
+    "time": null,
+    "capacity": 2,
+    "resources": [],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   },
+   {
+    "id": "wave_soldering",
+    "name": "Wave soldering",
+    "component": "wave_soldering",
+    "time": {
+     "dist": "constant",
+     "value": 3.0,
+     "low": null,
+     "mode": null,
+     "high": null,
+     "mean": null,
+     "std": null,
+     "unit": "s"
+    },
+    "capacity": null,
+    "resources": [
+     "operator_1"
+    ],
+    "yield_rate": null,
+    "time_basis": "per_entity",
+    "distance_m": null,
+    "speed_m_s": null,
+    "load_time_s": null,
+    "unload_time_s": null,
+    "units_per_trip": null
+   }
+  ],
+  "policies": [],
+  "carrier_loops": [],
+  "experiments": [],
+  "missing_information": [],
+  "assumptions": [],
+  "confidence_notes": [
+   "Interpretado por el intérprete OFFLINE (reglas deterministas ES/EN)."
+  ],
+  "items": null,
+  "custom_rules": [],
+  "unparsed": [
+   "Cada caja contiene 10 piezas",
+   "Llegan cajas sin parar"
+  ],
+  "layout_known": false
+ },
+ "model": {
+  "isms_version": "0.1",
+  "meta": {
+   "name": "Test station → Wave soldering",
+   "description": "Cada caja contiene 10 piezas. Un banco de test automático prueba la caja completa en 0,75 minutos. Las cajas probadas esperan en un buffer de 2 cajas. Después un operario embala las piezas: 3 segundos por pieza. Llegan cajas sin parar. El turno dura 7,5 horas.",
+   "tags": [],
+   "domain": null,
+   "origin": "ai_generated",
+   "generated_by": {
+    "interpreter": "offline-rules",
+    "prompt_version": "offline_rules_v2",
+    "compiler": "compiler_v2",
+    "prototype_mode": false,
+    "at": "2026-10-02T06:00:13+00:00"
+   }
+  },
+  "simulation": {
+   "horizon": {
+    "value": 8.0,
+    "unit": "h",
+    "provenance": {
+     "status": "assumed",
+     "source": null,
+     "note": "default 8 h",
+     "timestamp": null
+    }
+   },
+   "warmup": {
+    "value": 0.0,
+    "unit": "s",
+    "provenance": null
+   },
+   "kind": "terminating",
+   "replications": 1,
+   "base_seed": 12345,
+   "trace": false,
+   "dispatch_timing": "end_of_timestep",
+   "check_invariants": true
+  },
+  "entities": [
+   {
+    "id": "unit",
+    "name": "Unit",
+    "description": ""
+   }
+  ],
+  "parameters": [
+   {
+    "id": "test_station_time",
+    "value": 0.75,
+    "unit": "min",
+    "description": "Tiempo de 'Test station'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "buffer_1_capacity",
+    "value": 2.0,
+    "unit": "units",
+    "description": "Capacidad de 'Buffer 1'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "wave_soldering_time",
+    "value": 3.0,
+    "unit": "s",
+    "description": "Tiempo de 'Wave soldering'",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   },
+   {
+    "id": "operator_1_count",
+    "value": 1.0,
+    "unit": "units",
+    "description": "Número de Operario",
+    "role": "fixed",
+    "min": null,
+    "max": null,
+    "provenance": {
+     "status": "provided_by_client",
+     "source": "description",
+     "note": null,
+     "timestamp": "2026-10-02T06:00:13Z"
+    }
+   }
+  ],
+  "resources": [
+   {
+    "id": "operator_1",
+    "name": "Operario",
+    "kind": "operator",
+    "quantity": "$operator_1_count",
+    "dispatch": "fifo",
+    "wip_target": null,
+    "travel": null,
+    "home": null,
+    "cost_per_hour": null,
+    "provenance": null
+   }
+  ],
+  "nodes": [
+   {
+    "id": "source",
+    "name": "Source",
+    "component": "source",
+    "component_version": null,
+    "params": {
+     "arrival": "infinite"
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "test_station",
+    "name": "Test station",
+    "component": "test_station",
+    "component_version": "1.0.0",
+    "params": {
+     "process_time": {
+      "dist": "constant",
+      "unit": "min",
+      "value": "$test_station_time"
+     }
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "buffer_1",
+    "name": "Buffer 1",
+    "component": "buffer",
+    "component_version": "1.0.0",
+    "params": {
+     "capacity": "$buffer_1_capacity"
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "wave_soldering",
+    "name": "Wave soldering",
+    "component": "wave_soldering",
+    "component_version": "1.0.0",
+    "params": {
+     "process_time": {
+      "dist": "constant",
+      "unit": "s",
+      "value": "$wave_soldering_time"
+     },
+     "resources": [
+      {
+       "resource": "operator_1"
+      }
+     ]
+    },
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   },
+   {
+    "id": "sink",
+    "name": "Sink",
+    "component": "sink",
+    "component_version": null,
+    "params": {},
+    "priority": 0,
+    "seize": [],
+    "release": [],
+    "release_via": {},
+    "position": null,
+    "notes": ""
+   }
+  ],
+  "edges": [
+   {
+    "source": "source",
+    "target": "test_station",
+    "probability": null
+   },
+   {
+    "source": "test_station",
+    "target": "buffer_1",
+    "probability": null
+   },
+   {
+    "source": "buffer_1",
+    "target": "wave_soldering",
+    "probability": null
+   },
+   {
+    "source": "wave_soldering",
+    "target": "sink",
+    "probability": null
+   }
+  ],
+  "assumptions": [
+   {
+    "id": "a1",
+    "text": "Suministro infinito (la primera estación nunca espera material): no se indicó la llegada.",
+    "path": "nodes.source.params.arrival",
+    "origin": "ai",
+    "accepted": false
+   },
+   {
+    "id": "a2",
+    "text": "Horizonte de simulación de 8 h (no se indicó).",
+    "path": "simulation.horizon",
+    "origin": "ai",
+    "accepted": false
+   }
+  ],
+  "missing": [
+   {
+    "question": "No he usado esta frase: «Cada caja contiene 10 piezas». Si describe algo del proceso, reformúlala o añádelo a mano.",
+    "path": null,
+    "required": false
+   },
+   {
+    "question": "No he usado esta frase: «Llegan cajas sin parar». Si describe algo del proceso, reformúlala o añádelo a mano.",
+    "path": null,
+    "required": false
+   }
+  ],
+  "approval": {
+   "approved": false,
+   "by": null,
+   "at": null,
+   "model_hash": null,
+   "note": ""
+  },
+  "experiments": [],
+  "custom_rule_candidates": []
+ },
+ "questions": [
+  "No he usado esta frase: «Cada caja contiene 10 piezas». Si describe algo del proceso, reformúlala o añádelo a mano.",
+  "No he usado esta frase: «Llegan cajas sin parar». Si describe algo del proceso, reformúlala o añádelo a mano."
+ ],
+ "assumptions": [
+  "Suministro infinito (la primera estación nunca espera material): no se indicó la llegada.",
+  "Horizonte de simulación de 8 h (no se indicó)."
+ ],
+ "custom_rules": [],
+ "unparsed": [
+  "Cada caja contiene 10 piezas",
+  "Llegan cajas sin parar"
+ ],
+ "confidence_notes_dropped_by_compiler": [
+  "Interpretado por el intérprete OFFLINE (reglas deterministas ES/EN)."
+ ],
+ "evaluation": {
+  "case": "B4",
+  "results": [
+   {
+    "case": "B4",
+    "req": "B4-R01",
+    "kind": "flow",
+    "metric": "TOPOLOGY",
+    "description": "topology in flow order",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "steps in order (wrong components counted separately: ['packaging'])",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B4",
+    "req": "B4-R02",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "test -> accepted library component",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "test_station = test_station",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B4",
+    "req": "B4-R03",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "buffer -> accepted library component",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "buffer_1 = buffer",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B4",
+    "req": "B4-R04",
+    "kind": "component",
+    "metric": "COMPONENT_MATCH",
+    "description": "packaging -> accepted library component",
+    "status": "WRONG",
+    "error_type": "COMPONENT_MATCH_ERROR",
+    "severity": "CRITICAL",
+    "detail": "step present as 'wave_soldering' (wave_soldering); expected one of ['packaging']",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B4",
+    "req": "B4-R05",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "test 0.75 min PER_BOX",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "test_station: 45.0 s x 1 = 45.0 s per entity",
+    "evaluated": true,
+    "unit_sensitive": true
+   },
+   {
+    "case": "B4",
+    "req": "B4-R06",
+    "kind": "basis",
+    "metric": "SEMANTIC_BASIS",
+    "description": "test per box",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "per_entity (work_units=1)",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B4",
+    "req": "B4-R07",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "packaging 3 s PER_PIECE",
+    "status": "WRONG",
+    "error_type": "SEMANTIC_BASIS_ERROR",
+    "severity": "CRITICAL",
+    "detail": "3.0 s x 1 = 3.0 s per entity; expected 30.0 (3.0 per_item, x10)",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B4",
+    "req": "B4-R08",
+    "kind": "basis",
+    "metric": "SEMANTIC_BASIS",
+    "description": "packaging per piece",
+    "status": "WRONG",
+    "error_type": "SEMANTIC_BASIS_ERROR",
+    "severity": "CRITICAL",
+    "detail": "expected per_item, model per_entity (work_units=1); time per entity CHANGED",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B4",
+    "req": "B4-R09",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "10 pieces per box",
+    "status": "OMITTED",
+    "error_type": "SILENT_OMISSION",
+    "severity": "CRITICAL",
+    "detail": "NO_PARAM (-)",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B4",
+    "req": "B4-R10",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "buffer 2 boxes",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "buffer_1: 2.0",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B4",
+    "req": "B4-R11",
+    "kind": "no_resource",
+    "metric": "RESOURCE_ASSIGNMENT",
+    "description": "test automatic",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B4",
+    "req": "B4-R12",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "one operator packs",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "wave_soldering: 1.0",
+    "evaluated": true,
+    "unit_sensitive": false
+   },
+   {
+    "case": "B4",
+    "req": "B4-R13",
+    "kind": "value",
+    "metric": "PARAMETER_VALUE",
+    "description": "7.5 h",
+    "status": "WRONG",
+    "error_type": "PARAMETER_VALUE_ERROR",
+    "severity": "MAJOR",
+    "detail": "simulation.horizon: 28800.0 != 27000.0",
+    "evaluated": true,
+    "unit_sensitive": true
+   },
+   {
+    "case": "B4",
+    "req": "B4-R14",
+    "kind": "supply",
+    "metric": "PARAMETER_VALUE",
+    "description": "unlimited supply",
+    "status": "CORRECT",
+    "error_type": null,
+    "severity": null,
+    "detail": "infinite",
+    "evaluated": true,
+    "unit_sensitive": false
+   }
+  ],
+  "grounding": [
+   {
+    "parameter": "test_station_time",
+    "value": 0.75,
+    "unit": "min",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "buffer_1_capacity",
+    "value": 2.0,
+    "unit": "units",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "wave_soldering_time",
+    "value": 3.0,
+    "unit": "s",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   },
+   {
+    "parameter": "operator_1_count",
+    "value": 1.0,
+    "unit": "units",
+    "status": "USER_PROVIDED",
+    "grounded": true,
+    "verdict": "OK"
+   }
+  ],
+  "role_map": {
+   "test": "test_station",
+   "buffer": "buffer_1",
+   "packaging": "wave_soldering",
+   "packaging(loose)": true
+  },
+  "semantically_correct": false
+ },
+ "llm_calls": [],
+ "repeat": 1,
+ "signature": {
+  "topology": [
+   "source",
+   "test_station",
+   "buffer",
+   "wave_soldering",
+   "sink"
+  ],
+  "components": {
+   "test": "test_station",
+   "buffer": "buffer",
+   "packaging": "wave_soldering"
+  },
+  "loose_roles": [
+   "packaging"
+  ],
+  "requirements": {
+   "B4-R01": "CORRECT",
+   "B4-R02": "CORRECT",
+   "B4-R03": "CORRECT",
+   "B4-R04": "WRONG",
+   "B4-R05": "CORRECT",
+   "B4-R06": "CORRECT",
+   "B4-R07": "WRONG",
+   "B4-R08": "WRONG",
+   "B4-R09": "OMITTED",
+   "B4-R10": "CORRECT",
+   "B4-R11": "CORRECT",
+   "B4-R12": "CORRECT",
+   "B4-R13": "WRONG",
+   "B4-R14": "CORRECT"
+  },
+  "missing": [],
+  "assumption_paths": [
+   "nodes.source.params.arrival",
+   "simulation.horizon"
+  ],
+  "custom_rules": 0
+ }
+}
