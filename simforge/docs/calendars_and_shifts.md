@@ -212,7 +212,10 @@ la operación. Si se pierde la disponibilidad de **cualquiera** de ellos, se pau
 pausa, aunque su propio calendario siga disponible (pueden hacer otro trabajo por el dispatch normal), y se
 **vuelven a solicitar** por el dispatch normal cuando hay de nuevo disponibilidad conjunta, sin prioridad por estar
 pausada. Mientras un nodo no está disponible, sus peticiones de recursos pendientes **no se conceden** (conservan su
-antigüedad en la cola y compiten de nuevo cuando el nodo vuelve).
+antigüedad en la cola y compiten de nuevo cuando el nodo vuelve). Si durante la pausa el puesto además se **avería**, los recursos se vuelven a
+solicitar sólo cuando el calendario vuelve a estar disponible **y** la reparación ha terminado (no se retiene al
+operario con la máquina parada); lo hecho se conserva. Una petición antigua de un nodo fuera de turno no bloquea las
+concesiones a otros nodos disponibles.
 
 > **No soportado en 0.6.0**: operaciones multifase en las que el operario solo hace falta en la carga, la máquina
 > sigue sola y el operario vuelve a descargar. En 0.6.0 una operación con operario lo necesita durante toda la
@@ -350,3 +353,5 @@ Los avisos se clasifican en tres niveles:
 * No hay mix de productos, setups, mantenimiento preventivo, calendarios por cuadrillas/rotaciones ni absentismo.
 * No hay festivos automáticos.
 * Validado solo con casos sintéticos: **SYNTHETICALLY_VALIDATED**.
+
+Validación con datos reales de planta: ver [`real_calendar_validation.md`](real_calendar_validation.md).

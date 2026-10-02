@@ -1,0 +1,35 @@
+# SYNTHETIC EXAMPLE model. Calendars entered as weekly pattern (as an engineer would in the CLI/UI), NOT from the rows.
+meta: {name: Calendar validation example (synthetic)}
+simulation: {horizon: {value: 168, unit: h}, base_seed: 1}
+resources:
+  - {id: operator_1, name: Operator_1, kind: operator, quantity: 1}
+nodes:
+  - {id: src, component: source}
+  - {id: machine_a, name: Machine_A, component: manual_assembly,
+     params: {process_time: {dist: constant, value: 600}, resources: [{resource: operator_1}]}}
+  - {id: out, component: sink}
+edges:
+  - {source: src, target: machine_a}
+  - {source: machine_a, target: out}
+availability:
+  mode: dated
+  start_date: 2026-10-05
+  start_time: "00:00"
+  timezone: Europe/Madrid
+  calendars:
+    - id: two_shifts
+      weekly: {mon: [{start: "06:00", end: "14:00"}, {start: "14:00", end: "22:00"}],
+               tue: [{start: "06:00", end: "14:00"}, {start: "14:00", end: "22:00"}],
+               wed: [{start: "06:00", end: "14:00"}, {start: "14:00", end: "22:00"}],
+               thu: [{start: "06:00", end: "14:00"}, {start: "14:00", end: "22:00"}],
+               fri: [{start: "06:00", end: "14:00"}, {start: "14:00", end: "22:00"}]}
+    - id: morning
+      weekly: {mon: [{start: "06:00", end: "14:00"}], tue: [{start: "06:00", end: "14:00"}],
+               wed: [{start: "06:00", end: "14:00"}], thu: [{start: "06:00", end: "14:00"}],
+               fri: [{start: "06:00", end: "14:00"}]}
+      breaks: [{start: "10:00", end: "10:15"}]
+  resources: {operator_1: morning}
+  nodes: {machine_a: two_shifts}
+  always_available: [src]
+  operations:
+    machine_a: {at_unavailability: PAUSE_RESUME, start_rule: START_ANY_TIME, reason: "synthetic example"}

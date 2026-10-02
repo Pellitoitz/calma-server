@@ -1,0 +1,17 @@
+# SYNTHETIC EXAMPLE — exercises the validation tool. It is NOT plant data and validates nothing (status NOT_TESTED).
+study_id: EXAMPLE_SYNTHETIC
+synthetic: true
+plant_case: "Machine_A (2 shifts 06-14, 14-22, Mon-Fri) worked by Operator_1 (06-14 Mon-Fri, break 10:00-10:15). Invented."
+period_start: "2026-10-05T00:00:00"   # local wall-clock in `timezone`; must equal the model's start_date/start_time
+period_end: "2026-10-12T00:00:00"     # period length must equal the model horizon
+timezone: Europe/Madrid
+warmup_s: 0
+seed: 1
+targets:                               # name used in calendar_rows.csv / observed_events.csv -> model element
+  Machine_A: {node: machine_a}
+  Operator_1: {resource: operator_1}
+calendar_source: "invented for the example"
+calendar_confirmed_by: "nobody (synthetic)"
+extraction_date: "2026-10-02"
+boundary_policy: {operation: machine_a, policy: PAUSE_RESUME, confirmed_by: "nobody (synthetic)"}
+engineer_sign_off: {name: "", date: "", notes: ""}

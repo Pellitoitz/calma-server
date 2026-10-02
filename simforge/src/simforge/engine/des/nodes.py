@@ -291,11 +291,16 @@ class IndustrialServer(IndustrialNode):
         self.ctx.changed(self.id)
 
     def _release_for_calendar(self, e: Entity, slot: int, held: list[Unit], state: str) -> Proc:
-        """Free operators/tools (not carriers, not the slot) until every gating calendar is available again."""
+        """Free operators/tools (not carriers, not the slot) until every gating calendar is available again AND the
+        machine is not down: resources are re-requested only when the operation can really continue (a machine still
+        under repair when the shift starts does not pull its operator back until it is repaired)."""
         release_units(self.ctx, held)
         self._set(slot, state)
-        yield from self.ctx.calendar.wait_until_ok(self.gating)
-        return []
+        while True:
+            yield from self.ctx.calendar.wait_until_ok(self.gating)
+            if not self.down:
+                return []
+            yield self.up_event
 
     def _ready_to_start(self, e: Entity, slot: int, held: list[Unit]) -> Proc:
         """Before STARTING an operation: every gating calendar available, and (REQUIRE_FULL_WINDOW, deterministic times

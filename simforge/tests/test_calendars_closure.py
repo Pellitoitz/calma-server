@@ -293,3 +293,36 @@ def test_K_rebuild_from_description_keeps_calendars(tmp_path):
     rebuilt = p.load_version(pr.version)
     assert rebuilt.availability is not None and rebuilt.availability.resources == {"operator_1": "t"}
     assert any(h["action"] == "availability_carried_over" for h in p.history())
+
+
+# ------------------------------------------------------------------------------ preventive (real-data precheck)
+def test_pause_resume_with_breakdown_during_the_pause_resumes_only_after_repair():
+    # 13:58 start (300 s) -> 14:00 shift end: PAUSE with 180 s left -> 17:00 failure (off-shift) -> 06:00 calendar back
+    # but machine still DOWN -> 07:00 repair -> only then the operator is re-requested and the work resumes
+    m = station(cal("mach"), {"op": cal("opc")}, policy="PAUSE_RESUME", pt=300, failures=FAIL(17 * H, 14 * H), horizon=40)
+    d = m.model_dump(mode="json")
+    d["nodes"][0]["params"] = {"arrival": "interarrival", "interarrival": {"dist": "constant", "value": 13 * H + 58 * 60},
+                               "max_entities": 1}
+    r = run(model_from_dict(d))
+    assert trace(r) == [(13 * H + 58 * 60, "start_process", None), (14 * H, "paused_by_calendar", 180.0), (17 * H, "down", None),
+                        (31 * H, "up", None), (31 * H, "resume_process", 180.0), (31 * H + 180, "end_process", None)]
+    assert [d_["t"] for d_ in r.records[0].decisions] == [13 * H + 58 * 60, 31 * H]  # no re-acquire at 06:00
+    st = r.records[0].resource_state_time["op"]
+    assert st["working:assembly"] == pytest.approx(300)  # 120 s + 180 s: remaining conserved exactly
+    assert conserved(r)
+
+
+def test_old_fifo_request_of_off_shift_node_does_not_block_available_nodes():
+    # 'assembly' (machine 06-14) asks for the 24/7 operator at 13:59 while it is busy; from 14:00 its request stays pending
+    # (node off-shift) and the operator keeps serving 'rework' (later requests); at 06:00 assembly is served first (its
+    # genuine FIFO seniority), without any priority for having waited
+    m = station(cal("mach"), {"op": cal("opc", "00:00", "24:00")}, policy="PAUSE_RESUME",
+                rework_source={})  # infinite rework demand
+    d = m.model_dump(mode="json")
+    r = run(model_from_dict(d))
+    grants_off = [x for x in r.records[0].decisions if 14 * H <= x["t"] < 30 * H]
+    assert grants_off and all(x["chosen_node"] == "rework" for x in grants_off)
+    waiting_assembly = [x for x in grants_off if "assembly" in [c["node"] for c in x["candidates"]]]
+    assert waiting_assembly, "the old assembly request was pending while rework kept being served"
+    first6 = [x for x in r.records[0].decisions if x["t"] >= 30 * H][0]
+    assert first6["chosen_node"] == "assembly" and first6["rule"] == "fifo"

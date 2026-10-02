@@ -1,0 +1,21 @@
+# Real calendar validation study. Copy TEMPLATE/ to <STUDY_ID>/ and fill in. Anonymise: Machine_A, Operator_1, ...
+# No personal data: no names of operators, no badge numbers. Only roles/aliases.
+study_id: ""                 # e.g. CAL_2026_W41_LINE1
+synthetic: false
+plant_case: ""               # one machine + one operator, 1-2 shifts, one week (what, why this case)
+period_start: ""             # local wall-clock, e.g. "2026-10-05T00:00:00" (= model start_date + start_time)
+period_end: ""               # e.g. "2026-10-12T00:00:00" (period length = model horizon)
+timezone: ""                 # IANA, e.g. Europe/Madrid (MANDATORY, no default)
+warmup_s: 0                  # metrics/events are compared on [warmup, end)
+seed: 1
+targets:                     # alias used in the CSV files -> element in input/model.yaml
+  # Machine_A: {node: machine_a}
+  # Operator_1: {resource: operator_1}
+calendar_source: ""          # e.g. "HR shift plan export", "MES calendar", "supervisor sheet"
+calendar_confirmed_by: ""    # role, e.g. "production supervisor line 1" (MANDATORY)
+extraction_date: ""
+boundary_policy:             # what REALLY happens at shift end. Never inferred.
+  operation: ""              # node id
+  policy: MISSING            # FINISH_CURRENT | PAUSE_RESUME | STOP_RESTART | MISSING | REQUIRES_ENGINEER_CONFIRMATION
+  confirmed_by: ""
+engineer_sign_off: {name: "", date: "", notes: ""}   # filled ONLY after reviewing VALIDATION_REPORT.md
