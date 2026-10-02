@@ -84,6 +84,16 @@ preventivo por calendario o por uso (AFTER_CURRENT_ACTIVITY), efecto RESET / NO_
 calendarios y setups, métricas de downtime y fiabilidad con denominadores explícitos. Las averías legacy no cambian.
 `simforge maintenance ...` o pestaña **Maintenance**. Detalle: [`docs/maintenance_and_reliability.md`](docs/maintenance_and_reliability.md).
 
+## Economía y soporte a la decisión (motor 0.9.0)
+
+Capa económica explícita **posterior al run**: supuestos con moneda, base física y procedencia (MISSING visible,
+nunca inventado), costes por categoría (mano de obra paid ≠ busy, máquina, energía de potencia declarada, material,
+scrap, mantenimiento, downtime), costes unitarios, ingresos y `evaluated_net_result` (no "beneficio"), anualización
+explícita, CAPEX separado, comparación de escenarios con deltas/ahorros/payback simple. El bloque `economics` no forma
+parte del hash físico: cambiar un precio nunca re-simula ni invalida la aprobación física. SimForge no recomienda ni
+optimiza. `simforge economics ...` o pestaña **Economics**. Detalle:
+[`docs/economics_and_decision_support.md`](docs/economics_and_decision_support.md).
+
 ## Datos medidos (CSV/XLSX → distribución → parámetro)
 
 Importar un estudio de tiempos (CSV o XLSX, sin ejecutar nada del archivo) → validación fila a fila (nada se borra ni

@@ -48,6 +48,9 @@ app.add_typer(products_app, name="products")
 from .cli_maintenance import maintenance_app  # noqa: E402
 
 app.add_typer(maintenance_app, name="maintenance")
+from .cli_economics import economics_app  # noqa: E402
+
+app.add_typer(economics_app, name="economics")
 
 
 def _registry() -> ComponentRegistry:

@@ -511,7 +511,7 @@ def test_cli_products_show_and_run(tmp_path):
     assert "EXPLICIT_SEQUENCE [a, b, c] repeat=True" in out.output and "UNCONFIGURED → A: 9.0 s" in out.output
     out = CliRunner().invoke(cli, ["products", "run", str(tmp_path / "m.yaml"), "--seed", "1"])
     assert out.exit_code == 0, out.output
-    assert "engine 0.8.0" in out.output and "node m: setups" in out.output and "total setups" in out.output
+    assert "engine 0.9.0" in out.output and "node m: setups" in out.output and "total setups" in out.output
 
 
 def test_ui_products_tab(tmp_path, monkeypatch):

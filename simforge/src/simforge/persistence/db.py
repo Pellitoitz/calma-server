@@ -104,6 +104,23 @@ MIGRATIONS: list[str] = [
         input_tokens INTEGER, output_tokens INTEGER, est_cost_usd REAL, latency_ms REAL
     );
     """,
+    # 2 - economic evaluations (engine >= 0.9.0): many evaluations per physical run, referenced (never copied)
+    """
+    CREATE TABLE economic_evaluations (
+        evaluation_id TEXT PRIMARY KEY,
+        run_id TEXT NOT NULL REFERENCES runs(run_id),
+        physical_model_hash TEXT NOT NULL,
+        economic_hash TEXT NOT NULL,
+        economics_engine_version TEXT NOT NULL,
+        status TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        assumptions_json TEXT NOT NULL,
+        result_json TEXT NOT NULL,
+        approved_by TEXT,
+        approved_at TEXT
+    );
+    CREATE INDEX idx_econ_run ON economic_evaluations(run_id);
+    """,
 ]
 
 

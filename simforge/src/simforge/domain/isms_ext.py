@@ -2,7 +2,9 @@
 
 `SimModel` = ISMSModel + optional extension blocks: `availability` (calendars, shifts, breaks, exceptions,
 operation policies; engine >= 0.6.0) and `production` (product mix, product-specific processing/routing, setups;
-engine >= 0.7.0) and `maintenance` (failure clocks, corrective repair, preventive maintenance; engine >= 0.8.0). A model without extension blocks serialises exactly as an ISMS 0.1 model, so
+engine >= 0.7.0), `maintenance` (failure clocks, corrective repair, preventive maintenance; engine >= 0.8.0) and
+`economics` (economic assumptions; >= 0.9.0). `economics` is NOT physical: it is excluded from content_hash (the
+physical hash), so it never changes the DES, the physical approval or the result cache. A model without extension blocks serialises exactly as an ISMS 0.1 model, so
 its content_hash (and every approval bound to it) is unchanged.
 
 The frozen verifier/compiler only understands the core: `core()` returns that view; extension blocks are validated by
@@ -15,16 +17,32 @@ from pydantic import model_serializer
 
 from .calendar import AvailabilitySpec
 from .isms import ISMSModel
+import hashlib
+import json
+
+from .economics import EconomicsSpec
 from .maintenance import MaintenanceSpec
 from .production import ProductionSpec
 
-EXTENSION_KEYS = ("availability", "production", "maintenance")
+EXTENSION_KEYS = ("availability", "production", "maintenance", "economics")
+NON_PHYSICAL_KEYS = ("economics",)
 
 
 class SimModel(ISMSModel):
     availability: AvailabilitySpec | None = None
     production: ProductionSpec | None = None
     maintenance: MaintenanceSpec | None = None
+    economics: EconomicsSpec | None = None
+
+    def content_hash(self) -> str:
+        """PHYSICAL hash: same algorithm as ISMSModel.content_hash (frozen core), economics excluded."""
+        d = self.model_dump(mode="json", exclude={"approval": True, "meta": True, "assumptions": True, "missing": True,
+                                                   "experiments": True, "economics": True})
+        blob = json.dumps(d, sort_keys=True, separators=(",", ":"))
+        return hashlib.sha256(blob.encode()).hexdigest()[:16]
+
+    def economic_hash(self) -> str | None:
+        return self.economics.economic_hash() if self.economics is not None else None
 
     @property
     def has_extensions(self) -> bool:

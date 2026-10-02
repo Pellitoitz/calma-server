@@ -174,6 +174,39 @@ class Project:
             raise ProjectError(f"No existe la ejecución '{run_id}'.")
         return SimulationResult.from_dict(json.loads(row[0]))
 
+    # ------------------------------------------------------------------ economic evaluations (>= 0.9.0)
+    def save_evaluation(self, ev, assumptions) -> None:
+        """Store an economic evaluation REFERENCING its physical run (the run itself is not copied)."""
+        self.db.execute(
+            "INSERT OR REPLACE INTO economic_evaluations(evaluation_id, run_id, physical_model_hash, economic_hash, "
+            "economics_engine_version, status, created_at, assumptions_json, result_json) VALUES (?,?,?,?,?,?,?,?,?)",
+            (ev.evaluation_id, ev.run_id, ev.physical_model_hash, ev.economic_hash, ev.economics_engine_version, ev.status,
+             _now(), assumptions.model_dump_json(), json.dumps(ev.to_dict())))
+        self.db.commit()
+
+    def evaluations(self, run_id: str | None = None) -> list[dict[str, Any]]:
+        q = ("SELECT evaluation_id, run_id, economic_hash, status, created_at, approved_by FROM economic_evaluations"
+             + (" WHERE run_id = ?" if run_id else "") + " ORDER BY created_at")
+        return [dict(r) for r in self.db.execute(q, (run_id,) if run_id else ())]
+
+    def load_evaluation(self, evaluation_id: str):
+        from ..economics.evaluate import EconomicEvaluation
+        row = self.db.execute("SELECT result_json FROM economic_evaluations WHERE evaluation_id = ?", (evaluation_id,)).fetchone()
+        if not row:
+            raise ProjectError(f"No existe la evaluación económica '{evaluation_id}'.")
+        return EconomicEvaluation.from_dict(json.loads(row[0]))
+
+    def load_assumptions(self, evaluation_id: str):
+        from ..domain.economics import EconomicsSpec
+        row = self.db.execute("SELECT assumptions_json FROM economic_evaluations WHERE evaluation_id = ?", (evaluation_id,)).fetchone()
+        return EconomicsSpec.model_validate_json(row[0])
+
+    def approve_evaluation(self, evaluation_id: str, by: str) -> None:
+        """Economic approval: bound to ONE evaluation (run + economic hash); independent of the physical approval."""
+        self.db.execute("UPDATE economic_evaluations SET approved_by = ?, approved_at = ? WHERE evaluation_id = ?",
+                        (by, _now(), evaluation_id))
+        self.db.commit()
+
     def save_experiment(self, result: ExperimentResult, model_version: int | None) -> None:
         self.db.execute("INSERT OR REPLACE INTO experiments(experiment_id, model_version, created_at, name, result_json) VALUES (?,?,?,?,?)",
                         (result.experiment_id, model_version, result.started_at, result.spec.name, json.dumps(result.to_dict())))

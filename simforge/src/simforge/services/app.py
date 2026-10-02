@@ -174,6 +174,11 @@ class SimForgeApp:
             model = as_sim_model(model).model_copy(update={"maintenance": prev.maintenance})
             project.log("system", "maintenance_carried_over",
                         result=f"maintenance of v{project.meta.current_version} kept in the rebuilt model (references re-verified)")
+        if prev is not None and getattr(prev, "economics", None) is not None:
+            from ..domain.isms_ext import as_sim_model
+            model = as_sim_model(model).model_copy(update={"economics": prev.economics})
+            project.log("system", "economics_carried_over",
+                        result=f"economic assumptions of v{project.meta.current_version} kept in the rebuilt model")
         outcome.model = model
         gen_ms = (time.perf_counter() - t0) * 1000
         report, _ = verify(model, self.registry)
@@ -331,6 +336,32 @@ class SimForgeApp:
         project.save_run(res, project.meta.current_version)
         project.log("system", "run_simulation", result=f"run {res.run_id}: TH={res.kpis.mean('throughput_per_hour'):.2f}/h")
         return res
+
+    # --------------------------------------------------------------- economics (>= 0.9.0, post-run, no DES)
+    def run_model_of(self, project: Project, run_id: str) -> ISMSModel:
+        row = project.db.execute("SELECT model_version, model_hash FROM runs WHERE run_id = ?", (run_id,)).fetchone()
+        if not row:
+            raise ValueError(f"No existe la ejecución '{run_id}'.")
+        return project.load_version(row[0])
+
+    def evaluate_economics(self, project: Project, run_id: str, assumptions=None):
+        """Evaluate a STORED physical run with economic assumptions (default: those of the current model version).
+        No simulation is executed."""
+        from ..economics import evaluate_run
+        run = project.load_run(run_id)
+        model = self.run_model_of(project, run_id)
+        if assumptions is None:
+            cur = project.current_model()
+            assumptions = getattr(cur, "economics", None) or getattr(model, "economics", None)
+        ev = evaluate_run(run, model, assumptions, self.registry)
+        project.save_evaluation(ev, assumptions)
+        project.log("system", "evaluate_economics", result=f"evaluation {ev.evaluation_id} of run {run_id}: {ev.status}")
+        return ev
+
+    def compare_economics(self, project: Project, baseline_id: str, alternative_id: str):
+        from ..economics import compare_evaluations
+        eb, ea = project.load_evaluation(baseline_id), project.load_evaluation(alternative_id)
+        return compare_evaluations(eb, ea, self.run_model_of(project, eb.run_id), self.run_model_of(project, ea.run_id))
 
     def run_experiment(self, project: Project, spec: ExperimentSpec, model: ISMSModel | None = None,
                        progress: Callable[[int, int], None] | None = None) -> ExperimentResult:
