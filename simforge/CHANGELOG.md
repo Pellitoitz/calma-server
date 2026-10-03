@@ -66,6 +66,28 @@ Estado: CODE_COMPLETE + SYNTHETICALLY_VALIDATED.
 - **Garantías:** no simula, no recalcula ni muta nada.
 - **Sin cambios en:** motor, economics, KPIs, esquema, ficheros FREEZE y `content_hash`.
 
+### 1.1-D — Informes de ingeniería (C12)
+
+Estado: CODE_COMPLETE + SYNTHETICALLY_VALIDATED.
+
+- **Run engineering report y scenario comparison report** (`reporting/engineering.py`): modelos tipados construidos
+  sólo con fuentes existentes:
+  - workbench de 1.1-C;
+  - `compare_physical_runs` de 1.1-A;
+  - evaluaciones y comparación económica de 0.9;
+  - manifiesto de 1.0.
+- **Contenido:**
+  - identidad completa;
+  - estado de validación siempre visible;
+  - configuración (productos, setups, mantenimiento, calendarios) separada de los resultados;
+  - procedencia de datos y supuestos;
+  - limitaciones;
+  - NOT_AVAILABLE / NOT_EVALUATED / NO_BLOCK ≠ 0.
+- **Formatos:** Markdown, HTML (mismo contenido) y JSON.
+- **CLI:** `project engineering-report` y `project comparison-report`. **UI:** pestaña **Report**.
+- **Sin cambios en:** el informe de 1.0, el motor, economics, los KPIs, el esquema, los ficheros FREEZE y
+  `content_hash`. Sin PDF nativo.
+
 ## [1.0.0-rc1] — Release Candidate 1 (declarada; sin tag hasta su autorización explícita)
 
 Primera Release Candidate de SimForge 1.0. Release notes: `docs/release/1.0.0-rc1_release_notes.md`.
