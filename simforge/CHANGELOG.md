@@ -8,7 +8,13 @@ Capacidades relevantes. No es una lista de commits.
 - ninguna está REAL_DATA_VALIDATED;
 - validación económica real: **NOT_EXECUTED**.
 
-## [1.0.0-rc1] — Release Candidate 1 (declarada; sin tag hasta su autorización explícita)
+## [Unreleased — rama de estabilización posterior a v1.0.0-rc1]
+
+- Abierta la ventana de estabilización de RC1: registro, plantilla de sesión, registro de incidencias, plan de sesiones y
+  evaluación final (PENDING) en `docs/release/stabilization/1.0.0-rc1/`.
+- Sin cambios de código ni de comportamiento respecto al tag `v1.0.0-rc1` (1b283a7).
+
+## [1.0.0-rc1] — Release Candidate 1 (tag anotado `v1.0.0-rc1` sobre 1b283a7)
 
 Primera Release Candidate de SimForge 1.0. Release notes: `docs/release/1.0.0-rc1_release_notes.md`.
 
