@@ -87,8 +87,10 @@ class Project:
         return self.meta.name
 
     # -------------------------------------------------------------- versions
-    def save_version(self, model: ISMSModel, message: str = "", author: str = "engineer", label: str | None = None) -> int:
-        """Store a new immutable snapshot and make it current. Returns the version number."""
+    def save_version(self, model: ISMSModel, message: str = "", author: str = "engineer", label: str | None = None,
+                     parent: int | None = None) -> int:
+        """Store a new immutable snapshot and make it current. Returns the version number. `parent` (lineage) defaults
+        to the current version."""
         row = self.db.execute("SELECT MAX(version) FROM model_versions").fetchone()
         v = (row[0] or 0) + 1
         fname = f"versions/v{v:04d}.yaml"
@@ -99,7 +101,7 @@ class Project:
         path.write_text(dump_model(model), encoding="utf-8")
         self.db.execute(
             "INSERT INTO model_versions(version, created_at, author, message, parent, content_hash, label, file) VALUES (?,?,?,?,?,?,?,?)",
-            (v, _now(), author, message, self.meta.current_version, model.content_hash(), label, fname))
+            (v, _now(), author, message, self.meta.current_version if parent is None else parent, model.content_hash(), label, fname))
         self.db.commit()
         self.meta.current_version = v
         self.save_meta()
@@ -144,13 +146,26 @@ class Project:
         self.db.commit()
         self.log("user", "set_baseline", result=f"baseline = v{version}")
 
-    def create_scenario(self, name: str, model: ISMSModel, message: str = "") -> int:
+    def create_scenario(self, name: str, model: ISMSModel, message: str = "", parent: int | None = None,
+                        author: str = "engineer") -> int:
         if self.meta.baseline_version is None:
             raise ProjectError("Define primero un baseline: los escenarios se derivan del baseline.")
-        v = self.save_version(model, message or f"scenario {name}", label=f"scenario:{name}")
+        v = self.save_version(model, message or f"scenario {name}", author=author, label=f"scenario:{name}", parent=parent)
         self.meta.scenarios[name] = v
         self.save_meta()
         return v
+
+    def scenario_of(self, version: int | None) -> str | None:
+        """Scenario name currently mapped to `version` (None if the version is not a scenario head)."""
+        return next((n for n, v in sorted(self.meta.scenarios.items()) if v == version), None) if version is not None else None
+
+    def assign_scenario(self, name: str, version: int) -> None:
+        """Move a scenario name to a newer version of the same scenario (modification / approval)."""
+        self.load_version(version)
+        self.meta.scenarios[name] = version
+        self.save_meta()
+        self.db.execute("UPDATE model_versions SET label = ? WHERE version = ? AND label IS NULL", (f"scenario:{name}", version))
+        self.db.commit()
 
     # ------------------------------------------------------------------ runs
     def save_run(self, result: SimulationResult, model_version: int | None) -> None:

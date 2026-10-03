@@ -17,6 +17,9 @@ Un proyecto vive en `<workspace>/projects/<slug>/`:
 - `simforge project checkout <slug> N` vuelve a una versión anterior. No se pierde nada.
 - `simforge project baseline <slug>` marca la versión actual como **baseline**.
 - `simforge project scenario <slug> nombre alt.yaml` crea un escenario derivado del baseline.
+- Línea de desarrollo 1.1: `simforge project scenario-clone <slug> nombre --set ruta=valor` clona el baseline con cambios.
+  `project scenario-set`, `project scenarios` y `project compare-runs` completan el flujo, que también está en la
+  pestaña **Scenarios** de la UI. Ver la guía 16.
 
 ## Mover un proyecto a otra máquina
 

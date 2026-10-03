@@ -226,8 +226,11 @@ class SimForgeApp:
             "approval": Approval(approved=True, by=by, at=datetime.now(timezone.utc), model_hash=model.content_hash(), note=note),
             "assumptions": [a.model_copy(update={"accepted": True}) for a in model.assumptions],
         })
+        scenario = project.scenario_of(project.meta.current_version)
         v = project.save_version(approved, message=f"engineer approval by {by}", author=by)
-        project.log("user", "approve_model", result=f"v{v} approved by {by}")
+        if scenario is not None:  # the approved copy becomes the head of the same scenario (lineage: parent = old head)
+            project.assign_scenario(scenario, v)
+        project.log("user", "approve_model", result=f"v{v} approved by {by}" + (f" (scenario '{scenario}')" if scenario else ""))
         if project.metric("time_to_engineer_approval_s") is None:
             first = project.versions()[0].created_at
             delta = datetime.now(timezone.utc) - datetime.fromisoformat(first)
@@ -509,6 +512,81 @@ class SimForgeApp:
     # ------------------------------------------------------------- scenarios
     def compare_versions(self, project: Project, a: int, b: int) -> list[tuple[str, Any, Any]]:
         return diff(project.load_version(a), project.load_version(b))
+
+    @staticmethod
+    def _apply_changes(model: ISMSModel, changes: dict[str, Any]) -> ISMSModel:
+        new = model
+        for path, value in changes.items():
+            new = set_value(new, path, value)  # validated by the domain; unknown paths / invalid values raise
+        return new
+
+    def clone_scenario(self, project: Project, name: str, changes: dict[str, Any] | None = None,
+                       from_version: int | None = None, message: str = "", by: str = "engineer") -> int:
+        """Baseline -> clone -> modify (1.1-A). A new immutable version derived from `from_version` (default: the
+        baseline), with lineage parent = that version, labelled `scenario:<name>`; it becomes current. Approval is
+        never copied as valid: it stays bound to the content hash, so any real change leaves the clone unapproved.
+        The baseline version is not touched."""
+        from ..persistence.project import ProjectError
+        name = (name or "").strip()
+        if not name:
+            raise ProjectError("El escenario necesita un nombre.")
+        if name in project.meta.scenarios:
+            raise ProjectError(f"El escenario '{name}' ya existe (v{project.meta.scenarios[name]}): modifícalo o usa otro nombre.")
+        if project.meta.baseline_version is None:
+            raise ProjectError("Define primero un baseline: los escenarios se derivan del baseline.")
+        src = project.meta.baseline_version if from_version is None else from_version
+        base = project.load_version(src)
+        new = self._apply_changes(base, changes or {})
+        d = diff(base, new, ignore_provenance=True)
+        v = project.create_scenario(name, new, message or f"scenario {name} from v{src}: " +
+                                    ("; ".join(f"{p}={b}" for p, _, b in d)[:200] or "clone without changes"), parent=src, author=by)
+        project.log("user", "clone_scenario", result=f"scenario '{name}' = v{v} (from v{src}, {len(d)} change(s))",
+                    change=[list(c) for c in d] or None)
+        return v
+
+    def modify_scenario(self, project: Project, name: str, changes: dict[str, Any], message: str = "",
+                        by: str = "engineer") -> int:
+        """New version of an existing scenario (parent = its current head); the scenario name moves to it."""
+        from ..persistence.project import ProjectError
+        if name not in project.meta.scenarios:
+            raise ProjectError(f"No existe el escenario '{name}'.")
+        head = project.meta.scenarios[name]
+        model = project.load_version(head)
+        new = self._apply_changes(model, changes)
+        d = diff(model, new, ignore_provenance=True)
+        if not d:
+            raise ProjectError("Sin cambios: el escenario ya tiene esos valores.")
+        v = project.save_version(new, message or f"scenario {name}: " + "; ".join(f"{p}={b}" for p, _, b in d)[:200],
+                                 author=by, label=f"scenario:{name}", parent=head)
+        project.assign_scenario(name, v)
+        project.log("user", "modify_scenario", result=f"scenario '{name}' = v{v} (from v{head})", change=[list(c) for c in d])
+        return v
+
+    def run_identity(self, project: Project, run_id: str):
+        from ..analytics.run_comparison import identity
+        run = project.load_run(run_id)
+        row = project.db.execute("SELECT model_version FROM runs WHERE run_id = ?", (run_id,)).fetchone()
+        ver = row[0] if row else None
+        base = project.meta.baseline_version
+        return run, identity(run, ver, project.scenario_of(ver), (ver == base) if ver is not None and base is not None else None)
+
+    def compare_runs(self, project: Project, baseline_run_id: str, alternative_run_id: str, metrics: list[str] | None = None):
+        """Physical comparison of two STORED runs (1.1-A). Computed on demand, never stored, never simulates."""
+        from ..analytics.run_comparison import compare_physical_runs
+        b, bid = self.run_identity(project, baseline_run_id)
+        a, aid = self.run_identity(project, alternative_run_id)
+
+        def model(i):
+            try:
+                return self.run_model_of(project, i.run_id) if i.model_version is not None else None
+            except ValueError:
+                return None
+        return compare_physical_runs(b, a, metrics=metrics, base_model=model(bid), alt_model=model(aid), registry=self.registry,
+                                     baseline_identity=bid, alternative_identity=aid)
+
+    def experiment_deltas(self, project: Project, experiment_id: str, reference_index: int = 0, metrics: list[str] | None = None):
+        from ..analytics.run_comparison import experiment_deltas
+        return experiment_deltas(project.load_experiment(experiment_id), reference_index, metrics)
 
     # ------------------------------------------------------------------ reports
     def generate_report(self, project: Project, run_id: str | None = None, experiment_id: str | None = None) -> dict[str, Path]:

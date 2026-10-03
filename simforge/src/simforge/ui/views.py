@@ -533,6 +533,21 @@ def experiments_tab(app: SimForgeApp, project: Project) -> None:
             st.altair_chart(experiment_line(df, df.columns[0], "mean", metric_info(metric)[0]), width="stretch")
     st.dataframe(table, hide_index=True, width="stretch")
     st.download_button("Export CSV", experiment_csv(exp), file_name=f"experiment_{exp.experiment_id}.csv")
+    ok = [s.index for s in exp.scenarios if s.result]
+    if len(ok) > 1:  # 1.1-A: deltas vs an engineer-chosen reference scenario (same seeds -> paired); order kept, no ranking
+        ref = st.selectbox("Reference scenario for deltas", ok, key="exp_ref")
+        deltas = app.experiment_deltas(project, exp.experiment_id, int(ref), [metric])
+        rows = []
+        for s in deltas.scenarios:
+            m = s.comparison.metric(metric) if s.comparison else None
+            d = m.delta if m else None
+            rows.append({"scenario": s.index, **{k.split(".", 1)[-1]: v for k, v in s.factors.items()},
+                         "reference": "●" if s.is_reference else "", "value": m.alternative_mean if m else None,
+                         f"delta vs #{ref}": d.mean if d else None, "CI95 low": d.ci95_low if d else None,
+                         "CI95 high": d.ci95_high if d else None, "mode": d.mode if d else None,
+                         "status": (m.status if m else "FAILED") + (f" — {m.reason}" if m and m.reason else "")})
+        st.caption(f"{metric}: {deltas.delta_convention}. Rows keep the experiment order (no ranking).")
+        st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
 
 
 # --------------------------------------------------------------------------- library

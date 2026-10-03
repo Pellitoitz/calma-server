@@ -8,6 +8,31 @@ Capacidades relevantes. No es una lista de commits.
 - ninguna está REAL_DATA_VALIDATED;
 - validación económica real: **NOT_EXECUTED**.
 
+## [Unreleased] — línea de desarrollo 1.1 (`develop/simforge-1.1`; no forma parte de 1.0.0-rc1)
+
+### 1.1-A — Comparación física y escenarios
+
+Estado: CODE_COMPLETE + SYNTHETICALLY_VALIDATED. Sin validación real.
+
+- **Comparación física run↔run** (`analytics/run_comparison.py`, `SimForgeApp.compare_runs`):
+  - `delta = alternativa − baseline`;
+  - PAIRED solo con evidencia de números aleatorios comunes (mismo motor, mismas semillas, mismo horizonte y
+    warm-up), con deltas por réplica e IC95; UNPAIRED con diferencia de medias y sin IC; NOT_DETERMINABLE;
+  - ausente ≠ cero;
+  - comprobaciones HARD_INCOMPATIBILITY / WARNING / INFORMATIONAL;
+  - sin ranking ni recomendaciones;
+  - calculada bajo demanda, sin guardarla ni simular.
+- **Escenarios:**
+  - `clone_scenario` y `modify_scenario`, con linaje (`parent`) y la aprobación de 1.0 ligada al hash;
+  - al aprobar, la versión aprobada pasa a ser la cabeza del escenario.
+- **CLI:** `project compare-runs`, `project scenario-clone`, `project scenario-set`, `project scenarios` y
+  `project experiment` (deltas frente a un escenario de referencia).
+- **UI:**
+  - nueva pestaña **Scenarios**: baseline → clonar → modificar → verificar → aprobar → ejecutar → comparar;
+  - en Experiments, tabla de deltas frente a la referencia.
+- **Sin cambios en:** motor (0.9.0), economics (0.9.0), esquema SQLite (sin migraciones), ficheros FREEZE y versión de
+  producto (sigue siendo 1.0.0rc1).
+
 ## [1.0.0-rc1] — Release Candidate 1 (declarada; sin tag hasta su autorización explícita)
 
 Primera Release Candidate de SimForge 1.0. Release notes: `docs/release/1.0.0-rc1_release_notes.md`.

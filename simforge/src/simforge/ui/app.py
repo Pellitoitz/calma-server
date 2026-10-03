@@ -9,7 +9,7 @@ from pathlib import Path
 import streamlit as st
 
 from simforge.services.app import SimForgeApp
-from simforge.ui import calendar_view, data_view, economics_view, maintenance_view, products_view, views
+from simforge.ui import calendar_view, data_view, economics_view, maintenance_view, products_view, scenarios_view, views
 
 st.set_page_config(page_title="SimForge", page_icon="🏭", layout="wide")
 
@@ -94,7 +94,7 @@ if app.provider:
     st.warning(f"Remote LLM active ({app.provider.name}): text typed in the Assistant tab is SENT to the provider. "
                "Unset ANTHROPIC_API_KEY to work fully offline.")
 tabs = st.tabs(["Assistant", "Model", "Data", "Calendars", "Products", "Maintenance", "Run & results", "Economics",
-                "Experiments", "Library", "Report", "Project"])
+                "Experiments", "Library", "Report", "Project", "Scenarios"])
 with tabs[0]:
     views.assistant_tab(app, project)
 with tabs[1]:
@@ -119,3 +119,5 @@ with tabs[10]:
     views.report_tab(app, project)
 with tabs[11]:
     views.project_tab(app, project)
+with tabs[12]:
+    scenarios_view.scenarios_tab(app, project)

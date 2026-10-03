@@ -351,6 +351,140 @@ def project_scenario(slug: str, name: str, model: Path, message: str = typer.Opt
     typer.echo(f"scenario '{name}' = v{v}")
 
 
+# ------------------------------------------------------------------------------------------------ 1.1-A scenarios & comparison
+def _sets(items: list[str] | None) -> dict[str, object]:
+    """--set path=value (value parsed as JSON when possible: 2, 1.5, null, {"dist": ...}; otherwise a string)."""
+    out: dict[str, object] = {}
+    for k, v in _pairs(items, "--set").items():
+        try:
+            out[k] = json.loads(v)
+        except json.JSONDecodeError:
+            out[k] = v
+    return out
+
+
+@project_app.command("scenarios")
+def project_scenarios(slug: str):
+    """Baseline and named scenarios (version, approval, parent)."""
+    sf = _sf()
+    p = _proj(sf, slug)
+    parents = {v.version: v.parent for v in p.versions()}
+    b = p.meta.baseline_version
+    typer.echo(f"baseline: v{b}" if b is not None else "baseline: — (set one with 'project baseline')")
+    for name, v in sorted(p.meta.scenarios.items()):
+        typer.echo(f"  {name:<24} v{v:<4} parent v{parents.get(v)}  approved={p.load_version(v).is_approved}")
+
+
+@project_app.command("scenario-clone")
+def project_scenario_clone(slug: str, name: str,
+                           set_: Optional[list[str]] = typer.Option(None, "--set", help="path=value (repeatable)"),
+                           from_version: Optional[int] = typer.Option(None, help="default: the baseline"),
+                           message: str = typer.Option("", "-m"), by: str = "engineer"):
+    """Clone the baseline (or --from-version) into a named scenario, applying --set changes. It becomes current;
+    approval is bound to the content, so a changed clone is NOT approved."""
+    sf = _sf()
+    p = _proj(sf, slug)
+    v = sf.clone_scenario(p, name, _sets(set_), from_version=from_version, message=message, by=by)
+    m = p.load_version(v)
+    typer.echo(f"scenario '{name}' = v{v} (from v{from_version if from_version is not None else p.meta.baseline_version}) "
+               f"hash {m.content_hash()} approved={m.is_approved}")
+    for path, a, b in sf.compare_versions(p, from_version if from_version is not None else p.meta.baseline_version, v):
+        typer.echo(f"  {path}: {json.dumps(a, default=str)} -> {json.dumps(b, default=str)}")
+
+
+@project_app.command("scenario-set")
+def project_scenario_set(slug: str, name: str, set_: list[str] = typer.Option(..., "--set", help="path=value (repeatable)"),
+                         message: str = typer.Option("", "-m"), by: str = "engineer"):
+    """Modify an existing scenario: a new version (parent = its previous version); the scenario name moves to it."""
+    sf = _sf()
+    v = sf.modify_scenario(_proj(sf, slug), name, _sets(set_), message=message, by=by)
+    typer.echo(f"scenario '{name}' = v{v}")
+
+
+def _num_txt(v: float | None) -> str:
+    return "—" if v is None else f"{v:.6g}"
+
+
+def print_comparison(c, show_all: bool = False) -> None:
+    for side, i in (("baseline   ", c.baseline), ("alternative", c.alternative)):
+        tag = f"v{i.model_version}" if i.model_version is not None else "unsaved model"
+        tag += f" scenario '{i.scenario}'" if i.scenario else (" (baseline version)" if i.is_baseline_version else "")
+        typer.echo(f"{side} run {i.run_id} · {tag} · hash {i.model_hash} · {i.engine} {i.engine_version} · "
+                   f"horizon {i.horizon_s:g} s warm-up {i.warmup_s:g} s · {i.replications} rep · seeds {i.seeds}")
+    color = {"COMPARABLE": "green", "COMPARABLE_WITH_WARNINGS": "yellow", "NOT_COMPARABLE": "red"}[c.status]
+    typer.secho(f"status: {c.status} · mode: {c.comparison_mode} · {c.delta_convention}", fg=color, bold=True)
+    for e in c.pairing_evidence:
+        typer.echo(f"  pairing: {e}")
+    for ch in c.checks:
+        typer.secho(f"  [{ch.level}] {ch.check}: {ch.detail}",
+                    fg={"HARD_INCOMPATIBILITY": "red", "WARNING": "yellow"}.get(ch.level))
+    from .analytics.run_comparison import HEADLINE_METRICS
+    rows = [m for m in c.metrics if show_all or m.metric in HEADLINE_METRICS or m.metric.endswith(".utilization")]
+    typer.echo(f"  {'metric':<40} {'baseline':>12} {'alternative':>12} {'delta':>12} {'ci95':>25}  status")
+    for m in rows:
+        d = m.delta
+        ci = f"[{_num_txt(d.ci95_low)}, {_num_txt(d.ci95_high)}]" if d and d.ci95_low is not None else "—"
+        typer.echo(f"  {m.metric:<40} {_num_txt(m.baseline_mean):>12} {_num_txt(m.alternative_mean):>12} "
+                   f"{(f'{d.mean:+.6g}' if d else '—'):>12} {ci:>25}  {m.status}{(' — ' + m.reason) if m.reason else ''}")
+    hidden = len(c.metrics) - len(rows)
+    if hidden:
+        typer.echo(f"  ... {hidden} more metric(s): use --all or --metric")
+    typer.echo(c.note)
+
+
+@project_app.command("compare-runs")
+def project_compare_runs(slug: str, baseline_run: str, alternative_run: str,
+                         metric: Optional[list[str]] = typer.Option(None, help="metric key (repeatable); default: all"),
+                         show_all: bool = typer.Option(False, "--all", help="print every metric (default: headline + utilizations)"),
+                         as_json: bool = typer.Option(False, "--json")):
+    """Physical comparison of two STORED runs: delta = alternative - baseline, paired only with common-random-numbers
+    evidence, comparability checks. Facts only (no ranking, no recommendation); nothing is simulated or stored.
+    Exit code 1 when the runs are NOT_COMPARABLE."""
+    sf = _sf()
+    c = sf.compare_runs(_proj(sf, slug), baseline_run, alternative_run, metrics=metric or None)
+    if as_json:
+        typer.echo(c.model_dump_json(indent=2))
+    else:
+        print_comparison(c, show_all=show_all or bool(metric))
+    raise typer.Exit(1 if c.status == "NOT_COMPARABLE" else 0)
+
+
+@project_app.command("experiment")
+def project_experiment(slug: str, factor: list[str] = typer.Option(..., help="path=v1,v2,... (repeatable)"),
+                       reps: Optional[int] = None, reference: int = typer.Option(0, help="reference scenario index for deltas"),
+                       metric: Optional[list[str]] = typer.Option(None, help="metric key (repeatable)")):
+    """Run a grid experiment on the project's CURRENT model (approval gate applies; stored in the project) and print each
+    scenario with its delta vs the reference scenario (same seeds -> paired). Scenario order is kept: no ranking."""
+    from .domain.isms import ExperimentSpec, Factor
+    sf = _sf()
+    p = _proj(sf, slug)
+    facs = []
+    for f in factor:
+        path, sep, vals = f.partition("=")
+        if not sep:
+            typer.secho(f"--factor: usa path=v1,v2 (recibido '{f}')", fg="red")
+            raise typer.Exit(2)
+        facs.append(Factor(path=path, values=[json.loads(v) for v in vals.split(",")]))
+    exp = sf.run_experiment(p, ExperimentSpec(name="cli: " + ", ".join(x.path for x in facs), factors=facs, replications=reps))
+    keys = list(metric or ["units_completed", "throughput_per_hour", "avg_wip", "avg_lead_time_s"])
+    deltas = sf.experiment_deltas(p, exp.experiment_id, reference, keys)
+    typer.secho(f"experiment {exp.experiment_id} · {len(exp.scenarios)} scenarios · {deltas.delta_convention}", bold=True)
+    for s in deltas.scenarios:
+        head = f"  #{s.index}{' (reference)' if s.is_reference else ''} {json.dumps(s.factors, default=str)}"
+        if s.comparison is None:
+            typer.secho(f"{head}  FAILED: {s.error}", fg="red")
+            continue
+        cells = []
+        for k in keys:
+            m = s.comparison.metric(k)
+            if m is None or m.status != "COMPARED":
+                cells.append(f"{k}={_num_txt(m.alternative_mean if m else None)} (Δ {m.status if m else 'NOT_AVAILABLE'})")
+            else:
+                cells.append(f"{k}={_num_txt(m.alternative_mean)} (Δ {m.delta.mean:+.6g})")
+        typer.echo(f"{head}  [{s.comparison.status}] " + " · ".join(cells))
+    typer.echo(deltas.note)
+
+
 @project_app.command("runs")
 def project_runs(slug: str, limit: int = 20):
     """Stored runs (only COMPLETED runs are stored; failed / interrupted runs are in the history)."""
