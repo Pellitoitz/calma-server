@@ -33,6 +33,25 @@ Estado: CODE_COMPLETE + SYNTHETICALLY_VALIDATED. Sin validación real.
 - **Sin cambios en:** motor (0.9.0), economics (0.9.0), esquema SQLite (sin migraciones), ficheros FREEZE y versión de
   producto (sigue siendo 1.0.0rc1).
 
+### 1.1-B — Construcción del modelo sin YAML
+
+Estado: CODE_COMPLETE + SYNTHETICALLY_VALIDATED.
+
+- **Servicio** `services/model_builder.py`:
+  - constructor estructural (nodos, conexiones, recursos), editor de distribuciones (las 9 familias del dominio) y
+    editor de transporte (campos existentes);
+  - escribe sólo lo declarado: sin defaults silenciosos; unidad no declarada ≠ `s` declarada; los números se guardan
+    tal como se escriben;
+  - rechaza campos y componentes desconocidos, valores inválidos y referencias colgantes;
+  - respeta el orden de construcción;
+  - conserva los bloques de extensión;
+  - la aprobación sigue ligada al hash.
+- **UI:** sección *Model builder* en la pestaña **Model**, sin pestaña nueva.
+- **Equivalencia:** el ejemplo 01 (59) y el golden, construidos desde cero, tienen el mismo `content_hash` que su YAML.
+- **Corregido** (bug preexistente de 1.0): SAVE MODEL en el editor de parámetros, sin cambios, ya no materializa
+  defaults ni cambia el hash.
+- **Sin cambios en:** motor, economics, esquema, ficheros FREEZE y `content_hash`.
+
 ## [1.0.0-rc1] — Release Candidate 1 (declarada; sin tag hasta su autorización explícita)
 
 Primera Release Candidate de SimForge 1.0. Release notes: `docs/release/1.0.0-rc1_release_notes.md`.
