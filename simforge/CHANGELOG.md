@@ -52,6 +52,20 @@ Estado: CODE_COMPLETE + SYNTHETICALLY_VALIDATED.
   defaults ni cambia el hash.
 - **Sin cambios en:** motor, economics, esquema, ficheros FREEZE y `content_hash`.
 
+### 1.1-C — Results workbench y diagnóstico factual
+
+Estado: CODE_COMPLETE + SYNTHETICALLY_VALIDATED.
+
+- **Workbench de resultados guardados** (`analytics/workbench.py`), en la pestaña **Run & results**:
+  - resumen de KPIs con IC; réplicas;
+  - tablas de nodos, OEE, buffers y espera, transporte, recursos, setup, mantenimiento, calendario y productos;
+  - NOT_AVAILABLE / UNDEFINED ≠ 0.
+- **Observaciones factuales deterministas y Top-N** (ordenación explícita, desempate por id), sin recomendaciones ni
+  causalidad.
+- **KPIs sobre el grafo** del modelo del run, sólo texto.
+- **Garantías:** no simula, no recalcula ni muta nada.
+- **Sin cambios en:** motor, economics, KPIs, esquema, ficheros FREEZE y `content_hash`.
+
 ## [1.0.0-rc1] — Release Candidate 1 (declarada; sin tag hasta su autorización explícita)
 
 Primera Release Candidate de SimForge 1.0. Release notes: `docs/release/1.0.0-rc1_release_notes.md`.
