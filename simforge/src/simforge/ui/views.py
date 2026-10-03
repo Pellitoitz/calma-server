@@ -271,6 +271,31 @@ def _answers_form(app: SimForgeApp, project: Project, model: ISMSModel) -> None:
                 st.rerun()
 
 
+_NOT_DECLARED = object()
+_SHOWN_DEFAULTS = {"capacity": (1, 0, None), "yield_rate": (1.0,), "resources": ([],), "provenance": (None,)}
+
+
+def _declared(model: ISMSModel, path: str):
+    from ..domain.paths import get_value
+    try:
+        return get_value(model, path)
+    except KeyError:
+        return _NOT_DECLARED
+
+
+def _unchanged(model: ISMSModel, path: str, value) -> bool:
+    """1.1-B: the form shows every field, but only real edits are written. An undeclared field whose widget still shows
+    the displayed default is not written (no silent default); a declared value equal to the widget value keeps its
+    declared representation (60 stays 60, an omitted unit stays omitted)."""
+    cur = _declared(model, path)
+    if cur is _NOT_DECLARED:
+        return any(value == d for d in _SHOWN_DEFAULTS.get(path.rsplit(".", 1)[-1], ()))
+    if isinstance(cur, dict) and isinstance(value, dict):
+        strip = lambda d: {k: v for k, v in d.items() if k != "provenance"}  # noqa: E731
+        return strip(cur) == strip(value)
+    return cur == value
+
+
 def _param_editor(app: SimForgeApp, project: Project, model: ISMSModel) -> None:
     with st.form("params"):
         changes: dict[str, object] = {}
@@ -312,7 +337,8 @@ def _param_editor(app: SimForgeApp, project: Project, model: ISMSModel) -> None:
             if pt is None or pt.get("dist") == "constant":
                 val = _num(c[0], f"Time ({(pt or {}).get('unit', 's')})", (pt or {}).get("value", 0.0), f"pt_{n.id}")
                 if pt is not None or (not isinstance(val, str) and val > 0):
-                    changes[f"nodes.{n.id}.params.process_time"] = {"dist": "constant", "value": val, "unit": (pt or {}).get("unit", "s"),
+                    changes[f"nodes.{n.id}.params.process_time"] = {"dist": "constant", "value": val,  # unit only if declared (1.1-B)
+                                                                   **({"unit": pt["unit"]} if pt and "unit" in pt else {}),
                                                                    **({"provenance": pt["provenance"]} if pt and pt.get("provenance") and pt.get("value") == val else {})}
             else:
                 c[0].text_input("Time (distribution)", value=json.dumps({k: v for k, v in pt.items() if k != "provenance"}), disabled=True,
@@ -336,6 +362,7 @@ def _param_editor(app: SimForgeApp, project: Project, model: ISMSModel) -> None:
         submitted = st.form_submit_button("SAVE MODEL", type="primary")
     if submitted:
         new = model
+        changes = {k: v for k, v in changes.items() if not _unchanged(model, k, v)}
         try:
             for path, val in changes.items():
                 if path.endswith(("replications", "base_seed", "capacity", "quantity", "priority")) and val is not None and not isinstance(val, str):
