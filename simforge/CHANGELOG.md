@@ -21,6 +21,8 @@ Capacidades relevantes. No es una lista de commits.
   validación y la reproducibilidad completa.
 - **(S2) CLI.** Errores categorizados (`CATEGORÍA: mensaje`), sin traceback, con códigos de salida documentados y log
   local para los errores internos. Un comando desconocido es un error de uso (2).
+- **(S2) Contrato de lint reproducible.** Las reglas de ruff se fijan explícitamente en `pyproject.toml`, así que el
+  resultado ya no cambia con la versión de ruff instalada.
 - **(S3) Runs fallidos o interrumpidos.** Quedan registrados en el historial y nunca como completados.
 
 ### Added (sin capacidades de dominio nuevas)

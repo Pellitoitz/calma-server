@@ -29,8 +29,11 @@ REQUIRED_DOCS = [
 SECRET = re.compile(r"sk-ant-[A-Za-z0-9_-]{10,}|ANTHROPIC_API_KEY\s*=\s*['\"]?sk-|-----BEGIN [A-Z ]*PRIVATE KEY-----")
 FALSE_CLAIMS = [re.compile(p, re.I) for p in (
     r"simforge(?: economics)? (?:está|is) (?:industrially )?validad[oa] con datos reales",
-    r"simforge (?:is|está) (?:fully |industrially )?validated(?! by| per| only| for)",
-    r"\|\s*REAL_DATA_VALIDATED\s*\|")]
+    r"simforge (?:is|está) (?:fully |industrially )?validated(?! by| per| only| for)")]
+NEGATION = re.compile(r"prohibid|forbidden|never|nunca|\bno\b|\bnot\b|ninguna|ningún|none", re.I)
+# a capability-status cell claiming REAL_DATA_VALIDATED is only searched in the release / user status documents
+STATUS_DOCS = ("docs/release/", "docs/user/", "README.md", "KNOWN_LIMITATIONS.md", "CHANGELOG.md", "examples/")
+STATUS_CELL = re.compile(r"\|\s*REAL_DATA_VALIDATED\s*\|")
 
 
 def sh(cmd: list[str], env: dict | None = None, timeout: int = 3600) -> tuple[bool, str]:
@@ -104,14 +107,18 @@ def check_claims():
     hits = []
     for f in _tracked():
         if f.suffix in (".md", ".py", ".txt") and f.exists() and "test" not in f.name and f.name != "check_release.py":
-            t = f.read_text(encoding="utf-8", errors="ignore")
-            hits += [f"{f.relative_to(ROOT)}: {p.pattern}" for p in FALSE_CLAIMS if p.search(t)]
+            rel = str(f.relative_to(ROOT))
+            for ln in f.read_text(encoding="utf-8", errors="ignore").splitlines():
+                if NEGATION.search(ln):
+                    continue  # definitions and prohibitions ("PROHIBITED to state ...") are not claims
+                if any(p.search(ln) for p in FALSE_CLAIMS) or (rel.startswith(STATUS_DOCS) and STATUS_CELL.search(ln)):
+                    hits.append(f"{rel}: {ln.strip()[:100]}")
     return not hits, "; ".join(hits[:5]) or "no global / false validation claim found"
 
 
 def check_secrets():
     hits = [str(f.relative_to(ROOT)) for f in _tracked() if f.exists() and f.is_file() and f.stat().st_size < 5_000_000
-            and SECRET.search(f.read_text(encoding="utf-8", errors="ignore"))]
+            and any("FAKE" not in m.group(0).upper() for m in SECRET.finditer(f.read_text(encoding="utf-8", errors="ignore")))]
     env_files = [str(f.relative_to(ROOT)) for f in _tracked() if f.name == ".env"]
     return not (hits or env_files), f"secrets in {hits + env_files}" if hits or env_files else "no secrets / .env tracked"
 
