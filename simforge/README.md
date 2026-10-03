@@ -23,6 +23,9 @@ python scripts/release/check_release.py                 # puerta de release 1.0:
 LLM opcional (asistente EXPERIMENTAL): `pip install -e ".[llm]"` y `ANTHROPIC_API_KEY` en `.env`. Con la clave, el texto
 del asistente sale de la máquina (la UI lo avisa).
 
+**Versión actual: 1.0.0-rc1** (Release Candidate; motor `0.9.0`; sin tag todavía): ver
+[`docs/release/1.0.0-rc1_release_notes.md`](docs/release/1.0.0-rc1_release_notes.md).
+
 **Documentación de usuario:** [`docs/user/`](docs/user/01_getting_started.md) (primeros pasos, tutorial de punta a punta,
 glosario, solución de problemas). **Estado 1.0:** [`docs/release/`](docs/release/1.0_release_criteria.md) ·
 [`KNOWN_LIMITATIONS.md`](KNOWN_LIMITATIONS.md) · [`CHANGELOG.md`](CHANGELOG.md). Ninguna capacidad está validada con datos

@@ -8,7 +8,29 @@ Capacidades relevantes. No es una lista de commits.
 - ninguna está REAL_DATA_VALIDATED;
 - validación económica real: **NOT_EXECUTED**.
 
-## [Unreleased] — 1.0 release readiness
+## [1.0.0-rc1] — Release Candidate 1 (declarada; sin tag hasta su autorización explícita)
+
+Primera Release Candidate de SimForge 1.0. Release notes: `docs/release/1.0.0-rc1_release_notes.md`.
+
+### Declaración de RC1
+
+- Versión de producto **1.0.0-rc1** (`simforge.__version__ = "1.0.0rc1"`). Es la única fuente de verdad y
+  `pyproject.toml` la lee como versión dinámica.
+- `ENGINE_VERSION` sigue en `0.9.0` y `ECONOMICS_ENGINE_VERSION` en `0.9.0`: versión de producto y versión del motor son
+  independientes.
+- La cabecera de la UI muestra la versión de producto; la instalación limpia comprueba los metadatos instalados.
+- Política de estabilización, nueva RC y promoción: `docs/release/1.0_stabilization_policy.md`.
+- Tests de versionado: `tests/test_release_versioning.py`.
+- **Sin capacidades nuevas**: RC1 = alcance congelado + el trabajo de Release Readiness de abajo.
+
+### Pendiente para 1.0.0 final
+
+- Ventana de estabilización (7–14 días de uso real) con su registro.
+- Cero S0/S1 y cero S2 incompatibles, y los 20 criterios de promoción de `1.0_stabilization_policy.md` § 4.
+- `check_release.py` en PASS sobre el commit exacto candidato a la final.
+- Tags de RC y de la final: sólo con autorización explícita.
+
+## 1.0 release readiness (incluido en 1.0.0-rc1)
 
 ### Fixed
 
