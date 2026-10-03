@@ -485,3 +485,98 @@ def test_preexisting_param_editor_noop_save_does_not_materialize_defaults(tmp_pa
     p = sf.open_project(p.meta.slug)
     assert len(p.versions()) == n0 and p.current_model().content_hash() == h0
     assert p.current_model().node("m1").params == {"process_time": {"dist": "constant", "value": 60}}
+
+
+def _w(at, kind: str, key: str):
+    return next(w for w in getattr(at, kind) if w.key == key)
+
+
+def test_ui_builds_example_01_without_yaml_same_hash_and_runs(tmp_path, monkeypatch):
+    sf = _sf(tmp_path)
+    p = sf.create_project("ui build")
+    at = _ui(tmp_path, monkeypatch)
+    _w(at, "text_input", "bld_new_name").input("Simple line").run()
+    _w(at, "text_input", "bld_new_hv").input("1").run()
+    _w(at, "selectbox", "bld_new_hu").select("h").run()
+    _w(at, "button", "bld_new_btn").click().run()
+    assert not at.exception
+    for nid, comp, name in (("src", "source", ""), ("m1", "machine", "Machine 1"), ("buf", "buffer", "Buffer"),
+                            ("m2", "machine", "Machine 2"), ("out", "sink", "")):
+        _w(at, "text_input", "bld_add_id").input(nid).run()
+        _w(at, "selectbox", "bld_add_comp").select(comp).run()
+        _w(at, "text_input", "bld_add_name").input(name).run()
+        _w(at, "button", "bld_add_btn").click().run()
+        assert not at.exception, nid
+    # MISSING is visible (process times not declared yet), nothing was defaulted
+    shown = " ".join(str(df.value.to_dict()) for df in at.dataframe)
+    assert "nodes.m1.params.process_time" in shown
+    for a, b in (("src", "m1"), ("m1", "buf"), ("buf", "m2"), ("m2", "out")):
+        _w(at, "selectbox", "bld_e_src").select(a).run()
+        _w(at, "selectbox", "bld_e_dst").select(b).run()
+        _w(at, "button", "bld_e_add").click().run()
+        assert not at.exception, (a, b)
+    for nid, value in (("m1", "60"), ("m2", "45")):
+        _w(at, "selectbox", "bld_cfg_node").select(nid).run()
+        _w(at, "selectbox", f"bld_{nid}_pt_fam").select("constant").run()
+        _w(at, "text_input", f"bld_{nid}_pt_constant_value").input(value).run()
+        assert _w(at, "selectbox", f"bld_{nid}_pt_unit").value.startswith("(not declared")  # shown, not persisted
+        _w(at, "button", f"bld_{nid}_apply").click().run()
+        assert not at.exception, nid
+    _w(at, "selectbox", "bld_cfg_node").select("buf").run()
+    _w(at, "text_input", "bld_buf_cap").input("3").run()
+    _w(at, "button", "bld_buf_apply").click().run()
+    assert not at.exception
+    built = sf.open_project(p.meta.slug).current_model()
+    ref = load_model(EXAMPLES / "01_simple_line.yaml")
+    assert built.content_hash() == ref.content_hash()
+    assert built.model_dump(mode="json", exclude={"meta"}) == ref.model_dump(mode="json", exclude={"meta"})
+    next(b for b in at.button if b.label == "RUN SIMULATION").click().run()
+    assert not at.exception and any("COMPLETED" in s.value for s in at.success)
+    run = sf.open_project(p.meta.slug).runs()[0]
+    res = sf.open_project(p.meta.slug).load_run(run["run_id"])
+    assert res.model_hash == ref.content_hash() and res.kpis.mean("units_completed") == 59
+
+
+def test_ui_builder_rejects_invalid_input_and_shows_error(tmp_path, monkeypatch):
+    sf = _sf(tmp_path)
+    p = sf.create_project("ui err")
+    sf.save_model(p, load_model(EXAMPLES / "01_simple_line.yaml"), "01")
+    n0 = len(p.versions())
+    at = _ui(tmp_path, monkeypatch)
+    _w(at, "text_input", "bld_add_id").input("m1").run()  # duplicate id
+    _w(at, "button", "bld_add_btn").click().run()
+    assert any("Ya existe" in e.value for e in at.error)
+    _w(at, "selectbox", "bld_cfg_node").select("buf").run()
+    _w(at, "text_input", "bld_buf_cap").input("-2").run()
+    _w(at, "button", "bld_buf_apply").click().run()
+    assert any("Not applied" in e.value for e in at.error)
+    _w(at, "text_input", "bld_buf_cap").input("abc").run()
+    assert any("no es un número" in e.value for e in at.error)
+    assert len(sf.open_project(p.meta.slug).versions()) == n0  # nothing saved
+
+
+def test_ui_transport_editor_and_noop_apply_keeps_hash(tmp_path, monkeypatch, reg):
+    sf = _sf(tmp_path)
+    p = sf.create_project("ui tr")
+    sf.save_model(p, transport_line(reg), "line")
+    at = _ui(tmp_path, monkeypatch)
+    _w(at, "selectbox", "bld_cfg_node").select("move").run()
+    _w(at, "text_input", "bld_move_dist_v").input("20").run()
+    _w(at, "text_input", "bld_move_speed_v").input("1").run()
+    _w(at, "selectbox", "bld_move_lt_fam").select("constant").run()
+    _w(at, "text_input", "bld_move_lt_constant_value").input("5").run()
+    _w(at, "selectbox", "bld_move_ut_fam").select("constant").run()
+    _w(at, "text_input", "bld_move_ut_constant_value").input("4").run()
+    _w(at, "selectbox", "bld_move_ut_unit").select("s").run()
+    _w(at, "button", "bld_move_apply").click().run()
+    assert not at.exception
+    m = sf.open_project(p.meta.slug).current_model()
+    assert m.node("move").params == {"distance": {"value": 20, "unit": "m"}, "speed": {"value": 1, "unit": "m/s"},
+                                     "load_time": {"dist": "constant", "value": 5},
+                                     "unload_time": {"dist": "constant", "value": 4, "unit": "s"}}
+    assert verify_model(m, reg)[0].ok
+    h, n = m.content_hash(), len(sf.open_project(p.meta.slug).versions())
+    _w(at, "button", "bld_move_apply").click().run()  # no-op apply: nothing saved, same hash
+    m2 = sf.open_project(p.meta.slug).current_model()
+    assert m2.content_hash() == h and len(sf.open_project(p.meta.slug).versions()) == n
+    assert any("No changes" in i.value for i in at.info)

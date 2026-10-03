@@ -186,7 +186,9 @@ def _handle(app: SimForgeApp, project: Project, text: str, hist: list, confirm: 
 def model_tab(app: SimForgeApp, project: Project) -> None:
     model = project.current_model()
     if model is None:
-        st.info("No model yet. Describe the process in the Assistant tab, or load an example:")
+        from .builder_view import new_model_form
+        st.info("No model yet. Build one here (no YAML), describe the process in the Assistant tab, or load an example:")
+        new_model_form(app, project)
         ex = st.selectbox("Example", sorted(p.name for p in EXAMPLES.glob("*.yaml")))
         if st.button("Load example into project"):
             _save(app, project, load_model(EXAMPLES / ex), f"loaded example {ex}")
@@ -227,6 +229,9 @@ def model_tab(app: SimForgeApp, project: Project) -> None:
             if model.missing and st.button("Mark questions as answered (after editing the parameters)"):
                 _save(app, project, model.model_copy(update={"missing": []}), "missing data resolved by engineer")
 
+    with st.expander("Model builder — structure · distributions · transport (no YAML)", expanded=not model.nodes):
+        from .builder_view import builder_section
+        builder_section(app, project, model, report)
     st.markdown("#### Parameters")
     _param_editor(app, project, model)
     with st.expander("Advanced: edit ISMS (YAML)"):
