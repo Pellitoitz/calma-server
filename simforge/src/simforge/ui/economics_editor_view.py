@@ -125,12 +125,19 @@ def economics_editor(app: SimForgeApp, project: Project) -> None:
             pick = st.selectbox("Line", ids, key="ee_pick")
             pcat, idx = pick.split(".")[0], int(pick.split(".")[1])
             line = data[pcat][idx]
-            try:
-                eform = _money_inputs(f"ee_edit_{pick}", spec.currency,
-                                      E.basis_options(pcat, line.get("kind")), line[E.MONEY_FIELD[pcat]])
-            except E.EconomicsEditError as e:
-                st.error(str(e))
+            options = E.basis_options(pcat, line.get("kind"))
+            stored_basis = line[E.MONEY_FIELD[pcat]].get("basis")
+            if stored_basis not in options:  # E-D03: never re-base silently; the stored value is kept as is
+                st.warning(f"{pick} is read-only in this editor: stored basis {stored_basis} is not editable for "
+                           f"'{pcat}' (editable: {', '.join(options)}). It is preserved unchanged; remove it explicitly "
+                           "or edit the YAML.")
                 eform = None
+            else:
+                try:
+                    eform = _money_inputs(f"ee_edit_{pick}", spec.currency, options, line[E.MONEY_FIELD[pcat]])
+                except E.EconomicsEditError as e:
+                    st.error(str(e))
+                    eform = None
             c = st.columns(2)
             if c[0].button("SAVE LINE", key="ee_edit_btn", disabled=eform is None):
                 _save(app, project, lambda: E.update_line_money(model, pcat, idx, eform), f"economics: edit {pick}")

@@ -54,5 +54,6 @@ Reglas:
   `economic_hash`.
 - **Evaluar.** *Evaluar (sin re-simular)* aplica los supuestos actuales a un run ya guardado con el servicio de
   economics 0.9. No se ejecuta el DES.
+- **Valores que el editor no puede editar.** Si una línea guardada tiene una base que el editor no ofrece para su categoría (por ejemplo `PER_UNIT`), se muestra **solo lectura** con un aviso. Se conserva sin cambios: nunca se cambia de base en silencio. Puedes quitarla explícitamente o editar el YAML.
 - **Avisos.** Los del verificador (doble conteo, bases solapadas, REQUIRES_ENGINEER_DECISION) se muestran tal cual.
   El editor no los resuelve.

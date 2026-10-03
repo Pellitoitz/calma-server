@@ -184,8 +184,10 @@ def test_productivity_panel_shows_recorded_values_verbatim_and_missing_as_not_av
     assert rec["ai_generation_s"].status == "NOT_AVAILABLE" and rec["ai_generation_s"].value is None  # no AI used: not 0
     road = {x.name: x for x in pp.roadmap}
     assert set(road) == set(ROADMAP)
-    assert road["TIME_TO_FIRST_VALID_RUN"].value == p.metric("time_to_first_run_s")
-    for name in ("TIME_TO_VALID_MODEL", "TIME_TO_DECISION_READY_COMPARISON", "ACTIVE_ENGINEERING_TIME", "NUMBER_OF_CORRECTION_LOOPS"):
+    # E-D01: no contractual definition of "valid run" -> not renamed from time_to_first_run_s
+    assert "time_to_first_run_s" in road["TIME_TO_FIRST_VALID_RUN"].definition
+    for name in ("TIME_TO_FIRST_VALID_RUN", "TIME_TO_VALID_MODEL", "TIME_TO_DECISION_READY_COMPARISON",
+                 "ACTIVE_ENGINEERING_TIME", "NUMBER_OF_CORRECTION_LOOPS"):
         assert road[name].status == "NOT_AVAILABLE" and road[name].value is None and road[name].source == "NOT_INSTRUMENTED"
     counts = {x.name: x.value for x in pp.counts}
     assert counts["runs"] == 1 and counts["versions"] == len(p.versions()) and counts["ai_value_corrections"] == 0  # real zero
@@ -206,3 +208,33 @@ def test_productivity_panel_language_is_factual(proj):
     sf, p, _ = proj
     text = productivity_panel(p).model_dump_json().lower()
     assert not [w for w in ("excellent", "efficient", "saved you", "% more", "great", "score") if w in text]
+
+
+@pytest.mark.parametrize("basis", ["PER_UNIT", "PER_CYCLE"])  # non-calculable / not allowed for labor
+def test_ui_existing_unsupported_basis_is_read_only_and_never_lost(tmp_path, monkeypatch, basis):
+    """E-D03: a stored value the editor cannot edit is shown read-only and preserved, never silently re-based."""
+    pytest.importorskip("streamlit")
+    from pathlib import Path
+
+    from streamlit.testing.v1 import AppTest
+
+    from simforge.domain.paths import set_value
+    sf = SimForgeApp(workspace=tmp_path / "ws", library_dir=tmp_path / "lib", provider=None)
+    p = sf.create_project("ro")
+    m = set_value(load_model(GOLDEN / "model.yaml"), "economics.labor.0.rate.basis", basis)
+    sf.save_model(p, m, "unsupported basis")
+    n_versions = len(p.versions())
+    monkeypatch.setenv("SIMFORGE_WORKSPACE", str(tmp_path / "ws"))
+    monkeypatch.setenv("SIMFORGE_LIBRARY", str(tmp_path / "lib"))
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    monkeypatch.chdir(tmp_path)
+    at = AppTest.from_file(str(Path(__file__).parents[1] / "src" / "simforge" / "ui" / "app.py"), default_timeout=180)
+    at.run()
+    next(s for s in at.selectbox if s.key == "ee_pick").select("labor.0").run()
+    assert not at.exception
+    assert any("read-only" in w.value and basis in w.value for w in at.warning)
+    save = next(b for b in at.button if b.key == "ee_edit_btn")
+    assert save.disabled  # a browser user cannot save (and thus re-base) this line
+    at.run()
+    p = sf.open_project(p.meta.slug)
+    assert len(p.versions()) == n_versions and p.current_model().economics.labor[0].rate.basis.value == basis

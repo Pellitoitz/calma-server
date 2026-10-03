@@ -114,7 +114,8 @@ from typing import Literal  # noqa: E402
 from pydantic import BaseModel, ConfigDict  # noqa: E402
 
 RECORDED: dict[str, tuple[str, str, str]] = {  # key -> (unit, source, definition)
-    "time_to_first_run_s": ("s", "MEASURED", "first saved model version -> first stored (completed) run"),
+    "time_to_first_run_s": ("s", "MEASURED", "first saved model version -> first stored run (stored runs are completed "
+                                         "runs of a model that passed the verifier)"),
     "time_to_engineer_approval_s": ("s", "MEASURED", "first saved model version -> first engineer approval"),
     "engineer_review_s": ("s", "MEASURED", "last AI generation -> approval (upper bound: includes corrections and pauses)"),
     "ai_generation_s": ("s", "MEASURED", "interpreter + compiler wall clock of the last AI generation"),
@@ -124,9 +125,11 @@ RECORDED: dict[str, tuple[str, str, str]] = {  # key -> (unit, source, definitio
     "custom_logic_count": ("count", "MEASURED", "custom rule candidates in the last AI generation"),
     "ai_questions": ("count", "MEASURED", "questions asked by the last AI generation"),
 }
-# requested by the 1.1 roadmap -> recorded key with the SAME definition, or None (not instrumented: NOT_AVAILABLE)
+# requested by the 1.1 roadmap -> recorded key ONLY with a contractually identical definition, else None (NOT_AVAILABLE)
 ROADMAP: dict[str, tuple[str | None, str]] = {
-    "TIME_TO_FIRST_VALID_RUN": ("time_to_first_run_s", "same definition as time_to_first_run_s (only completed runs are stored)"),
+    "TIME_TO_FIRST_VALID_RUN": (None, "not instrumented: 'valid run' has no contractual definition; related recorded "
+                                "metric: time_to_first_run_s (first completed run of a verifier-passing model; approval "
+                                "and real-world validity are not guaranteed)"),
     "TIME_TO_VALID_MODEL": (None, "not instrumented; related recorded metric: time_to_engineer_approval_s (approval, not validity)"),
     "TIME_TO_DECISION_READY_COMPARISON": (None, "not instrumented"),
     "ACTIVE_ENGINEERING_TIME": (None, "not instrumented (wall-clock windows include idle time)"),

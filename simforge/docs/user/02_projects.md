@@ -49,7 +49,7 @@ referencia inventada.
 
 | Métrica del roadmap | Estado | Fuente |
 |---|---|---|
-| TIME_TO_FIRST_VALID_RUN | registrada | `time_to_first_run_s`: primera versión guardada → primer run completado (sólo se guardan runs completados) |
+| TIME_TO_FIRST_VALID_RUN | NOT_AVAILABLE («run válido» no tiene definición contractual) | métrica relacionada, con su propio nombre: `time_to_first_run_s` (primera versión guardada → primer run guardado; los runs guardados son runs completados de un modelo que pasa el verificador; no garantiza aprobación ni validez real) |
 | TIME_TO_VALID_MODEL | NOT_AVAILABLE (no instrumentada) | métrica relacionada: `time_to_engineer_approval_s` (aprobación, no validez) |
 | TIME_TO_DECISION_READY_COMPARISON | NOT_AVAILABLE (no instrumentada) | — |
 | ACTIVE_ENGINEERING_TIME | NOT_AVAILABLE (no instrumentada) | las ventanas de reloj incluyen pausas |
@@ -57,7 +57,7 @@ referencia inventada.
 
 También se muestran:
 
-- **Métricas registradas:** `time_to_engineer_approval_s`, `engineer_review_s`, `ai_generation_s`, `reuse_ratio`,
+- **Métricas registradas:** `time_to_first_run_s`, `time_to_engineer_approval_s`, `engineer_review_s`, `ai_generation_s`, `reuse_ratio`,
   `custom_logic_count`, `ai_questions` y los tiempos introducidos por el ingeniero.
 - **Recuentos:** versiones, runs, ediciones de la IA y correcciones.
 
