@@ -10,7 +10,7 @@
 | DES_ENGINE | `0.9.0` |
 | ECONOMICS_ENGINE | `0.9.0` |
 | Preflight del tag | HEAD = 1b283a7, árbol limpio, 711 tests, ruff PASS, FREEZE [] (18), 01–05 = [59, 359, 1889.05, 477.5, 130], `check_release.py` PASS 11/11 (manifiesto: working_tree_dirty false), criterios RC 16/16, S0/S1/S2 = 0/0/0 |
-| Estado del tag en el remoto | **BLOQUEADO**: el push del tag fue rechazado por la política de la sesión (HTTP 403 en la referencia del tag; los pushes de la rama sí se aceptan). El tag existe y está verificado **en local**. Se publica con `git push origin refs/tags/v1.0.0-rc1` desde un entorno con permiso para tags |
+| Estado del tag en el remoto | **RC1_TAG_STATUS = LOCAL_CORRECT_REMOTE_PUBLICATION_BLOCKED** (`REMOTE_TAG_PUBLICATION = BLOCKED_BY_REMOTE_PERMISSION`). El tag local es correcto: anotado, peeled = 1b283a7edd1bfa1c5317d10b490fc050bd855ed5. El push sólo del tag (`git push origin refs/tags/v1.0.0-rc1`) se rechazó con HTTP 403 en los dos intentos (apertura de la ventana y 2026-10-03, intento único autorizado). `refs/tags/v1.0.0-rc1` **no existe** en origin. No es un bug de SimForge. Publicación manual desde un entorno autorizado: `git fetch origin && git tag -a v1.0.0-rc1 1b283a7 -m "SimForge 1.0.0-rc1 — Release candidate 1" && git push origin refs/tags/v1.0.0-rc1`, y verificación con `git ls-remote origin 'refs/tags/v1.0.0-rc1^{}'` → 1b283a7edd1bfa1c5317d10b490fc050bd855ed5 |
 
 **Reglas:**
 
@@ -24,7 +24,7 @@
 
 | | |
 |---|---|
-| Sesiones ejecutadas | 0 |
+| Sesiones ejecutadas | 0 (S-001 preparada como plantilla vacía, `sessions/S-001.md`: NOT_EXECUTED / READY_FOR_HUMAN_EXECUTION) |
 | Incidencias | 0 |
 | RC2_REQUIRED | NO (por ahora) |
 
