@@ -584,6 +584,24 @@ class SimForgeApp:
         return compare_physical_runs(b, a, metrics=metrics, base_model=model(bid), alt_model=model(aid), registry=self.registry,
                                      baseline_identity=bid, alternative_identity=aid)
 
+    def _stored_model_of(self, project: Project, run_id: str):
+        try:
+            return self.run_model_of(project, run_id)
+        except ValueError:
+            return None  # run of an unsaved model (or hash mismatch): no model-based ordering / overlay
+
+    def results_workbench(self, project: Project, run_id: str):
+        """1.1-C results workbench of a STORED run (never simulates)."""
+        from ..analytics.workbench import build_workbench
+        run, ident = self.run_identity(project, run_id)
+        return build_workbench(run, ident, self._stored_model_of(project, run_id))
+
+    def graph_overlay(self, project: Project, run_id: str, metric: str):
+        """Stored node KPI on the run's own model version (None when that model is not available)."""
+        from ..analytics.workbench import graph_overlay
+        model = self._stored_model_of(project, run_id)
+        return (graph_overlay(project.load_run(run_id), model, metric), model) if model is not None else (None, None)
+
     def experiment_deltas(self, project: Project, experiment_id: str, reference_index: int = 0, metrics: list[str] | None = None):
         from ..analytics.run_comparison import experiment_deltas
         return experiment_deltas(project.load_experiment(experiment_id), reference_index, metrics)

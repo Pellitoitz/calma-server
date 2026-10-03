@@ -26,7 +26,8 @@ EXAMPLES = Path(__file__).resolve().parents[3] / "examples"
 
 
 # --------------------------------------------------------------------------- helpers
-def process_graph(model: ISMSModel, report: VerificationReport | None = None) -> str:
+def process_graph(model: ISMSModel, report: VerificationReport | None = None, overlay: dict[str, str] | None = None) -> str:
+    """Graphviz DOT of the model. `overlay` (1.1-C): node id -> extra label line with a stored run value (text only)."""
     bad = {i.path.split(".")[1] for i in (report.errors if report else []) if i.path and i.path.startswith("nodes.")}
     lines = ["digraph G {", "rankdir=LR; bgcolor=transparent;",
              'node [fontname="Helvetica", fontsize=11, style="rounded,filled", fillcolor="#f6f8fa", color="#57606a"];',
@@ -50,6 +51,8 @@ def process_graph(model: ISMSModel, report: VerificationReport | None = None) ->
             shape = "cds"
             tp = n.params
             label.append(f"{(tp.get('distance') or {}).get('value', '?')} m @ {(tp.get('speed') or {}).get('value', '?')} m/s")
+        if overlay is not None and n.id in overlay:
+            label.append(overlay[n.id])
         extra = ', color="#cf222e", penwidth=2' if n.id in bad else ""
         lab = "\\n".join(str(x).replace('"', "'") for x in label)
         lines.append(f'"{n.id}" [label="{lab}", shape={shape}{extra}];')
@@ -425,6 +428,8 @@ def run_tab(app: SimForgeApp, project: Project) -> None:
     rid = st.selectbox("Run", ids, index=default, format_func=lambda i: next(f"{r['created_at']} · v{r['model_version']} · {r['replications']} rep · {i}" for r in runs if r["run_id"] == i))
     res = last if last and last.run_id == rid else project.load_run(rid)
     show_results(res, project)
+    from .workbench_view import workbench_section
+    workbench_section(app, project, rid)
 
 
 def show_results(res: SimulationResult, project: Project | None = None) -> None:
