@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "simforge"
-version = "0.1.0"
+dynamic = ["version"]   # product version: simforge.__version__ (single source of truth)
 description = "Local AI-assisted industrial discrete-event simulation workbench"
 readme = "README.md"
 requires-python = ">=3.11,<3.12"   # 1.0 contract: Python 3.11 only (the tested version)
@@ -28,6 +28,9 @@ all = ["simforge[ui,llm,excel,data,dev]"]
 
 [project.scripts]
 simforge = "simforge.cli:main"
+
+[tool.setuptools.dynamic]
+version = { attr = "simforge.__version__" }
 
 [tool.setuptools.packages.find]
 where = ["src"]

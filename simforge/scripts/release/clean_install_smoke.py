@@ -35,6 +35,9 @@ def main(argv: list[str]) -> int:
         ("venv", [sys.executable, "-m", "venv", str(venv)]),
         ("install", [str(bin_ / "python"), "-m", "pip", "install", "-q", f"{ROOT}[ui,data,dev]"]),
         ("entry point", [str(bin_ / "simforge"), "--help"]),
+        ("product version", [str(bin_ / "python"), "-c", "import importlib.metadata as m, simforge; "
+                             "v=m.version('simforge'); assert v==simforge.__version__=='1.0.0rc1', v; "
+                             "assert simforge.ENGINE_VERSION=='0.9.0'; print('SimForge', v, 'engine', simforge.ENGINE_VERSION)"]),
         ("example run", [str(bin_ / "simforge"), "run", str(ROOT / "examples" / "01_simple_line.yaml")]),
         ("project new", [str(bin_ / "simforge"), "project", "new", "Clean", "--model", str(golden / "model.yaml")]),
         ("approve", [str(bin_ / "simforge"), "project", "approve", "clean", "--by", "engineer"]),

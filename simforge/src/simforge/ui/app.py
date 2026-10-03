@@ -84,9 +84,10 @@ st.header(project.name)
 _cur = project.current_model()
 if _cur is not None:  # where am I: version, approval, MISSING, engine, validation status (1.0 release audit)
     from simforge import ENGINE_VERSION as _EV
+    from simforge import __version__ as _PV
     _missing = sum(1 for m in _cur.missing if m.required)
     st.caption(f"Model v{project.meta.current_version} · `{_cur.content_hash()}` · engineer approval: "
-               f"**{'YES' if _cur.is_approved else 'NO'}** · required MISSING values: **{_missing}** · engine {_EV} · "
+               f"**{'YES' if _cur.is_approved else 'NO'}** · required MISSING values: **{_missing}** · SimForge {_PV} · engine {_EV} · "
                "validation: capabilities SYNTHETICALLY_VALIDATED (tests), real-data validation per capability only "
                "(economics: NOT_EXECUTED) — see docs/release/1.0_capability_matrix.md")
 if app.provider:
