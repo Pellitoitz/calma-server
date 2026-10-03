@@ -126,9 +126,10 @@ def build_markdown(model: ISMSModel, report: VerificationReport, run: Simulation
         if best:
             top = best[0].result.kpis.mean("throughput_per_hour")  # type: ignore[union-attr]
             desc = "; ".join(", ".join(f"{k.split('.')[-2]}={v}" for k, v in s.factors.items()) for s in best[:5])
-            tie = f" ({len(best)} scenarios within 0.5% of the maximum — choose on secondary criteria such as WIP or cost)" if len(best) > 1 else ""
+            tie = (f" ({len(best)} scenarios within 0.5% of the maximum; secondary criteria are not evaluated by this "
+                   "report)") if len(best) > 1 else ""
             L.append(f"- Experiment '{experiment.spec.name}': max mean throughput {top:.2f} u/h at {desc}{tie}. "
-                     "Check confidence intervals before concluding.")
+                     "Means only: confidence intervals are not assessed in this summary.")
     L.append("")
 
     # 2. current state / model
@@ -245,14 +246,15 @@ def build_markdown(model: ISMSModel, report: VerificationReport, run: Simulation
           "(NOT_EXECUTED).",
           f"- This model: engineer approval **{'YES' if model.is_approved else 'NO'}**. Whether it represents the real "
           "system is the engineer's validation, not established by SimForge.", "",
-          "## 10. Risks and next steps", ""]
+          "## 10. Open items (facts)", ""]
     if not model.is_approved:
-        L.append("- Validate the model against real data (throughput, WIP, utilisations) and approve it.")
-    if any(not a.accepted for a in model.assumptions):
-        L.append("- Confirm or correct the open assumptions listed in section 3.")
+        L.append("- Engineer approval: **NO** — the model has not been approved as representing the real system.")
+    open_a = sum(1 for a in model.assumptions if not a.accepted)
+    if open_a:
+        L.append(f"- {open_a} assumption(s) listed in section 3 are not accepted.")
     if run and run.kpis.n < 10 and any(i.code == "FEW_REPLICATIONS" for i in report.warnings):
-        L.append("- Increase replications (stochastic model).")
-    L.append("- Recommendations must be evaluated as scenarios (compare against baseline) before acting.")
+        L.append(f"- The verifier reports FEW_REPLICATIONS ({run.kpis.n} replication(s) in this run).")
+    L.append("- Any engineering decision requires evaluation outside this report.")
     if run:
         L += ["", "## Reproducibility", "", f"run `{run.run_id}` · started {run.started_at} · model_hash `{run.model_hash}` · "
               f"engine {run.engine} {run.engine_version} · app {run.app_version} · horizon {run.horizon_s:g} s · warm-up "
