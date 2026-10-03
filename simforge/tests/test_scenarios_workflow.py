@@ -376,7 +376,7 @@ def test_ui_comparison_rendering_and_wording(tmp_path, monkeypatch):
     assert next(s for s in at.selectbox if s.key == "scn_cmp_base").value == rb.run_id
     assert next(s for s in at.selectbox if s.key == "scn_cmp_alt").value == ra.run_id
     assert any("COMPARABLE · mode PAIRED" in s.value for s in at.success)
-    tab = at.tabs[12]
+    tab = at.tabs[11]  # Project tab hosts the scenario workflow (RC1 tab count unchanged)
     texts = [x.value for x in tab.caption] + [x.value for x in tab.markdown] + [x.value for x in tab.success]
     assert any("delta = alternative - baseline" in t for t in texts)
     assert not [t for t in texts if any(w in t.lower() for w in ("best", "winner", "recommended", "optimal", "superior"))]

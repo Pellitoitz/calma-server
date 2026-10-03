@@ -94,7 +94,7 @@ if app.provider:
     st.warning(f"Remote LLM active ({app.provider.name}): text typed in the Assistant tab is SENT to the provider. "
                "Unset ANTHROPIC_API_KEY to work fully offline.")
 tabs = st.tabs(["Assistant", "Model", "Data", "Calendars", "Products", "Maintenance", "Run & results", "Economics",
-                "Experiments", "Library", "Report", "Project", "Scenarios"])
+                "Experiments", "Library", "Report", "Project"])
 with tabs[0]:
     views.assistant_tab(app, project)
 with tabs[1]:
@@ -118,6 +118,7 @@ with tabs[9]:
 with tabs[10]:
     views.report_tab(app, project)
 with tabs[11]:
-    views.project_tab(app, project)
-with tabs[12]:
+    st.markdown("### Scenarios & run comparison")
     scenarios_view.scenarios_tab(app, project)
+    st.divider()
+    views.project_tab(app, project)

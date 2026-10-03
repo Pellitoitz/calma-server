@@ -28,7 +28,7 @@ Estado: CODE_COMPLETE + SYNTHETICALLY_VALIDATED. Sin validación real.
 - **CLI:** `project compare-runs`, `project scenario-clone`, `project scenario-set`, `project scenarios` y
   `project experiment` (deltas frente a un escenario de referencia).
 - **UI:**
-  - nueva pestaña **Scenarios**: baseline → clonar → modificar → verificar → aprobar → ejecutar → comparar;
+  - sección *Scenarios & run comparison* en la pestaña **Project** (se mantienen las 12 pestañas de RC1): baseline → clonar → modificar → verificar → aprobar → ejecutar → comparar;
   - en Experiments, tabla de deltas frente a la referencia.
 - **Sin cambios en:** motor (0.9.0), economics (0.9.0), esquema SQLite (sin migraciones), ficheros FREEZE y versión de
   producto (sigue siendo 1.0.0rc1).

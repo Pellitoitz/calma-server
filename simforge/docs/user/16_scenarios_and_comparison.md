@@ -10,7 +10,7 @@ El flujo es:
 SimForge **describe** las diferencias entre dos runs guardados. No elige escenario, no ordena y no recomienda: el
 ingeniero decide.
 
-## Flujo en la UI (pestaña **Scenarios**)
+## Flujo en la UI (pestaña **Project**, sección *Scenarios & run comparison*)
 
 1. **Baseline.** Si el proyecto aún no tiene baseline, elige la versión y pulsa *SET BASELINE*.
 2. **Clonar.** Indica el nombre del escenario, la versión de partida (por defecto, el baseline) y los cambios
