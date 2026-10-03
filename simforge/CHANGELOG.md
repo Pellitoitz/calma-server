@@ -88,6 +88,27 @@ Estado: CODE_COMPLETE + SYNTHETICALLY_VALIDATED.
 - **Sin cambios en:** el informe de 1.0, el motor, economics, los KPIs, el esquema, los ficheros FREEZE y
   `content_hash`. Sin PDF nativo.
 
+### 1.1-D (D-1) — Lenguaje del informe 1.0
+
+- El informe 1.0 describe en lugar de prescribir: la sección 10 pasa a «Open items (facts)».
+- La numeración de secciones y los contratos de release no cambian.
+
+### 1.1-E — Editor económico (C06), productividad visible (C17) y tests de la biblioteca (C15)
+
+Estado: CODE_COMPLETE + SYNTHETICALLY_VALIDATED.
+
+- **C06:** editor de supuestos económicos en la pestaña **Economics**:
+  - ofrece sólo las bases existentes;
+  - MISSING ≠ 0;
+  - cada guardado es una versión nueva;
+  - el hash físico, la caché y la aprobación no cambian;
+  - se evalúa sin DES.
+- **C17:** panel de métricas registradas en la pestaña **Project**. Las métricas del roadmap no instrumentadas
+  aparecen como NOT_AVAILABLE.
+- **C15:** tests de comportamiento para los 19 componentes `draft`. El metadato no se promueve (FREEZE; propuesta
+  documentada).
+- **Sin cambios en:** motor, economics 0.9, KPIs, esquema, ficheros FREEZE y `content_hash`.
+
 ## [1.0.0-rc1] — Release Candidate 1 (declarada; sin tag hasta su autorización explícita)
 
 Primera Release Candidate de SimForge 1.0. Release notes: `docs/release/1.0.0-rc1_release_notes.md`.

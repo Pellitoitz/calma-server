@@ -40,3 +40,25 @@ Al abrir un proyecto creado con una versión anterior, la base de datos se migra
 
 - cada migración es atómica;
 - antes de migrar se guarda una copia `project.db.pre-migration-vN.bak`.
+
+## Métricas de productividad (1.1-E, línea de desarrollo)
+
+En la pestaña **Project**, sección *Productivity metrics (recorded values only)*, se muestran **sólo** valores ya
+registrados por SimForge, sin reconstruirlos a partir de fechas, sin puntuaciones y sin comparaciones contra una
+referencia inventada.
+
+| Métrica del roadmap | Estado | Fuente |
+|---|---|---|
+| TIME_TO_FIRST_VALID_RUN | registrada | `time_to_first_run_s`: primera versión guardada → primer run completado (sólo se guardan runs completados) |
+| TIME_TO_VALID_MODEL | NOT_AVAILABLE (no instrumentada) | métrica relacionada: `time_to_engineer_approval_s` (aprobación, no validez) |
+| TIME_TO_DECISION_READY_COMPARISON | NOT_AVAILABLE (no instrumentada) | — |
+| ACTIVE_ENGINEERING_TIME | NOT_AVAILABLE (no instrumentada) | las ventanas de reloj incluyen pausas |
+| NUMBER_OF_CORRECTION_LOOPS | NOT_AVAILABLE (no instrumentada) | recuento relacionado: correcciones de valores propuestos por la IA |
+
+También se muestran:
+
+- **Métricas registradas:** `time_to_engineer_approval_s`, `engineer_review_s`, `ai_generation_s`, `reuse_ratio`,
+  `custom_logic_count`, `ai_questions` y los tiempos introducidos por el ingeniero.
+- **Recuentos:** versiones, runs, ediciones de la IA y correcciones.
+
+Una métrica no registrada es NOT_AVAILABLE, nunca 0. Aún no se ha medido productividad en sesiones humanas reales.
