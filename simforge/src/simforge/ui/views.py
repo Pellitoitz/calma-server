@@ -649,6 +649,43 @@ def report_tab(app: SimForgeApp, project: Project) -> None:
         st.caption("PDF: open the HTML and print to PDF. Native PDF/PowerPoint: NOT IMPLEMENTED.")
         with st.container(border=True):
             st.markdown(Path(paths["markdown"]).read_text(encoding="utf-8"))
+    _engineering_reports(app, project, runs)
+
+
+def _engineering_reports(app: SimForgeApp, project: Project, runs: list[dict]) -> None:
+    """1.1-D: run engineering report and scenario comparison report (existing sources only; files, not DB rows)."""
+    st.markdown("#### Engineering reports (1.1-D)")
+    st.caption("Built from stored results and existing services (workbench, compare-runs, economics). Deterministic "
+               "text; no recommendation. Markdown + HTML (same content) + JSON report model.")
+    if not runs:
+        st.info("No stored runs yet.")
+        return
+    ids = [r["run_id"] for r in runs]
+    label = {r["run_id"]: f"{r['created_at']} · v{r['model_version']} · {r['replications']} rep · {r['run_id']}" for r in runs}
+    c = st.columns([3, 1])
+    rid = c[0].selectbox("Run (engineering report)", ids, format_func=label.get, key="er_run")
+    if c[1].button("BUILD RUN REPORT", key="er_run_btn"):
+        st.session_state["er_paths"] = {k: str(v) for k, v in
+                                        app.export_engineering_report(project, app.engineering_report(project, rid)).items()}
+    c = st.columns(2)
+    b = c[0].selectbox("Baseline run", ids, index=len(ids) - 1, format_func=label.get, key="er_base")
+    a = c[1].selectbox("Alternative run", ids, index=0, format_func=label.get, key="er_alt")
+    auto = "(automatic: only when the run has exactly one evaluation)"
+    be = c[0].selectbox("Baseline economic evaluation", [auto] + [e["evaluation_id"] for e in project.evaluations(b)], key="er_be")
+    ae = c[1].selectbox("Alternative economic evaluation", [auto] + [e["evaluation_id"] for e in project.evaluations(a)], key="er_ae")
+    if st.button("BUILD COMPARISON REPORT", key="er_cmp_btn"):
+        try:
+            rep = app.comparison_report(project, b, a, None if be == auto else be, None if ae == auto else ae)
+            st.session_state["er_paths"] = {k: str(v) for k, v in app.export_engineering_report(project, rep).items()}
+        except Exception as e:  # noqa: BLE001
+            st.error(f"Comparison report not built: {e}")
+    paths = st.session_state.get("er_paths")
+    if paths and all(Path(x).exists() for x in paths.values()):
+        c = st.columns(3)
+        for col, (kind, p) in zip(c, paths.items()):
+            col.download_button(f"Download {kind}", Path(p).read_bytes(), file_name=Path(p).name, key=f"er_dl_{kind}")
+        with st.container(border=True):
+            st.markdown(Path(paths["markdown"]).read_text(encoding="utf-8"))
 
 
 def project_tab(app: SimForgeApp, project: Project) -> None:

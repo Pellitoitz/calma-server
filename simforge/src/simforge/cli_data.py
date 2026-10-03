@@ -531,6 +531,29 @@ def project_report(slug: str, run_id: Optional[str] = typer.Option(None, help="d
         typer.echo(f"{k}: {path}")
 
 
+@project_app.command("engineering-report")
+def project_engineering_report(slug: str, run_id: str, output: Optional[Path] = typer.Option(None, "-o", help="output directory")):
+    """1.1-D run engineering report (Markdown + HTML + JSON model) from stored evidence; nothing is simulated."""
+    sf = _sf()
+    p = _proj(sf, slug)
+    for k, path in sf.export_engineering_report(p, sf.engineering_report(p, run_id), output).items():
+        typer.echo(f"{k}: {path}")
+
+
+@project_app.command("comparison-report")
+def project_comparison_report(slug: str, baseline_run: str, alternative_run: str,
+                              baseline_eval: Optional[str] = typer.Option(None, help="economic evaluation of the baseline run"),
+                              alternative_eval: Optional[str] = typer.Option(None, help="economic evaluation of the alternative run"),
+                              output: Optional[Path] = typer.Option(None, "-o", help="output directory")):
+    """1.1-D scenario comparison report: compare-runs + existing economics comparison (if evaluated). Facts only."""
+    sf = _sf()
+    p = _proj(sf, slug)
+    rep = sf.comparison_report(p, baseline_run, alternative_run, baseline_eval, alternative_eval)
+    for k, path in sf.export_engineering_report(p, rep, output).items():
+        typer.echo(f"{k}: {path}")
+    typer.echo(f"physical: {rep.physical.status} ({rep.physical.comparison_mode}) · economics: {rep.economics.status}")
+
+
 @project_app.command("manifest")
 def project_manifest(slug: str, run_id: str, output: Optional[Path] = typer.Option(None, "-o")):
     """Reproducibility manifest of a stored run (versions, hashes, seeds, approval, datasets, economic evaluations)."""

@@ -606,6 +606,34 @@ class SimForgeApp:
         from ..analytics.run_comparison import experiment_deltas
         return experiment_deltas(project.load_experiment(experiment_id), reference_index, metrics)
 
+    # ------------------------------------------------------------------ engineering reports (1.1-D)
+    def engineering_report(self, project: Project, run_id: str):
+        """Typed run engineering report from existing sources (workbench, manifest, evaluations). No simulation."""
+        from ..reporting.engineering import build_run_report
+        return build_run_report(self, project, run_id)
+
+    def comparison_report(self, project: Project, baseline_run: str, alternative_run: str,
+                          baseline_evaluation: str | None = None, alternative_evaluation: str | None = None):
+        """Typed scenario comparison report (compare_runs + existing economics comparison). No simulation."""
+        from ..reporting.engineering import build_comparison_report
+        return build_comparison_report(self, project, baseline_run, alternative_run, baseline_evaluation, alternative_evaluation)
+
+    def export_engineering_report(self, project: Project, report, out_dir: Path | None = None) -> dict[str, Path]:
+        """Write Markdown + HTML (same content) + the JSON report model. Files only: nothing is stored in the database."""
+        from ..reporting.engineering import RunEngineeringReport, render_comparison_markdown, render_html, render_run_markdown
+        if isinstance(report, RunEngineeringReport):
+            md, stem = render_run_markdown(report), f"engineering_run_{report.run.identity.run_id}"
+        else:
+            md = render_comparison_markdown(report)
+            stem = f"comparison_{report.baseline.identity.run_id}_vs_{report.alternative.identity.run_id}"
+        out = out_dir or project.root / "reports"
+        out.mkdir(parents=True, exist_ok=True)
+        paths = {"markdown": out / f"{stem}.md", "html": out / f"{stem}.html", "json": out / f"{stem}.json"}
+        paths["markdown"].write_text(md, encoding="utf-8")
+        paths["html"].write_text(render_html(md, stem), encoding="utf-8")
+        paths["json"].write_text(report.model_dump_json(indent=2), encoding="utf-8")
+        return paths
+
     # ------------------------------------------------------------------ reports
     def generate_report(self, project: Project, run_id: str | None = None, experiment_id: str | None = None) -> dict[str, Path]:
         from ..reporting.report import build_markdown, markdown_to_html, results_csv
