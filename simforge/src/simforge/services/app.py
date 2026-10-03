@@ -377,6 +377,18 @@ class SimForgeApp:
         project.log("system", "evaluate_economics", result=f"evaluation {ev.evaluation_id} of run {run_id}: {ev.status}")
         return ev
 
+    def save_economics(self, project: Project, model: ISMSModel, message: str, by: str = "engineer") -> int:
+        """1.1-E (C06): store an economics-only edit as a NEW version (parent = current). Refused if the physical model
+        differs from the current version: the physical hash, approval and cache identity stay as they are."""
+        cur = project.current_model()
+        if cur is None:
+            raise ValueError("El proyecto no tiene modelo.")
+        if model.content_hash() != cur.content_hash() or diff(cur, model.model_copy(update={"economics": getattr(cur, "economics", None)})):
+            raise ValueError("Sólo se pueden guardar cambios del bloque economics desde el editor económico.")
+        v = project.save_version(model, message=message, author=by)
+        project.log("user", "edit_economics", result=f"v{v}: {message}"[:500])
+        return v
+
     def compare_economics(self, project: Project, baseline_id: str, alternative_id: str):
         from ..economics import compare_evaluations
         eb, ea = project.load_evaluation(baseline_id), project.load_evaluation(alternative_id)

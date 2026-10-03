@@ -24,6 +24,8 @@ def economics_tab(app: SimForgeApp, project: Project) -> None:
     spec = getattr(model, "economics", None)
     st.caption("SimForge calcula, compara y traza consecuencias económicas de supuestos DECLARADOS. No recomienda: el "
                "ingeniero decide.")
+    from .economics_editor_view import economics_editor
+    economics_editor(app, project)  # 1.1-E (C06): edit assumptions without simulating
     if spec is None:
         st.info("El modelo no tiene bloque 'economics' (supuestos económicos). Los resultados físicos no dependen de él.")
         return

@@ -104,3 +104,75 @@ def productivity(project: Project) -> ProductivityReport:
             rep.time_saved_min = manual * 60 - rep.total_ai_assisted_min
             rep.time_saved_pct = rep.time_saved_min / (manual * 60)
     return rep
+
+
+# ------------------------------------------------------------------------------------------------ 1.1-E (C17)
+# Visible productivity: ONLY metrics already recorded by SimForge, verbatim. Nothing is reconstructed from timestamps,
+# nothing is scored or compared against an invented baseline. A metric that is not recorded is NOT_AVAILABLE (never 0).
+from typing import Literal  # noqa: E402
+
+from pydantic import BaseModel, ConfigDict  # noqa: E402
+
+RECORDED: dict[str, tuple[str, str, str]] = {  # key -> (unit, source, definition)
+    "time_to_first_run_s": ("s", "MEASURED", "first saved model version -> first stored (completed) run"),
+    "time_to_engineer_approval_s": ("s", "MEASURED", "first saved model version -> first engineer approval"),
+    "engineer_review_s": ("s", "MEASURED", "last AI generation -> approval (upper bound: includes corrections and pauses)"),
+    "ai_generation_s": ("s", "MEASURED", "interpreter + compiler wall clock of the last AI generation"),
+    "engineer_review_s_user": ("s", "USER_PROVIDED", "engineer review time entered by the engineer"),
+    "correction_s_user": ("s", "USER_PROVIDED", "correction time entered by the engineer"),
+    "reuse_ratio": ("", "MEASURED", "share of process steps matched to library components (last AI generation)"),
+    "custom_logic_count": ("count", "MEASURED", "custom rule candidates in the last AI generation"),
+    "ai_questions": ("count", "MEASURED", "questions asked by the last AI generation"),
+}
+# requested by the 1.1 roadmap -> recorded key with the SAME definition, or None (not instrumented: NOT_AVAILABLE)
+ROADMAP: dict[str, tuple[str | None, str]] = {
+    "TIME_TO_FIRST_VALID_RUN": ("time_to_first_run_s", "same definition as time_to_first_run_s (only completed runs are stored)"),
+    "TIME_TO_VALID_MODEL": (None, "not instrumented; related recorded metric: time_to_engineer_approval_s (approval, not validity)"),
+    "TIME_TO_DECISION_READY_COMPARISON": (None, "not instrumented"),
+    "ACTIVE_ENGINEERING_TIME": (None, "not instrumented (wall-clock windows include idle time)"),
+    "NUMBER_OF_CORRECTION_LOOPS": (None, "not instrumented; related recorded count: corrections of AI values"),
+}
+
+
+class ProductivityMetric(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    name: str
+    key: str | None
+    status: Literal["AVAILABLE", "NOT_AVAILABLE"]
+    value: float | None
+    unit: str
+    source: str
+    definition: str
+
+
+class ProductivityPanel(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    project: str
+    recorded: list[ProductivityMetric]
+    counts: list[ProductivityMetric]
+    roadmap: list[ProductivityMetric]
+    note: str = ("Recorded values only: nothing is reconstructed, rated or compared with an invented baseline. "
+                 "Human productivity sessions have not been measured yet.")
+
+
+def productivity_panel(project: Project) -> ProductivityPanel:
+    def rec(key: str, name: str | None = None, definition: str | None = None) -> ProductivityMetric:
+        unit, source, d = RECORDED[key]
+        v = project.metric(key)
+        return ProductivityMetric(name=name or key, key=key, status="AVAILABLE" if v is not None else "NOT_AVAILABLE",
+                                  value=v, unit=unit, source=source if v is not None else "MISSING", definition=definition or d)
+    m = project.metrics()
+    counts = [ProductivityMetric(name=k, key=k, status="AVAILABLE", value=float(m[k]), unit="count", source="COUNT",
+                                 definition=d) for k, d in (("versions", "model versions saved"), ("runs", "completed runs stored"),
+                                                            ("ai_edits", "history entries by the AI"))]
+    counts.append(ProductivityMetric(name="ai_value_corrections", key=None, status="AVAILABLE",
+                                     value=float(len(project.corrections())), unit="count", source="COUNT",
+                                     definition="engineer corrections of AI-proposed values"))
+    roadmap = []
+    for name, (key, note) in ROADMAP.items():
+        if key is None:
+            roadmap.append(ProductivityMetric(name=name, key=None, status="NOT_AVAILABLE", value=None, unit="", source="NOT_INSTRUMENTED",
+                                              definition=note))
+        else:
+            roadmap.append(rec(key, name, note))
+    return ProductivityPanel(project=project.meta.slug, recorded=[rec(k) for k in RECORDED], counts=counts, roadmap=roadmap)

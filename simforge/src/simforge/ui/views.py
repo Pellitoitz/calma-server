@@ -720,6 +720,17 @@ def project_tab(app: SimForgeApp, project: Project) -> None:
         project.meta.manual_model_estimated_hours = est or None
         project.save_meta()
         st.toast("Saved")
+    st.markdown("#### Productivity metrics (recorded values only)")
+    from ..services.productivity import productivity_panel
+    pp = productivity_panel(project)
+    st.caption(pp.note)
+    for title, rows in (("Roadmap metrics", pp.roadmap), ("Recorded metrics", pp.recorded), ("Counts", pp.counts)):
+        st.markdown(f"**{title}**")
+        st.dataframe(pd.DataFrame([{"metric": x.name, "status": x.status,
+                                    "value": "NOT_AVAILABLE" if x.value is None else (f"{x.value:.4g} {x.unit}".strip() if x.unit != "s"
+                                                                                      else f"{x.value:.4g} s ({x.value / 60:.2f} min)"),
+                                    "source": x.source, "definition": x.definition} for x in rows]),
+                     hide_index=True, width="stretch", key=f"pp_{title}")
     st.markdown("#### Productivity (time saved vs manual model building)")
     from ..services.productivity import productivity, record_engineer_time
     p1, p2, p3 = st.columns(3)
