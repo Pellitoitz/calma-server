@@ -22,7 +22,8 @@ ROOT = Path(__file__).resolve().parents[2]
 PY = sys.executable
 REQUIRED_DOCS = [
     "docs/release/1.0_feature_freeze.md", "docs/release/1.0_capability_matrix.md", "docs/release/1.0_gap_analysis.md",
-    "docs/release/1.0_release_criteria.md", "KNOWN_LIMITATIONS.md", "CHANGELOG.md", "docs/user/01_getting_started.md",
+    "docs/release/1.0_release_criteria.md", "docs/release/1.0_stabilization_policy.md",
+    "docs/release/1.0.0-rc1_release_notes.md", "KNOWN_LIMITATIONS.md", "CHANGELOG.md", "docs/user/01_getting_started.md",
     "docs/user/tutorial_end_to_end.md", "docs/user/13_validation_status.md", "docs/user/15_limitations.md",
     "examples/README.md", "examples/1_0_golden_project/README.md",
 ]
