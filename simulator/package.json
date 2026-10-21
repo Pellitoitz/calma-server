@@ -1,0 +1,18 @@
+{
+  "name": "universal-manual-process-simulator",
+  "version": "0.1.0",
+  "description": "Simulador estocástico de procesos manuales e industriales con analítica de incertidumbre y generador 3D",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test test/*.test.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "UNLICENSED",
+  "dependencies": {
+    "three": "0.160.0"
+  }
+}
