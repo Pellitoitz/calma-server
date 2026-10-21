@@ -15,6 +15,7 @@ import { Store } from './src/storage/store.js';
 import { exampleModel } from './src/model/examples.js';
 import { validateModel } from './src/model/schema.js';
 import { fitDistributions } from './src/stochastic/fitting.js';
+import { toAnyLogic } from './src/export/anylogic.js';
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT) || 3100;
@@ -232,6 +233,15 @@ route('GET', '/api/jobs/:id', ({ id }) => {
   return j.status === 'done' ? { ...rest, result } : rest;
 });
 
+route('GET', '/api/models/:id/anylogic', async ({ id }) => {
+  const m = await store.getModel(id);
+  if (!m) throw Object.assign(new Error('Modelo no encontrado'), { status: 404 });
+  const { errors } = validateModel(m);
+  if (errors.length) throw Object.assign(new Error('Corrige los errores del modelo antes de exportar'), { status: 422, details: errors });
+  const { xml, fileName } = toAnyLogic(m);
+  return { __file: { name: fileName, type: 'application/xml; charset=utf-8', body: xml } };
+});
+
 route('POST', '/api/fit', (_p, body) => fitDistributions(body.samples));
 
 route('GET', '/api/library', () => store.getLibrary());
@@ -252,6 +262,14 @@ const server = http.createServer(async (req, res) => {
       const params = Object.fromEntries(r.keys.map((k, i) => [k, decodeURIComponent(m[i + 1])]));
       const body = ['POST', 'PUT'].includes(req.method) ? await readBody(req) : {};
       const out = await r.handler(params, body, url.searchParams);
+      if (out && out.__file) {
+        res.writeHead(200, {
+          'Content-Type': out.__file.type,
+          'Content-Disposition': `attachment; filename="${out.__file.name}"`,
+          'Cache-Control': 'no-store',
+        });
+        return res.end(out.__file.body);
+      }
       return send(res, 200, out);
     }
     send(res, 404, { error: 'Ruta no encontrada' });

@@ -270,6 +270,27 @@ function exportModel() {
   a.remove();
 }
 
+async function exportAnyLogic() {
+  await saver.flush();
+  try {
+    const res = await fetch(`/api/models/${state.model.id}/anylogic`);
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw Object.assign(new Error(data.error || `Error ${res.status}`), { details: data.details });
+    }
+    const name = /filename="([^"]+)"/.exec(res.headers.get('Content-Disposition') || '')?.[1] || 'modelo.alp';
+    const url = URL.createObjectURL(await res.blob());
+    const a = h('a', { href: url, download: name });
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+    toast(`Descargado ${name}: ábrelo con AnyLogic (Archivo → Abrir)`);
+  } catch (e) {
+    toast(e.details?.length ? `${e.message}: ${e.details.slice(0, 3).join(' · ')}` : e.message, true);
+  }
+}
+
 function importModel() {
   const inp = h('input', { type: 'file', accept: '.json,application/json' });
   inp.addEventListener('change', async () => {
@@ -383,6 +404,7 @@ function render() {
         h('button', { type: 'button', onclick: duplicateModel, title: 'Crea una copia para probar cambios' }, 'Duplicar escenario'),
         h('button', { type: 'button', onclick: showHistory }, 'Historial'),
         h('button', { type: 'button', onclick: exportModel }, 'Exportar'),
+        h('button', { type: 'button', onclick: exportAnyLogic, title: 'Descarga el modelo como proyecto de AnyLogic 8.9 (.alp)' }, 'Exportar a AnyLogic'),
         h('button', { type: 'button', class: 'danger', onclick: deleteModel }, 'Eliminar'),
       ),
     ),

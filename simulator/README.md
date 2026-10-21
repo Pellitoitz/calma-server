@@ -11,7 +11,7 @@ Está en una carpeta propia dentro de `calma-server` y no depende de ese servido
 cd simulator
 npm install        # solo instala three.js (para el 3D sin internet)
 npm start          # http://localhost:3100
-npm test           # 31 tests, incluida la validación frente a teoría de colas
+npm test           # 35 tests, incluida la validación frente a teoría de colas
 ```
 
 Variables: `PORT` (3100 por defecto) y `DATA_DIR` (carpeta de datos, `./data` por defecto).
@@ -125,6 +125,38 @@ La pestaña **Vista 3D** construye la celda a partir del modelo, sin dibujar nad
 - Balizas de máquina: verde en marcha, ámbar parada, rojo en avería.
 - Reproducción sincronizada con el reloj de la simulación (réplica 1, primeras 2 h): play/pausa, ×1 a ×600 y barra de tiempo.
 
+## Exportar a AnyLogic
+
+Botón **Exportar a AnyLogic** (o `GET /api/models/:id/anylogic`): descarga el modelo
+como proyecto `.alp` de AnyLogic 8.9 (Process Modeling Library). Ejemplo ya generado:
+[`anylogic/Celula_montaje_ECU.alp`](anylogic/Celula_montaje_ECU.alp).
+
+Se abre con **Archivo → Abrir** y se ejecuta con el experimento `Simulation`. Al
+terminar, la consola muestra el informe (producción, lead time P50/P90/P95, WIP, FPY,
+rechazos, retrabajos, utilización y metros por operario, averías por máquina) y los
+mismos valores quedan en los *Outputs* de `Main`.
+
+| Simulador | AnyLogic |
+| --- | --- |
+| Estación (puestos + buffer) | `Seize` del pool `puestosN` (su cola = buffer) → … → `Queue` salida → `Release` |
+| Operación | `[Seize máquina] [Seize operario] Delay [Release operario] [Release máquina]` |
+| Operarios compartidos | pool `operarios` (tipo `Operario`) con condición de elección `puedeHacer(...)` |
+| Inspección / retrabajo / desecho | `SelectOutput` aceptada/rechazada → retrabajo que vuelve a inspección, o `Sink desecho` |
+| Setup | `SelectOutput necesitaSetup(...)` → cadena de setup |
+| Transporte | `Delay` con distancia de la planta / velocidad aleatoria |
+| Llegadas | `Source` por `inject()` (material siempre disponible) o tiempo entre llegadas por lotes |
+| Variabilidad | funciones Java `op_*` (una por operación) con el mismo motor: distribución, consistencia, ritmo, aprendizaje, fatiga, interrupciones, marcha, averías, producto, pausas, calidad |
+
+Para cambiar un tiempo en AnyLogic se edita la primera línea `double base = …` de la
+función `op_<operación>`; los parámetros de operarios y máquinas están en los arrays
+`op*` y `maq*` de `Main`.
+
+Diferencias con el simulador web: la cola de entrada mínima es 1 (AnyLogic no admite 0),
+la regla de asignación es la de AnyLogic (no «el más cercano»), y durante el transporte
+de salida se mantiene ocupado el puesto. Los tests comprueban que el XML es válido, que
+cada puerto del diagrama está conectado y que todo el código Java compila y se ejecuta
+con `javac`; la carga en el propio AnyLogic no se ha podido probar aquí.
+
 ## API
 
 | Método | Ruta | Uso |
@@ -138,6 +170,7 @@ La pestaña **Vista 3D** construye la celda a partir del modelo, sin dibujar nad
 | POST | `/api/compare` | `{a, b}` (ids o modelos) → `{jobId}` |
 | GET | `/api/jobs/:id` | progreso y resultado |
 | GET | `/api/models/:id/results` · `/trace` · `/contribution` | últimos resultados guardados |
+| GET | `/api/models/:id/anylogic` | descarga el proyecto AnyLogic (.alp) |
 | POST | `/api/fit` | `{samples}` → distribuciones ajustadas |
 | GET/PUT | `/api/library` | biblioteca de plantillas |
 | POST | `/api/validate` | errores y avisos del modelo |
